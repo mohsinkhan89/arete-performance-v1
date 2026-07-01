@@ -12,7 +12,7 @@
         <article class="stat-card">
             <div>
                 <span>Inventory Value</span>
-                <strong>${{ number_format((float) $inventoryValue, 2) }}</strong>
+                <strong>£{{ number_format((float) $inventoryValue, 2) }}</strong>
                 <small class="up"><i class="fa-solid fa-boxes-stacked"></i> {{ number_format($totalInventory) }}</small>
                 <em>total stock units</em>
             </div>
@@ -59,7 +59,7 @@
             </div>
             <div class="chart-area">
                 <div class="axis">
-                    <span>$10K</span><span>$8K</span><span>$6K</span><span>$4K</span><span>$2K</span><span>$0</span>
+                    <span>£10K</span><span>£8K</span><span>£6K</span><span>£4K</span><span>£2K</span><span>£0</span>
                 </div>
                 <div class="line-chart">
                     <div class="tooltip-card">Live Data<strong>{{ number_format($totalProducts) }} items</strong></div>
@@ -112,9 +112,9 @@
                                 <td>{{ $product->name }}</td>
                                 <td>{{ $product->category?->name ?? '-' }}</td>
                                 <td>{{ $product->sku }}</td>
-                                <td>${{ number_format((float) $product->price, 2) }}</td>
+                                <td>£{{ number_format((float) $product->price, 2) }}</td>
                                 <td>{{ number_format($product->stock) }}</td>
-                                <td><span class="badge {{ $product->status === 'active' ? 'green' : 'muted' }}">{{ ucfirst($product->status) }}</span></td>
+                                <td><span class="badge {{ $product->status === 'active' ? 'green' : 'red' }}">{{ ucfirst($product->status) }}</span></td>
                             </tr>
                         @empty
                             <tr><td colspan="6" class="empty-cell">No products found.</td></tr>

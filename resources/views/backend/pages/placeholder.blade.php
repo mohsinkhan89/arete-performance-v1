@@ -37,13 +37,13 @@
                                     </td>
                                     <td>{{ $product->category?->name ?? '-' }}</td>
                                     <td>{{ $product->sku }}</td>
-                                    <td>${{ number_format((float) $product->price, 2) }}</td>
+                                    <td>£{{ number_format((float) $product->price, 2) }}</td>
                                     <td>{{ $product->stock }}</td>
                                     <td>
                                         <form action="{{ route('backend.resource.status', ['resource' => 'products', 'id' => $product->id]) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
-                                            <button class="status-toggle {{ $product->status === 'active' ? 'is-active' : '' }}" type="submit" title="Toggle status">
+                                            <button class="status-toggle {{ $product->status === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status">
                                                 <i class="fa-solid {{ $product->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
                                                 {{ ucfirst($product->status) }}
                                             </button>
@@ -81,7 +81,7 @@
                                         <form action="{{ route('backend.resource.status', ['resource' => 'categories', 'id' => $category->id]) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
-                                            <button class="status-toggle {{ $category->status === 'active' ? 'is-active' : '' }}" type="submit" title="Toggle status">
+                                            <button class="status-toggle {{ $category->status === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status">
                                                 <i class="fa-solid {{ $category->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
                                                 {{ ucfirst($category->status) }}
                                             </button>
@@ -121,13 +121,13 @@
                                             <form action="{{ route('backend.resource.status', ['resource' => 'users', 'id' => $user->id]) }}" method="POST">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button class="status-toggle {{ ($user->status ?? 'active') === 'active' ? 'is-active' : '' }}" type="submit" title="Toggle status">
+                                                <button class="status-toggle {{ ($user->status ?? 'active') === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status">
                                                     <i class="fa-solid {{ ($user->status ?? 'active') === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
                                                     {{ ucfirst($user->status ?? 'active') }}
                                                 </button>
                                             </form>
                                         @else
-                                            <span class="badge {{ ($user->status ?? 'active') === 'active' ? 'green' : 'muted' }}">{{ ucfirst($user->status ?? 'active') }}</span>
+                                            <span class="badge {{ ($user->status ?? 'active') === 'active' ? 'green' : 'red' }}">{{ ucfirst($user->status ?? 'active') }}</span>
                                         @endif
                                     </td>
                                     <td>{{ $user->created_at?->format('M d, Y') }}</td>

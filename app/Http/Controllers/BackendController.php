@@ -169,7 +169,7 @@ class BackendController extends Controller
         $record = $this->findRecord($resource, $id);
 
         match ($resource) {
-            'products' => $record->update($this->productData($request, $record->id, $record->image)),
+            'products' => $record->update($this->productData($request, $record->id, $record->image, $record->test_report_image)),
             'categories' => $record->update($this->categoryData($request, $record->id, $record->image)),
             'users' => $record->update($this->userData($request, $record->id)),
             default => abort(404),
@@ -187,6 +187,10 @@ class BackendController extends Controller
 
         if (in_array($resource, ['products', 'categories'], true)) {
             $this->deleteUploadedImage($record->image);
+        }
+
+        if ($resource === 'products') {
+            $this->deleteUploadedImage($record->test_report_image);
         }
 
         $record->delete();
@@ -224,7 +228,7 @@ class BackendController extends Controller
         };
     }
 
-    private function productData(Request $request, ?int $ignoreId = null, ?string $currentImage = null): array
+    private function productData(Request $request, ?int $ignoreId = null, ?string $currentImage = null, ?string $currentTestReportImage = null): array
     {
         $data = $request->validate([
             'category_id' => ['nullable', 'exists:categories,id'],
@@ -233,9 +237,10 @@ class BackendController extends Controller
             'sku' => ['required', 'string', 'max:255', Rule::unique('products', 'sku')->ignore($ignoreId)],
             'short_description' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'image' => ['nullable', 'string', 'max:255'],
             'image_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'remove_image' => ['nullable', 'boolean'],
+            'test_report_image_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'remove_test_report_image' => ['nullable', 'boolean'],
             'price' => ['required', 'numeric', 'min:0'],
             'sale_price' => ['nullable', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
@@ -245,9 +250,10 @@ class BackendController extends Controller
 
         $data['slug'] = $this->uniqueSlug(Product::class, $data['slug'] ?: Str::slug($data['name']), $ignoreId);
         $data['is_featured'] = $request->boolean('is_featured');
-        $data['image'] = $this->imageValue($request, $currentImage, $data['image'] ?? null);
+        $data['image'] = $this->imageValue($request, 'image_file', 'remove_image', $currentImage);
+        $data['test_report_image'] = $this->imageValue($request, 'test_report_image_file', 'remove_test_report_image', $currentTestReportImage);
 
-        unset($data['image_file'], $data['remove_image']);
+        unset($data['image_file'], $data['remove_image'], $data['test_report_image_file'], $data['remove_test_report_image']);
 
         return $data;
     }
@@ -266,29 +272,29 @@ class BackendController extends Controller
         ]);
 
         $data['slug'] = $this->uniqueSlug(Category::class, $data['slug'] ?: Str::slug($data['name']), $ignoreId);
-        $data['image'] = $this->imageValue($request, $currentImage, $data['image'] ?? null);
+        $data['image'] = $this->imageValue($request, 'image_file', 'remove_image', $currentImage, $data['image'] ?? null);
 
         unset($data['image_file'], $data['remove_image']);
 
         return $data;
     }
 
-    private function imageValue(Request $request, ?string $currentImage = null, ?string $pathValue = null): ?string
+    private function imageValue(Request $request, string $fileKey, string $removeKey, ?string $currentImage = null, ?string $pathValue = null): ?string
     {
-        if ($request->boolean('remove_image')) {
+        if ($request->hasFile($fileKey)) {
             $this->deleteUploadedImage($currentImage);
 
-            return null;
-        }
-
-        if ($request->hasFile('image_file')) {
-            $this->deleteUploadedImage($currentImage);
-
-            $file = $request->file('image_file');
+            $file = $request->file($fileKey);
             $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('backend/assets/imgs/uploads'), $filename);
 
             return 'backend/assets/imgs/uploads/' . $filename;
+        }
+
+        if ($request->boolean($removeKey)) {
+            $this->deleteUploadedImage($currentImage);
+
+            return null;
         }
 
         return $pathValue ?: $currentImage;

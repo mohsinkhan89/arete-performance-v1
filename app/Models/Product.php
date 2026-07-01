@@ -18,6 +18,7 @@ class Product extends Model
         'short_description',
         'description',
         'image',
+        'test_report_image',
         'price',
         'sale_price',
         'stock',

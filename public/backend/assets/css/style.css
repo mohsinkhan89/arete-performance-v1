@@ -825,30 +825,68 @@ tbody tr:last-child td {
 }
 
 .pagination-row {
-  margin-top: 16px;
-  color: #dfe2e8;
+  margin-top: 18px;
+  color: #667085;
   font-size: 12px;
 }
 
-.pagination-row nav > div:first-child {
-  display: none;
-}
-
-.pagination-row nav > div:last-child {
+.pagination-row nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pagination-row nav > div:first-child {
+  color: #667085;
+}
+
+.pagination-row nav > div:last-child,
+.pagination-row nav > div:last-child > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .pagination-row svg {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
 }
 
 .pagination-row a,
 .pagination-row span {
-  color: #dfe2e8;
+  color: #334155;
+}
+
+.pagination-row a,
+.pagination-row nav > div:last-child span span,
+.pagination-row nav > div:last-child span[aria-current="page"] span {
+  display: inline-flex;
+  min-width: 34px;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  padding: 0 10px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  transition: 0.18s ease;
+}
+
+.pagination-row a:hover,
+.pagination-row nav > div:last-child span[aria-current="page"] span {
+  border-color: #d7a83a;
+  color: #17120b;
+  background: #ffe9a8;
+}
+
+.pagination-row span[aria-disabled="true"] span {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .login-body {
@@ -1316,9 +1354,15 @@ td {
 }
 
 .status-toggle.is-active {
-  color: #55ee78;
-  border-color: rgba(69, 223, 107, 0.24);
-  background: rgba(69, 223, 107, 0.1);
+  color: #15803d;
+  border-color: rgba(22, 163, 74, 0.28);
+  background: #dcfce7;
+}
+
+.status-toggle.is-inactive {
+  color: #b91c1c;
+  border-color: rgba(220, 38, 38, 0.26);
+  background: #fee2e2;
 }
 
 .status-toggle:hover,
@@ -1334,6 +1378,11 @@ td {
 .badge.muted {
   color: #b8bec8;
   background: rgba(255, 255, 255, 0.08);
+}
+
+.badge.red {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.12);
 }
 
 .action-group {
@@ -1450,6 +1499,12 @@ td {
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.04);
+}
+
+.image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .image-preview-card img {
@@ -1871,6 +1926,18 @@ body.admin-light-page {
   background: #ffe9a8;
 }
 
+.admin-light-page .status-toggle.is-active,
+.admin-light-page .badge.green {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.admin-light-page .status-toggle.is-inactive,
+.admin-light-page .badge.red {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
 .admin-light-page .axis,
 .admin-light-page .x-axis,
 .admin-light-page .legend,
@@ -2064,6 +2131,40 @@ body.admin-dark-page {
   background: #ffe9a8;
 }
 
+.admin-dark-page .status-toggle.is-active,
+.admin-dark-page .badge.green {
+  color: #86efac;
+  border-color: rgba(74, 222, 128, 0.35);
+  background: rgba(22, 101, 52, 0.38);
+}
+
+.admin-dark-page .status-toggle.is-inactive,
+.admin-dark-page .badge.red {
+  color: #fecaca;
+  border-color: rgba(248, 113, 113, 0.35);
+  background: rgba(127, 29, 29, 0.38);
+}
+
+.admin-dark-page .pagination-row,
+.admin-dark-page .pagination-row nav > div:first-child {
+  color: #a6abb6;
+}
+
+.admin-dark-page .pagination-row a,
+.admin-dark-page .pagination-row nav > div:last-child span span,
+.admin-dark-page .pagination-row nav > div:last-child span[aria-current="page"] span {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f4f6fb;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-dark-page .pagination-row a:hover,
+.admin-dark-page .pagination-row nav > div:last-child span[aria-current="page"] span {
+  border-color: rgba(255, 214, 110, 0.55);
+  color: #17120b;
+  background: #ffe9a8;
+}
+
 .admin-dark-page .profile-panel a:hover i,
 .admin-dark-page .profile-panel button:hover i {
   color: #17120b;
@@ -2141,6 +2242,10 @@ body.admin-dark-page {
 
   .profile-info-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .image-preview-grid {
+    grid-template-columns: 1fr;
   }
 
   .login-visual {
