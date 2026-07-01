@@ -58,22 +58,35 @@
                             <option value="inactive" @selected(old('status', $record->status ?? '') === 'inactive')>Inactive</option>
                         </select>
                     </label>
-                    <label>Upload Image
+                    <label>Product Image
                         <input type="file" name="image_file" accept="image/png,image/jpeg,image/webp">
                         @error('image_file')<span>{{ $message }}</span>@enderror
                     </label>
-                    <label>Image Path
-                        <input name="image" value="{{ old('image', $record->image ?? 'backend/assets/imgs/product-bottle.png') }}">
+                    <label>Test Report Image
+                        <input type="file" name="test_report_image_file" accept="image/png,image/jpeg,image/webp">
+                        @error('test_report_image_file')<span>{{ $message }}</span>@enderror
                     </label>
-                    @if ($isEdit && filled($record->image))
-                        <div class="image-preview-card wide">
-                            <img src="{{ url($record->image) }}" alt="{{ $record->name }} image">
-                            <label class="switch-row">
-                                <input type="checkbox" name="remove_image" value="1">
-                                <span>Remove current image</span>
-                            </label>
-                        </div>
-                    @endif
+                    <div class="image-preview-grid wide">
+                        @if ($isEdit && filled($record->image))
+                            <div class="image-preview-card">
+                                <img src="{{ url($record->image) }}" alt="{{ $record->name }} image">
+                                <label class="switch-row">
+                                    <input type="checkbox" name="remove_image" value="1">
+                                    <span>Remove product image</span>
+                                </label>
+                            </div>
+                        @endif
+
+                        @if ($isEdit && filled($record->test_report_image))
+                            <div class="image-preview-card">
+                                <img src="{{ url($record->test_report_image) }}" alt="{{ $record->name }} test report image">
+                                <label class="switch-row">
+                                    <input type="checkbox" name="remove_test_report_image" value="1">
+                                    <span>Remove test report</span>
+                                </label>
+                            </div>
+                        @endif
+                    </div>
                     <label class="wide">Short Description
                         <input name="short_description" value="{{ old('short_description', $record->short_description ?? '') }}">
                     </label>
