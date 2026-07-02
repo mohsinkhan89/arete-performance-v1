@@ -547,7 +547,7 @@ class BackendController extends Controller
             'header_logo' => 'frontend/assets/images/logo/logo-transperent.png',
             'footer_logo' => 'frontend/assets/images/logo/logo.png',
             'primary_color' => '#f5a817',
-            'secondary_color' => '#111111',
+            'secondary_color' => '#ffc14d',
         ], SiteSetting::allKeyed());
     }
 }

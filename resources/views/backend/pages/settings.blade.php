@@ -61,12 +61,12 @@
 
                     <label class="color-field">
                         <span>Secondary Color</span>
-                        <input type="color" name="secondary_color" value="{{ old('secondary_color', $settings['secondary_color'] ?? '#111111') }}">
+                        <input type="color" name="secondary_color" value="{{ old('secondary_color', $settings['secondary_color'] ?? '#ffc14d') }}">
                         @error('secondary_color') <small class="field-error">{{ $message }}</small> @enderror
                     </label>
                 </div>
 
-                <div class="brand-preview" style="--preview-primary: {{ old('primary_color', $settings['primary_color'] ?? '#f5a817') }}; --preview-secondary: {{ old('secondary_color', $settings['secondary_color'] ?? '#111111') }};">
+                <div class="brand-preview" style="--preview-primary: {{ old('primary_color', $settings['primary_color'] ?? '#f5a817') }}; --preview-secondary: {{ old('secondary_color', $settings['secondary_color'] ?? '#ffc14d') }};">
                     <span></span>
                     <strong>Brand preview</strong>
                     <button type="button">Shop Now</button>
