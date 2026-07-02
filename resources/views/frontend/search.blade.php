@@ -26,7 +26,7 @@
 
     <section class="search-results-page section-space">
       <div class="container">
-        <nav class="search-breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><i class="fa-solid fa-chevron-right"></i><span>Search</span></nav>
+        <nav class="search-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i><span>Search</span></nav>
         <div class="shop-layout search-layout">
           <aside class="shop-sidebar search-sidebar reveal-on-scroll" aria-label="Search filters">
             <div class="filter-block collapsible-filter">
@@ -88,11 +88,11 @@
             </div>
 
             <nav class="search-pagination" aria-label="Search results pages">
-              <a href="search.html" aria-label="Previous page"><i class="fa-solid fa-arrow-left"></i></a>
-              <a class="active" href="search.html">1</a>
-              <a href="search.html?page=2">2</a>
-              <a href="search.html?page=3">3</a>
-              <a href="search.html?page=2" aria-label="Next page"><i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{{ route('frontend.search') }}" aria-label="Previous page"><i class="fa-solid fa-arrow-left"></i></a>
+              <a class="active" href="{{ route('frontend.search') }}">1</a>
+              <a href="{{ route('frontend.search', ['page' => 2]) }}">2</a>
+              <a href="{{ route('frontend.search', ['page' => 3]) }}">3</a>
+              <a href="{{ route('frontend.search', ['page' => 2]) }}" aria-label="Next page"><i class="fa-solid fa-arrow-right"></i></a>
             </nav>
           </div>
         </div>

@@ -10,7 +10,7 @@
 
     <section class="cart-hero">
       <div class="container">
-        <nav class="cart-breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><i class="fa-solid fa-chevron-right"></i><span>Cart</span></nav>
+        <nav class="cart-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i><span>Cart</span></nav>
         <div class="cart-hero-copy reveal-up">
           <h1>Your <span>Cart</span></h1>
           <p>Review your items and proceed to checkout.</p>
@@ -63,7 +63,7 @@
               </article>
             </div>
             <div class="cart-panel-actions">
-              <a class="cart-secondary-btn" href="shop.html"><i class="fa-solid fa-arrow-left"></i> Continue shopping</a>
+              <a class="cart-secondary-btn" href="{{ route('frontend.shop') }}"><i class="fa-solid fa-arrow-left"></i> Continue shopping</a>
               <button class="cart-secondary-btn" type="button">Clear cart <i class="fa-regular fa-trash-can"></i></button>
             </div>
           </section>
@@ -74,7 +74,7 @@
             <div class="summary-line"><span>Shipping <i class="fa-regular fa-circle-question"></i></span><span>Calculated at checkout</span></div>
             <div class="summary-line"><span>Tax <i class="fa-regular fa-circle-question"></i></span><span>Calculated at checkout</span></div>
             <div class="summary-total"><span>Estimated Total</span><strong>$249.96</strong></div>
-            <a class="btn btn-gold w-100" href="checkout.html">Proceed to checkout <i class="fa-solid fa-arrow-right"></i></a>
+            <a class="btn btn-gold w-100" href="{{ route('frontend.checkout') }}">Proceed to checkout <i class="fa-solid fa-arrow-right"></i></a>
             <p>We accept</p>
             <div class="payment-badges cart-payments"><span>VISA</span><span></span><span>AMEX</span><span>PayPal</span><span>BTC</span></div>
           </aside>
@@ -87,7 +87,7 @@
             <p class="eyebrow">Bundle &amp; save</p>
             <h2>Buy More. Save More.</h2>
             <p>Stack your results with premium bundles and exclusive savings.</p>
-            <a class="btn btn-gold" href="shop.html">View bundles <i class="fa-solid fa-arrow-right"></i></a>
+            <a class="btn btn-gold" href="{{ route('frontend.shop') }}">View bundles <i class="fa-solid fa-arrow-right"></i></a>
           </div>
         </section>
       </div>

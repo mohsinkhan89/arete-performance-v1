@@ -1,4 +1,4 @@
-@extends('backend.layouts.master')
+﻿@extends('backend.layouts.master')
 
 @section('title', $pageTitle)
 
@@ -8,14 +8,14 @@
         <p>Manage {{ strtolower($pageTitle) }} from your Arete Performance admin panel.</p>
     </div>
 
-    @if (in_array($page, ['products', 'categories', 'users'], true))
+    @if (in_array($page, ['products', 'categories', 'users', 'reviews'], true))
         @php
             $canManage = $page !== 'users' || $canManageUsers;
         @endphp
         <article class="panel resource-panel">
             <div class="panel-head">
                 <h2>{{ $pageTitle }} Table</h2>
-                @if ($canManage)
+                @if ($canManage && in_array($page, ['products', 'categories', 'users'], true))
                     <a href="{{ route('backend.resource.create', ['resource' => $page]) }}"><i class="fa-solid fa-plus"></i> Add New</a>
                 @endif
             </div>
@@ -68,11 +68,12 @@
                 @elseif ($page === 'categories')
                     <table>
                         <thead>
-                            <tr><th>Name</th><th>Slug</th><th>Products</th><th>Sort</th><th>Status</th><th>Created</th><th>Action</th></tr>
+                            <tr><th>Image</th><th>Name</th><th>Slug</th><th>Products</th><th>Sort</th><th>Status</th><th>Created</th><th>Action</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $category)
                                 <tr>
+                                    <td><img class="category-thumb" src="{{ url($category->image ?: 'backend/assets/imgs/product-bottle.png') }}" alt="{{ $category->name }}"></td>
                                     <td>{{ $category->name }}</td>
                                     <td>{{ $category->slug }}</td>
                                     <td>{{ $category->products_count }}</td>
@@ -100,11 +101,11 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="7" class="empty-cell">No categories found.</td></tr>
+                                <tr><td colspan="8" class="empty-cell">No categories found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
-                @else
+                @elseif ($page === 'users')
                     <table>
                         <thead>
                             <tr><th>User</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Joined</th><th>Action</th></tr>
@@ -153,6 +154,31 @@
                             @endforelse
                         </tbody>
                     </table>
+                @else
+                    <table>
+                        <thead>
+                            <tr><th>Customer</th><th>Product</th><th>Rating</th><th>Review</th><th>Status</th><th>Created</th></tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($records as $review)
+                                <tr>
+                                    <td>
+                                        <span class="table-media">
+                                            <img src="{{ url($review->avatar ?: 'frontend/assets/images/testimonials/miker.png') }}" alt="{{ $review->customer_name }}">
+                                            {{ $review->customer_name }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $review->product?->name ?? '-' }}</td>
+                                    <td><span class="rating-stars">{{ str_repeat('★', $review->rating) }}</span></td>
+                                    <td>{{ \Illuminate\Support\Str::limit($review->comment, 70) }}</td>
+                                    <td><span class="badge {{ $review->status === 'active' ? 'green' : 'red' }}">{{ ucfirst($review->status) }}</span></td>
+                                    <td>{{ $review->created_at?->format('M d, Y') }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="6" class="empty-cell">No reviews found.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 @endif
             </div>
 
@@ -168,3 +194,4 @@
         </article>
     @endif
 @endsection
+

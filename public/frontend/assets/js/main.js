@@ -184,6 +184,9 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = url;
   }
 
+  const routes = window.appRoutes || {};
+  const route = (name, fallback) => routes[name] || fallback;
+
   function openCart() {
     renderCart();
     cartOverlay.classList.add("is-open");
@@ -281,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
   searchInput.addEventListener("input", (event) => renderSearchResults(event.target.value));
   searchForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    goToPage("search.html");
+    goToPage(route("search", "/search"));
   });
 
   document.querySelector(".cart-btn").addEventListener("click", openCart);
@@ -398,23 +401,23 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     if (goTrigger) goToPage(goTrigger.dataset.go);
-    if (accountButton) goToPage("my-cart.html");
-    if (clearFilters) goToPage(document.body.classList.contains("search-page") ? "search.html" : "shop.html");
-    if (clearSearch) goToPage("search.html");
-    if (sortButton) goToPage(document.body.classList.contains("search-page") ? "search.html" : "shop.html");
-    if (categoryCard && !event.target.closest("button, a")) goToPage("shop.html");
+    if (accountButton) goToPage(route("cart", "/my-cart"));
+    if (clearFilters) goToPage(document.body.classList.contains("search-page") ? route("search", "/search") : route("shop", "/shop"));
+    if (clearSearch) goToPage(route("search", "/search"));
+    if (sortButton) goToPage(document.body.classList.contains("search-page") ? route("search", "/search") : route("shop", "/shop"));
+    if (categoryCard && !event.target.closest("button, a")) goToPage(route("shop", "/shop"));
 
     if (productCard && event.target.closest("button")) {
       const index = [...document.querySelectorAll(".product-card")].indexOf(productCard);
       addToCart(productCard.dataset.productId || products[index]?.id);
     } else if (productCard && !event.target.closest("a")) {
-      goToPage("product-detail.html");
+      goToPage(route("productDetails", "/product-details"));
     }
 
     if (relatedCard && event.target.closest("button")) {
       addToCart(relatedCard.dataset.productId);
     } else if (relatedCard) {
-      goToPage("product-detail.html");
+      goToPage(route("productDetails", "/product-details"));
     }
 
     if (productThumb) {
@@ -434,10 +437,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (productAdd) addToCart(productAdd.dataset.productAdd, getProductQty());
     if (buyNow) {
       addToCart(buyNow.dataset.buyNow, getProductQty());
-      window.location.href = "checkout.html";
+      window.location.href = route("checkout", "/checkout");
     }
     if (labReport) showToast("Lab report preview is opening soon.");
-    if (drawerCheckout) goToPage("checkout.html");
+    if (drawerCheckout) goToPage(route("checkout", "/checkout"));
 
     if (detailTapCard && !event.target.closest("button, a, summary")) {
       detailTapCard.classList.remove("is-tapped");

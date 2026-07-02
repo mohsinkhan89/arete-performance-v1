@@ -818,6 +818,19 @@ tbody tr:last-child td {
   object-fit: contain;
 }
 
+.category-thumb {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 4px;
+}
+
+.admin-light-page .category-thumb {
+  background: #eef2f7;
+}
+
 .empty-cell {
   padding: 28px 0;
   color: var(--muted);

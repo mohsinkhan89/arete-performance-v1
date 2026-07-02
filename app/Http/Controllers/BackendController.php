@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -70,6 +71,7 @@ class BackendController extends Controller
             'products' => Product::with('category')->latest()->paginate(10),
             'categories' => Category::withCount('products')->latest()->paginate(10),
             'users' => User::latest()->paginate(10),
+            'reviews' => Review::with('product')->latest()->paginate(10),
             default => null,
         };
 

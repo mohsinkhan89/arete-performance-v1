@@ -58,6 +58,17 @@
   <div class="toast-container position-fixed bottom-0 end-0 p-3"><div id="cartToast" class="toast" role="status"><div class="toast-body">Product added to your cart.</div></div></div>
 
   @yield('js')
+  <script>
+    window.appRoutes = {
+      home: "{{ route('frontend.index') }}",
+      shop: "{{ route('frontend.shop') }}",
+      search: "{{ route('frontend.search') }}",
+      cart: "{{ route('frontend.my-cart') }}",
+      checkout: "{{ route('frontend.checkout') }}",
+      orderSuccess: "{{ route('frontend.order-success') }}",
+      productDetails: "{{ route('frontend.product-details') }}"
+    };
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="{{ url('frontend/assets/js/main.js') }}"></script>
 </body>

@@ -11,7 +11,7 @@
     <section class="checkout-hero">
       <div class="container">
         <div class="checkout-hero-copy reveal-up">
-          <nav class="cart-breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><i class="fa-solid fa-chevron-right"></i><a href="my-cart.html">Cart</a><i class="fa-solid fa-chevron-right"></i><span>Checkout</span></nav>
+          <nav class="cart-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i><a href="{{ route('frontend.my-cart') }}">Cart</a><i class="fa-solid fa-chevron-right"></i><span>Checkout</span></nav>
           <h1>Secure Checkout.<br><span>Stronger You.</span></h1>
         </div>
       </div>
@@ -25,7 +25,7 @@
               <div class="checkout-step-head">
                 <span>1</span>
                 <h2>Contact Information</h2>
-                <p>Already have an account? <a href="my-cart.html">Log in</a></p>
+                <p>Already have an account? <a href="{{ route('frontend.my-cart') }}">Log in</a></p>
               </div>
               <label class="visually-hidden" for="checkoutEmail">Email Address</label>
               <input id="checkoutEmail" type="email" placeholder="Email Address">
@@ -100,7 +100,7 @@
             </div>
             <div class="checkout-total"><span>Total</span><strong>$279.96</strong></div>
             <p class="checkout-savings"><i class="fa-solid fa-shield-heart"></i> You saved $29.99 with this order!</p>
-            <button class="btn btn-gold w-100" type="button" data-go="order-success.html">Place order <i class="fa-solid fa-lock"></i></button>
+            <button class="btn btn-gold w-100" type="button" data-go="{{ route('frontend.order-success') }}">Place order <i class="fa-solid fa-lock"></i></button>
             <p class="checkout-secure"><i class="fa-solid fa-shield-halved"></i> Secure 256-bit SSL encrypted checkout</p>
           </aside>
         </div>
