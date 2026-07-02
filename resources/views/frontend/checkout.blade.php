@@ -37,17 +37,6 @@
               <section class="checkout-step">
                 <div class="checkout-step-head">
                   <span>1</span>
-                  <h2>Contact Information</h2>
-                  <p>Already have an account? <a href="{{ route('frontend.my-cart') }}">Cart</a></p>
-                </div>
-                <label class="visually-hidden" for="checkoutEmail">Email Address</label>
-                <input id="checkoutEmail" name="email" type="email" placeholder="Email Address" value="{{ old('email') }}" required>
-                <label class="checkout-check"><input type="checkbox" checked> Email me with news and offers</label>
-              </section>
-
-              <section class="checkout-step">
-                <div class="checkout-step-head">
-                  <span>2</span>
                   <h2>Billing Details</h2>
                 </div>
                 <div class="checkout-fields">
@@ -74,25 +63,6 @@
                   <textarea id="orderNotes" name="order_notes" class="wide" placeholder="Order notes (optional)">{{ old('order_notes') }}</textarea>
                 </div>
               </section>
-
-              <section class="checkout-step">
-                <div class="checkout-step-head">
-                  <span>3</span>
-                  <h2>Shipping Method</h2>
-                </div>
-                <label class="checkout-option active"><span><input type="radio" name="shipping_method" value="uk_tracked" checked> UK tracked postage (24 hours tracked service)</span><strong>£4.99</strong></label>
-              </section>
-
-              <section class="checkout-step">
-                <div class="checkout-step-head">
-                  <span>4</span>
-                  <h2>Payment Method</h2>
-                </div>
-                <label class="checkout-option active payment-option"><span><input type="radio" name="payment_method" value="card" checked> Credit / Debit Card</span><div class="payment-badges mini-payments"><span>VISA</span><span></span><span>AMEX</span><span>DISC</span></div></label>
-                <label class="checkout-option payment-option"><span><input type="radio" name="payment_method" value="paypal"> PayPal</span><strong class="paypal-mark">PayPal</strong></label>
-                <label class="checkout-option payment-option"><span><input type="radio" name="payment_method" value="other"> Other Payment Methods</span><div class="crypto-marks"><span>BTC</span><span>ETH</span></div></label>
-              </section>
-
               <button class="btn btn-gold w-100" type="submit">Place order <i class="fa-solid fa-lock"></i></button>
             </form>
 

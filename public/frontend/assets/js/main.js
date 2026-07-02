@@ -57,6 +57,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartCount = document.querySelector(".cart-count");
   const cartSubtotal = document.querySelector(".cart-subtotal");
   const productTrack = document.querySelector(".product-track");
+  const reportLightbox = document.querySelector(".report-lightbox");
+  const reportLightboxImage = document.querySelector("[data-report-lightbox-image]");
+  const reportLightboxTitle = document.querySelector("[data-report-lightbox-title]");
 
   const money = (value) => `£${Number(value || 0).toFixed(2)}`;
   const findProduct = (id) => products.find((product) => product.id === id);
@@ -157,6 +160,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!toast || !toastBody) return;
     toastBody.textContent = message;
     toast.show();
+  }
+
+  function openReportLightbox(src, title = "Test Report") {
+    if (!reportLightbox || !reportLightboxImage) return;
+    reportLightboxImage.src = src;
+    reportLightboxImage.alt = title;
+    if (reportLightboxTitle) reportLightboxTitle.textContent = title;
+    reportLightbox.classList.add("is-open");
+    reportLightbox.setAttribute("aria-hidden", "false");
+    document.body.classList.add("panel-open");
+  }
+
+  function closeReportLightbox() {
+    if (!reportLightbox) return;
+    reportLightbox.classList.remove("is-open");
+    reportLightbox.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("panel-open");
+    if (reportLightboxImage) reportLightboxImage.src = "";
   }
 
   function syncBodyLock() {
@@ -434,6 +455,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const productQtyDec = event.target.closest("[data-product-qty-dec]");
     const cardQtyInc = event.target.closest("[data-card-qty-inc]");
     const cardQtyDec = event.target.closest("[data-card-qty-dec]");
+    const testReport = event.target.closest("[data-test-report]");
     const productZoom = event.target.closest("[data-product-zoom]");
     const labReport = event.target.closest("[data-lab-report]");
     const detailTapCard = event.target.closest(".product-benefit-strip > div, .description-assurance > div, .benefit-list > div, .dosage-steps > div, .ingredient-certifications > div, .review-card, .shop-trust-grid > div");
@@ -463,13 +485,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sortButton) goToPage(document.body.classList.contains("search-page") ? route("search", "/search") : route("shop", "/shop"));
     if (categoryCard && !event.target.closest("button, a")) goToPage(categoryCard.dataset.categoryUrl || route("shop", "/shop"));
 
-    if (cardQtyInc) setCardQty(cardQtyInc, getCardQty(cardQtyInc) + 1);
-    if (cardQtyDec) setCardQty(cardQtyDec, getCardQty(cardQtyDec) - 1);
+    if (testReport) {
+      openReportLightbox(testReport.dataset.testReport, testReport.dataset.testReportTitle || "Test Report");
+      return;
+    }
+
+    if (cardQtyInc) {
+      setCardQty(cardQtyInc, getCardQty(cardQtyInc) + 1);
+      return;
+    }
+
+    if (cardQtyDec) {
+      setCardQty(cardQtyDec, getCardQty(cardQtyDec) - 1);
+      return;
+    }
 
     if (event.target.closest("[data-cart-add]")) {
       const addButton = event.target.closest("[data-cart-add]");
       await addToCart(addButton.dataset.cartAdd, getCardQty(addButton));
-    } else if (productCard && event.target.closest("button") && !event.target.closest("[data-card-qty-inc], [data-card-qty-dec]")) {
+    } else if (productCard && event.target.closest("button") && !event.target.closest("[data-card-qty-inc], [data-card-qty-dec], [data-test-report]")) {
       const index = [...document.querySelectorAll(".product-card")].indexOf(productCard);
       await addToCart(productCard.dataset.productId || products[index]?.id);
     } else if (productCard && !event.target.closest("a")) {
@@ -501,7 +535,14 @@ document.addEventListener("DOMContentLoaded", () => {
       await addToCart(buyNow.dataset.buyNow, getProductQty());
       window.location.href = route("checkout", "/checkout");
     }
-    if (labReport) showToast("Lab report preview is opening soon.");
+    if (labReport) {
+      const detailReport = document.querySelector("[data-product-report]");
+      if (detailReport?.dataset.productReport) {
+        openReportLightbox(detailReport.dataset.productReport, detailReport.dataset.productReportTitle || "Test Report");
+      } else {
+        showToast("Lab report preview is opening soon.");
+      }
+    }
     if (drawerCheckout) goToPage(route("checkout", "/checkout"));
 
     if (detailTapCard && !event.target.closest("button, a, summary")) {
@@ -530,9 +571,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
+      closeReportLightbox();
       closeSearch();
       closeCart();
     }
+  });
+
+  document.querySelector(".report-lightbox-close")?.addEventListener("click", closeReportLightbox);
+  reportLightbox?.addEventListener("click", (event) => {
+    if (event.target === reportLightbox) closeReportLightbox();
   });
 
   document.querySelector(".newsletter")?.addEventListener("submit", (event) => {

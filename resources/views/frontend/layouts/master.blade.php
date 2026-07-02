@@ -58,6 +58,14 @@
 
   <div class="toast-container position-fixed bottom-0 end-0 p-3"><div id="cartToast" class="toast" role="status"><div class="toast-body">Product added to your cart.</div></div></div>
 
+  <div class="report-lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Test report">
+    <button class="report-lightbox-close" type="button" aria-label="Close test report"><i class="fa-solid fa-xmark"></i></button>
+    <figure>
+      <img src="" alt="Product test report" data-report-lightbox-image>
+      <figcaption data-report-lightbox-title>Test Report</figcaption>
+    </figure>
+  </div>
+
   @yield('js')
   <script>
     window.appRoutes = {
