@@ -53,7 +53,7 @@
         <article class="panel order-summary-panel">
             <div class="panel-head">
                 <h2>Customer</h2>
-                <span class="badge {{ ($order->payment_status ?? 'unpaid') === 'paid' ? 'green' : (($order->payment_status ?? 'unpaid') === 'failed' ? 'red' : 'yellow') }}">{{ $paymentLabels[$order->payment_status ?? 'unpaid'] ?? ucfirst($order->payment_status ?? 'unpaid') }}</span>
+                <span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ $paymentLabels[$order->payment_status ?? 'unpaid'] ?? ucfirst($order->payment_status ?? 'unpaid') }}</span>
             </div>
             <div class="order-meta-grid">
                 <div><span>Email</span><strong>{{ $order->email }}</strong></div>

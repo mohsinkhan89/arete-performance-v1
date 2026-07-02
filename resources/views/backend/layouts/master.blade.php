@@ -71,10 +71,32 @@
                     <button class="icon-btn theme-toggle" type="button" aria-label="Toggle dark mode">
                         <i class="fa-regular fa-moon"></i>
                     </button>
-                    <button class="icon-btn has-badge" type="button" aria-label="Notifications">
-                        <i class="fa-regular fa-bell"></i>
-                        <span>3</span>
-                    </button>
+                    <div class="notification-dropdown">
+                        <button class="icon-btn has-badge notification-toggle" type="button" aria-label="Notifications" aria-expanded="false">
+                            <i class="fa-regular fa-bell"></i>
+                            <span data-notification-count>{{ $orderNotificationCount ?? 0 }}</span>
+                        </button>
+                        <div class="notification-panel" aria-hidden="true">
+                            <div class="notification-head">
+                                <strong>Live Orders</strong>
+                                <small>Runtime updates</small>
+                            </div>
+                            <div class="notification-list" data-order-notifications>
+                                @forelse (($orderNotifications ?? collect()) as $order)
+                                    <a class="notification-item" href="{{ route('backend.orders.show', $order) }}">
+                                        <span class="notification-dot payment-status-{{ $order->payment_status ?? 'unpaid' }}"></span>
+                                        <div>
+                                            <strong>#{{ $order->order_number }} · {{ $order->customer_name }}</strong>
+                                            <small>{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }} · {{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }} · £{{ number_format((float) $order->total, 2) }}</small>
+                                        </div>
+                                    </a>
+                                @empty
+                                    <div class="notification-empty">No orders yet.</div>
+                                @endforelse
+                            </div>
+                            <a class="notification-all" href="{{ route('backend.page', 'orders') }}">View all orders</a>
+                        </div>
+                    </div>
                     <div class="profile-dropdown">
                         <button class="profile-menu" type="button" aria-expanded="false" aria-haspopup="true">
                             <span class="avatar small"><i class="fa-solid fa-user"></i></span>
@@ -115,6 +137,11 @@
         </main>
     </div>
 
+    <script>
+        window.adminRoutes = {
+            orderNotifications: "{{ route('backend.notifications.orders') }}"
+        };
+    </script>
     <script src="{{ url('backend/assets/js/main.js') }}"></script>
     @yield('js')
 </body>

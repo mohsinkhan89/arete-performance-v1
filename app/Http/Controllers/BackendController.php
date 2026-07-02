@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
@@ -129,6 +130,24 @@ class BackendController extends Controller
             'admin' => auth()->user(),
             'editMode' => false,
             'pageTitle' => 'My Profile',
+        ]);
+    }
+
+    public function orderNotifications(): JsonResponse
+    {
+        $orders = Order::latest()->take(50)->get()->map(fn (Order $order) => [
+            'order_number' => $order->order_number,
+            'customer_name' => $order->customer_name,
+            'total' => number_format((float) $order->total, 2),
+            'payment_status' => $order->payment_status ?? 'unpaid',
+            'tracking_status' => $order->tracking_status ?? 'placed',
+            'created' => $order->created_at?->diffForHumans(),
+            'url' => route('backend.orders.show', $order),
+        ]);
+
+        return response()->json([
+            'count' => Order::count(),
+            'orders' => $orders,
         ]);
     }
 

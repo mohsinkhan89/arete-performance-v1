@@ -22,7 +22,7 @@
 
             @if ($resource === 'products')
                 <div class="form-grid">
-                    <label>Product Name
+                    <label class="field-medium">Product Name
                         <input name="name" value="{{ old('name', $record->name ?? '') }}" required>
                         @error('name')<span>{{ $message }}</span>@enderror
                     </label>
@@ -87,7 +87,7 @@
                             </div>
                         @endif
                     </div>
-                    <label class="wide">Short Description
+                    <label class="field-medium">Short Description
                         <input name="short_description" value="{{ old('short_description', $record->short_description ?? '') }}">
                     </label>
                     <label class="wide">Description
@@ -100,7 +100,7 @@
                 </div>
             @elseif ($resource === 'categories')
                 <div class="form-grid">
-                    <label>Name
+                    <label class="field-medium">Name
                         <input name="name" value="{{ old('name', $record->name ?? '') }}" required>
                         @error('name')<span>{{ $message }}</span>@enderror
                     </label>
@@ -139,11 +139,11 @@
                 </div>
             @elseif ($resource === 'reviews')
                 <div class="form-grid">
-                    <label>Customer Name
+                    <label class="field-medium">Customer Name
                         <input name="customer_name" value="{{ old('customer_name', $record->customer_name ?? '') }}" required>
                         @error('customer_name')<span>{{ $message }}</span>@enderror
                     </label>
-                    <label>Customer Title
+                    <label class="field-medium">Customer Title
                         <input name="customer_title" value="{{ old('customer_title', $record->customer_title ?? '') }}" placeholder="Fitness Coach, Athlete, Customer...">
                         @error('customer_title')<span>{{ $message }}</span>@enderror
                     </label>

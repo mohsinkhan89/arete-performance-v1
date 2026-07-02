@@ -86,7 +86,7 @@
                                     <td>{{ $order->order_number }}</td>
                                     <td>{{ $order->customer_name }}</td>
                                     <td>&pound;{{ number_format((float) $order->total, 2) }}</td>
-                                    <td><span class="badge {{ ($order->payment_status ?? 'unpaid') === 'paid' ? 'green' : (($order->payment_status ?? 'unpaid') === 'proof_submitted' ? 'yellow' : 'red') }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
+                                    <td><span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
                                     <td>{{ $order->tracking_number ?: 'Pending label' }}</td>
                                     <td>
                                         @php

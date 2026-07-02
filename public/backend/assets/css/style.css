@@ -1479,6 +1479,36 @@ td {
   background: rgba(220, 38, 38, 0.12);
 }
 
+.badge.payment-status-unpaid,
+.notification-dot.payment-status-unpaid {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.badge.payment-status-proof_submitted,
+.notification-dot.payment-status-proof_submitted {
+  color: #854d0e;
+  background: #fef3c7;
+}
+
+.badge.payment-status-paid,
+.notification-dot.payment-status-paid {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.badge.payment-status-failed,
+.notification-dot.payment-status-failed {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.badge.payment-status-refunded,
+.notification-dot.payment-status-refunded {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
 .action-group {
   display: inline-flex;
   align-items: center;
@@ -1511,6 +1541,112 @@ td {
   font-size: 11px;
 }
 
+.notification-dropdown {
+  position: relative;
+  z-index: 1100;
+}
+
+.notification-panel {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: 0;
+  z-index: 1300;
+  width: min(390px, calc(100vw - 28px));
+  overflow: hidden;
+  border: 1px solid #d8dee8;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 22px 62px rgba(18, 25, 36, .2);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.notification-dropdown.is-open .notification-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.notification-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.notification-head strong {
+  color: #202938;
+  font-size: 14px;
+}
+
+.notification-head small {
+  color: #667085;
+  font-size: 11px;
+}
+
+.notification-list {
+  display: grid;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #edf0f5;
+  transition: background .18s ease;
+}
+
+.notification-item:hover {
+  background: #fff9ea;
+}
+
+.notification-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  margin-top: 4px;
+}
+
+.notification-item strong,
+.notification-item small {
+  display: block;
+}
+
+.notification-item strong {
+  color: #202938;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.notification-item small,
+.notification-empty {
+  margin-top: 5px;
+  color: #667085;
+  font-size: 11px;
+}
+
+.notification-empty {
+  padding: 18px 14px;
+  text-align: center;
+}
+
+.notification-all {
+  display: grid;
+  min-height: 42px;
+  place-items: center;
+  color: #17120b;
+  background: #ffe9a8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .form-panel {
   max-width: 980px;
 }
@@ -1526,7 +1662,7 @@ td {
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -1574,6 +1710,10 @@ td {
 
 .admin-form .wide {
   grid-column: 1 / -1;
+}
+
+.admin-form .field-medium {
+  grid-column: span 2;
 }
 
 .switch-row {
@@ -2190,6 +2330,32 @@ body.admin-dark-page {
   background: rgba(15, 18, 24, 0.98);
 }
 
+.admin-dark-page .notification-panel {
+  border-color: rgba(255, 255, 255, 0.13);
+  background: rgba(15, 18, 24, 0.98);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .38);
+}
+
+.admin-dark-page .notification-head,
+.admin-dark-page .notification-item {
+  border-bottom-color: rgba(255, 255, 255, .08);
+}
+
+.admin-dark-page .notification-head strong,
+.admin-dark-page .notification-item strong {
+  color: #f1f3f7;
+}
+
+.admin-dark-page .notification-head small,
+.admin-dark-page .notification-item small,
+.admin-dark-page .notification-empty {
+  color: #a6abb6;
+}
+
+.admin-dark-page .notification-item:hover {
+  background: rgba(215, 168, 58, .14);
+}
+
 .admin-dark-page .profile-panel-head,
 .admin-dark-page th,
 .admin-dark-page td,
@@ -2287,6 +2453,10 @@ body.admin-dark-page {
 
   .status-content {
     grid-template-columns: 280px minmax(0, 1fr);
+  }
+
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

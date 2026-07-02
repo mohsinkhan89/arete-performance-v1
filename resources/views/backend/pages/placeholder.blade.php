@@ -68,7 +68,7 @@
                                 <td>{{ $order->order_number }}</td>
                                 <td>{{ $order->customer_name }}</td>
                                 <td>£{{ number_format((float) $order->total, 2) }}</td>
-                                <td><span class="badge {{ ($order->payment_status ?? 'unpaid') === 'paid' ? 'green' : (($order->payment_status ?? 'unpaid') === 'proof_submitted' ? 'yellow' : 'red') }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
+                                <td><span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
                                 <td>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</td>
                                 <td>{{ $order->created_at?->format('M d, Y') }}</td>
                                 <td><div class="action-group"><a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a></div></td>
@@ -246,7 +246,7 @@
                                     <td>£{{ number_format((float) $order->total, 2) }}</td>
                                     <td>
                                         <div class="payment-cell-actions">
-                                            <span class="badge {{ ($order->payment_status ?? 'unpaid') === 'paid' ? 'green' : (($order->payment_status ?? 'unpaid') === 'proof_submitted' ? 'yellow' : 'red') }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span>
+                                            <span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span>
                                             @if (($order->payment_status ?? 'unpaid') !== 'paid')
                                                 <a class="inline-update-btn" href="{{ route('backend.orders.show', $order) }}"><i class="fa-solid fa-pen-to-square"></i> Update</a>
                                             @endif
