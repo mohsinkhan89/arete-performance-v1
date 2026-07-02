@@ -32,38 +32,50 @@
           </div>
         @else
           <div class="checkout-layout">
-            <form class="checkout-form reveal-on-scroll" method="POST" action="{{ route('frontend.order.store') }}">
+            <form id="checkoutForm" class="checkout-form reveal-on-scroll" method="POST" action="{{ route('frontend.order.store') }}">
               @csrf
-              <section class="checkout-step">
-                <div class="checkout-step-head">
-                  <span>1</span>
+              <section class="checkout-step checkout-billing-card">
+                <div class="checkout-step-head checkout-title-head">
                   <h2>Billing Details</h2>
                 </div>
-                <div class="checkout-fields">
-                  <label class="visually-hidden" for="firstName">First name</label>
-                  <input id="firstName" name="first_name" type="text" placeholder="First name *" value="{{ old('first_name') }}" required>
-                  <label class="visually-hidden" for="lastName">Last name</label>
-                  <input id="lastName" name="last_name" type="text" placeholder="Last name *" value="{{ old('last_name') }}" required>
-                  <label class="visually-hidden" for="company">Company name</label>
-                  <input id="company" name="company" class="wide" type="text" placeholder="Company name (optional)" value="{{ old('company') }}">
-                  <label class="checkout-select wide" for="country"><span>Country / Region</span><select id="country" name="country" required><option value="United Kingdom" selected>United Kingdom (UK)</option></select></label>
-                  <label class="visually-hidden" for="streetAddress">Street address</label>
-                  <input id="streetAddress" name="address" class="wide" type="text" placeholder="House number and street name *" value="{{ old('address') }}" required>
-                  <label class="visually-hidden" for="addressTwo">Apartment, suite, unit</label>
-                  <input id="addressTwo" name="address_2" class="wide" type="text" placeholder="Apartment, suite, unit, etc. (optional)" value="{{ old('address_2') }}">
-                  <label class="visually-hidden" for="city">Town / City</label>
-                  <input id="city" name="city" type="text" placeholder="Town / City *" value="{{ old('city') }}" required>
-                  <label class="visually-hidden" for="state">County</label>
-                  <input id="state" name="state" type="text" placeholder="County (optional)" value="{{ old('state') }}">
-                  <label class="visually-hidden" for="zip">Postcode</label>
-                  <input id="zip" name="zip" type="text" placeholder="Postcode *" value="{{ old('zip') }}" data-uk-postcode required>
-                  <label class="visually-hidden" for="phone">Phone</label>
-                  <input id="phone" name="phone" type="tel" placeholder="Phone *" value="{{ old('phone') }}" data-uk-phone required>
-                  <label class="visually-hidden" for="orderNotes">Order notes</label>
-                  <textarea id="orderNotes" name="order_notes" class="wide" placeholder="Order notes (optional)">{{ old('order_notes') }}</textarea>
+
+                <div class="checkout-fields checkout-fields-two">
+                  <label class="checkout-field" for="firstName"><span>First Name</span><input id="firstName" name="first_name" type="text" value="{{ old('first_name') }}" required></label>
+                  <label class="checkout-field" for="lastName"><span>Last Name</span><input id="lastName" name="last_name" type="text" value="{{ old('last_name') }}" required></label>
+
+                  <label class="checkout-field" for="zip"><span>Post Code</span><input id="zip" name="zip" type="text" value="{{ old('zip') }}" data-uk-postcode required></label>
+                  <div class="postcode-actions">
+                    <button class="postcode-action-btn" type="button" data-find-postcode><i class="fa-solid fa-magnifying-glass"></i> Find Post Code</button>
+                    <button class="postcode-action-btn" type="button" data-enter-manual>Enter Manually</button>
+                  </div>
+
+                  <label class="checkout-field" for="phone"><span>Phone</span><input id="phone" name="phone" type="tel" value="{{ old('phone') }}" data-uk-phone required></label>
+                  <label class="checkout-field" for="checkoutEmail"><span>Email Address</span><input id="checkoutEmail" name="email" type="email" value="{{ old('email') }}" required></label>
                 </div>
+
+                <input type="hidden" name="country" value="United Kingdom">
+
+                <div class="postcode-lookup-status" data-postcode-status aria-live="polite"></div>
+
+                <div class="manual-address-fields {{ old('address') || $errors->has('address') || $errors->has('city') ? 'is-visible' : '' }}" data-manual-address>
+                  <div class="checkout-fields checkout-fields-two">
+                    <label class="checkout-field wide" for="company"><span>Company Name</span><input id="company" name="company" type="text" value="{{ old('company') }}" placeholder="Optional"></label>
+                    <label class="checkout-field wide" for="streetAddress"><span>Street Address</span><input id="streetAddress" name="address" type="text" value="{{ old('address') }}" data-address-required></label>
+                    <label class="checkout-field wide" for="addressTwo"><span>Apartment, suite, unit</span><input id="addressTwo" name="address_2" type="text" value="{{ old('address_2') }}" placeholder="Optional"></label>
+                    <label class="checkout-field" for="city"><span>Town / City</span><input id="city" name="city" type="text" value="{{ old('city') }}" data-address-required></label>
+                    <label class="checkout-field" for="state"><span>County</span><input id="state" name="state" type="text" value="{{ old('state') }}" placeholder="Optional"></label>
+                  </div>
+                </div>
+
+                <div class="checkout-additional">
+                  <h3>Additional information</h3>
+                  <label class="visually-hidden" for="orderNotes">Order notes</label>
+                  <textarea id="orderNotes" name="order_notes" placeholder="Notes about your order...">{{ old('order_notes') }}</textarea>
+                </div>
+
+                <input type="hidden" name="shipping_method" value="uk_tracked">
+                <input type="hidden" name="payment_method" value="card">
               </section>
-              <button class="btn btn-gold w-100" type="submit">Place order <i class="fa-solid fa-lock"></i></button>
             </form>
 
             <aside class="checkout-summary reveal-on-scroll" aria-labelledby="checkoutSummaryTitle">
@@ -83,6 +95,7 @@
                 <div><span>UK tracked postage <i class="fa-regular fa-circle-question"></i></span><strong>£4.99</strong></div>
               </div>
               <div class="checkout-total"><span>Total</span><strong>£{{ number_format($cart['subtotal'] + 4.99, 2) }}</strong></div>
+              <button class="btn btn-gold w-100" type="submit" form="checkoutForm">Place order <i class="fa-solid fa-lock"></i></button>
               <p class="checkout-secure"><i class="fa-solid fa-shield-halved"></i> Secure checkout</p>
             </aside>
           </div>

@@ -596,6 +596,58 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  const manualAddress = document.querySelector("[data-manual-address]");
+  const postcodeStatus = document.querySelector("[data-postcode-status]");
+  const postcodeInput = document.querySelector("[data-uk-postcode]");
+  const cityInput = document.querySelector("#city");
+  const countyInput = document.querySelector("#state");
+
+  function setAddressFieldsVisible(visible) {
+    if (!manualAddress) return;
+    manualAddress.classList.toggle("is-visible", visible);
+    manualAddress.querySelectorAll("[data-address-required]").forEach((input) => {
+      input.toggleAttribute("required", visible);
+    });
+  }
+
+  setAddressFieldsVisible(manualAddress?.classList.contains("is-visible"));
+
+  document.querySelector("[data-enter-manual]")?.addEventListener("click", () => {
+    setAddressFieldsVisible(true);
+    if (postcodeStatus) postcodeStatus.textContent = "Enter your address manually.";
+    document.querySelector("#streetAddress")?.focus();
+  });
+
+  document.querySelector("[data-find-postcode]")?.addEventListener("click", async () => {
+    const postcode = postcodeInput?.value.trim();
+    if (!postcode) {
+      if (postcodeStatus) postcodeStatus.textContent = "Please enter a UK post code first.";
+      postcodeInput?.focus();
+      return;
+    }
+
+    if (postcodeStatus) postcodeStatus.textContent = "Finding post code...";
+
+    try {
+      const response = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`);
+      const data = await response.json();
+
+      if (!response.ok || data.status !== 200) {
+        throw new Error("Post code not found.");
+      }
+
+      if (cityInput) cityInput.value = data.result.admin_district || data.result.parish || "";
+      if (countyInput) countyInput.value = data.result.admin_county || data.result.region || "";
+      setAddressFieldsVisible(true);
+      if (postcodeStatus) postcodeStatus.textContent = "Post code found. Please add your house number and street address.";
+      document.querySelector("#streetAddress")?.focus();
+    } catch (error) {
+      setAddressFieldsVisible(true);
+      if (postcodeStatus) postcodeStatus.textContent = "We could not find that post code. Please enter your address manually.";
+      document.querySelector("#streetAddress")?.focus();
+    }
+  });
+
   document.querySelectorAll("[data-uk-phone]").forEach((input) => {
     input.addEventListener("input", () => {
       let value = input.value.replace(/[^\d+]/g, "");
