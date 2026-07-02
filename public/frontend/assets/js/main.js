@@ -640,7 +640,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function fillAddress(address) {
-    if (streetInput) streetInput.value = address.address || "";
+    if (streetInput) streetInput.value = address.address || address.label || "";
     if (addressTwoInput) addressTwoInput.value = address.address_2 || "";
     if (cityInput) cityInput.value = address.city || "";
     if (countyInput) countyInput.value = address.state || "";
@@ -717,7 +717,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    fillAddress(JSON.parse(option.dataset.address));
+    const selectedAddress = JSON.parse(option.dataset.address);
+    selectedAddress.label = selectedAddress.label || option.textContent.trim();
+    fillAddress(selectedAddress);
     setAddressFieldsVisible(false);
     if (postcodeStatus) postcodeStatus.textContent = streetInput?.value ? "Address selected." : "Address selected. Use Enter Manually if you need to add street details.";
   });

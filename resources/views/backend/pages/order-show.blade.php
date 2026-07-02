@@ -14,16 +14,21 @@
             <a href="{{ route('backend.page', 'orders') }}"><i class="fa-solid fa-arrow-left"></i> Back to orders</a>
         </div>
 
-        <div class="order-view-grid">
-            <div><span>Customer</span><strong>{{ $order->customer_name }}</strong></div>
-            <div><span>Email</span><strong>{{ $order->email }}</strong></div>
-            <div><span>Phone</span><strong>{{ $order->phone ?? '-' }}</strong></div>
-            <div><span>Post Code</span><strong>{{ $order->zip }}</strong></div>
-            <div class="wide"><span>Address</span><strong>{{ $order->address }}@if($order->address_2), {{ $order->address_2 }}@endif, {{ $order->city }}, {{ $order->state }} {{ $order->zip }}, {{ $order->country }}</strong></div>
-            <div><span>Payment</span><strong>{{ ucfirst($order->payment_method) }}</strong></div>
-            <div><span>Shipping</span><strong>{{ ucfirst($order->shipping_method) }}</strong></div>
-            <div><span>Status</span><strong><span class="badge green">{{ ucfirst($order->status) }}</span></strong></div>
-            <div class="wide"><span>Order Notes</span><strong>{{ $order->order_notes ?: '-' }}</strong></div>
+        <div class="table-wrap">
+            <table>
+                <tbody>
+                    <tr><th>Customer</th><td>{{ $order->customer_name }}</td></tr>
+                    <tr><th>Email</th><td>{{ $order->email }}</td></tr>
+                    <tr><th>Phone</th><td>{{ $order->phone ?? '-' }}</td></tr>
+                    <tr><th>Company</th><td>{{ $order->company ?? '-' }}</td></tr>
+                    <tr><th>Post Code</th><td>{{ $order->zip }}</td></tr>
+                    <tr><th>Address</th><td>{{ $order->address }}@if($order->address_2), {{ $order->address_2 }}@endif, {{ $order->city }}, {{ $order->state }} {{ $order->zip }}, {{ $order->country }}</td></tr>
+                    <tr><th>Payment</th><td>{{ ucfirst($order->payment_method) }}</td></tr>
+                    <tr><th>Shipping</th><td>{{ ucfirst($order->shipping_method) }}</td></tr>
+                    <tr><th>Order Notes</th><td>{{ $order->order_notes ?: '-' }}</td></tr>
+                    <tr><th>Status</th><td><span class="badge green">{{ ucfirst($order->status) }}</span></td></tr>
+                </tbody>
+            </table>
         </div>
     </article>
 

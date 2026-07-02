@@ -63,14 +63,15 @@ class FrontendController extends Controller
                     $addresses = collect($payload['addresses'] ?? [])->map(function ($address) {
                         if (is_array($address)) {
                             $line1 = trim(collect([$address['line_1'] ?? null, $address['line_2'] ?? null])->filter()->implode(', '));
+                            $label = collect([
+                                $line1,
+                                $address['town_or_city'] ?? null,
+                                $address['county'] ?? null,
+                            ])->filter()->implode(', ');
 
                             return [
-                                'label' => collect([
-                                    $line1,
-                                    $address['town_or_city'] ?? null,
-                                    $address['county'] ?? null,
-                                ])->filter()->implode(', '),
-                                'address' => $line1,
+                                'label' => $label,
+                                'address' => $line1 ?: $label,
                                 'address_2' => trim((string) ($address['line_3'] ?? '')),
                                 'city' => $address['town_or_city'] ?? '',
                                 'state' => $address['county'] ?? '',
@@ -130,7 +131,7 @@ class FrontendController extends Controller
             'postcode' => $postcode,
             'addresses' => [[
                 'label' => trim("{$postcode} - enter house number and street"),
-                'address' => '',
+                'address' => "Post code lookup: {$postcode}",
                 'address_2' => '',
                 'city' => $city,
                 'state' => $county,
