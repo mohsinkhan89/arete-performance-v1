@@ -306,6 +306,7 @@ class FrontendController extends Controller
                 'status' => 'pending',
                 'payment_status' => 'unpaid',
                 'tracking_status' => 'placed',
+                'tracking_number' => $this->royalMailTrackingNumber(),
             ]);
 
             foreach ($summary['items'] as $item) {
@@ -390,6 +391,15 @@ class FrontendController extends Controller
         do {
             $number = 'AR' . now()->format('ymd') . strtoupper(Str::random(5));
         } while (Order::where('order_number', $number)->exists());
+
+        return $number;
+    }
+
+    private function royalMailTrackingNumber(): string
+    {
+        do {
+            $number = 'RM' . now()->format('ymd') . strtoupper(Str::random(5)) . 'GB';
+        } while (Order::where('tracking_number', $number)->exists());
 
         return $number;
     }

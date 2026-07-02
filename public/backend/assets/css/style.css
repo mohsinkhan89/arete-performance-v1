@@ -2794,21 +2794,38 @@ body.admin-dark-page {
   gap: 10px;
 }
 
-.snapshot-grid div {
+.status-breakdown {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.snapshot-grid div,
+.status-breakdown div {
   border: 1px solid #edf0f5;
   border-radius: 9px;
   padding: 12px;
   background: #fafbfc;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.snapshot-grid div:hover,
+.status-breakdown div:hover {
+  border-color: #e8b63e;
+  background: #fff9ea;
+  transform: translateY(-2px);
 }
 
 .snapshot-grid span,
-.snapshot-grid small {
+.snapshot-grid small,
+.status-breakdown span {
   display: block;
   color: #667085;
   font-size: 11px;
 }
 
-.snapshot-grid strong {
+.snapshot-grid strong,
+.status-breakdown strong {
   display: block;
   margin: 6px 0;
   color: #202938;
@@ -2924,6 +2941,7 @@ body.admin-dark-page .dashboard-hero-panel,
 body.admin-dark-page .compact-stat,
 body.admin-dark-page .queue-item,
 body.admin-dark-page .snapshot-grid div,
+body.admin-dark-page .status-breakdown div,
 body.admin-dark-page .order-meta-grid div,
 body.admin-dark-page .proof-preview,
 body.admin-dark-page .empty-queue,
@@ -2938,6 +2956,7 @@ body.admin-dark-page .compact-stat strong,
 body.admin-dark-page .queue-item strong,
 body.admin-dark-page .queue-item b,
 body.admin-dark-page .snapshot-grid strong,
+body.admin-dark-page .status-breakdown strong,
 body.admin-dark-page .order-meta-grid strong {
   color: #f7f7f7;
 }
@@ -2948,6 +2967,7 @@ body.admin-dark-page .compact-stat small,
 body.admin-dark-page .queue-item small,
 body.admin-dark-page .snapshot-grid span,
 body.admin-dark-page .snapshot-grid small,
+body.admin-dark-page .status-breakdown span,
 body.admin-dark-page .order-meta-grid span,
 body.admin-dark-page .proof-time,
 body.admin-dark-page .order-decision-panel p {
@@ -2956,7 +2976,8 @@ body.admin-dark-page .order-decision-panel p {
 
 @media (max-width: 1180px) {
   .compact-stats,
-  .snapshot-grid {
+  .snapshot-grid,
+  .status-breakdown {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -2981,6 +3002,7 @@ body.admin-dark-page .order-decision-panel p {
 
   .compact-stats,
   .snapshot-grid,
+  .status-breakdown,
   .order-meta-grid,
   .decision-actions {
     grid-template-columns: 1fr;

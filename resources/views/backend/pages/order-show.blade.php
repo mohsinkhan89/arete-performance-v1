@@ -6,6 +6,7 @@
     @php
         $phone = preg_replace('/\D+/', '', $order->phone ?? '');
         $trackUrl = route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email]);
+        $labelUrl = route('backend.orders.royal-mail-label', $order);
         $proofMessage = "Hi {$order->customer_name},\n\nPlease send/upload your payment proof for Arete Performance order #{$order->order_number}.\nTotal: £" . number_format((float) $order->total, 2) . "\n\nUpload here: {$trackUrl}\n\nOnce submitted, we will verify the payment and process your order.";
         $proofWaUrl = 'https://wa.me/' . $phone . '?text=' . rawurlencode($proofMessage);
         $statusLabels = [
@@ -38,12 +39,13 @@
     <div class="page-heading compact-heading">
         <div>
             <h1>{{ $pageTitle }}</h1>
-            <p>{{ $order->customer_name }} · £{{ number_format((float) $order->total, 2) }} · {{ $order->created_at?->format('M d, Y') }}</p>
+            <p>{{ $order->customer_name }} &middot; &pound;{{ number_format((float) $order->total, 2) }} &middot; Royal Mail ID {{ $order->tracking_number }}</p>
         </div>
         <div class="action-group">
             <a href="{{ route('backend.page', 'orders') }}" title="Back"><i class="fa-solid fa-arrow-left"></i></a>
             <a href="{{ $proofWaUrl }}" target="_blank" rel="noopener" title="Ask for payment proof"><i class="fa-brands fa-whatsapp"></i></a>
             <a href="{{ $trackUrl }}" target="_blank" rel="noopener" title="Customer tracking page"><i class="fa-solid fa-truck-fast"></i></a>
+            <a href="{{ $labelUrl }}" target="_blank" rel="noopener" title="Print Royal Mail label"><i class="fa-solid fa-tag"></i></a>
         </div>
     </div>
 
@@ -57,7 +59,9 @@
                 <div><span>Email</span><strong>{{ $order->email }}</strong></div>
                 <div><span>Phone</span><strong>{{ $order->phone ?? '-' }}</strong></div>
                 <div><span>Post Code</span><strong>{{ $order->zip }}</strong></div>
+                <div><span>Royal Mail ID</span><strong>{{ $order->tracking_number }}</strong></div>
                 <div><span>Tracking</span><strong>{{ $trackingLabels[$order->tracking_status ?? 'placed'] ?? ucfirst($order->tracking_status ?? 'placed') }}</strong></div>
+                <div><span>Label</span><strong><a href="{{ $labelUrl }}" target="_blank" rel="noopener">Print shipping label</a></strong></div>
                 <div class="wide"><span>Address</span><strong>{{ $order->address }}@if($order->address_2), {{ $order->address_2 }}@endif, {{ $order->city }}, {{ $order->state }} {{ $order->zip }}, {{ $order->country }}</strong></div>
                 <div class="wide"><span>Notes</span><strong>{{ $order->order_notes ?: '-' }}</strong></div>
             </div>
@@ -156,8 +160,8 @@
                         </select>
                     </label>
                     <label>
-                        <span>Tracking Number</span>
-                        <input type="text" name="tracking_number" value="{{ old('tracking_number', $order->tracking_number) }}" placeholder="Courier tracking number">
+                        <span>Royal Mail ID</span>
+                        <input type="text" name="tracking_number" value="{{ old('tracking_number', $order->tracking_number) }}" placeholder="Royal Mail tracking ID">
                     </label>
                     <label class="form-wide">
                         <span>Customer Tracking Note</span>
@@ -195,13 +199,13 @@
                             </td>
                             <td>{{ $item->product_sku }}</td>
                             <td>{{ $item->quantity }}</td>
-                            <td>£{{ number_format((float) $item->unit_price, 2) }}</td>
-                            <td>£{{ number_format((float) $item->line_total, 2) }}</td>
+                            <td>&pound;{{ number_format((float) $item->unit_price, 2) }}</td>
+                            <td>&pound;{{ number_format((float) $item->line_total, 2) }}</td>
                         </tr>
                     @endforeach
-                    <tr><td colspan="4"><strong>Subtotal</strong></td><td>£{{ number_format((float) $order->subtotal, 2) }}</td></tr>
-                    <tr><td colspan="4"><strong>Shipping</strong></td><td>£{{ number_format((float) $order->shipping_total, 2) }}</td></tr>
-                    <tr><td colspan="4"><strong>Total</strong></td><td><strong>£{{ number_format((float) $order->total, 2) }}</strong></td></tr>
+                    <tr><td colspan="4"><strong>Subtotal</strong></td><td>&pound;{{ number_format((float) $order->subtotal, 2) }}</td></tr>
+                    <tr><td colspan="4"><strong>Shipping</strong></td><td>&pound;{{ number_format((float) $order->shipping_total, 2) }}</td></tr>
+                    <tr><td colspan="4"><strong>Total</strong></td><td><strong>&pound;{{ number_format((float) $order->total, 2) }}</strong></td></tr>
                 </tbody>
             </table>
         </div>

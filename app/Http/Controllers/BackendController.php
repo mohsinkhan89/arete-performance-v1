@@ -34,12 +34,19 @@ class BackendController extends Controller
         $paidOrders = Order::where('payment_status', 'paid')->count();
         $unpaidOrders = Order::whereIn('payment_status', ['unpaid', 'proof_submitted'])->count();
         $proofSubmittedOrders = Order::where('payment_status', 'proof_submitted')->count();
+        $totalOrders = Order::count();
+        $totalRevenue = Order::sum('total');
+        $trackingStatuses = ['placed', 'processing', 'packed', 'dispatched', 'out_for_delivery', 'delivered', 'cancelled'];
+        $paymentStatuses = ['unpaid', 'proof_submitted', 'paid', 'failed', 'refunded'];
 
         return view('backend.dashboard', [
             'totalProducts' => Product::count(),
             'totalCategories' => Category::count(),
             'totalUsers' => User::count(),
-            'totalOrders' => Order::count(),
+            'totalOrders' => $totalOrders,
+            'todayOrders' => Order::whereDate('created_at', today())->count(),
+            'totalRevenue' => $totalRevenue,
+            'averageOrderValue' => $totalOrders > 0 ? $totalRevenue / $totalOrders : 0,
             'paidOrders' => $paidOrders,
             'unpaidOrders' => $unpaidOrders,
             'proofSubmittedOrders' => $proofSubmittedOrders,
@@ -51,6 +58,7 @@ class BackendController extends Controller
             'activeCategories' => $activeCategories,
             'inactiveCategories' => $inactiveCategories,
             'activeUsers' => $activeUsers,
+            'reviewsCount' => Review::count(),
             'totalInventory' => Product::sum('stock'),
             'inventoryValue' => Product::selectRaw('SUM(price * stock) as value')->value('value') ?? 0,
             'topProducts' => Product::with('category')->latest()->take(5)->get(),
@@ -59,6 +67,9 @@ class BackendController extends Controller
             'recentUsers' => User::latest()->take(5)->get(),
             'recentOrders' => Order::latest()->take(5)->get(),
             'recentPaymentProofs' => Order::where('payment_status', 'proof_submitted')->latest('payment_proof_submitted_at')->take(5)->get(),
+            'trackingBreakdown' => collect($trackingStatuses)->mapWithKeys(fn ($status) => [$status => Order::where('tracking_status', $status)->count()]),
+            'paymentBreakdown' => collect($paymentStatuses)->mapWithKeys(fn ($status) => [$status => Order::where('payment_status', $status)->count()]),
+            'lowStockProducts' => Product::with('category')->where('stock', '<=', 5)->orderBy('stock')->take(5)->get(),
         ]);
     }
 
@@ -123,9 +134,25 @@ class BackendController extends Controller
 
     public function showOrder(Order $order): View
     {
+        if (! $order->tracking_number) {
+            $order->forceFill(['tracking_number' => $this->royalMailTrackingNumber($order)])->save();
+        }
+
         return view('backend.pages.order-show', [
             'order' => $order->load('items'),
             'pageTitle' => 'Order #' . $order->order_number,
+        ]);
+    }
+
+    public function royalMailLabel(Order $order): View
+    {
+        if (! $order->tracking_number) {
+            $order->forceFill(['tracking_number' => $this->royalMailTrackingNumber($order)])->save();
+        }
+
+        return view('backend.pages.royal-mail-label', [
+            'order' => $order->load('items'),
+            'pageTitle' => 'Royal Mail Label #' . $order->order_number,
         ]);
     }
 
@@ -141,6 +168,10 @@ class BackendController extends Controller
             'tracking_note' => ['nullable', 'string', 'max:1000'],
             'admin_note' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        if (empty($data['tracking_number'])) {
+            $data['tracking_number'] = $this->royalMailTrackingNumber($order);
+        }
 
         $order->update($data);
 
@@ -408,5 +439,13 @@ class BackendController extends Controller
         }
 
         return $data;
+    }
+
+    private function royalMailTrackingNumber(Order $order): string
+    {
+        $seed = strtoupper(substr(preg_replace('/[^A-Z0-9]/', '', $order->order_number), -6));
+        $checksum = str_pad((string) (($order->id * 37 + now()->dayOfYear) % 1000), 3, '0', STR_PAD_LEFT);
+
+        return 'RM' . $seed . $checksum . 'GB';
     }
 }

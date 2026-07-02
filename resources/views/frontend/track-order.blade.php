@@ -42,6 +42,7 @@
             <dl class="order-detail-list">
               <div><dt>Customer</dt><dd>{{ $order->customer_name }}</dd></div>
               <div><dt>Payment</dt><dd>{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</dd></div>
+              <div><dt>Royal Mail ID</dt><dd>{{ $order->tracking_number ?: 'Preparing label' }}</dd></div>
               <div><dt>Total</dt><dd>£{{ number_format((float) $order->total, 2) }}</dd></div>
               <div><dt>Address</dt><dd>{{ $order->address }}, {{ $order->city }}, {{ $order->zip }}</dd></div>
             </dl>
