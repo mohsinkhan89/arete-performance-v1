@@ -594,6 +594,26 @@ document.addEventListener("DOMContentLoaded", () => {
       if (value.length > 3) value = `${value.slice(0, -3)} ${value.slice(-3)}`;
       input.value = value;
     });
+
+    input.addEventListener("change", async () => {
+      const postcode = input.value.trim();
+      if (!postcode) return;
+      try {
+        const response = await fetch(`${route("postcodeLookup", "/checkout/postcode")}?postcode=${encodeURIComponent(postcode)}`, {
+          headers: { Accept: "application/json" },
+        });
+        const data = await response.json();
+        if (response.ok && data.found && Array.isArray(data.addresses) && data.addresses.length > 0) {
+          const address = data.addresses[0];
+          const cityInput = document.querySelector("#city");
+          const countyInput = document.querySelector("#state");
+          if (cityInput && !cityInput.value) cityInput.value = address.city || "";
+          if (countyInput && !countyInput.value) countyInput.value = address.state || "";
+        }
+      } catch (e) {
+        // silent fail
+      }
+    });
   });
 
   const manualAddress = document.querySelector("[data-manual-address]");

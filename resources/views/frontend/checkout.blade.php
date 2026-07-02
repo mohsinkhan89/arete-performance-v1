@@ -20,7 +20,12 @@
       <div class="container">
         @if ($errors->any())
           <div class="alert alert-warning">
-            Please complete the required checkout fields.
+            Please complete the required checkout fields:
+            <ul class="mb-0 mt-2">
+              @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+              @endforeach
+            </ul>
           </div>
         @endif
 
@@ -66,12 +71,15 @@
                   </label>
                 </div>
 
-                <div class="manual-address-fields {{ old('address') || $errors->has('address') || $errors->has('city') ? 'is-visible' : '' }}" data-manual-address>
+                <div class="manual-address-fields {{ old('address') || $errors->has('address') || $errors->has('city') || $errors->has('state') ? 'is-visible' : '' }}" data-manual-address>
                   <div class="checkout-fields checkout-fields-two">
-                    {{-- <label class="checkout-field wide" for="company"><span>Company Name</span><input id="company" name="company" type="text" value="{{ old('company') }}" placeholder="Optional"></label> --}}
                     <label class="checkout-field wide" for="streetAddress"><span>Street Address</span><input id="streetAddress" name="address" type="text" value="{{ old('address') }}" data-address-required></label>
                   </div>
                 </div>
+
+                <input type="hidden" id="addressTwo" name="address_2" value="{{ old('address_2') }}">
+                <input type="hidden" id="city" name="city" value="{{ old('city') }}">
+                <input type="hidden" id="state" name="state" value="{{ old('state') }}">
 
                 <div class="checkout-additional">
                   <h3>Additional information</h3>

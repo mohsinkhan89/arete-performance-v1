@@ -234,11 +234,11 @@ class FrontendController extends Controller
             'email' => ['required', 'email', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
             'address_2' => ['nullable', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:120'],
+            'city' => ['nullable', 'string', 'max:120'],
             'state' => ['nullable', 'string', 'max:120'],
-            'zip' => ['required', 'string', 'max:10', 'regex:/^([A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i'],
+            'zip' => ['required', 'string', 'max:20'],
             'country' => ['required', 'in:United Kingdom'],
-            'phone' => ['required', 'string', 'max:20', 'regex:/^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/'],
+            'phone' => ['required', 'string', 'max:30'],
             'shipping_method' => ['required', 'in:uk_tracked'],
             'payment_method' => ['required', 'in:card,paypal,other'],
             'order_notes' => ['nullable', 'string', 'max:1000'],
@@ -246,6 +246,7 @@ class FrontendController extends Controller
 
         $data['customer_name'] = trim($data['first_name'] . ' ' . $data['last_name']);
         $data['zip'] = strtoupper(preg_replace('/\s+/', ' ', trim($data['zip'])));
+        $data['city'] = trim($data['city'] ?? $data['state'] ?? 'UK');
         unset($data['first_name'], $data['last_name']);
 
         $shipping = 4.99;
