@@ -16,6 +16,8 @@ Route::get('checkout', [FrontendController::class, 'checkout'])->name('frontend.
 Route::get('checkout/postcode', [FrontendController::class, 'lookupPostcode'])->name('frontend.checkout.postcode');
 Route::post('checkout', [FrontendController::class, 'placeOrder'])->name('frontend.order.store');
 Route::get('order-success', [FrontendController::class, 'orderSuccess'])->name('frontend.order-success');
+Route::get('track-order', [FrontendController::class, 'trackOrder'])->name('frontend.track-order');
+Route::post('track-order/payment-proof', [FrontendController::class, 'submitPaymentProof'])->name('frontend.payment-proof.store');
 Route::get('product-details', [FrontendController::class, 'productDetails'])->name('frontend.product-details');
 Route::get('search', [FrontendController::class, 'search'])->name('frontend.search');
 Route::get('shop', [FrontendController::class, 'shop'])->name('frontend.shop');
@@ -39,6 +41,7 @@ Route::prefix('admin')->name('backend.')->middleware('auth')->group(function () 
     Route::get('profile/edit', [BackendController::class, 'editProfile'])->name('profile.edit');
     Route::put('profile', [BackendController::class, 'updateProfile'])->name('profile.update');
     Route::get('orders/{order}', [BackendController::class, 'showOrder'])->name('orders.show');
+    Route::patch('orders/{order}', [BackendController::class, 'updateOrder'])->name('orders.update');
     Route::get('{resource}/create', [BackendController::class, 'create'])->name('resource.create');
     Route::post('{resource}', [BackendController::class, 'store'])->name('resource.store');
     Route::get('{resource}/{id}/edit', [BackendController::class, 'edit'])->name('resource.edit');

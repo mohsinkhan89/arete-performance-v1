@@ -8,7 +8,79 @@
         <p>Manage {{ strtolower($pageTitle) }} from your Arete Performance admin panel.</p>
     </div>
 
-    @if (in_array($page, ['products', 'categories', 'users', 'reviews', 'orders'], true))
+    @if ($page === 'reports')
+        <div class="stats-grid">
+            <article class="stat-card">
+                <div>
+                    <span>Paid Orders</span>
+                    <strong>{{ number_format($reportStats['paid_count']) }}</strong>
+                    <small class="up"><i class="fa-solid fa-check-circle"></i> £{{ number_format((float) $reportStats['paid_total'], 2) }}</small>
+                    <em>payment received</em>
+                </div>
+                <i class="stat-icon fa-solid fa-wallet"></i>
+                <svg viewBox="0 0 180 42" aria-hidden="true"><path d="M2 33 C22 31 34 18 52 23 S82 34 102 20 S132 17 150 22 S171 17 178 10"/></svg>
+            </article>
+            <article class="stat-card">
+                <div>
+                    <span>Proof Submitted</span>
+                    <strong>{{ number_format($reportStats['proof_count']) }}</strong>
+                    <small class="up"><i class="fa-solid fa-receipt"></i> £{{ number_format((float) $reportStats['proof_total'], 2) }}</small>
+                    <em>waiting verification</em>
+                </div>
+                <i class="stat-icon fa-solid fa-file-invoice"></i>
+                <svg viewBox="0 0 180 42" aria-hidden="true"><path d="M2 34 C23 33 37 22 55 25 S82 36 103 22 S134 13 150 18 S169 20 178 12"/></svg>
+            </article>
+            <article class="stat-card">
+                <div>
+                    <span>Unpaid Orders</span>
+                    <strong>{{ number_format($reportStats['unpaid_count']) }}</strong>
+                    <small class="down"><i class="fa-solid fa-clock"></i> £{{ number_format((float) $reportStats['unpaid_total'], 2) }}</small>
+                    <em>payment pending</em>
+                </div>
+                <i class="stat-icon fa-solid fa-hourglass-half"></i>
+                <svg viewBox="0 0 180 42" aria-hidden="true"><path d="M2 32 C22 31 34 17 53 24 S84 34 104 18 S134 16 151 20 S171 18 178 9"/></svg>
+            </article>
+            <article class="stat-card">
+                <div>
+                    <span>Total Orders</span>
+                    <strong>{{ number_format($reportStats['orders']) }}</strong>
+                    <small class="down"><i class="fa-solid fa-ban"></i> {{ number_format($reportStats['cancelled_count']) }}</small>
+                    <em>cancelled orders</em>
+                </div>
+                <i class="stat-icon fa-solid fa-chart-column"></i>
+                <svg viewBox="0 0 180 42" aria-hidden="true"><path d="M2 33 C23 32 36 21 55 23 S84 36 104 23 S133 11 150 18 S170 21 178 11"/></svg>
+            </article>
+        </div>
+
+        <article class="panel resource-panel">
+            <div class="panel-head">
+                <h2>Payment Report</h2>
+                <a href="{{ route('backend.page', 'orders') }}"><i class="fa-solid fa-clipboard-list"></i> Orders</a>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Created</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($reportStats['recent'] as $order)
+                            <tr>
+                                <td>{{ $order->order_number }}</td>
+                                <td>{{ $order->customer_name }}</td>
+                                <td>£{{ number_format((float) $order->total, 2) }}</td>
+                                <td><span class="badge {{ ($order->payment_status ?? 'unpaid') === 'paid' ? 'green' : (($order->payment_status ?? 'unpaid') === 'proof_submitted' ? 'yellow' : 'red') }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
+                                <td>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</td>
+                                <td>{{ $order->created_at?->format('M d, Y') }}</td>
+                                <td><div class="action-group"><a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a></div></td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="7" class="empty-cell">No report data found.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    @elseif (in_array($page, ['products', 'categories', 'users', 'reviews', 'orders'], true))
         @php
             $canManage = $page !== 'users' || $canManageUsers;
         @endphp
@@ -157,7 +229,7 @@
                 @elseif ($page === 'orders')
                     <table>
                         <thead>
-                            <tr><th>Order</th><th>Customer</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Created</th><th>Action</th></tr>
+                            <tr><th>Order</th><th>Customer</th><th>Email</th><th>Items</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Created</th><th>Action</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $order)
@@ -167,20 +239,15 @@
                                     <td>{{ $order->email }}</td>
                                     <td>{{ $order->items_count }}</td>
                                     <td>£{{ number_format((float) $order->total, 2) }}</td>
-                                    <td><span class="badge green">{{ ucfirst($order->status) }}</span></td>
+                                    <td><span class="badge {{ ($order->payment_status ?? 'unpaid') === 'paid' ? 'green' : (($order->payment_status ?? 'unpaid') === 'proof_submitted' ? 'yellow' : 'red') }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
+                                    <td>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</td>
                                     <td>{{ $order->created_at?->format('M d, Y') }}</td>
                                     <td>
                                         @php
                                             $phone = preg_replace('/\D+/', '', $order->phone ?? '');
                                             $fullAddress = trim($order->address . ', ' . ($order->address_2 ? $order->address_2 . ', ' : '') . "{$order->city}, {$order->state} {$order->zip}, {$order->country}");
-                                            $waMessage = "Arete Performance Order\n\nOrder: #{$order->order_number}\nCustomer: {$order->customer_name}\nEmail: {$order->email}\nPhone: {$order->phone}\nAddress: {$fullAddress}\n\nItems:\n";
-                                            foreach ($order->items as $item) {
-                                                $waMessage .= "- {$item->product_name} x {$item->quantity} = £" . number_format((float) $item->line_total, 2) . "\n";
-                                            }
-                                            $waMessage .= "\nSubtotal: £" . number_format((float) $order->subtotal, 2) . "\nShipping: £" . number_format((float) $order->shipping_total, 2) . "\nTotal: £" . number_format((float) $order->total, 2);
-                                            if ($order->order_notes) {
-                                                $waMessage .= "\nNotes: {$order->order_notes}";
-                                            }
+                                            $trackUrl = route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email]);
+                                            $waMessage = "Hi {$order->customer_name},\n\nPlease send/upload your payment proof for Arete Performance order #{$order->order_number}.\nTotal: £" . number_format((float) $order->total, 2) . "\n\nUpload here: {$trackUrl}\n\nOnce submitted, we will verify the payment and process your order.";
                                             $waUrl = 'https://wa.me/' . $phone . '?text=' . rawurlencode($waMessage);
                                         @endphp
                                         <div class="action-group">
@@ -190,7 +257,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="8" class="empty-cell">No orders found.</td></tr>
+                                <tr><td colspan="9" class="empty-cell">No orders found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

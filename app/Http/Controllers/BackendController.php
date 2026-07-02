@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PaymentProofStatusMail;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
@@ -11,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -29,11 +31,21 @@ class BackendController extends Controller
         $activeCategories = Category::where('status', 'active')->count();
         $inactiveCategories = Category::where('status', 'inactive')->count();
         $activeUsers = User::where('status', 'active')->count();
+        $paidOrders = Order::where('payment_status', 'paid')->count();
+        $unpaidOrders = Order::whereIn('payment_status', ['unpaid', 'proof_submitted'])->count();
+        $proofSubmittedOrders = Order::where('payment_status', 'proof_submitted')->count();
 
         return view('backend.dashboard', [
             'totalProducts' => Product::count(),
             'totalCategories' => Category::count(),
             'totalUsers' => User::count(),
+            'totalOrders' => Order::count(),
+            'paidOrders' => $paidOrders,
+            'unpaidOrders' => $unpaidOrders,
+            'proofSubmittedOrders' => $proofSubmittedOrders,
+            'paidRevenue' => Order::where('payment_status', 'paid')->sum('total'),
+            'pendingRevenue' => Order::whereIn('payment_status', ['unpaid', 'proof_submitted'])->sum('total'),
+            'proofSubmittedTotal' => Order::where('payment_status', 'proof_submitted')->sum('total'),
             'activeProducts' => $activeProducts,
             'inactiveProducts' => $inactiveProducts,
             'activeCategories' => $activeCategories,
@@ -46,6 +58,7 @@ class BackendController extends Controller
             'recentCategories' => Category::withCount('products')->latest()->take(5)->get(),
             'recentUsers' => User::latest()->take(5)->get(),
             'recentOrders' => Order::latest()->take(5)->get(),
+            'recentPaymentProofs' => Order::where('payment_status', 'proof_submitted')->latest('payment_proof_submitted_at')->take(5)->get(),
         ]);
     }
 
@@ -74,15 +87,28 @@ class BackendController extends Controller
             'categories' => Category::withCount('products')->latest()->paginate(10),
             'users' => User::latest()->paginate(10),
             'reviews' => Review::with('product')->latest()->paginate(10),
-            'orders' => Order::withCount('items')->latest()->paginate(10),
+            'orders' => Order::with('items')->withCount('items')->latest()->paginate(10),
             default => null,
         };
+
+        $reportStats = $page === 'reports' ? [
+            'orders' => Order::count(),
+            'paid_count' => Order::where('payment_status', 'paid')->count(),
+            'paid_total' => Order::where('payment_status', 'paid')->sum('total'),
+            'proof_count' => Order::where('payment_status', 'proof_submitted')->count(),
+            'proof_total' => Order::where('payment_status', 'proof_submitted')->sum('total'),
+            'unpaid_count' => Order::where('payment_status', 'unpaid')->count(),
+            'unpaid_total' => Order::where('payment_status', 'unpaid')->sum('total'),
+            'cancelled_count' => Order::where('status', 'cancelled')->count(),
+            'recent' => Order::latest()->take(10)->get(),
+        ] : null;
 
         return view('backend.pages.placeholder', [
             'page' => $page,
             'pageTitle' => $pageTitle,
             'records' => $records,
             'canManageUsers' => $this->isSuperAdmin(),
+            'reportStats' => $reportStats,
         ]);
     }
 
@@ -101,6 +127,28 @@ class BackendController extends Controller
             'order' => $order->load('items'),
             'pageTitle' => 'Order #' . $order->order_number,
         ]);
+    }
+
+    public function updateOrder(Request $request, Order $order): RedirectResponse
+    {
+        $previousPaymentStatus = $order->payment_status;
+
+        $data = $request->validate([
+            'status' => ['required', Rule::in(['pending', 'processing', 'shipped', 'delivered', 'cancelled'])],
+            'payment_status' => ['required', Rule::in(['unpaid', 'proof_submitted', 'paid', 'failed', 'refunded'])],
+            'tracking_status' => ['required', Rule::in(['placed', 'processing', 'packed', 'dispatched', 'out_for_delivery', 'delivered', 'cancelled'])],
+            'tracking_number' => ['nullable', 'string', 'max:120'],
+            'tracking_note' => ['nullable', 'string', 'max:1000'],
+            'admin_note' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $order->update($data);
+
+        if ($previousPaymentStatus !== $order->payment_status && in_array($order->payment_status, ['paid', 'failed'], true)) {
+            Mail::to($order->email)->send(new PaymentProofStatusMail($order->fresh(), $order->payment_status === 'paid' ? 'accepted' : 'rejected'));
+        }
+
+        return back()->with('success', 'Order updated successfully.');
     }
 
     public function editProfile(): View

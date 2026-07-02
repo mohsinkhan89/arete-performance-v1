@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class FrontendController extends Controller
 {
@@ -149,6 +150,50 @@ class FrontendController extends Controller
         ]);
     }
 
+    public function trackOrder(Request $request): View
+    {
+        $order = null;
+
+        if ($request->filled(['order_number', 'email'])) {
+            $order = Order::with('items')
+                ->where('order_number', trim((string) $request->query('order_number')))
+                ->where('email', trim((string) $request->query('email')))
+                ->first();
+        }
+
+        return view('frontend.track-order', [
+            'order' => $order,
+            'searched' => $request->filled(['order_number', 'email']),
+        ]);
+    }
+
+    public function submitPaymentProof(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'order_number' => ['required', 'string', 'exists:orders,order_number'],
+            'email' => ['required', 'email', 'max:255'],
+            'payment_proof' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:4096'],
+        ]);
+
+        $order = Order::where('order_number', $data['order_number'])
+            ->where('email', $data['email'])
+            ->firstOrFail();
+
+        $file = $request->file('payment_proof');
+        $filename = 'payment-proof-' . Str::slug($order->order_number) . '-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('backend/assets/imgs/uploads'), $filename);
+
+        $order->update([
+            'payment_proof' => 'backend/assets/imgs/uploads/' . $filename,
+            'payment_status' => 'proof_submitted',
+            'payment_proof_submitted_at' => now(),
+        ]);
+
+        return redirect()
+            ->route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email])
+            ->with('success', 'Payment proof submitted successfully. Admin will verify it shortly.');
+    }
+
     public function productDetails()
     {
         return view('frontend.product-details');
@@ -259,6 +304,8 @@ class FrontendController extends Controller
                 'shipping_total' => $shipping,
                 'total' => $summary['subtotal'] + $shipping,
                 'status' => 'pending',
+                'payment_status' => 'unpaid',
+                'tracking_status' => 'placed',
             ]);
 
             foreach ($summary['items'] as $item) {

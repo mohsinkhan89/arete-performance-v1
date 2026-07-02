@@ -1,11 +1,5 @@
 @extends('frontend.layouts.master')
 
-@section('metas')
-@endsection
-
-@section('css')
-@endsection
-
 @section('body')
     <section class="success-hero">
       <div class="container">
@@ -15,7 +9,10 @@
           @if ($order)
             <p>Thank you for your order. Your purchase has been confirmed and saved.</p>
             <p class="success-order-id">Order <strong>#{{ $order->order_number }}</strong></p>
-            <a class="btn btn-gold" href="#orderDetails">View order details <i class="fa-solid fa-arrow-right"></i></a>
+            <div class="success-actions">
+              <a class="btn btn-gold" href="#orderDetails">View order details <i class="fa-solid fa-arrow-right"></i></a>
+              <a class="btn btn-outline-light" href="{{ route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email]) }}">Track order <i class="fa-solid fa-truck-fast"></i></a>
+            </div>
           @else
             <p>No recent order found.</p>
             <a class="btn btn-gold" href="{{ route('frontend.shop') }}">Continue shopping <i class="fa-solid fa-arrow-right"></i></a>
@@ -36,12 +33,26 @@
 
               <article class="success-card reveal-on-scroll">
                 <h2>What's Next?</h2>
-                <div class="order-timeline">
-                  <div class="timeline-item active"><i class="fa-solid fa-envelope-circle-check"></i><div><strong>Order Confirmed</strong><span>{{ $order->created_at?->format('M d, Y - h:i A') }}</span></div></div>
-                  <div class="timeline-item"><i class="fa-solid fa-box-open"></i><div><strong>Order Processing</strong><span>We are preparing your order</span></div></div>
-                  <div class="timeline-item"><i class="fa-solid fa-truck-fast"></i><div><strong>Shipped</strong><span>Tracking info will be shared once ready</span></div></div>
-                  <div class="timeline-item"><i class="fa-solid fa-house-circle-check"></i><div><strong>Delivered</strong><span>Estimated delivery to your doorstep</span></div></div>
-                </div>
+                @include('frontend.partials.order-timeline', ['order' => $order])
+              </article>
+
+              <article class="success-card reveal-on-scroll">
+                <h2><i class="fa-solid fa-receipt"></i> Payment Proof</h2>
+                <p>Status: <strong>{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</strong></p>
+                @if (($order->payment_status ?? 'unpaid') !== 'paid')
+                  <form class="payment-proof-form" action="{{ route('frontend.payment-proof.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="order_number" value="{{ $order->order_number }}">
+                    <input type="hidden" name="email" value="{{ $order->email }}">
+                    <label>
+                      <span>Upload screenshot or PDF</span>
+                      <input type="file" name="payment_proof" accept=".jpg,.jpeg,.png,.webp,.pdf" required>
+                    </label>
+                    <button class="btn btn-gold" type="submit">Submit proof <i class="fa-solid fa-upload"></i></button>
+                  </form>
+                @else
+                  <p>Your payment has been verified.</p>
+                @endif
               </article>
             </aside>
 
@@ -51,9 +62,11 @@
                 <div><dt>Order Number</dt><dd>{{ $order->order_number }}</dd></div>
                 <div><dt>Order Date</dt><dd>{{ $order->created_at?->format('M d, Y') }}</dd></div>
                 <div><dt>Payment Method</dt><dd>{{ ucfirst($order->payment_method) }}</dd></div>
+                <div><dt>Payment Status</dt><dd>{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</dd></div>
+                <div><dt>Order Status</dt><dd>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? $order->status)) }}</dd></div>
                 <div><dt>Shipping Method</dt><dd>{{ ucfirst($order->shipping_method) }}</dd></div>
                 <div><dt>Shipping Address</dt><dd><strong>{{ $order->customer_name }}</strong><br>@if($order->company){{ $order->company }}<br>@endif{{ $order->address }}<br>@if($order->address_2){{ $order->address_2 }}<br>@endif{{ $order->city }}, {{ $order->state }} {{ $order->zip }}<br>{{ $order->country }}<br>{{ $order->phone }}</dd></div>
-                <div class="paid-line"><dt>Total Paid</dt><dd>£{{ number_format((float) $order->total, 2) }}</dd></div>
+                <div class="paid-line"><dt>Total</dt><dd>£{{ number_format((float) $order->total, 2) }}</dd></div>
               </dl>
             </section>
 
@@ -80,7 +93,4 @@
     @endif
 
     @include('frontend.inc.delivery-trusted')
-@endsection
-
-@section('js')
 @endsection
