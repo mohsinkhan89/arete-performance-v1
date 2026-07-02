@@ -33,7 +33,7 @@
 
               <div class="filter-block">
                 <h2>Categories</h2>
-                <a class="{{ empty($filters['category']) ? 'active' : '' }}" href="{{ route('frontend.shop', array_filter(['q' => $filters['q'] ?? null, 'sort' => $filters['sort'] ?? null])) }}"><span>All Products</span><strong>({{ $products->total() }})</strong></a>
+                <a class="{{ empty($filters['category']) ? 'active' : '' }}" href="{{ route('frontend.shop', array_filter(['q' => $filters['q'] ?? null, 'sort' => $filters['sort'] ?? null])) }}"><span>All Products</span><strong>({{ $totalProducts }})</strong></a>
                 @foreach ($categories as $category)
                   <a class="{{ ($filters['category'] ?? '') === $category->slug ? 'active' : '' }}" href="{{ route('frontend.shop', array_filter(['category' => $category->slug, 'q' => $filters['q'] ?? null, 'sort' => $filters['sort'] ?? null])) }}"><span>{{ $category->name }}</span><strong>({{ $category->products_count }})</strong></a>
                 @endforeach
@@ -41,17 +41,27 @@
 
               <div class="filter-block">
                 <h2>Price Range</h2>
-                <div class="price-range"><span></span></div>
-                <div class="price-values"><strong>£0</strong><strong>£400</strong></div>
+                @php
+                  $minBound = $priceBounds['min'] ?? 0;
+                  $maxBound = $priceBounds['max'] ?? 400;
+                  $selectedMin = is_numeric($filters['min_price']) ? (int) $filters['min_price'] : $minBound;
+                  $selectedMax = is_numeric($filters['max_price']) ? (int) $filters['max_price'] : $maxBound;
+                @endphp
+                <div class="price-range-control" data-price-range>
+                  <input type="range" min="{{ $minBound }}" max="{{ $maxBound }}" value="{{ $selectedMin }}" data-price-min-range aria-label="Minimum price">
+                  <input type="range" min="{{ $minBound }}" max="{{ $maxBound }}" value="{{ $selectedMax }}" data-price-max-range aria-label="Maximum price">
+                  <div class="price-range"><span data-price-range-fill></span></div>
+                </div>
+                <div class="price-values"><strong>£<span data-price-min-label>{{ $selectedMin }}</span></strong><strong>£<span data-price-max-label>{{ $selectedMax }}</span></strong></div>
                 <div class="filter-fields">
-                  <input type="number" name="min_price" min="0" placeholder="Min" value="{{ $filters['min_price'] }}">
-                  <input type="number" name="max_price" min="0" placeholder="Max" value="{{ $filters['max_price'] }}">
+                  <input type="number" name="min_price" min="{{ $minBound }}" max="{{ $maxBound }}" placeholder="Min" value="{{ $filters['min_price'] }}" data-price-min-input>
+                  <input type="number" name="max_price" min="{{ $minBound }}" max="{{ $maxBound }}" placeholder="Max" value="{{ $filters['max_price'] }}" data-price-max-input>
                 </div>
               </div>
 
               <div class="filter-block">
                 <h2>Lab Tested</h2>
-                <label><input type="checkbox" checked> Yes <strong>({{ $products->total() }})</strong></label>
+                <label><input type="checkbox" checked> Yes <strong>({{ $totalProducts }})</strong></label>
               </div>
 
               <button class="clear-filters" type="submit">Apply filters <i class="fa-solid fa-filter"></i></button>

@@ -2036,6 +2036,8 @@ img {
 }
 
 .shop-sidebar {
+  position: sticky;
+  top: 104px;
   background: var(--color-white);
   border: 1px solid #e5e5e5;
   border-radius: var(--radius);
@@ -2092,29 +2094,56 @@ img {
   position: relative;
   height: 4px;
   margin: 20px 5px 16px;
-  background: var(--color-primary);
+  background: #e7e7e7;
   border-radius: 999px;
 }
 
-.price-range::before,
-.price-range::after {
-  content: "";
+.price-range-control {
+  position: relative;
+  padding: 12px 0 2px;
+}
+
+.price-range-control input[type="range"] {
   position: absolute;
-  top: 50%;
-  width: 14px;
-  height: 14px;
+  top: 12px;
+  left: 0;
+  width: 100%;
+  height: 18px;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.price-range-control input[type="range"]::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
   background: var(--color-white);
   border: 3px solid var(--color-primary);
   border-radius: 50%;
-  transform: translateY(-50%);
+  cursor: pointer;
+  pointer-events: auto;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
-.price-range::before {
-  left: -2px;
+.price-range-control input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--color-white);
+  border: 3px solid var(--color-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
-.price-range::after {
-  right: -2px;
+.price-range span {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-primary);
+  border-radius: inherit;
 }
 
 .price-values {
@@ -5633,6 +5662,7 @@ img {
   }
 
   .shop-sidebar {
+    position: static;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }

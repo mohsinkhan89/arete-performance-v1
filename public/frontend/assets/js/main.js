@@ -700,7 +700,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       setPostcodePickerVisible(true);
-      if (postcodeStatus) postcodeStatus.textContent = data.source === "addresses" ? "Post code found. Select your address." : "Post code found. Select the option below, then add house number and street.";
+      if (postcodeStatus) postcodeStatus.textContent = data.source === "addresses" ? "Post code found. Select your address." : "Post code found. Full address list needs an address API key; use Enter Manually for street details.";
       postcodeSelect?.focus();
     } catch (error) {
       setAddressFieldsVisible(false);
@@ -718,9 +718,62 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     fillAddress(JSON.parse(option.dataset.address));
-    setAddressFieldsVisible(true);
-    if (postcodeStatus) postcodeStatus.textContent = streetInput?.value ? "Address selected. Please check the details below." : "Please add your house number and street address.";
-    streetInput?.focus();
+    setAddressFieldsVisible(false);
+    if (postcodeStatus) postcodeStatus.textContent = streetInput?.value ? "Address selected." : "Address selected. Use Enter Manually if you need to add street details.";
+  });
+
+  document.querySelectorAll("[data-price-range]").forEach((range) => {
+    const minRange = range.querySelector("[data-price-min-range]");
+    const maxRange = range.querySelector("[data-price-max-range]");
+    const form = range.closest("form");
+    const minInput = form?.querySelector("[data-price-min-input]");
+    const maxInput = form?.querySelector("[data-price-max-input]");
+    const minLabel = form?.querySelector("[data-price-min-label]");
+    const maxLabel = form?.querySelector("[data-price-max-label]");
+    const fill = range.querySelector("[data-price-range-fill]");
+
+    if (!minRange || !maxRange || !minInput || !maxInput) return;
+
+    const minLimit = Number(minRange.min || 0);
+    const maxLimit = Number(maxRange.max || 0);
+
+    function clampValues(source) {
+      let minValue = Number(minRange.value || minLimit);
+      let maxValue = Number(maxRange.value || maxLimit);
+
+      if (minValue > maxValue) {
+        if (source === "min") maxValue = minValue;
+        else minValue = maxValue;
+      }
+
+      minRange.value = minValue;
+      maxRange.value = maxValue;
+      minInput.value = minValue;
+      maxInput.value = maxValue;
+      if (minLabel) minLabel.textContent = minValue;
+      if (maxLabel) maxLabel.textContent = maxValue;
+
+      const span = Math.max(1, maxLimit - minLimit);
+      const left = ((minValue - minLimit) / span) * 100;
+      const right = 100 - ((maxValue - minLimit) / span) * 100;
+      if (fill) {
+        fill.style.left = `${left}%`;
+        fill.style.right = `${right}%`;
+      }
+    }
+
+    minRange.addEventListener("input", () => clampValues("min"));
+    maxRange.addEventListener("input", () => clampValues("max"));
+    minInput.addEventListener("input", () => {
+      minRange.value = minInput.value || minLimit;
+      clampValues("min");
+    });
+    maxInput.addEventListener("input", () => {
+      maxRange.value = maxInput.value || maxLimit;
+      clampValues("max");
+    });
+
+    clampValues();
   });
 
   document.querySelectorAll("[data-uk-phone]").forEach((input) => {
