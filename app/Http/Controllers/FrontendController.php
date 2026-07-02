@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -37,6 +38,103 @@ class FrontendController extends Controller
     {
         return view('frontend.checkout', [
             'cart' => $cart->summary(),
+        ]);
+    }
+
+    public function lookupPostcode(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'postcode' => ['required', 'string', 'max:10', 'regex:/^([A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i'],
+        ]);
+
+        $postcode = strtoupper(preg_replace('/\s+/', ' ', trim($data['postcode'])));
+        $postcodeUrl = rawurlencode($postcode);
+        $addressApiKey = env('GETADDRESS_API_KEY');
+
+        if ($addressApiKey) {
+            try {
+                $response = Http::timeout(8)->get("https://api.getAddress.io/find/{$postcodeUrl}", [
+                    'api-key' => $addressApiKey,
+                    'expand' => 'true',
+                ]);
+
+                if ($response->successful()) {
+                    $payload = $response->json();
+                    $addresses = collect($payload['addresses'] ?? [])->map(function ($address) {
+                        if (is_array($address)) {
+                            $line1 = trim(collect([$address['line_1'] ?? null, $address['line_2'] ?? null])->filter()->implode(', '));
+
+                            return [
+                                'label' => collect([
+                                    $line1,
+                                    $address['town_or_city'] ?? null,
+                                    $address['county'] ?? null,
+                                ])->filter()->implode(', '),
+                                'address' => $line1,
+                                'address_2' => trim((string) ($address['line_3'] ?? '')),
+                                'city' => $address['town_or_city'] ?? '',
+                                'state' => $address['county'] ?? '',
+                            ];
+                        }
+
+                        $parts = collect(explode(',', (string) $address))->map(fn ($part) => trim($part))->filter()->values();
+
+                        return [
+                            'label' => $parts->implode(', '),
+                            'address' => $parts->take(2)->implode(', '),
+                            'address_2' => '',
+                            'city' => $parts->get(max(0, $parts->count() - 2), ''),
+                            'state' => $parts->last() ?? '',
+                        ];
+                    })->filter(fn ($address) => $address['label'] !== '')->values();
+
+                    if ($addresses->isNotEmpty()) {
+                        return response()->json([
+                            'found' => true,
+                            'source' => 'addresses',
+                            'postcode' => $postcode,
+                            'addresses' => $addresses,
+                        ]);
+                    }
+                }
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
+        }
+
+        try {
+            $response = Http::timeout(8)->get("https://api.postcodes.io/postcodes/{$postcodeUrl}");
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return response()->json([
+                'found' => false,
+                'message' => 'Post code lookup is unavailable right now.',
+            ], 503);
+        }
+
+        if (! $response->successful() || (int) $response->json('status') !== 200) {
+            return response()->json([
+                'found' => false,
+                'message' => 'Post code not found.',
+            ], 404);
+        }
+
+        $result = $response->json('result', []);
+        $city = $result['admin_district'] ?? $result['parish'] ?? '';
+        $county = $result['admin_county'] ?? $result['region'] ?? '';
+
+        return response()->json([
+            'found' => true,
+            'source' => 'postcode',
+            'postcode' => $postcode,
+            'addresses' => [[
+                'label' => trim("{$postcode} - enter house number and street"),
+                'address' => '',
+                'address_2' => '',
+                'city' => $city,
+                'state' => $county,
+            ]],
         ]);
     }
 

@@ -47,6 +47,7 @@
                   <div class="postcode-actions">
                     <button class="postcode-action-btn" type="button" data-find-postcode><i class="fa-solid fa-magnifying-glass"></i> Find Post Code</button>
                     <button class="postcode-action-btn" type="button" data-enter-manual>Enter Manually</button>
+                    <button class="postcode-action-btn postcode-action-alt" type="button" data-use-postcode hidden><i class="fa-solid fa-magnifying-glass"></i> Use Post Code Search</button>
                   </div>
 
                   <label class="checkout-field" for="phone"><span>Phone</span><input id="phone" name="phone" type="tel" value="{{ old('phone') }}" data-uk-phone required></label>
@@ -57,13 +58,18 @@
 
                 <div class="postcode-lookup-status" data-postcode-status aria-live="polite"></div>
 
+                <div class="postcode-address-picker" data-postcode-address-picker hidden>
+                  <label class="checkout-field wide" for="postcodeAddress"><span>Select Address</span>
+                    <select id="postcodeAddress" data-postcode-address>
+                      <option value="">Select your address</option>
+                    </select>
+                  </label>
+                </div>
+
                 <div class="manual-address-fields {{ old('address') || $errors->has('address') || $errors->has('city') ? 'is-visible' : '' }}" data-manual-address>
                   <div class="checkout-fields checkout-fields-two">
-                    <label class="checkout-field wide" for="company"><span>Company Name</span><input id="company" name="company" type="text" value="{{ old('company') }}" placeholder="Optional"></label>
+                    {{-- <label class="checkout-field wide" for="company"><span>Company Name</span><input id="company" name="company" type="text" value="{{ old('company') }}" placeholder="Optional"></label> --}}
                     <label class="checkout-field wide" for="streetAddress"><span>Street Address</span><input id="streetAddress" name="address" type="text" value="{{ old('address') }}" data-address-required></label>
-                    <label class="checkout-field wide" for="addressTwo"><span>Apartment, suite, unit</span><input id="addressTwo" name="address_2" type="text" value="{{ old('address_2') }}" placeholder="Optional"></label>
-                    <label class="checkout-field" for="city"><span>Town / City</span><input id="city" name="city" type="text" value="{{ old('city') }}" data-address-required></label>
-                    <label class="checkout-field" for="state"><span>County</span><input id="state" name="state" type="text" value="{{ old('state') }}" placeholder="Optional"></label>
                   </div>
                 </div>
 

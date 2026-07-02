@@ -77,6 +77,7 @@
       orderSuccess: "{{ route('frontend.order-success') }}",
       productDetails: "{{ route('frontend.product-details') }}",
       cartJson: "{{ route('frontend.cart.json') }}",
+      postcodeLookup: "{{ route('frontend.checkout.postcode') }}",
       cartAddBase: "{{ url('cart/add') }}",
       cartUpdateBase: "{{ url('cart/update') }}",
       cartRemoveBase: "{{ url('cart/remove') }}",

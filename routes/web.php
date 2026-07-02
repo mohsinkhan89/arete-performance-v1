@@ -13,6 +13,7 @@ use App\Http\Controllers\FrontendController;
 Route::get('/', [FrontendController::class, 'index'])->name('frontend.index');
 Route::get('my-cart', [FrontendController::class, 'myCart'])->name('frontend.my-cart');
 Route::get('checkout', [FrontendController::class, 'checkout'])->name('frontend.checkout');
+Route::get('checkout/postcode', [FrontendController::class, 'lookupPostcode'])->name('frontend.checkout.postcode');
 Route::post('checkout', [FrontendController::class, 'placeOrder'])->name('frontend.order.store');
 Route::get('order-success', [FrontendController::class, 'orderSuccess'])->name('frontend.order-success');
 Route::get('product-details', [FrontendController::class, 'productDetails'])->name('frontend.product-details');

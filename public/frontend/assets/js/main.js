@@ -599,6 +599,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const manualAddress = document.querySelector("[data-manual-address]");
   const postcodeStatus = document.querySelector("[data-postcode-status]");
   const postcodeInput = document.querySelector("[data-uk-postcode]");
+  const postcodePicker = document.querySelector("[data-postcode-address-picker]");
+  const postcodeSelect = document.querySelector("[data-postcode-address]");
+  const findPostcodeButton = document.querySelector("[data-find-postcode]");
+  const enterManualButton = document.querySelector("[data-enter-manual]");
+  const usePostcodeButton = document.querySelector("[data-use-postcode]");
+  const streetInput = document.querySelector("#streetAddress");
+  const addressTwoInput = document.querySelector("#addressTwo");
   const cityInput = document.querySelector("#city");
   const countyInput = document.querySelector("#state");
 
@@ -610,16 +617,61 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  setAddressFieldsVisible(manualAddress?.classList.contains("is-visible"));
+  function setPostcodePickerVisible(visible) {
+    if (!postcodePicker) return;
+    postcodePicker.hidden = !visible;
+    if (!visible && postcodeSelect) {
+      postcodeSelect.innerHTML = '<option value="">Select your address</option>';
+    }
+  }
 
-  document.querySelector("[data-enter-manual]")?.addEventListener("click", () => {
+  function clearAddressFields() {
+    [streetInput, addressTwoInput, cityInput, countyInput].forEach((input) => {
+      if (input) input.value = "";
+    });
+  }
+
+  function setPostcodeMode(mode) {
+    const manualMode = mode === "manual";
+    if (findPostcodeButton) findPostcodeButton.hidden = manualMode;
+    if (enterManualButton) enterManualButton.hidden = manualMode;
+    if (usePostcodeButton) usePostcodeButton.hidden = !manualMode;
+    if (manualMode) setPostcodePickerVisible(false);
+  }
+
+  function fillAddress(address) {
+    if (streetInput) streetInput.value = address.address || "";
+    if (addressTwoInput) addressTwoInput.value = address.address_2 || "";
+    if (cityInput) cityInput.value = address.city || "";
+    if (countyInput) countyInput.value = address.state || "";
+  }
+
+  setAddressFieldsVisible(manualAddress?.classList.contains("is-visible"));
+  setPostcodeMode(manualAddress?.classList.contains("is-visible") ? "manual" : "search");
+
+  enterManualButton?.addEventListener("click", () => {
+    setPostcodeMode("manual");
     setAddressFieldsVisible(true);
+    setPostcodePickerVisible(false);
     if (postcodeStatus) postcodeStatus.textContent = "Enter your address manually.";
-    document.querySelector("#streetAddress")?.focus();
+    streetInput?.focus();
   });
 
-  document.querySelector("[data-find-postcode]")?.addEventListener("click", async () => {
+  usePostcodeButton?.addEventListener("click", () => {
+    setPostcodeMode("search");
+    setAddressFieldsVisible(false);
+    setPostcodePickerVisible(false);
+    clearAddressFields();
+    if (postcodeStatus) postcodeStatus.textContent = "Enter a UK post code and click Find Post Code.";
+    postcodeInput?.focus();
+  });
+
+  findPostcodeButton?.addEventListener("click", async () => {
     const postcode = postcodeInput?.value.trim();
+    setAddressFieldsVisible(false);
+    setPostcodePickerVisible(false);
+    clearAddressFields();
+
     if (!postcode) {
       if (postcodeStatus) postcodeStatus.textContent = "Please enter a UK post code first.";
       postcodeInput?.focus();
@@ -629,23 +681,46 @@ document.addEventListener("DOMContentLoaded", () => {
     if (postcodeStatus) postcodeStatus.textContent = "Finding post code...";
 
     try {
-      const response = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`);
+      const response = await fetch(`${route("postcodeLookup", "/checkout/postcode")}?postcode=${encodeURIComponent(postcode)}`, {
+        headers: { Accept: "application/json" },
+      });
       const data = await response.json();
 
-      if (!response.ok || data.status !== 200) {
+      if (!response.ok || !data.found || !Array.isArray(data.addresses) || data.addresses.length === 0) {
         throw new Error("Post code not found.");
       }
 
-      if (cityInput) cityInput.value = data.result.admin_district || data.result.parish || "";
-      if (countyInput) countyInput.value = data.result.admin_county || data.result.region || "";
-      setAddressFieldsVisible(true);
-      if (postcodeStatus) postcodeStatus.textContent = "Post code found. Please add your house number and street address.";
-      document.querySelector("#streetAddress")?.focus();
+      postcodeSelect.innerHTML = '<option value="">Select your address</option>';
+      data.addresses.forEach((address, index) => {
+        const option = document.createElement("option");
+        option.value = String(index);
+        option.textContent = address.label || `Address ${index + 1}`;
+        option.dataset.address = JSON.stringify(address);
+        postcodeSelect.append(option);
+      });
+
+      setPostcodePickerVisible(true);
+      if (postcodeStatus) postcodeStatus.textContent = data.source === "addresses" ? "Post code found. Select your address." : "Post code found. Select the option below, then add house number and street.";
+      postcodeSelect?.focus();
     } catch (error) {
-      setAddressFieldsVisible(true);
-      if (postcodeStatus) postcodeStatus.textContent = "We could not find that post code. Please enter your address manually.";
-      document.querySelector("#streetAddress")?.focus();
+      setAddressFieldsVisible(false);
+      setPostcodePickerVisible(false);
+      if (postcodeStatus) postcodeStatus.textContent = "Post code not found. Check the UK post code or use Enter Manually.";
+      postcodeInput?.focus();
     }
+  });
+
+  postcodeSelect?.addEventListener("change", () => {
+    const option = postcodeSelect.selectedOptions[0];
+    if (!option?.dataset.address) {
+      setAddressFieldsVisible(false);
+      return;
+    }
+
+    fillAddress(JSON.parse(option.dataset.address));
+    setAddressFieldsVisible(true);
+    if (postcodeStatus) postcodeStatus.textContent = streetInput?.value ? "Address selected. Please check the details below." : "Please add your house number and street address.";
+    streetInput?.focus();
   });
 
   document.querySelectorAll("[data-uk-phone]").forEach((input) => {
