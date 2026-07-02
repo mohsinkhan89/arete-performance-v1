@@ -328,6 +328,28 @@ document.addEventListener("DOMContentLoaded", () => {
       </article>`).join("") : '<p class="no-results">No products found. Try searching "Peptides" or "HGH".</p>';
   }
 
+  // Set active link on page load
+  const currentPathname = window.location.pathname;
+  const currentHashname = window.location.hash;
+
+  navLinks.forEach((link) => {
+    const linkUrl = new URL(link.href, window.location.origin);
+    const linkPathname = linkUrl.pathname;
+    const linkHashname = linkUrl.hash;
+
+    let isActive = false;
+
+    if (linkHashname === "#contact") {
+      isActive = (currentPathname === linkPathname && currentHashname === "#contact");
+    } else if (linkPathname === "/") {
+      isActive = (currentPathname === "/" && (currentHashname === "" || currentHashname === "#home" || !currentHashname));
+    } else {
+      isActive = (currentPathname === linkPathname);
+    }
+
+    link.classList.toggle("active", isActive);
+  });
+
   navLinks.forEach((link) => {
     link.addEventListener("click", () => {
       navLinks.forEach((item) => item.classList.remove("active"));

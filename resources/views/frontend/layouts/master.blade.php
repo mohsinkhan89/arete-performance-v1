@@ -17,7 +17,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <link href="{{ url('frontend/assets/css/style.css') }}" rel="stylesheet">
 </head>
-<body>
+<body class="@yield('body_class', (Request::path() === '/' ? 'home-page' : str_replace('/', '-', Request::path()) . '-page'))">
   
 
   @include('frontend.inc.header')

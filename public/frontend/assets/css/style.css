@@ -7903,3 +7903,130 @@ button:not(.navbar-toggler):not(.panel-close):not(.slider-arrow):not(.testimonia
     font-size: 2.05rem;
   }
 }
+
+/* Make all inner page heroes (checkout, cart, search, success) match the design of shop-hero */
+.checkout-hero,
+.cart-hero,
+.search-hero {
+  color: var(--color-white) !important;
+  background: var(--color-black) url("../images/hero-performance.png") right 35% bottom/auto 120% no-repeat !important;
+  border-bottom: 1px solid rgba(255, 255, 255, .1) !important;
+  overflow: hidden !important;
+  position: relative !important;
+  text-align: left !important;
+}
+
+.checkout-hero::before,
+.cart-hero::before,
+.search-hero::before,
+.success-hero::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(90deg, rgba(0, 0, 0, .98) 0%, rgba(0, 0, 0, .88) 36%, rgba(0, 0, 0, .22) 68%, rgba(0, 0, 0, .4) 100%) !important;
+  z-index: 0 !important;
+}
+
+.checkout-hero::after,
+.cart-hero::after,
+.search-hero::after,
+.success-hero::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -18% !important;
+  background: linear-gradient(128deg, transparent 34%, rgba(245, 168, 23, .1) 37%, rgba(245, 168, 23, .45) 38%, transparent 39%, transparent 46%, rgba(245, 168, 23, .32) 48%, transparent 50%, transparent 58%, rgba(245, 168, 23, .28) 60%, transparent 62%) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+.checkout-hero .container,
+.cart-hero .container,
+.search-hero .container,
+.success-hero .container {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.checkout-hero-copy,
+.cart-hero-copy,
+.search-hero-copy {
+  max-width: 520px !important;
+  padding: 102px 0 78px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  margin: 0 !important;
+}
+
+/* Titles matching the shop hero headline style */
+.checkout-hero-copy h1,
+.cart-hero-copy h1,
+.search-hero-copy h1,
+.success-hero-copy h1 {
+  margin: 0 !important;
+  font-family: var(--font-display) !important;
+  font-size: clamp(3rem, 6vw, 4.8rem) !important;
+  font-weight: 800 !important;
+  line-height: .96 !important;
+  text-transform: uppercase !important;
+  text-align: left !important;
+  color: var(--color-white) !important;
+}
+
+.checkout-hero-copy h1 span,
+.cart-hero-copy h1 span,
+.search-hero-copy h1 span,
+.success-hero-copy h1 span {
+  color: var(--color-primary) !important;
+}
+
+/* Breadcrumbs aligned left with custom colors */
+.cart-breadcrumb,
+.search-breadcrumb,
+.product-breadcrumb {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  margin-bottom: 20px !important;
+  font-size: 0.9rem !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.cart-breadcrumb a,
+.search-breadcrumb a,
+.product-breadcrumb a {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.cart-breadcrumb i,
+.search-breadcrumb i,
+.product-breadcrumb i {
+  color: rgba(255, 255, 255, 0.4) !important;
+  margin: 0 10px !important;
+  font-size: 0.75rem !important;
+}
+
+/* Search form in search hero */
+.search-hero-form {
+  margin: 24px 0 0 0 !important;
+  max-width: 480px !important;
+  width: 100% !important;
+}
+
+/* Success check icon spacing */
+.success-check {
+  margin-bottom: 18px !important;
+}
+
+/* Make header sticky and solid dark on all inner pages, not fixed */
+body:not(.home-page) .site-header {
+  position: sticky !important;
+  top: 0 !important;
+  background: #030303 !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .28) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, .1) !important;
+}
