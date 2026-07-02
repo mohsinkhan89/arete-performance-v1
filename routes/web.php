@@ -37,6 +37,7 @@ Route::prefix('admin')->name('backend.')->middleware('auth')->group(function () 
     Route::get('profile', [BackendController::class, 'profile'])->name('profile');
     Route::get('profile/edit', [BackendController::class, 'editProfile'])->name('profile.edit');
     Route::put('profile', [BackendController::class, 'updateProfile'])->name('profile.update');
+    Route::get('orders/{order}', [BackendController::class, 'showOrder'])->name('orders.show');
     Route::get('{resource}/create', [BackendController::class, 'create'])->name('resource.create');
     Route::post('{resource}', [BackendController::class, 'store'])->name('resource.store');
     Route::get('{resource}/{id}/edit', [BackendController::class, 'edit'])->name('resource.edit');

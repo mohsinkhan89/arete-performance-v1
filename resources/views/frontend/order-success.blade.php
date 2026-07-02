@@ -52,7 +52,7 @@
                 <div><dt>Order Date</dt><dd>{{ $order->created_at?->format('M d, Y') }}</dd></div>
                 <div><dt>Payment Method</dt><dd>{{ ucfirst($order->payment_method) }}</dd></div>
                 <div><dt>Shipping Method</dt><dd>{{ ucfirst($order->shipping_method) }}</dd></div>
-                <div><dt>Shipping Address</dt><dd><strong>{{ $order->customer_name }}</strong><br>{{ $order->address }}<br>{{ $order->city }}, {{ $order->state }} {{ $order->zip }}<br>{{ $order->country }}<br>{{ $order->phone }}</dd></div>
+                <div><dt>Shipping Address</dt><dd><strong>{{ $order->customer_name }}</strong><br>@if($order->company){{ $order->company }}<br>@endif{{ $order->address }}<br>@if($order->address_2){{ $order->address_2 }}<br>@endif{{ $order->city }}, {{ $order->state }} {{ $order->zip }}<br>{{ $order->country }}<br>{{ $order->phone }}</dd></div>
                 <div class="paid-line"><dt>Total Paid</dt><dd>£{{ number_format((float) $order->total, 2) }}</dd></div>
               </dl>
             </section>

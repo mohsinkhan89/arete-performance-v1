@@ -98,26 +98,34 @@
     <div class="dashboard-grid bottom-grid">
         <article class="panel orders-panel">
             <div class="panel-head">
-                <h2>Recent Products</h2>
-                <a href="{{ route('backend.resource.create', ['resource' => 'products']) }}">Add Product</a>
+                <h2>Recent Orders</h2>
+                <a href="{{ route('backend.page', 'orders') }}">View All</a>
             </div>
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th>Product</th><th>Category</th><th>SKU</th><th>Price</th><th>Stock</th><th>Status</th></tr>
+                        <tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Action</th></tr>
                     </thead>
                     <tbody>
-                        @forelse ($recentProducts as $product)
+                        @forelse ($recentOrders as $order)
                             <tr>
-                                <td>{{ $product->name }}</td>
-                                <td>{{ $product->category?->name ?? '-' }}</td>
-                                <td>{{ $product->sku }}</td>
-                                <td>£{{ number_format((float) $product->price, 2) }}</td>
-                                <td>{{ number_format($product->stock) }}</td>
-                                <td><span class="badge {{ $product->status === 'active' ? 'green' : 'red' }}">{{ ucfirst($product->status) }}</span></td>
+                                <td>{{ $order->order_number }}</td>
+                                <td>{{ $order->customer_name }}</td>
+                                <td>£{{ number_format((float) $order->total, 2) }}</td>
+                                <td><span class="badge green">{{ ucfirst($order->status) }}</span></td>
+                                <td>
+                                    @php
+                                        $phone = preg_replace('/\D+/', '', $order->phone ?? '');
+                                        $message = "Arete Performance Order\n\nOrder: #{$order->order_number}\nCustomer: {$order->customer_name}\nTotal: £" . number_format((float) $order->total, 2);
+                                    @endphp
+                                    <div class="action-group">
+                                        <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
+                                        <a href="https://wa.me/{{ $phone }}?text={{ rawurlencode($message) }}" target="_blank" rel="noopener" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                                    </div>
+                                </td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="empty-cell">No products found.</td></tr>
+                            <tr><td colspan="5" class="empty-cell">No orders found.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

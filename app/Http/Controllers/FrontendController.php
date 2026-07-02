@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderPlacedMail;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
@@ -11,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class FrontendController extends Controller
@@ -118,19 +120,27 @@ class FrontendController extends Controller
         }
 
         $data = $request->validate([
+            'first_name' => ['required', 'string', 'max:120'],
+            'last_name' => ['required', 'string', 'max:120'],
+            'company' => ['nullable', 'string', 'max:160'],
             'email' => ['required', 'email', 'max:255'],
-            'customer_name' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
+            'address_2' => ['nullable', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:120'],
             'state' => ['nullable', 'string', 'max:120'],
-            'zip' => ['nullable', 'string', 'max:40'],
-            'country' => ['required', 'string', 'max:120'],
-            'phone' => ['nullable', 'string', 'max:40'],
-            'shipping_method' => ['required', 'in:standard,express'],
+            'zip' => ['required', 'string', 'max:10', 'regex:/^([A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i'],
+            'country' => ['required', 'in:United Kingdom'],
+            'phone' => ['required', 'string', 'max:20', 'regex:/^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/'],
+            'shipping_method' => ['required', 'in:uk_tracked'],
             'payment_method' => ['required', 'in:card,paypal,other'],
+            'order_notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $shipping = $data['shipping_method'] === 'express' ? 19.99 : 9.99;
+        $data['customer_name'] = trim($data['first_name'] . ' ' . $data['last_name']);
+        $data['zip'] = strtoupper(preg_replace('/\s+/', ' ', trim($data['zip'])));
+        unset($data['first_name'], $data['last_name']);
+
+        $shipping = 4.99;
 
         $order = DB::transaction(function () use ($data, $summary, $shipping) {
             $order = Order::create([
@@ -162,6 +172,7 @@ class FrontendController extends Controller
 
         $cart->clear();
         session(['latest_order_id' => $order->id]);
+        Mail::to($order->email)->send(new OrderPlacedMail($order->load('items')));
 
         return redirect()->route('frontend.order-success');
     }

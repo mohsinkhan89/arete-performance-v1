@@ -157,7 +157,7 @@
                 @elseif ($page === 'orders')
                     <table>
                         <thead>
-                            <tr><th>Order</th><th>Customer</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Created</th></tr>
+                            <tr><th>Order</th><th>Customer</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Created</th><th>Action</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $order)
@@ -169,9 +169,28 @@
                                     <td>£{{ number_format((float) $order->total, 2) }}</td>
                                     <td><span class="badge green">{{ ucfirst($order->status) }}</span></td>
                                     <td>{{ $order->created_at?->format('M d, Y') }}</td>
+                                    <td>
+                                        @php
+                                            $phone = preg_replace('/\D+/', '', $order->phone ?? '');
+                                            $fullAddress = trim($order->address . ', ' . ($order->address_2 ? $order->address_2 . ', ' : '') . "{$order->city}, {$order->state} {$order->zip}, {$order->country}");
+                                            $waMessage = "Arete Performance Order\n\nOrder: #{$order->order_number}\nCustomer: {$order->customer_name}\nEmail: {$order->email}\nPhone: {$order->phone}\nAddress: {$fullAddress}\n\nItems:\n";
+                                            foreach ($order->items as $item) {
+                                                $waMessage .= "- {$item->product_name} x {$item->quantity} = £" . number_format((float) $item->line_total, 2) . "\n";
+                                            }
+                                            $waMessage .= "\nSubtotal: £" . number_format((float) $order->subtotal, 2) . "\nShipping: £" . number_format((float) $order->shipping_total, 2) . "\nTotal: £" . number_format((float) $order->total, 2);
+                                            if ($order->order_notes) {
+                                                $waMessage .= "\nNotes: {$order->order_notes}";
+                                            }
+                                            $waUrl = 'https://wa.me/' . $phone . '?text=' . rawurlencode($waMessage);
+                                        @endphp
+                                        <div class="action-group">
+                                            <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
+                                            <a href="{{ $waUrl }}" target="_blank" rel="noopener" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                                        </div>
+                                    </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="7" class="empty-cell">No orders found.</td></tr>
+                                <tr><td colspan="8" class="empty-cell">No orders found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

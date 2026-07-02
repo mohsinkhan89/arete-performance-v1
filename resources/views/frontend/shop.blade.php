@@ -86,6 +86,7 @@
                   <small>{{ $product->category?->name }}</small>
                   <h3>{{ $product->name }}</h3>
                   <div class="rating">★★★★★ <span>({{ $product->stock }})</span></div>
+                  <div class="product-card-qty" aria-label="{{ $product->name }} quantity"><button type="button" data-card-qty-dec>-</button><span data-card-qty>1</span><button type="button" data-card-qty-inc>+</button></div>
                   <div><strong>£{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong><button type="button" data-cart-add="{{ $product->id }}" aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button></div>
                 </article>
               @empty

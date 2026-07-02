@@ -92,7 +92,7 @@ class CartService
 
         $subtotal = (float) $items->sum('line_total');
         $itemCount = (int) $items->sum('quantity');
-        $shipping = $itemCount > 0 ? 9.99 : 0.0;
+        $shipping = $itemCount > 0 ? 4.99 : 0.0;
         $total = $subtotal + $shipping;
 
         return [

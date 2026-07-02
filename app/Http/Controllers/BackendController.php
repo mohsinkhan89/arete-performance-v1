@@ -45,6 +45,7 @@ class BackendController extends Controller
             'recentProducts' => Product::with('category')->latest()->take(5)->get(),
             'recentCategories' => Category::withCount('products')->latest()->take(5)->get(),
             'recentUsers' => User::latest()->take(5)->get(),
+            'recentOrders' => Order::latest()->take(5)->get(),
         ]);
     }
 
@@ -91,6 +92,14 @@ class BackendController extends Controller
             'admin' => auth()->user(),
             'editMode' => false,
             'pageTitle' => 'My Profile',
+        ]);
+    }
+
+    public function showOrder(Order $order): View
+    {
+        return view('backend.pages.order-show', [
+            'order' => $order->load('items'),
+            'pageTitle' => 'Order #' . $order->order_number,
         ]);
     }
 

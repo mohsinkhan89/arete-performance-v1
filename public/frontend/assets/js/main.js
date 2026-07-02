@@ -226,7 +226,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const safeQty = Math.max(1, Number(quantity) || 1);
     try {
       const data = await cartRequest(endpoint(route("cartAddBase", "/cart/add"), id), "POST", { quantity: safeQty });
-      renderCart(data);
+      await renderCart(data);
+      cartOverlay.classList.add("is-open");
+      cartOverlay.setAttribute("aria-hidden", "false");
+      setPanelState(cartDrawer, true);
       showToast("Product added to your cart.");
     } catch (error) {
       showToast("Unable to update cart right now.");
@@ -429,6 +432,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const buyNow = event.target.closest("[data-buy-now]");
     const productQtyInc = event.target.closest("[data-product-qty-inc]");
     const productQtyDec = event.target.closest("[data-product-qty-dec]");
+    const cardQtyInc = event.target.closest("[data-card-qty-inc]");
+    const cardQtyDec = event.target.closest("[data-card-qty-dec]");
     const productZoom = event.target.closest("[data-product-zoom]");
     const labReport = event.target.closest("[data-lab-report]");
     const detailTapCard = event.target.closest(".product-benefit-strip > div, .description-assurance > div, .benefit-list > div, .dosage-steps > div, .ingredient-certifications > div, .review-card, .shop-trust-grid > div");
@@ -440,6 +445,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const qtyOutput = document.querySelector("[data-product-qty]");
     const getProductQty = () => Math.max(1, Number(qtyOutput?.textContent) || 1);
+    const getCardQty = (button) => Math.max(1, Number(button?.closest(".product-card")?.querySelector("[data-card-qty]")?.textContent) || 1);
+    const setCardQty = (button, qty) => {
+      const output = button?.closest(".product-card")?.querySelector("[data-card-qty]");
+      if (!output) return;
+      output.textContent = String(Math.max(1, Math.min(99, qty)));
+    };
     const setProductQty = (qty) => {
       if (!qtyOutput) return;
       qtyOutput.textContent = String(Math.max(1, Math.min(99, qty)));
@@ -450,11 +461,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (clearFilters) goToPage(document.body.classList.contains("search-page") ? route("search", "/search") : route("shop", "/shop"));
     if (clearSearch) goToPage(route("search", "/search"));
     if (sortButton) goToPage(document.body.classList.contains("search-page") ? route("search", "/search") : route("shop", "/shop"));
-    if (categoryCard && !event.target.closest("button, a")) goToPage(route("shop", "/shop"));
+    if (categoryCard && !event.target.closest("button, a")) goToPage(categoryCard.dataset.categoryUrl || route("shop", "/shop"));
+
+    if (cardQtyInc) setCardQty(cardQtyInc, getCardQty(cardQtyInc) + 1);
+    if (cardQtyDec) setCardQty(cardQtyDec, getCardQty(cardQtyDec) - 1);
 
     if (event.target.closest("[data-cart-add]")) {
-      await addToCart(event.target.closest("[data-cart-add]").dataset.cartAdd);
-    } else if (productCard && event.target.closest("button")) {
+      const addButton = event.target.closest("[data-cart-add]");
+      await addToCart(addButton.dataset.cartAdd, getCardQty(addButton));
+    } else if (productCard && event.target.closest("button") && !event.target.closest("[data-card-qty-inc], [data-card-qty-dec]")) {
       const index = [...document.querySelectorAll(".product-card")].indexOf(productCard);
       await addToCart(productCard.dataset.productId || products[index]?.id);
     } else if (productCard && !event.target.closest("a")) {
@@ -524,6 +539,28 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
     showToast("Thanks for joining our newsletter.");
     event.currentTarget.reset();
+  });
+
+  document.querySelectorAll("[data-uk-postcode]").forEach((input) => {
+    input.addEventListener("input", () => {
+      let value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 7);
+      if (value.length > 3) value = `${value.slice(0, -3)} ${value.slice(-3)}`;
+      input.value = value;
+    });
+  });
+
+  document.querySelectorAll("[data-uk-phone]").forEach((input) => {
+    input.addEventListener("input", () => {
+      let value = input.value.replace(/[^\d+]/g, "");
+      if (value.startsWith("+44")) {
+        const digits = value.replace(/\D/g, "").slice(0, 12);
+        value = `+44 ${digits.slice(2, 6)} ${digits.slice(6, 9)} ${digits.slice(9, 12)}`.trim();
+      } else {
+        const digits = value.replace(/\D/g, "").slice(0, 11);
+        value = [digits.slice(0, 5), digits.slice(5, 8), digits.slice(8, 11)].filter(Boolean).join(" ");
+      }
+      input.value = value;
+    });
   });
 
   const tabCards = [...document.querySelectorAll(".tab-content-card")];

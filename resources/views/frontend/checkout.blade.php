@@ -48,22 +48,30 @@
               <section class="checkout-step">
                 <div class="checkout-step-head">
                   <span>2</span>
-                  <h2>Shipping Information</h2>
+                  <h2>Billing Details</h2>
                 </div>
                 <div class="checkout-fields">
-                  <label class="visually-hidden" for="fullName">Full Name</label>
-                  <input id="fullName" name="customer_name" class="wide" type="text" placeholder="Full Name" value="{{ old('customer_name') }}" required>
-                  <label class="visually-hidden" for="streetAddress">Street Address</label>
-                  <input id="streetAddress" name="address" class="wide" type="text" placeholder="Street Address" value="{{ old('address') }}" required>
-                  <label class="visually-hidden" for="city">City</label>
-                  <input id="city" name="city" type="text" placeholder="City" value="{{ old('city') }}" required>
-                  <label class="visually-hidden" for="state">State / Province</label>
-                  <input id="state" name="state" type="text" placeholder="State / Province" value="{{ old('state') }}">
-                  <label class="visually-hidden" for="zip">ZIP / Postal Code</label>
-                  <input id="zip" name="zip" type="text" placeholder="ZIP / Postal Code" value="{{ old('zip') }}">
-                  <label class="checkout-select" for="country"><span>Country</span><select id="country" name="country"><option @selected(old('country') === 'United States')>United States</option><option @selected(old('country') === 'Canada')>Canada</option><option @selected(old('country') === 'United Kingdom')>United Kingdom</option></select></label>
-                  <label class="visually-hidden" for="phone">Phone Number</label>
-                  <input id="phone" name="phone" class="span-2" type="tel" placeholder="Phone Number" value="{{ old('phone') }}">
+                  <label class="visually-hidden" for="firstName">First name</label>
+                  <input id="firstName" name="first_name" type="text" placeholder="First name *" value="{{ old('first_name') }}" required>
+                  <label class="visually-hidden" for="lastName">Last name</label>
+                  <input id="lastName" name="last_name" type="text" placeholder="Last name *" value="{{ old('last_name') }}" required>
+                  <label class="visually-hidden" for="company">Company name</label>
+                  <input id="company" name="company" class="wide" type="text" placeholder="Company name (optional)" value="{{ old('company') }}">
+                  <label class="checkout-select wide" for="country"><span>Country / Region</span><select id="country" name="country" required><option value="United Kingdom" selected>United Kingdom (UK)</option></select></label>
+                  <label class="visually-hidden" for="streetAddress">Street address</label>
+                  <input id="streetAddress" name="address" class="wide" type="text" placeholder="House number and street name *" value="{{ old('address') }}" required>
+                  <label class="visually-hidden" for="addressTwo">Apartment, suite, unit</label>
+                  <input id="addressTwo" name="address_2" class="wide" type="text" placeholder="Apartment, suite, unit, etc. (optional)" value="{{ old('address_2') }}">
+                  <label class="visually-hidden" for="city">Town / City</label>
+                  <input id="city" name="city" type="text" placeholder="Town / City *" value="{{ old('city') }}" required>
+                  <label class="visually-hidden" for="state">County</label>
+                  <input id="state" name="state" type="text" placeholder="County (optional)" value="{{ old('state') }}">
+                  <label class="visually-hidden" for="zip">Postcode</label>
+                  <input id="zip" name="zip" type="text" placeholder="Postcode *" value="{{ old('zip') }}" data-uk-postcode required>
+                  <label class="visually-hidden" for="phone">Phone</label>
+                  <input id="phone" name="phone" type="tel" placeholder="Phone *" value="{{ old('phone') }}" data-uk-phone required>
+                  <label class="visually-hidden" for="orderNotes">Order notes</label>
+                  <textarea id="orderNotes" name="order_notes" class="wide" placeholder="Order notes (optional)">{{ old('order_notes') }}</textarea>
                 </div>
               </section>
 
@@ -72,8 +80,7 @@
                   <span>3</span>
                   <h2>Shipping Method</h2>
                 </div>
-                <label class="checkout-option active"><span><input type="radio" name="shipping_method" value="standard" checked> Standard Shipping (5-7 Business Days)</span><strong>£9.99</strong></label>
-                <label class="checkout-option"><span><input type="radio" name="shipping_method" value="express"> Express Shipping (2-3 Business Days)</span><strong>£19.99</strong></label>
+                <label class="checkout-option active"><span><input type="radio" name="shipping_method" value="uk_tracked" checked> UK tracked postage (24 hours tracked service)</span><strong>£4.99</strong></label>
               </section>
 
               <section class="checkout-step">
@@ -103,9 +110,9 @@
               </div>
               <div class="checkout-total-lines">
                 <div><span>Subtotal ({{ $cart['item_count'] }} Items)</span><strong>£{{ number_format($cart['subtotal'], 2) }}</strong></div>
-                <div><span>Shipping <i class="fa-regular fa-circle-question"></i></span><strong>£9.99</strong></div>
+                <div><span>UK tracked postage <i class="fa-regular fa-circle-question"></i></span><strong>£4.99</strong></div>
               </div>
-              <div class="checkout-total"><span>Total</span><strong>£{{ number_format($cart['subtotal'] + 9.99, 2) }}</strong></div>
+              <div class="checkout-total"><span>Total</span><strong>£{{ number_format($cart['subtotal'] + 4.99, 2) }}</strong></div>
               <p class="checkout-secure"><i class="fa-solid fa-shield-halved"></i> Secure checkout</p>
             </aside>
           </div>

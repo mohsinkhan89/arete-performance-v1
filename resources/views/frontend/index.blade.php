@@ -32,10 +32,10 @@
         <div class="row g-3 mt-3 reveal-group">
           @foreach ($categories as $category)
             <div class="col-6 col-md-4 col-lg-3">
-              <a class="category-card" href="{{ route('frontend.shop', ['category' => $category->slug]) }}">
+              <article class="category-card" data-category-url="{{ route('frontend.shop', ['category' => $category->slug]) }}">
                 <img src="{{ url($category->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $category->name }}">
                 <div><h3>{{ $category->name }}</h3><i class="fa-solid fa-chevron-right"></i></div>
-              </a>
+              </article>
             </div>
           @endforeach
         </div>
@@ -74,6 +74,7 @@
                   <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
                   <h3>{{ $product->name }}</h3>
                   <small>{{ $product->category?->name }}</small>
+                  <div class="product-card-qty" aria-label="{{ $product->name }} quantity"><button type="button" data-card-qty-dec>-</button><span data-card-qty>1</span><button type="button" data-card-qty-inc>+</button></div>
                   <div><strong>£{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong><button type="button" data-cart-add="{{ $product->id }}" aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button></div>
                 </article>
               </div>
