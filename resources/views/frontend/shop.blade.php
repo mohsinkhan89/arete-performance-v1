@@ -62,9 +62,11 @@
               @endforelse
             </div>
 
-            <div class="mt-4">
-              {{ $products->links() }}
-            </div>
+            @if ($products->hasPages())
+              <div class="shop-pagination" aria-label="Shop pagination">
+                {{ $products->onEachSide(1)->links('pagination::bootstrap-5') }}
+              </div>
+            @endif
           </div>
         </div>
 
