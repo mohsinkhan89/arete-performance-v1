@@ -94,37 +94,35 @@
                     <span>Use WhatsApp to ask the customer for payment proof.</span>
                 </div>
             @endif
-        </article>
 
-        <article class="panel order-decision-panel">
-            <div class="panel-head">
-                <h2>Payment Decision</h2>
+            <div class="proof-decision-block">
+                <h3>Payment Decision</h3>
+                <div class="decision-actions">
+                    <form action="{{ route('backend.orders.update', $order) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="status" value="processing">
+                        <input type="hidden" name="payment_status" value="paid">
+                        <input type="hidden" name="tracking_status" value="{{ $order->tracking_status ?? 'processing' }}">
+                        <input type="hidden" name="tracking_number" value="{{ $order->tracking_number }}">
+                        <input type="hidden" name="tracking_note" value="{{ $order->tracking_note }}">
+                        <input type="hidden" name="admin_note" value="{{ $order->admin_note }}">
+                        <button class="decision-btn accept" type="submit"><i class="fa-solid fa-check"></i> Accept proof</button>
+                    </form>
+                    <form action="{{ route('backend.orders.update', $order) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="status" value="{{ $order->status }}">
+                        <input type="hidden" name="payment_status" value="failed">
+                        <input type="hidden" name="tracking_status" value="{{ $order->tracking_status ?? 'placed' }}">
+                        <input type="hidden" name="tracking_number" value="{{ $order->tracking_number }}">
+                        <input type="hidden" name="tracking_note" value="{{ $order->tracking_note }}">
+                        <input type="hidden" name="admin_note" value="{{ $order->admin_note ?: 'Payment proof could not be verified. Please upload a clearer proof.' }}">
+                        <button class="decision-btn reject" type="submit"><i class="fa-solid fa-xmark"></i> Reject proof</button>
+                    </form>
+                </div>
+                <p>Accept or reject sends an email to the customer automatically.</p>
             </div>
-            <div class="decision-actions">
-                <form action="{{ route('backend.orders.update', $order) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <input type="hidden" name="status" value="processing">
-                    <input type="hidden" name="payment_status" value="paid">
-                    <input type="hidden" name="tracking_status" value="{{ $order->tracking_status ?? 'processing' }}">
-                    <input type="hidden" name="tracking_number" value="{{ $order->tracking_number }}">
-                    <input type="hidden" name="tracking_note" value="{{ $order->tracking_note }}">
-                    <input type="hidden" name="admin_note" value="{{ $order->admin_note }}">
-                    <button class="decision-btn accept" type="submit"><i class="fa-solid fa-check"></i> Accept proof</button>
-                </form>
-                <form action="{{ route('backend.orders.update', $order) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <input type="hidden" name="status" value="{{ $order->status }}">
-                    <input type="hidden" name="payment_status" value="failed">
-                    <input type="hidden" name="tracking_status" value="{{ $order->tracking_status ?? 'placed' }}">
-                    <input type="hidden" name="tracking_number" value="{{ $order->tracking_number }}">
-                    <input type="hidden" name="tracking_note" value="{{ $order->tracking_note }}">
-                    <input type="hidden" name="admin_note" value="{{ $order->admin_note ?: 'Payment proof could not be verified. Please upload a clearer proof.' }}">
-                    <button class="decision-btn reject" type="submit"><i class="fa-solid fa-xmark"></i> Reject proof</button>
-                </form>
-            </div>
-            <p>Accept or reject sends an email to the customer automatically.</p>
         </article>
 
         <article class="panel order-update-panel">
@@ -135,6 +133,38 @@
                 @csrf
                 @method('PATCH')
                 <div class="form-grid">
+                    <label>
+                        <span>Customer Name</span>
+                        <input type="text" name="customer_name" value="{{ old('customer_name', $order->customer_name) }}" placeholder="Customer name">
+                    </label>
+                    <label>
+                        <span>Email</span>
+                        <input type="email" name="email" value="{{ old('email', $order->email) }}" placeholder="Customer email">
+                    </label>
+                    <label>
+                        <span>Phone</span>
+                        <input type="text" name="phone" value="{{ old('phone', $order->phone) }}" placeholder="Phone">
+                    </label>
+                    <label>
+                        <span>Post Code</span>
+                        <input type="text" name="zip" value="{{ old('zip', $order->zip) }}" placeholder="Post code">
+                    </label>
+                    <label class="form-wide">
+                        <span>Address</span>
+                        <input type="text" name="address" value="{{ old('address', $order->address) }}" placeholder="Address line 1">
+                    </label>
+                    <label>
+                        <span>Address 2</span>
+                        <input type="text" name="address_2" value="{{ old('address_2', $order->address_2) }}" placeholder="Address line 2">
+                    </label>
+                    <label>
+                        <span>City</span>
+                        <input type="text" name="city" value="{{ old('city', $order->city) }}" placeholder="City">
+                    </label>
+                    <label>
+                        <span>County/State</span>
+                        <input type="text" name="state" value="{{ old('state', $order->state) }}" placeholder="County or state">
+                    </label>
                     <label>
                         <span>Order Status</span>
                         <select name="status" required>

@@ -49,6 +49,18 @@ body {
   }
 }
 
+@keyframes flashSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -1323,17 +1335,24 @@ td {
 }
 
 .flash-message {
+  position: sticky;
+  top: 72px;
+  z-index: 900;
   display: flex;
   align-items: center;
   gap: 9px;
-  margin-bottom: 14px;
-  padding: 10px 12px;
+  width: fit-content;
+  max-width: min(720px, 100%);
+  margin: 0 0 14px auto;
+  padding: 12px 14px;
   border: 1px solid rgba(22, 163, 74, 0.32);
-  border-radius: 7px;
+  border-radius: 10px;
   color: #166534;
   background: #dcfce7;
-  font-size: 12px;
-  animation: fadeSlideUp 0.35s ease both;
+  box-shadow: 0 14px 34px rgba(18, 25, 36, .12);
+  font-size: 13px;
+  font-weight: 700;
+  animation: flashSlideUp 0.38s ease both;
 }
 
 .flash-message.error {
@@ -1344,6 +1363,69 @@ td {
 
 .resource-panel table {
   min-width: 860px;
+}
+
+.compact-orders-resource {
+  padding: 14px;
+}
+
+.compact-orders-resource .panel-head {
+  margin-bottom: 10px;
+}
+
+.orders-table-compact {
+  min-width: 900px !important;
+}
+
+.orders-table-compact th,
+.orders-table-compact td {
+  padding: 9px 8px;
+  vertical-align: middle;
+}
+
+.orders-table-compact td:first-child,
+.orders-table-compact th:first-child {
+  padding-left: 0;
+}
+
+.orders-table-compact td:last-child,
+.orders-table-compact th:last-child {
+  padding-right: 0;
+}
+
+.table-subtext {
+  display: block;
+  margin-top: 4px;
+  color: #8b94a3;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.payment-cell-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.inline-update-btn {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e8b63e;
+  border-radius: 999px;
+  padding: 0 10px;
+  color: #17120b;
+  background: #ffe9a8;
+  font-size: 11px;
+  font-weight: 800;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.inline-update-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(215, 168, 58, .22);
 }
 
 .status-toggle {
@@ -1431,6 +1513,10 @@ td {
 
 .form-panel {
   max-width: 980px;
+}
+
+.form-panel-full {
+  max-width: none;
 }
 
 .admin-form {
@@ -2846,6 +2932,10 @@ body.admin-dark-page {
   margin-bottom: 14px;
 }
 
+.order-update-panel {
+  grid-column: 1 / -1;
+}
+
 .order-meta-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2865,6 +2955,7 @@ body.admin-dark-page {
 
 .order-meta-grid span,
 .proof-time,
+.proof-decision-block p,
 .order-decision-panel p {
   display: block;
   color: #667085;
@@ -2896,6 +2987,22 @@ body.admin-dark-page {
 }
 
 .proof-time {
+  margin: 10px 0 0;
+}
+
+.proof-decision-block {
+  margin-top: 14px;
+  border-top: 1px solid #edf0f5;
+  padding-top: 14px;
+}
+
+.proof-decision-block h3 {
+  margin: 0 0 10px;
+  color: #202938;
+  font-size: 14px;
+}
+
+.proof-decision-block p {
   margin: 10px 0 0;
 }
 
@@ -2937,6 +3044,10 @@ body.admin-dark-page {
   gap: 10px;
 }
 
+.compact-order-form .form-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 body.admin-dark-page .dashboard-hero-panel,
 body.admin-dark-page .compact-stat,
 body.admin-dark-page .queue-item,
@@ -2949,6 +3060,24 @@ body.admin-dark-page .proof-empty,
 body.admin-dark-page .proof-file {
   border-color: rgba(255, 255, 255, .12);
   background: rgba(255, 255, 255, .04);
+}
+
+body.admin-dark-page .proof-decision-block {
+  border-top-color: rgba(255, 255, 255, .1);
+}
+
+body.admin-dark-page .proof-decision-block h3 {
+  color: #f7f7f7;
+}
+
+body.admin-dark-page .table-subtext {
+  color: #a6abb6;
+}
+
+body.admin-dark-page .inline-update-btn {
+  border-color: rgba(255, 214, 110, .55);
+  color: #17120b;
+  background: #ffe9a8;
 }
 
 body.admin-dark-page .dashboard-hero-panel h1,
@@ -2970,6 +3099,7 @@ body.admin-dark-page .snapshot-grid small,
 body.admin-dark-page .status-breakdown span,
 body.admin-dark-page .order-meta-grid span,
 body.admin-dark-page .proof-time,
+body.admin-dark-page .proof-decision-block p,
 body.admin-dark-page .order-decision-panel p {
   color: #a6abb6;
 }
@@ -2985,6 +3115,10 @@ body.admin-dark-page .order-decision-panel p {
   .dashboard-workbench-secondary,
   .order-workspace {
     grid-template-columns: 1fr;
+  }
+
+  .compact-order-form .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -3004,7 +3138,8 @@ body.admin-dark-page .order-decision-panel p {
   .snapshot-grid,
   .status-breakdown,
   .order-meta-grid,
-  .decision-actions {
+  .decision-actions,
+  .compact-order-form .form-grid {
     grid-template-columns: 1fr;
   }
 }

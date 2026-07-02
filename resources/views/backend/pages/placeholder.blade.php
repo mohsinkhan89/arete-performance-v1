@@ -84,10 +84,10 @@
         @php
             $canManage = $page !== 'users' || $canManageUsers;
         @endphp
-        <article class="panel resource-panel">
+        <article class="panel resource-panel {{ $page === 'orders' ? 'compact-orders-resource' : '' }}">
             <div class="panel-head">
                 <h2>{{ $pageTitle }} Table</h2>
-                @if ($canManage && in_array($page, ['products', 'categories', 'users'], true))
+                @if ($canManage && in_array($page, ['products', 'categories', 'users', 'reviews'], true))
                     <a href="{{ route('backend.resource.create', ['resource' => $page]) }}"><i class="fa-solid fa-plus"></i> Add New</a>
                 @endif
             </div>
@@ -227,25 +227,38 @@
                         </tbody>
                     </table>
                 @elseif ($page === 'orders')
-                    <table>
+                    <table class="orders-table-compact">
                         <thead>
-                            <tr><th>Order</th><th>Customer</th><th>Email</th><th>Items</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Created</th><th>Action</th></tr>
+                            <tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Action</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $order)
                                 <tr>
-                                    <td>{{ $order->order_number }}</td>
-                                    <td>{{ $order->customer_name }}</td>
-                                    <td>{{ $order->email }}</td>
+                                    <td>
+                                        <strong>{{ $order->order_number }}</strong>
+                                        <small class="table-subtext">{{ $order->created_at?->format('M d, Y') }}</small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ $order->customer_name }}</strong>
+                                        <small class="table-subtext">{{ $order->email }}</small>
+                                    </td>
                                     <td>{{ $order->items_count }}</td>
                                     <td>£{{ number_format((float) $order->total, 2) }}</td>
-                                    <td><span class="badge {{ ($order->payment_status ?? 'unpaid') === 'paid' ? 'green' : (($order->payment_status ?? 'unpaid') === 'proof_submitted' ? 'yellow' : 'red') }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
-                                    <td>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</td>
-                                    <td>{{ $order->created_at?->format('M d, Y') }}</td>
+                                    <td>
+                                        <div class="payment-cell-actions">
+                                            <span class="badge {{ ($order->payment_status ?? 'unpaid') === 'paid' ? 'green' : (($order->payment_status ?? 'unpaid') === 'proof_submitted' ? 'yellow' : 'red') }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span>
+                                            @if (($order->payment_status ?? 'unpaid') !== 'paid')
+                                                <a class="inline-update-btn" href="{{ route('backend.orders.show', $order) }}"><i class="fa-solid fa-pen-to-square"></i> Update</a>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</strong>
+                                        <small class="table-subtext">{{ $order->tracking_number ?: 'Label pending' }}</small>
+                                    </td>
                                     <td>
                                         @php
                                             $phone = preg_replace('/\D+/', '', $order->phone ?? '');
-                                            $fullAddress = trim($order->address . ', ' . ($order->address_2 ? $order->address_2 . ', ' : '') . "{$order->city}, {$order->state} {$order->zip}, {$order->country}");
                                             $trackUrl = route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email]);
                                             $waMessage = "Hi {$order->customer_name},\n\nPlease send/upload your payment proof for Arete Performance order #{$order->order_number}.\nTotal: £" . number_format((float) $order->total, 2) . "\n\nUpload here: {$trackUrl}\n\nOnce submitted, we will verify the payment and process your order.";
                                             $waUrl = 'https://wa.me/' . $phone . '?text=' . rawurlencode($waMessage);
@@ -257,14 +270,14 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="9" class="empty-cell">No orders found.</td></tr>
+                                <tr><td colspan="7" class="empty-cell">No orders found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
                 @else
                     <table>
                         <thead>
-                            <tr><th>Customer</th><th>Product</th><th>Rating</th><th>Review</th><th>Status</th><th>Created</th></tr>
+                            <tr><th>Customer</th><th>Product</th><th>Rating</th><th>Review</th><th>Status</th><th>Created</th><th>Action</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $review)
@@ -278,11 +291,30 @@
                                     <td>{{ $review->product?->name ?? '-' }}</td>
                                     <td><span class="rating-stars">{{ str_repeat('★', $review->rating) }}</span></td>
                                     <td>{{ \Illuminate\Support\Str::limit($review->comment, 70) }}</td>
-                                    <td><span class="badge {{ $review->status === 'active' ? 'green' : 'red' }}">{{ ucfirst($review->status) }}</span></td>
+                                    <td>
+                                        <form action="{{ route('backend.resource.status', ['resource' => 'reviews', 'id' => $review->id]) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button class="status-toggle {{ $review->status === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status">
+                                                <i class="fa-solid {{ $review->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
+                                                {{ ucfirst($review->status) }}
+                                            </button>
+                                        </form>
+                                    </td>
                                     <td>{{ $review->created_at?->format('M d, Y') }}</td>
+                                    <td>
+                                        <div class="action-group">
+                                            <a href="{{ route('backend.resource.edit', ['resource' => 'reviews', 'id' => $review->id]) }}" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                                            <form action="{{ route('backend.resource.destroy', ['resource' => 'reviews', 'id' => $review->id]) }}" method="POST" onsubmit="return confirm('Delete this review?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6" class="empty-cell">No reviews found.</td></tr>
+                                <tr><td colspan="7" class="empty-cell">No reviews found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

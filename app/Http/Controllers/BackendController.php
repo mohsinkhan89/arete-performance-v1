@@ -161,6 +161,14 @@ class BackendController extends Controller
         $previousPaymentStatus = $order->payment_status;
 
         $data = $request->validate([
+            'customer_name' => ['nullable', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'address_2' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:120'],
+            'state' => ['nullable', 'string', 'max:120'],
+            'zip' => ['nullable', 'string', 'max:20'],
             'status' => ['required', Rule::in(['pending', 'processing', 'shipped', 'delivered', 'cancelled'])],
             'payment_status' => ['required', Rule::in(['unpaid', 'proof_submitted', 'paid', 'failed', 'refunded'])],
             'tracking_status' => ['required', Rule::in(['placed', 'processing', 'packed', 'dispatched', 'out_for_delivery', 'delivered', 'cancelled'])],
@@ -171,6 +179,10 @@ class BackendController extends Controller
 
         if (empty($data['tracking_number'])) {
             $data['tracking_number'] = $this->royalMailTrackingNumber($order);
+        }
+
+        if (! empty($data['zip'])) {
+            $data['zip'] = strtoupper(preg_replace('/\s+/', ' ', trim($data['zip'])));
         }
 
         $order->update($data);
@@ -224,6 +236,7 @@ class BackendController extends Controller
             'resource' => $resource,
             'record' => null,
             'categories' => Category::where('status', 'active')->orderBy('name')->get(),
+            'products' => Product::orderBy('name')->get(),
             'pageTitle' => 'Add ' . Str::headline(Str::singular($resource)),
         ]);
     }
@@ -236,6 +249,7 @@ class BackendController extends Controller
             'products' => Product::create($this->productData($request)),
             'categories' => Category::create($this->categoryData($request)),
             'users' => User::create($this->userData($request)),
+            'reviews' => Review::create($this->reviewData($request)),
             default => abort(404),
         };
 
@@ -250,6 +264,7 @@ class BackendController extends Controller
             'resource' => $resource,
             'record' => $this->findRecord($resource, $id),
             'categories' => Category::where('status', 'active')->orderBy('name')->get(),
+            'products' => Product::orderBy('name')->get(),
             'pageTitle' => 'Edit ' . Str::headline(Str::singular($resource)),
         ]);
     }
@@ -264,6 +279,7 @@ class BackendController extends Controller
             'products' => $record->update($this->productData($request, $record->id, $record->image, $record->test_report_image)),
             'categories' => $record->update($this->categoryData($request, $record->id, $record->image)),
             'users' => $record->update($this->userData($request, $record->id)),
+            'reviews' => $record->update($this->reviewData($request)),
             default => abort(404),
         };
 
@@ -306,16 +322,17 @@ class BackendController extends Controller
 
     private function authorizeResource(string $resource): void
     {
-        abort_unless(in_array($resource, ['products', 'categories', 'users'], true), 404);
+        abort_unless(in_array($resource, ['products', 'categories', 'users', 'reviews'], true), 404);
         abort_if($resource === 'users' && ! $this->isSuperAdmin(), 403);
     }
 
-    private function findRecord(string $resource, int $id): Product|Category|User
+    private function findRecord(string $resource, int $id): Product|Category|User|Review
     {
         return match ($resource) {
             'products' => Product::findOrFail($id),
             'categories' => Category::findOrFail($id),
             'users' => User::findOrFail($id),
+            'reviews' => Review::findOrFail($id),
             default => abort(404),
         };
     }
@@ -437,6 +454,24 @@ class BackendController extends Controller
         } else {
             unset($data['password']);
         }
+
+        return $data;
+    }
+
+    private function reviewData(Request $request): array
+    {
+        $data = $request->validate([
+            'product_id' => ['nullable', 'exists:products,id'],
+            'customer_name' => ['required', 'string', 'max:255'],
+            'customer_title' => ['nullable', 'string', 'max:255'],
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'comment' => ['required', 'string'],
+            'avatar' => ['nullable', 'string', 'max:255'],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+            'is_featured' => ['nullable', 'boolean'],
+        ]);
+
+        $data['is_featured'] = $request->boolean('is_featured');
 
         return $data;
     }
