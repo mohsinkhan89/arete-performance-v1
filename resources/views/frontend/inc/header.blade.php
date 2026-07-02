@@ -1,7 +1,7 @@
 <header class="site-header">
     <nav class="navbar navbar-expand-lg navbar-dark py-3">
       <div class="container">
-        <a class="brand" href="{{ route('frontend.index') }}#home" aria-label="Arete Performance home"><img src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance"></a>
+        <a class="brand" href="{{ route('frontend.index') }}#home" aria-label="Arete Performance home"><img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance"></a>
         <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>

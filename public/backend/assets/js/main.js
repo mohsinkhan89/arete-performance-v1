@@ -1,4 +1,73 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const richTextareas = document.querySelectorAll('textarea[data-rich-text]');
+
+  const richCommands = [
+    { command: 'formatBlock', value: 'p', icon: 'fa-paragraph', label: 'Paragraph' },
+    { command: 'formatBlock', value: 'h3', icon: 'fa-heading', label: 'Heading' },
+    { command: 'bold', icon: 'fa-bold', label: 'Bold' },
+    { command: 'italic', icon: 'fa-italic', label: 'Italic' },
+    { command: 'underline', icon: 'fa-underline', label: 'Underline' },
+    { command: 'insertUnorderedList', icon: 'fa-list-ul', label: 'Bullet list' },
+    { command: 'insertOrderedList', icon: 'fa-list-ol', label: 'Numbered list' },
+    { command: 'createLink', icon: 'fa-link', label: 'Link', prompt: 'Enter link URL' },
+    { command: 'removeFormat', icon: 'fa-eraser', label: 'Clear format' },
+  ];
+
+  richTextareas.forEach((textarea) => {
+    const editorShell = document.createElement('div');
+    editorShell.className = 'rich-editor';
+
+    const toolbar = document.createElement('div');
+    toolbar.className = 'rich-toolbar';
+
+    const editor = document.createElement('div');
+    editor.className = 'rich-editor-box';
+    editor.contentEditable = 'true';
+    editor.innerHTML = textarea.value || '';
+    editor.setAttribute('role', 'textbox');
+    editor.setAttribute('aria-multiline', 'true');
+
+    richCommands.forEach((item) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.title = item.label;
+      button.setAttribute('aria-label', item.label);
+      button.innerHTML = `<i class="fa-solid ${item.icon}"></i>`;
+
+      button.addEventListener('click', () => {
+        editor.focus();
+
+        if (item.prompt) {
+          const value = window.prompt(item.prompt, 'https://');
+          if (!value) return;
+          document.execCommand(item.command, false, value);
+        } else {
+          document.execCommand(item.command, false, item.value || null);
+        }
+
+        textarea.value = editor.innerHTML.trim();
+      });
+
+      toolbar.appendChild(button);
+    });
+
+    const syncSource = () => {
+      textarea.value = editor.innerHTML.trim();
+    };
+
+    editor.addEventListener('input', syncSource);
+    editor.addEventListener('blur', syncSource);
+    textarea.form?.addEventListener('submit', syncSource);
+
+    editorShell.appendChild(toolbar);
+    editorShell.appendChild(editor);
+
+    const label = textarea.closest('label');
+    textarea.classList.add('rich-text-hidden-source');
+    label?.classList.add('rich-source-label');
+    (label || textarea).after(editorShell);
+  });
+
   const themeToggle = document.querySelector('.theme-toggle');
   const themeIcon = themeToggle?.querySelector('i');
   const savedTheme = localStorage.getItem('adminTheme') || 'light';
@@ -83,8 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <a class="notification-item" href="${escapeHtml(order.url)}">
           <span class="notification-dot payment-status-${escapeHtml(payment)}"></span>
           <div>
-            <strong>#${escapeHtml(order.order_number)} · ${escapeHtml(order.customer_name)}</strong>
-            <small>${escapeHtml(paymentLabel)} · ${escapeHtml(tracking)} · £${escapeHtml(order.total)} · ${escapeHtml(order.created || '')}</small>
+            <strong>#${escapeHtml(order.order_number)} &middot; ${escapeHtml(order.customer_name)}</strong>
+            <small>${escapeHtml(paymentLabel)} &middot; ${escapeHtml(tracking)} &middot; &pound;${escapeHtml(order.total)} &middot; ${escapeHtml(order.created || '')}</small>
           </div>
         </a>
       `;

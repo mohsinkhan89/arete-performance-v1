@@ -2,7 +2,7 @@
     <div class="container">
       <div class="footer-main">
         <div class="footer-brand-block">
-          <a class="brand footer-brand" href="{{ route('frontend.index') }}#home"><img src="{{ url('frontend/assets/images/logo/logo.png') }}" alt="Arete Performance"></a>
+          <a class="brand footer-brand" href="{{ route('frontend.index') }}#home"><img src="{{ url($siteSettings['footer_logo'] ?? 'frontend/assets/images/logo/logo.png') }}" alt="Arete Performance"></a>
           <p class="footer-copy">Premium performance solutions designed to help you reach your full potential.</p>
           <div class="socials"><a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a><a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a><a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="Youtube"><i class="fa-brands fa-youtube"></i></a></div>
         </div>

@@ -9,13 +9,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <link href="{{ url('backend/assets/css/style.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --gold: {{ $siteSettings['primary_color'] ?? '#d7a83a' }};
+            --gold-2: {{ $siteSettings['secondary_color'] ?? '#ffd66e' }};
+        }
+    </style>
     @yield('css')
 </head>
 <body class="admin-light-page">
     <div class="admin-shell">
         <aside class="admin-sidebar" id="adminSidebar">
             <a class="brand" href="{{ route('backend.dashboard') }}" aria-label="Arete Performance Admin">
-                <img src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
+                <img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
             </a>
 
             @php
@@ -27,6 +33,7 @@
                     ['label' => 'Users', 'icon' => 'fa-users', 'url' => route('backend.page', 'users')],
                     ['label' => 'Reviews', 'icon' => 'fa-star', 'url' => route('backend.page', 'reviews')],
                     ['label' => 'Reports', 'icon' => 'fa-chart-column', 'url' => route('backend.page', 'reports')],
+                    ['label' => 'Settings', 'icon' => 'fa-gear', 'url' => route('backend.page', 'settings')],
                 ];
             @endphp
 
@@ -86,8 +93,8 @@
                                     <a class="notification-item" href="{{ route('backend.orders.show', $order) }}">
                                         <span class="notification-dot payment-status-{{ $order->payment_status ?? 'unpaid' }}"></span>
                                         <div>
-                                            <strong>#{{ $order->order_number }} · {{ $order->customer_name }}</strong>
-                                            <small>{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }} · {{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }} · £{{ number_format((float) $order->total, 2) }}</small>
+                                            <strong>#{{ $order->order_number }} &middot; {{ $order->customer_name }}</strong>
+                                            <small>{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }} &middot; {{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }} &middot; &pound;{{ number_format((float) $order->total, 2) }}</small>
                                         </div>
                                     </a>
                                 @empty

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\SiteSetting;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
@@ -115,6 +116,14 @@ class BackendController extends Controller
             'recent' => Order::latest()->take(10)->get(),
         ] : null;
 
+        if ($page === 'settings') {
+            return view('backend.pages.settings', [
+                'page' => $page,
+                'pageTitle' => 'Site Settings',
+                'settings' => $this->siteSettings(),
+            ]);
+        }
+
         return view('backend.pages.placeholder', [
             'page' => $page,
             'pageTitle' => $pageTitle,
@@ -149,6 +158,35 @@ class BackendController extends Controller
             'count' => Order::count(),
             'orders' => $orders,
         ]);
+    }
+
+    public function updateSiteSettings(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'primary_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'secondary_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'header_logo_file' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
+            'footer_logo_file' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
+        ]);
+
+        $settings = $this->siteSettings();
+
+        foreach (['header_logo' => 'header_logo_file', 'footer_logo' => 'footer_logo_file'] as $settingKey => $fileKey) {
+            if (! $request->hasFile($fileKey)) {
+                continue;
+            }
+
+            $this->deleteUploadedImage($settings[$settingKey] ?? null);
+            $file = $request->file($fileKey);
+            $filename = 'site-' . $settingKey . '-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('backend/assets/imgs/uploads'), $filename);
+            SiteSetting::setValue($settingKey, 'backend/assets/imgs/uploads/' . $filename);
+        }
+
+        SiteSetting::setValue('primary_color', $data['primary_color']);
+        SiteSetting::setValue('secondary_color', $data['secondary_color']);
+
+        return back()->with('success', 'Site settings updated successfully.');
     }
 
     public function showOrder(Order $order): View
@@ -501,5 +539,15 @@ class BackendController extends Controller
         $checksum = str_pad((string) (($order->id * 37 + now()->dayOfYear) % 1000), 3, '0', STR_PAD_LEFT);
 
         return 'RM' . $seed . $checksum . 'GB';
+    }
+
+    private function siteSettings(): array
+    {
+        return array_merge([
+            'header_logo' => 'frontend/assets/images/logo/logo-transperent.png',
+            'footer_logo' => 'frontend/assets/images/logo/logo.png',
+            'primary_color' => '#f5a817',
+            'secondary_color' => '#111111',
+        ], SiteSetting::allKeyed());
     }
 }

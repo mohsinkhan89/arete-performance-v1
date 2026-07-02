@@ -90,8 +90,8 @@
                     <label class="field-medium">Short Description
                         <input name="short_description" value="{{ old('short_description', $record->short_description ?? '') }}">
                     </label>
-                    <label class="wide">Description
-                        <textarea name="description" rows="4">{{ old('description', $record->description ?? '') }}</textarea>
+                    <label class="wide rich-field">Description
+                        <textarea class="rich-text-source" name="description" rows="4" data-rich-text>{{ old('description', $record->description ?? '') }}</textarea>
                     </label>
                     <label class="switch-row">
                         <input type="checkbox" name="is_featured" value="1" @checked(old('is_featured', $record->is_featured ?? false))>
@@ -133,8 +133,8 @@
                             </label>
                         </div>
                     @endif
-                    <label class="wide">Description
-                        <textarea name="description" rows="4">{{ old('description', $record->description ?? '') }}</textarea>
+                    <label class="wide rich-field">Description
+                        <textarea class="rich-text-source" name="description" rows="4" data-rich-text>{{ old('description', $record->description ?? '') }}</textarea>
                     </label>
                 </div>
             @elseif ($resource === 'reviews')
