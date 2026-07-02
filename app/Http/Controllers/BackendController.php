@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
@@ -72,6 +73,7 @@ class BackendController extends Controller
             'categories' => Category::withCount('products')->latest()->paginate(10),
             'users' => User::latest()->paginate(10),
             'reviews' => Review::with('product')->latest()->paginate(10),
+            'orders' => Order::withCount('items')->latest()->paginate(10),
             default => null,
         };
 

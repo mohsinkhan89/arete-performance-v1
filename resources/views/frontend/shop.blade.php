@@ -23,39 +23,70 @@
       <div class="container">
         <div class="shop-layout">
           <aside class="shop-sidebar reveal-on-scroll" aria-label="Shop filters">
-            <div class="filter-block">
-              <h2>Categories</h2>
-              <a class="active" href="{{ route('frontend.shop') }}"><span>All Products</span><strong>({{ $products->total() }})</strong></a>
-              @foreach ($categories as $category)
-                <a href="#{{ $category->slug }}"><span>{{ $category->name }}</span><strong>({{ $category->products_count }})</strong></a>
-              @endforeach
-            </div>
-            <div class="filter-block">
-              <h2>Price Range</h2>
-              <div class="price-range"><span></span></div>
-              <div class="price-values"><strong>£0</strong><strong>£400</strong></div>
-            </div>
-            <div class="filter-block">
-              <h2>Lab Tested</h2>
-              <label><input type="checkbox" checked> Yes <strong>({{ $products->total() }})</strong></label>
-            </div>
-            <button class="clear-filters" type="button">Clear filters <i class="fa-solid fa-rotate-right"></i></button>
+            <form method="GET" action="{{ route('frontend.shop') }}">
+              @if (! empty($filters['q']))
+                <input type="hidden" name="q" value="{{ $filters['q'] }}">
+              @endif
+              @if (! empty($filters['sort']))
+                <input type="hidden" name="sort" value="{{ $filters['sort'] }}">
+              @endif
+
+              <div class="filter-block">
+                <h2>Categories</h2>
+                <a class="{{ empty($filters['category']) ? 'active' : '' }}" href="{{ route('frontend.shop', array_filter(['q' => $filters['q'] ?? null, 'sort' => $filters['sort'] ?? null])) }}"><span>All Products</span><strong>({{ $products->total() }})</strong></a>
+                @foreach ($categories as $category)
+                  <a class="{{ ($filters['category'] ?? '') === $category->slug ? 'active' : '' }}" href="{{ route('frontend.shop', array_filter(['category' => $category->slug, 'q' => $filters['q'] ?? null, 'sort' => $filters['sort'] ?? null])) }}"><span>{{ $category->name }}</span><strong>({{ $category->products_count }})</strong></a>
+                @endforeach
+              </div>
+
+              <div class="filter-block">
+                <h2>Price Range</h2>
+                <div class="price-range"><span></span></div>
+                <div class="price-values"><strong>£0</strong><strong>£400</strong></div>
+                <div class="filter-fields">
+                  <input type="number" name="min_price" min="0" placeholder="Min" value="{{ $filters['min_price'] }}">
+                  <input type="number" name="max_price" min="0" placeholder="Max" value="{{ $filters['max_price'] }}">
+                </div>
+              </div>
+
+              <div class="filter-block">
+                <h2>Lab Tested</h2>
+                <label><input type="checkbox" checked> Yes <strong>({{ $products->total() }})</strong></label>
+              </div>
+
+              <button class="clear-filters" type="submit">Apply filters <i class="fa-solid fa-filter"></i></button>
+              <a class="clear-filters filter-reset" href="{{ route('frontend.shop') }}">Clear filters <i class="fa-solid fa-rotate-right"></i></a>
+            </form>
           </aside>
 
           <div class="shop-products">
             <div class="shop-toolbar reveal-on-scroll">
               <p>Showing {{ $products->firstItem() ?? 0 }}-{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p>
-              <button type="button">Sort by: Latest <i class="fa-solid fa-chevron-down"></i></button>
+              <form method="GET" action="{{ route('frontend.shop') }}" class="sort-form">
+                @foreach (['q', 'category', 'min_price', 'max_price'] as $filterKey)
+                  @if (! empty($filters[$filterKey]))
+                    <input type="hidden" name="{{ $filterKey }}" value="{{ $filters[$filterKey] }}">
+                  @endif
+                @endforeach
+                <label class="visually-hidden" for="shopSort">Sort products</label>
+                <select id="shopSort" name="sort" onchange="this.form.submit()">
+                  <option value="latest" @selected(($filters['sort'] ?? 'latest') === 'latest')>Sort by: Latest</option>
+                  <option value="name" @selected(($filters['sort'] ?? '') === 'name')>Sort by: Name</option>
+                  <option value="price_asc" @selected(($filters['sort'] ?? '') === 'price_asc')>Price: Low to high</option>
+                  <option value="price_desc" @selected(($filters['sort'] ?? '') === 'price_desc')>Price: High to low</option>
+                </select>
+              </form>
             </div>
+
             <div class="shop-grid reveal-group">
               @forelse ($products as $product)
-                <article class="shop-product-card product-card" id="{{ $product->category?->slug }}" data-product-id="{{ $product->slug }}">
+                <article class="shop-product-card product-card" id="{{ $product->category?->slug }}" data-product-id="{{ $product->id }}">
                   @if ($product->is_featured)<span class="tag">Popular</span>@endif
                   <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
                   <small>{{ $product->category?->name }}</small>
                   <h3>{{ $product->name }}</h3>
                   <div class="rating">★★★★★ <span>({{ $product->stock }})</span></div>
-                  <div><strong>£{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong><button aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button></div>
+                  <div><strong>£{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong><button type="button" data-cart-add="{{ $product->id }}" aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button></div>
                 </article>
               @empty
                 <p>No products found.</p>

@@ -7,115 +7,79 @@
 @endsection
 
 @section('body')
-
     <section class="success-hero">
       <div class="container">
         <div class="success-hero-copy reveal-up">
           <div class="success-check" aria-hidden="true"><i class="fa-solid fa-check"></i></div>
           <h1>Order Placed <span>Successfully!</span></h1>
-          <p>Thank you for your order. Your purchase has been confirmed and you will receive an email with order details.</p>
-          <p class="success-order-id">Order <strong>#AR12345678</strong></p>
-          <a class="btn btn-gold" href="#orderDetails">View order details <i class="fa-solid fa-arrow-right"></i></a>
+          @if ($order)
+            <p>Thank you for your order. Your purchase has been confirmed and saved.</p>
+            <p class="success-order-id">Order <strong>#{{ $order->order_number }}</strong></p>
+            <a class="btn btn-gold" href="#orderDetails">View order details <i class="fa-solid fa-arrow-right"></i></a>
+          @else
+            <p>No recent order found.</p>
+            <a class="btn btn-gold" href="{{ route('frontend.shop') }}">Continue shopping <i class="fa-solid fa-arrow-right"></i></a>
+          @endif
         </div>
       </div>
     </section>
 
-    <section class="success-main section-space">
-      <div class="container">
-        <div class="success-grid">
-          <aside class="success-side">
-            <article class="success-card reveal-on-scroll">
-              <h2><i class="fa-regular fa-clipboard"></i> Order Confirmation Sent!</h2>
-              <p>We've sent a confirmation email to <a href="mailto:john.doe@example.com">john.doe@example.com</a> with your order details and tracking information.</p>
-            </article>
+    @if ($order)
+      <section class="success-main section-space">
+        <div class="container">
+          <div class="success-grid">
+            <aside class="success-side">
+              <article class="success-card reveal-on-scroll">
+                <h2><i class="fa-regular fa-clipboard"></i> Order Confirmation</h2>
+                <p>Confirmation is ready for <a href="mailto:{{ $order->email }}">{{ $order->email }}</a>.</p>
+              </article>
 
-            <article class="success-card reveal-on-scroll">
-              <h2>What's Next?</h2>
-              <div class="order-timeline">
-                <div class="timeline-item active"><i class="fa-solid fa-envelope-circle-check"></i><div><strong>Order Confirmed</strong><span>May 25, 2024 - 10:30 AM</span></div></div>
-                <div class="timeline-item"><i class="fa-solid fa-box-open"></i><div><strong>Order Processing</strong><span>We are preparing your order</span></div></div>
-                <div class="timeline-item"><i class="fa-solid fa-truck-fast"></i><div><strong>Shipped</strong><span>You'll receive tracking info once your order is on the way</span></div></div>
-                <div class="timeline-item"><i class="fa-solid fa-house-circle-check"></i><div><strong>Delivered</strong><span>Estimated delivery to your doorstep</span></div></div>
+              <article class="success-card reveal-on-scroll">
+                <h2>What's Next?</h2>
+                <div class="order-timeline">
+                  <div class="timeline-item active"><i class="fa-solid fa-envelope-circle-check"></i><div><strong>Order Confirmed</strong><span>{{ $order->created_at?->format('M d, Y - h:i A') }}</span></div></div>
+                  <div class="timeline-item"><i class="fa-solid fa-box-open"></i><div><strong>Order Processing</strong><span>We are preparing your order</span></div></div>
+                  <div class="timeline-item"><i class="fa-solid fa-truck-fast"></i><div><strong>Shipped</strong><span>Tracking info will be shared once ready</span></div></div>
+                  <div class="timeline-item"><i class="fa-solid fa-house-circle-check"></i><div><strong>Delivered</strong><span>Estimated delivery to your doorstep</span></div></div>
+                </div>
+              </article>
+            </aside>
+
+            <section class="success-card order-detail-card reveal-on-scroll" id="orderDetails">
+              <h2><i class="fa-regular fa-rectangle-list"></i> Order Details</h2>
+              <dl class="order-detail-list">
+                <div><dt>Order Number</dt><dd>{{ $order->order_number }}</dd></div>
+                <div><dt>Order Date</dt><dd>{{ $order->created_at?->format('M d, Y') }}</dd></div>
+                <div><dt>Payment Method</dt><dd>{{ ucfirst($order->payment_method) }}</dd></div>
+                <div><dt>Shipping Method</dt><dd>{{ ucfirst($order->shipping_method) }}</dd></div>
+                <div><dt>Shipping Address</dt><dd><strong>{{ $order->customer_name }}</strong><br>{{ $order->address }}<br>{{ $order->city }}, {{ $order->state }} {{ $order->zip }}<br>{{ $order->country }}<br>{{ $order->phone }}</dd></div>
+                <div class="paid-line"><dt>Total Paid</dt><dd>£{{ number_format((float) $order->total, 2) }}</dd></div>
+              </dl>
+            </section>
+
+            <aside class="success-card success-summary reveal-on-scroll" aria-labelledby="successSummaryTitle">
+              <h2 id="successSummaryTitle">Order Summary ({{ $order->items->sum('quantity') }} Items)</h2>
+              <div class="checkout-summary-items">
+                @foreach ($order->items as $item)
+                  <article>
+                    <img src="{{ url($item->product_image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $item->product_name }}">
+                    <div><strong>{{ $item->product_name }}</strong><span>{{ $item->product_sku }}</span><small>Qty: {{ $item->quantity }}</small></div>
+                    <b>£{{ number_format((float) $item->line_total, 2) }}</b>
+                  </article>
+                @endforeach
               </div>
-            </article>
-          </aside>
-
-          <section class="success-card order-detail-card reveal-on-scroll" id="orderDetails">
-            <h2><i class="fa-regular fa-rectangle-list"></i> Order Details</h2>
-            <dl class="order-detail-list">
-              <div><dt>Order Number</dt><dd>AR12345678</dd></div>
-              <div><dt>Order Date</dt><dd>May 25, 2024</dd></div>
-              <div><dt>Payment Method</dt><dd>Visa **** 4242</dd></div>
-              <div><dt>Shipping Method</dt><dd>Standard Shipping (5-7 Business Days)</dd></div>
-              <div><dt>Shipping Address</dt><dd><strong>John Doe</strong><br>123 Strength Ave,<br>Miami, FL 33101,<br>United States<br>+1 (888) 123-4567</dd></div>
-              <div class="paid-line"><dt>Total Paid</dt><dd>$279.96</dd></div>
-            </dl>
-          </section>
-
-          <aside class="success-card success-summary reveal-on-scroll" aria-labelledby="successSummaryTitle">
-            <h2 id="successSummaryTitle">Order Summary (3 Items)</h2>
-            <div class="checkout-summary-items">
-              <article>
-                <img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Anavar 50">
-                <div><strong>Anavar 50</strong><span>(Oxandrolone)</span><small>Qty: 1</small></div>
-                <b>$59.99</b>
-              </article>
-              <article>
-                <img src="{{ url('frontend/assets/images/category-boxes.svg') }}" alt="PCT Complete Stack">
-                <div><strong>PCT Complete Stack</strong><span>Post Cycle Therapy</span><small>Qty: 1</small></div>
-                <b>$89.99</b>
-              </article>
-              <article>
-                <img src="{{ url('frontend/assets/images/categories-imgs/peptides.png') }}" alt="CJC-1295">
-                <div><strong>CJC-1295 2mg</strong><span>Peptides</span><small>Qty: 2</small></div>
-                <b>$149.98</b>
-              </article>
-            </div>
-            <div class="checkout-total-lines">
-              <div><span>Subtotal (3 Items)</span><strong>$299.96</strong></div>
-              <div><span>Shipping <i class="fa-regular fa-circle-question"></i></span><strong>$9.99</strong></div>
-              <div class="discount"><span>Discount (ARETE10)</span><strong>- $29.99</strong></div>
-            </div>
-            <div class="checkout-total"><span>Total</span><strong>$279.96</strong></div>
-          </aside>
+              <div class="checkout-total-lines">
+                <div><span>Subtotal</span><strong>£{{ number_format((float) $order->subtotal, 2) }}</strong></div>
+                <div><span>Shipping</span><strong>£{{ number_format((float) $order->shipping_total, 2) }}</strong></div>
+              </div>
+              <div class="checkout-total"><span>Total</span><strong>£{{ number_format((float) $order->total, 2) }}</strong></div>
+            </aside>
+          </div>
         </div>
-
-        <section class="recommended-products">
-          <div class="recommend-head">
-            <p class="eyebrow">You might also like</p>
-            <button type="button" aria-label="Next products"><i class="fa-solid fa-chevron-right"></i></button>
-          </div>
-          <div class="recommended-grid reveal-group">
-            <article class="shop-product-card product-card" data-product-id="testosterone-enanthate"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Testosterone Enanthate"><h3>Testosterone Enanthate</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span>(68)</span></div><div><strong>$49.99</strong><button aria-label="Add Testosterone Enanthate to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-            <article class="shop-product-card product-card bottle-silver" data-product-id="winstrol"><img src="{{ url('frontend/assets/images/categories-imgs/orals.png') }}" alt="Winstrol 10mg"><h3>Winstrol 10mg</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9734; <span>(46)</span></div><div><strong>$54.99</strong><button aria-label="Add Winstrol to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-            <article class="shop-product-card product-card" data-product-id="male-enhancement-stack"><img src="{{ url('frontend/assets/images/categories-imgs/sexual-health.png') }}" alt="Lean Bulking Stack"><h3>Lean Bulking Stack</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span>(51)</span></div><div><strong>$79.99</strong><button aria-label="Add Lean Bulking Stack to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-            <article class="shop-product-card product-card bottle-gold" data-product-id="clenbuterol"><img src="{{ url('frontend/assets/images/categories-imgs/fat-burrners.png') }}" alt="Clenbuterol 40mcg"><h3>Clenbuterol 40mcg</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#973３; <span>(67)</span></div><div><strong>$49.99</strong><button aria-label="Add Clenbuterol to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-            <article class="shop-product-card product-card bottle-gold" data-product-id="trenbolone-acetate"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Trenbolone Acetate"><h third>Trenbolone Acetate</h third><div class="rating">&#97３;&#９７３&#９７３&#９７３&#９７３; <span>(42)</span></div><div><strong>$64.99</strong><button aria-label="Add Trenbolone Acetate to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-            <article class="shop-product-card product-card bottle-silver" data-product-id="masteron-enanthate"><img src="{{ url('frontend/assets/images/categories-imgs/peptides.png') }}" alt="Masteron Enanthate"><h third>Masteron Enanthate</h third><div class="rating">&#９７３&#９７３&#９７３&#９７３&#９７３; <span>( thirty-eight )</span></div><><strong>$4 ninety-nine</strong><button aria-label= "Add Masteron Enanthate to cart" ><i class= "fa-solid fa-cart-plus" ></i></button ></ div ></ article >
-          </div>
-        </section>
-      </div>
-    </section>
+      </section>
+    @endif
 
     @include('frontend.inc.delivery-trusted')
-
-    <section class="shop-newsletter">
-      <div class="container">
-        <div class="shop-newsletter-inner">
-          <div>
-            <p class="eyebrow">Stay in the loop</p>
-            <h2>Exclusive deals. Expert tips. Straight to your inbox.</h2>
-            <p>Join the Arete Performance community.</p>
-          </div>
-          <form class="newsletter">
-            <label class="visually-hidden" for="successNewsletter">Email</label>
-            <input id="successNewsletter" type="email" placeholder="Enter your email" required>
-            <button type="submit">Subscribe</button>
-          </form>
-        </div>
-      </div>
-    </section>
-
 @endsection
 
 @section('js')

@@ -8,7 +8,7 @@
         <p>Manage {{ strtolower($pageTitle) }} from your Arete Performance admin panel.</p>
     </div>
 
-    @if (in_array($page, ['products', 'categories', 'users', 'reviews'], true))
+    @if (in_array($page, ['products', 'categories', 'users', 'reviews', 'orders'], true))
         @php
             $canManage = $page !== 'users' || $canManageUsers;
         @endphp
@@ -151,6 +151,27 @@
                                 </tr>
                             @empty
                                 <tr><td colspan="7" class="empty-cell">No users found.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                @elseif ($page === 'orders')
+                    <table>
+                        <thead>
+                            <tr><th>Order</th><th>Customer</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Created</th></tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($records as $order)
+                                <tr>
+                                    <td>{{ $order->order_number }}</td>
+                                    <td>{{ $order->customer_name }}</td>
+                                    <td>{{ $order->email }}</td>
+                                    <td>{{ $order->items_count }}</td>
+                                    <td>£{{ number_format((float) $order->total, 2) }}</td>
+                                    <td><span class="badge green">{{ ucfirst($order->status) }}</span></td>
+                                    <td>{{ $order->created_at?->format('M d, Y') }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="7" class="empty-cell">No orders found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

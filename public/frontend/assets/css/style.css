@@ -1994,7 +1994,31 @@ img {
   font-size: .78rem;
 }
 
+.filter-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.filter-fields input,
+.sort-form select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  color: #171717;
+  font-size: .78rem;
+  font-weight: 800;
+  background: var(--color-white);
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+}
+
 .clear-filters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: calc(100% - 32px);
   margin: 16px;
   padding: 14px;
@@ -2008,8 +2032,14 @@ img {
 }
 
 .clear-filters i {
-  margin-left: 6px;
   color: var(--color-primary);
+}
+
+.filter-reset {
+  margin-top: -8px;
+  color: #111;
+  background: var(--color-white);
+  border: 1px solid #d9d9d9;
 }
 
 .shop-toolbar {
@@ -2040,6 +2070,10 @@ img {
 .shop-toolbar i {
   margin-left: 20px;
   color: var(--color-primary);
+}
+
+.sort-form {
+  min-width: 190px;
 }
 
 .shop-grid {

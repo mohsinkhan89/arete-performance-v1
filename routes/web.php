@@ -13,10 +13,16 @@ use App\Http\Controllers\FrontendController;
 Route::get('/', [FrontendController::class, 'index'])->name('frontend.index');
 Route::get('my-cart', [FrontendController::class, 'myCart'])->name('frontend.my-cart');
 Route::get('checkout', [FrontendController::class, 'checkout'])->name('frontend.checkout');
+Route::post('checkout', [FrontendController::class, 'placeOrder'])->name('frontend.order.store');
 Route::get('order-success', [FrontendController::class, 'orderSuccess'])->name('frontend.order-success');
 Route::get('product-details', [FrontendController::class, 'productDetails'])->name('frontend.product-details');
 Route::get('search', [FrontendController::class, 'search'])->name('frontend.search');
 Route::get('shop', [FrontendController::class, 'shop'])->name('frontend.shop');
+Route::get('cart/json', [FrontendController::class, 'cartJson'])->name('frontend.cart.json');
+Route::post('cart/add/{product}', [FrontendController::class, 'addCart'])->name('frontend.cart.add');
+Route::patch('cart/update/{product}', [FrontendController::class, 'updateCart'])->name('frontend.cart.update');
+Route::delete('cart/remove/{product}', [FrontendController::class, 'removeCart'])->name('frontend.cart.remove');
+Route::delete('cart/clear', [FrontendController::class, 'clearCart'])->name('frontend.cart.clear');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'showLogin'])->name('login');

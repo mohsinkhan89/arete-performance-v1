@@ -4,6 +4,7 @@
     @yield('metas')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="Arete Performance premium sports nutrition and performance products.">
     @yield('metas')
     <title>Arete Performance</title>
@@ -66,7 +67,12 @@
       cart: "{{ route('frontend.my-cart') }}",
       checkout: "{{ route('frontend.checkout') }}",
       orderSuccess: "{{ route('frontend.order-success') }}",
-      productDetails: "{{ route('frontend.product-details') }}"
+      productDetails: "{{ route('frontend.product-details') }}",
+      cartJson: "{{ route('frontend.cart.json') }}",
+      cartAddBase: "{{ url('cart/add') }}",
+      cartUpdateBase: "{{ url('cart/update') }}",
+      cartRemoveBase: "{{ url('cart/remove') }}",
+      cartClear: "{{ route('frontend.cart.clear') }}"
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -58,9 +58,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartSubtotal = document.querySelector(".cart-subtotal");
   const productTrack = document.querySelector(".product-track");
 
-  const money = (value) => `$${value.toFixed(2)}`;
+  const money = (value) => `£${Number(value || 0).toFixed(2)}`;
   const findProduct = (id) => products.find((product) => product.id === id);
   const cartQty = () => [...cart.values()].reduce((total, qty) => total + qty, 0);
+  const csrfToken = document.querySelector("meta[name='csrf-token']")?.content || "";
 
   function prepareAnimatedHeadings() {
     document.querySelectorAll(".section-heading h2, .why-intro h2").forEach((heading) => {
@@ -187,8 +188,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const routes = window.appRoutes || {};
   const route = (name, fallback) => routes[name] || fallback;
 
-  function openCart() {
-    renderCart();
+  function endpoint(base, id) {
+    return `${base}/${id}`;
+  }
+
+  async function cartRequest(url, method = "GET", body = null) {
+    const response = await fetch(url, {
+      method,
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": csrfToken
+      },
+      body: body ? JSON.stringify(body) : null
+    });
+
+    if (!response.ok) throw new Error("Cart request failed.");
+
+    return response.json();
+  }
+
+  async function openCart() {
+    await renderCart();
     cartOverlay.classList.add("is-open");
     cartOverlay.setAttribute("aria-hidden", "false");
     setPanelState(cartDrawer, true);
@@ -200,50 +221,72 @@ document.addEventListener("DOMContentLoaded", () => {
     setPanelState(cartDrawer, false);
   }
 
-  function addToCart(id, quantity = 1) {
-    const product = findProduct(id);
-    if (!product) return;
+  async function addToCart(id, quantity = 1) {
+    if (!id) return;
     const safeQty = Math.max(1, Number(quantity) || 1);
-    cart.set(id, (cart.get(id) || 0) + safeQty);
-    renderCart();
-    showToast(`${product.name}${safeQty > 1 ? ` x${safeQty}` : ""} added to your cart.`);
-  }
-
-  function updateQty(id, direction) {
-    const nextQty = (cart.get(id) || 0) + direction;
-    if (nextQty <= 0) {
-      cart.delete(id);
-    } else {
-      cart.set(id, nextQty);
+    try {
+      const data = await cartRequest(endpoint(route("cartAddBase", "/cart/add"), id), "POST", { quantity: safeQty });
+      renderCart(data);
+      showToast("Product added to your cart.");
+    } catch (error) {
+      showToast("Unable to update cart right now.");
     }
-    renderCart();
   }
 
-  function renderCart() {
-    const entries = [...cart.entries()];
-    const subtotal = entries.reduce((total, [id, qty]) => total + findProduct(id).price * qty, 0);
+  async function updateQty(id, direction, currentQty = null) {
+    const nextQty = Math.max(0, Number(currentQty ?? 1) + direction);
+    try {
+      const data = await cartRequest(endpoint(route("cartUpdateBase", "/cart/update"), id), "PATCH", { quantity: nextQty });
+      renderCart(data);
+      if (document.querySelector("[data-cart-row]")) window.location.reload();
+    } catch (error) {
+      showToast("Unable to update quantity.");
+    }
+  }
 
-    cartItems.innerHTML = entries.map(([id, qty]) => {
-      const product = findProduct(id);
+  async function removeFromCart(id) {
+    try {
+      const data = await cartRequest(endpoint(route("cartRemoveBase", "/cart/remove"), id), "DELETE");
+      renderCart(data);
+      if (document.querySelector("[data-cart-row]")) window.location.reload();
+    } catch (error) {
+      showToast("Unable to remove item.");
+    }
+  }
+
+  async function clearServerCart() {
+    try {
+      const data = await cartRequest(route("cartClear", "/cart/clear"), "DELETE");
+      renderCart(data);
+      if (document.querySelector("[data-cart-row]")) window.location.reload();
+    } catch (error) {
+      showToast("Unable to clear cart.");
+    }
+  }
+
+  async function renderCart(cartData = null) {
+    const data = cartData || await cartRequest(route("cartJson", "/cart/json"));
+
+    cartItems.innerHTML = data.items.map((product) => {
       return `
         <article class="cart-item">
           <img src="${product.image}" alt="${product.name}">
           <div>
             <h3>${product.name}</h3>
-            <small>${product.meta} - ${money(product.price)}</small>
+            <small>${product.meta} - ${money(product.unit_price)}</small>
             <div class="qty-control" aria-label="Quantity controls">
-              <button type="button" data-cart-dec="${product.id}" aria-label="Decrease ${product.name}">-</button>
-              <span>${qty}</span>
-              <button type="button" data-cart-inc="${product.id}" aria-label="Increase ${product.name}">+</button>
+              <button type="button" data-cart-dec="${product.id}" data-cart-qty="${product.quantity}" aria-label="Decrease ${product.name}">-</button>
+              <span>${product.quantity}</span>
+              <button type="button" data-cart-inc="${product.id}" data-cart-qty="${product.quantity}" aria-label="Increase ${product.name}">+</button>
             </div>
           </div>
           <button class="remove-item" type="button" data-cart-remove="${product.id}" aria-label="Remove ${product.name}"><i class="fa-solid fa-trash-can"></i></button>
         </article>`;
     }).join("");
 
-    cartCount.textContent = cartQty();
-    cartSubtotal.textContent = money(subtotal);
-    cartEmpty.classList.toggle("is-visible", entries.length === 0);
+    cartCount.textContent = data.item_count;
+    cartSubtotal.textContent = money(data.subtotal);
+    cartEmpty.classList.toggle("is-visible", data.is_empty);
   }
 
   function renderSearchResults(query) {
@@ -284,7 +327,8 @@ document.addEventListener("DOMContentLoaded", () => {
   searchInput.addEventListener("input", (event) => renderSearchResults(event.target.value));
   searchForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    goToPage(route("search", "/search"));
+    const query = searchInput.value.trim();
+    goToPage(`${route("search", "/search")}${query ? `?q=${encodeURIComponent(query)}` : ""}`);
   });
 
   document.querySelector(".cart-btn").addEventListener("click", openCart);
@@ -370,14 +414,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document.addEventListener("click", (event) => {
+  document.addEventListener("click", async (event) => {
     const productCard = event.target.closest(".product-card");
     const relatedCard = event.target.closest(".related-card");
     const categoryCard = event.target.closest(".category-card");
     const addFromSearch = event.target.closest("[data-search-add]");
     const goTrigger = event.target.closest("[data-go]");
     const accountButton = event.target.closest(".icon-btn[aria-label='Account']");
-    const clearFilters = event.target.closest(".clear-filters");
+    const clearFilters = event.target.closest("[data-clear-filters]");
     const clearSearch = event.target.closest("[aria-label='Clear search']");
     const sortButton = event.target.closest(".shop-toolbar button");
     const productThumb = event.target.closest("[data-product-image]");
@@ -391,6 +435,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const inc = event.target.closest("[data-cart-inc]");
     const dec = event.target.closest("[data-cart-dec]");
     const remove = event.target.closest("[data-cart-remove]");
+    const clearCart = event.target.closest("[data-cart-clear]");
     const drawerCheckout = event.target.closest(".cart-summary .btn");
 
     const qtyOutput = document.querySelector("[data-product-qty]");
@@ -407,15 +452,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sortButton) goToPage(document.body.classList.contains("search-page") ? route("search", "/search") : route("shop", "/shop"));
     if (categoryCard && !event.target.closest("button, a")) goToPage(route("shop", "/shop"));
 
-    if (productCard && event.target.closest("button")) {
+    if (event.target.closest("[data-cart-add]")) {
+      await addToCart(event.target.closest("[data-cart-add]").dataset.cartAdd);
+    } else if (productCard && event.target.closest("button")) {
       const index = [...document.querySelectorAll(".product-card")].indexOf(productCard);
-      addToCart(productCard.dataset.productId || products[index]?.id);
+      await addToCart(productCard.dataset.productId || products[index]?.id);
     } else if (productCard && !event.target.closest("a")) {
       goToPage(route("productDetails", "/product-details"));
     }
 
     if (relatedCard && event.target.closest("button")) {
-      addToCart(relatedCard.dataset.productId);
+      await addToCart(relatedCard.dataset.productId);
     } else if (relatedCard) {
       goToPage(route("productDetails", "/product-details"));
     }
@@ -434,9 +481,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (productQtyInc) setProductQty(getProductQty() + 1);
     if (productQtyDec) setProductQty(getProductQty() - 1);
-    if (productAdd) addToCart(productAdd.dataset.productAdd, getProductQty());
+    if (productAdd) await addToCart(productAdd.dataset.productAdd, getProductQty());
     if (buyNow) {
-      addToCart(buyNow.dataset.buyNow, getProductQty());
+      await addToCart(buyNow.dataset.buyNow, getProductQty());
       window.location.href = route("checkout", "/checkout");
     }
     if (labReport) showToast("Lab report preview is opening soon.");
@@ -453,10 +500,11 @@ document.addEventListener("DOMContentLoaded", () => {
       productZoom.setAttribute("aria-pressed", String(isZoomed));
     }
 
-    if (addFromSearch) addToCart(addFromSearch.dataset.searchAdd);
-    if (inc) updateQty(inc.dataset.cartInc, 1);
-    if (dec) updateQty(dec.dataset.cartDec, -1);
-    if (remove) updateQty(remove.dataset.cartRemove, -999);
+    if (addFromSearch) await addToCart(addFromSearch.dataset.searchAdd);
+    if (inc) updateQty(inc.dataset.cartInc, 1, inc.dataset.cartQty || inc.parentElement?.querySelector("span")?.textContent);
+    if (dec) updateQty(dec.dataset.cartDec, -1, dec.dataset.cartQty || dec.parentElement?.querySelector("span")?.textContent);
+    if (remove) removeFromCart(remove.dataset.cartRemove);
+    if (clearCart) clearServerCart();
   });
 
   document.querySelector("[data-product-zoom]")?.addEventListener("keydown", (event) => {

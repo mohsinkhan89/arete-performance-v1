@@ -16,7 +16,7 @@
           <div class="nav-actions d-flex align-items-center gap-2">
             <button class="icon-btn search-toggle" type="button" aria-label="Search products"><i class="fa-solid fa-magnifying-glass"></i></button>
             <button class="icon-btn" type="button" aria-label="Account"><i class="fa-regular fa-user"></i></button>
-            <button class="icon-btn cart-btn" type="button" aria-label="Cart"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">2</span></button>
+            <button class="icon-btn cart-btn" type="button" aria-label="Cart"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">{{ $cartSummary['item_count'] ?? 0 }}</span></button>
           </div>
         </div>
       </div>

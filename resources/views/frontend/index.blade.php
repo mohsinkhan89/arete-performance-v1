@@ -32,10 +32,10 @@
         <div class="row g-3 mt-3 reveal-group">
           @foreach ($categories as $category)
             <div class="col-6 col-md-4 col-lg-3">
-              <article class="category-card">
+              <a class="category-card" href="{{ route('frontend.shop', ['category' => $category->slug]) }}">
                 <img src="{{ url($category->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $category->name }}">
                 <div><h3>{{ $category->name }}</h3><i class="fa-solid fa-chevron-right"></i></div>
-              </article>
+              </a>
             </div>
           @endforeach
         </div>
@@ -69,12 +69,12 @@
           <div class="row g-3 mt-3 reveal-group product-track">
             @foreach ($featuredProducts as $product)
               <div class="col-6 col-md-4 col-lg">
-                <article class="product-card">
+                <article class="product-card" data-product-id="{{ $product->id }}">
                   @if ($product->is_featured)<span class="tag">Popular</span>@endif
                   <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
                   <h3>{{ $product->name }}</h3>
                   <small>{{ $product->category?->name }}</small>
-                  <div><strong>£{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong><button aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button></div>
+                  <div><strong>£{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong><button type="button" data-cart-add="{{ $product->id }}" aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button></div>
                 </article>
               </div>
             @endforeach
