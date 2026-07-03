@@ -61,6 +61,13 @@ body {
   }
 }
 
+@keyframes flashSlideOut {
+  to {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -1353,6 +1360,11 @@ td {
   font-size: 13px;
   font-weight: 700;
   animation: flashSlideUp 0.38s ease both;
+}
+
+.flash-message.is-hiding {
+  pointer-events: none;
+  animation: flashSlideOut 0.28s ease both;
 }
 
 .flash-message.error {

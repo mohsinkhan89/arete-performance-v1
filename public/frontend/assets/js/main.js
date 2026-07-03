@@ -1,4 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const autoDismissAlerts = (selector, delay = 4000) => {
+    document.querySelectorAll(selector).forEach((alert) => {
+      window.setTimeout(() => {
+        alert.classList.add("is-hiding");
+        alert.addEventListener("animationend", () => alert.remove(), { once: true });
+      }, delay);
+    });
+  };
+
+  autoDismissAlerts(".alert, .track-alert");
+
   const products = [
     { id: "anavar-50", name: "Anavar 50", meta: "Oxandrolone", price: 59.99, image: "assets/images/product-bottle.png" },
     { id: "cardarine", name: "Cardarine", meta: "GW-501516", price: 69.99, image: "assets/images/product-bottle.png" },

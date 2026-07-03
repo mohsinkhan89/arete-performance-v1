@@ -33,6 +33,19 @@ body {
   width: 100%;
 }
 
+@keyframes alertSlideOut {
+  to {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+
+.alert.is-hiding,
+.track-alert.is-hiding {
+  pointer-events: none;
+  animation: alertSlideOut .28s ease both;
+}
+
 html,
 body {
   max-width: 100%;

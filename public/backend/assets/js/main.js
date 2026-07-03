@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const autoDismissAlerts = (selector, delay = 4000) => {
+    document.querySelectorAll(selector).forEach((alert) => {
+      window.setTimeout(() => {
+        alert.classList.add('is-hiding');
+        alert.addEventListener('animationend', () => alert.remove(), { once: true });
+      }, delay);
+    });
+  };
+
+  autoDismissAlerts('.flash-message');
+
   const richTextareas = document.querySelectorAll('textarea[data-rich-text]');
 
   const richCommands = [

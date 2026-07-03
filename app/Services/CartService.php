@@ -91,7 +91,7 @@ class CartService
         $this->syncFromItems($items);
 
         $subtotal = (float) $items->sum('line_total');
-        $itemCount = (int) $items->sum('quantity');
+        $itemCount = $items->count();
         $shipping = $itemCount > 0 ? 4.99 : 0.0;
         $total = $subtotal + $shipping;
 
