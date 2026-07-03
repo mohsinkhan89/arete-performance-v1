@@ -16,12 +16,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <link href="{{ url('frontend/assets/css/style.css') }}" rel="stylesheet">
-    <style>
-      :root {
-        --color-primary: {{ $siteSettings['primary_color'] ?? '#f5a817' }};
-        --color-primary-light: {{ $siteSettings['secondary_color'] ?? '#ffc14d' }};
-      }
-    </style>
 </head>
 <body class="@yield('body_class', (Request::path() === '/' ? 'home-page' : str_replace('/', '-', Request::path()) . '-page'))">
   

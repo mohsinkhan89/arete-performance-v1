@@ -44,8 +44,6 @@ class AppServiceProvider extends ServiceProvider
         return array_merge([
             'header_logo' => 'frontend/assets/images/logo/logo-transperent.png',
             'footer_logo' => 'frontend/assets/images/logo/logo.png',
-            'primary_color' => '#f5a817',
-            'secondary_color' => '#ffc14d',
         ], SiteSetting::allKeyed());
     }
 }

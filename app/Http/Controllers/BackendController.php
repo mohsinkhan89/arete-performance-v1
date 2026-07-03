@@ -162,9 +162,7 @@ class BackendController extends Controller
 
     public function updateSiteSettings(Request $request): RedirectResponse
     {
-        $data = $request->validate([
-            'primary_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
-            'secondary_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+        $request->validate([
             'header_logo_file' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
             'footer_logo_file' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
         ]);
@@ -182,9 +180,6 @@ class BackendController extends Controller
             $file->move(public_path('backend/assets/imgs/uploads'), $filename);
             SiteSetting::setValue($settingKey, 'backend/assets/imgs/uploads/' . $filename);
         }
-
-        SiteSetting::setValue('primary_color', $data['primary_color']);
-        SiteSetting::setValue('secondary_color', $data['secondary_color']);
 
         return back()->with('success', 'Site settings updated successfully.');
     }
@@ -546,8 +541,6 @@ class BackendController extends Controller
         return array_merge([
             'header_logo' => 'frontend/assets/images/logo/logo-transperent.png',
             'footer_logo' => 'frontend/assets/images/logo/logo.png',
-            'primary_color' => '#f5a817',
-            'secondary_color' => '#ffc14d',
         ], SiteSetting::allKeyed());
     }
 }

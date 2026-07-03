@@ -44,34 +44,6 @@
                 </div>
             </section>
 
-            <section class="settings-panel">
-                <div class="settings-panel-head">
-                    <div>
-                        <span class="eyebrow">Theme</span>
-                        <h2>Website Colors</h2>
-                    </div>
-                </div>
-
-                <div class="color-settings-grid">
-                    <label class="color-field">
-                        <span>Primary Color</span>
-                        <input type="color" name="primary_color" value="{{ old('primary_color', $settings['primary_color'] ?? '#f5a817') }}">
-                        @error('primary_color') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-
-                    <label class="color-field">
-                        <span>Secondary Color</span>
-                        <input type="color" name="secondary_color" value="{{ old('secondary_color', $settings['secondary_color'] ?? '#ffc14d') }}">
-                        @error('secondary_color') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                </div>
-
-                <div class="brand-preview" style="--preview-primary: {{ old('primary_color', $settings['primary_color'] ?? '#f5a817') }}; --preview-secondary: {{ old('secondary_color', $settings['secondary_color'] ?? '#ffc14d') }};">
-                    <span></span>
-                    <strong>Brand preview</strong>
-                    <button type="button">Shop Now</button>
-                </div>
-            </section>
         </div>
 
         <div class="form-actions sticky-actions">
