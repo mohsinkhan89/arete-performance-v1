@@ -74,11 +74,42 @@
             </div>
           </aside>
         </div>
-      @elseif ($searched)
-        <article class="success-card">
-          <h2>No order found</h2>
-          <p>Please check the order number and email address, then try again.</p>
-        </article>
+      @else
+        <section class="track-empty-panel">
+          <div class="track-empty-copy">
+            <span class="track-empty-kicker">
+              <i class="fa-solid {{ $searched ? 'fa-magnifying-glass' : 'fa-location-crosshairs' }}"></i>
+              {{ $searched ? 'Search result' : 'Order tracking' }}
+            </span>
+            <h2>{{ $searched ? 'No order found yet' : 'Ready to track your order?' }}</h2>
+            <p>
+              {{ $searched
+                ? 'We could not match that order number with the email address. Check both details exactly as they appear on your confirmation email and search again.'
+                : 'Enter your order number and email above to see the latest status, Royal Mail ID, order timeline, payment update, and item details in one place.' }}
+            </p>
+            <div class="track-empty-actions">
+              <a class="btn btn-gold" href="{{ route('frontend.shop') }}">Continue shopping <i class="fa-solid fa-arrow-right"></i></a>
+              <a class="btn btn-outline-dark" href="mailto:support@areteperformance.co.uk">Contact support <i class="fa-regular fa-envelope"></i></a>
+            </div>
+          </div>
+          <div class="track-empty-steps" aria-label="Tracking help">
+            <div>
+              <i class="fa-regular fa-envelope-open"></i>
+              <strong>Check your email</strong>
+              <span>Use the same email address from checkout.</span>
+            </div>
+            <div>
+              <i class="fa-solid fa-hashtag"></i>
+              <strong>Enter order number</strong>
+              <span>Copy the full order number without extra spaces.</span>
+            </div>
+            <div>
+              <i class="fa-solid fa-truck-fast"></i>
+              <strong>View live details</strong>
+              <span>If the order is found, the current details show here.</span>
+            </div>
+          </div>
+        </section>
       @endif
     </div>
   </section>
