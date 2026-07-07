@@ -456,7 +456,7 @@ body {
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
-  padding: 0 0 clamp(28px, 7vh, 74px) clamp(20px, 6.8vw, 132px);
+  padding: 0 0 clamp(22px, 5vh, 52px) clamp(18px, 5vw, 96px);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -479,10 +479,10 @@ body {
 .cookie-card {
   position: relative;
   z-index: 1;
-  width: min(560px, calc(100vw - 40px));
-  padding: 31px 45px 28px;
-  border: 1px solid rgba(245, 168, 23, .9);
-  border-radius: 16px;
+  width: min(430px, calc(100vw - 36px));
+  padding: 22px 30px 20px;
+  border: 1px solid rgba(245, 168, 23, .86);
+  border-radius: 13px;
   background:
     radial-gradient(circle at 14% 0%, rgba(245, 168, 23, .13), transparent 30%),
     linear-gradient(135deg, rgba(20, 20, 20, .98), rgba(5, 5, 5, .97));
@@ -498,35 +498,35 @@ body {
 
 .cookie-icon {
   display: grid;
-  width: 43px;
-  height: 43px;
+  width: 34px;
+  height: 34px;
   place-items: center;
-  margin-bottom: 13px;
+  margin-bottom: 9px;
   color: var(--color-primary);
-  font-size: 2rem;
+  font-size: 1.55rem;
 }
 
 .cookie-card h2 {
-  margin: 0 0 13px;
+  margin: 0 0 10px;
   color: #fff;
   font-family: var(--font-display);
-  font-size: clamp(2rem, 3vw, 2.45rem);
+  font-size: clamp(1.55rem, 2.4vw, 1.9rem);
   font-weight: 800;
   line-height: 1;
 }
 
 .cookie-card p {
-  max-width: 480px;
+  max-width: 360px;
   margin: 0;
   color: rgba(255, 255, 255, .9);
-  font-size: 1rem;
-  line-height: 1.65;
+  font-size: .88rem;
+  line-height: 1.55;
 }
 
 .cookie-divider {
   position: relative;
   height: 1px;
-  margin: 19px 0 22px;
+  margin: 14px 0 15px;
   background: rgba(255, 255, 255, .16);
 }
 
@@ -535,8 +535,8 @@ body {
   position: absolute;
   left: 0;
   top: -1px;
-  width: 36px;
-  height: 3px;
+  width: 28px;
+  height: 2px;
   border-radius: 999px;
   background: var(--color-primary);
   box-shadow: 0 0 14px rgba(245, 168, 23, .75);
@@ -544,17 +544,18 @@ body {
 
 .cookie-actions {
   display: grid;
-  gap: 12px;
+  gap: 9px;
 }
 
 .cookie-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 50px;
-  border-radius: 7px;
-  padding: 12px 16px;
+  min-height: 40px;
+  border-radius: 6px;
+  padding: 10px 14px;
   font: inherit;
+  font-size: .82rem;
   font-weight: 900;
   line-height: 1;
   text-transform: uppercase;
@@ -589,10 +590,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  margin-top: 22px;
+  gap: 7px;
+  margin-top: 15px;
   color: rgba(255, 255, 255, .84);
-  font-size: .9rem;
+  font-size: .78rem;
 }
 
 .cookie-policy i {
@@ -601,8 +602,8 @@ body {
 
 .cookie-customize {
   display: none;
-  gap: 10px;
-  margin: -4px 0 16px;
+  gap: 8px;
+  margin: -3px 0 12px;
 }
 
 .cookie-customize.is-open {
@@ -613,8 +614,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 12px 14px;
+  gap: 12px;
+  padding: 9px 11px;
   border: 1px solid rgba(255, 255, 255, .14);
   border-radius: 8px;
   background: rgba(255, 255, 255, .035);
@@ -628,13 +629,13 @@ body {
 
 .cookie-customize strong {
   color: #fff;
-  font-size: .88rem;
+  font-size: .78rem;
 }
 
 .cookie-customize small {
   margin-top: 3px;
   color: rgba(255, 255, 255, .64);
-  font-size: .76rem;
+  font-size: .68rem;
   line-height: 1.35;
 }
 
@@ -651,13 +652,13 @@ body {
   }
 
   .cookie-card {
-    width: min(500px, 100%);
-    padding: 25px 22px 24px;
-    border-radius: 14px;
+    width: min(410px, 100%);
+    padding: 20px 18px 19px;
+    border-radius: 12px;
   }
 
   .cookie-card p {
-    font-size: .92rem;
+    font-size: .82rem;
   }
 
 }

@@ -56,10 +56,9 @@
       <p>We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. You can choose to accept all cookies or manage your preferences.</p>
       <div class="cookie-divider"></div>
       <div class="cookie-actions">
-        <button type="button" class="cookie-btn cookie-btn-primary" data-cookie-accept>Accept All</button>
+        <button type="button" class="cookie-btn cookie-btn-primary" data-cookie-accept>Accept</button>
         <button type="button" class="cookie-btn cookie-btn-light" data-cookie-reject>Reject</button>
       </div>
-      <a class="cookie-policy" href="{{ route('frontend.index') }}#contact"><i class="fa-solid fa-shield-halved"></i> Privacy Policy</a>
     </section>
   </div>
 

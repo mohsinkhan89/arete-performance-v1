@@ -16,7 +16,7 @@
         </div>
         <div class="footer-links">
           <h3>Support</h3>
-          <a href="{{ route('frontend.my-cart') }}">My Account</a><a href="{{ route('frontend.order-success') }}#orderDetails">Track Order</a><a href="{{ route('frontend.index') }}#contact">Help Center</a><a href="{{ route('frontend.shop') }}">Wholesale</a>
+          <a href="{{ route('frontend.my-cart') }}">My Account</a><a href="{{ route('frontend.track-order') }}">Track Order</a><a href="{{ route('frontend.index') }}#contact">Help Center</a><a href="{{ route('frontend.shop') }}">Wholesale</a>
         </div>
         <!-- <div class="footer-newsletter">
           <h3>Newsletter</h3>
