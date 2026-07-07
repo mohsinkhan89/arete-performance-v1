@@ -28,14 +28,14 @@
                 <input type="hidden" name="q" value="{{ $filters['q'] }}">
               @endif
               @if (! empty($filters['sort']))
-                <input type="hidden" name="sort" value="{{ $filters['sort'] }}">
+                <input type="hidden" name="sort" value="{{ $filters['sort'] }}" data-price-sort-field>
               @endif
 
               <div class="filter-block">
                 <h2>Categories</h2>
-                <a class="{{ empty($filters['category']) ? 'active' : '' }}" href="{{ route('frontend.shop', array_filter(['q' => $filters['q'] ?? null, 'sort' => $filters['sort'] ?? null])) }}"><span>All Products</span><strong>({{ $totalProducts }})</strong></a>
+                <a class="{{ empty($filters['category']) ? 'active' : '' }}" href="{{ route('frontend.shop', array_filter(['q' => $filters['q'] ?? null, 'sort' => $filters['sort'] ?? null, 'min_price' => $filters['min_price'] ?? null, 'max_price' => $filters['max_price'] ?? null])) }}"><span>All Products</span><strong>({{ $totalProducts }})</strong></a>
                 @foreach ($categories as $category)
-                  <a class="{{ ($filters['category'] ?? '') === $category->slug ? 'active' : '' }}" href="{{ route('frontend.shop', array_filter(['category' => $category->slug, 'q' => $filters['q'] ?? null, 'sort' => $filters['sort'] ?? null])) }}"><span>{{ $category->name }}</span><strong>({{ $category->products_count }})</strong></a>
+                  <a class="{{ ($filters['category'] ?? '') === $category->slug ? 'active' : '' }}" href="{{ route('frontend.shop', array_filter(['category' => $category->slug, 'q' => $filters['q'] ?? null, 'sort' => $filters['sort'] ?? null, 'min_price' => $filters['min_price'] ?? null, 'max_price' => $filters['max_price'] ?? null])) }}"><span>{{ $category->name }}</span><strong>({{ $category->products_count }})</strong></a>
                 @endforeach
               </div>
 

@@ -785,14 +785,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const maxInput = form?.querySelector("[data-price-max-input]");
     const minLabel = form?.querySelector("[data-price-min-label]");
     const maxLabel = form?.querySelector("[data-price-max-label]");
+    const sortInput = form?.querySelector("[data-price-sort-field]");
     const fill = range.querySelector("[data-price-range-fill]");
 
     if (!minRange || !maxRange || !minInput || !maxInput) return;
 
     const minLimit = Number(minRange.min || 0);
     const maxLimit = Number(maxRange.max || 0);
+    const hasInitialMin = minInput.value !== "";
+    const hasInitialMax = maxInput.value !== "";
 
-    function clampValues(source) {
+    function clampValues(source, syncInputs = true) {
       let minValue = Number(minRange.value || minLimit);
       let maxValue = Number(maxRange.value || maxLimit);
 
@@ -803,8 +806,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       minRange.value = minValue;
       maxRange.value = maxValue;
-      minInput.value = minValue;
-      maxInput.value = maxValue;
+      if (syncInputs) {
+        minInput.value = minValue;
+        maxInput.value = maxValue;
+      }
+      if (source && sortInput) sortInput.value = "price_asc";
       if (minLabel) minLabel.textContent = minValue;
       if (maxLabel) maxLabel.textContent = maxValue;
 
@@ -828,7 +834,7 @@ document.addEventListener("DOMContentLoaded", () => {
       clampValues("max");
     });
 
-    clampValues();
+    clampValues(null, hasInitialMin || hasInitialMax);
   });
 
   document.querySelectorAll("[data-uk-phone]").forEach((input) => {

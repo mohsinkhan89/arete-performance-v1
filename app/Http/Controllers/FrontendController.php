@@ -336,12 +336,28 @@ class FrontendController extends Controller
 
     private function filters(Request $request): array
     {
+        $minPrice = $request->query('min_price');
+        $maxPrice = $request->query('max_price');
+        $sort = $request->query('sort', 'latest');
+
+        if (is_numeric($minPrice) && is_numeric($maxPrice) && (float) $minPrice > (float) $maxPrice) {
+            [$minPrice, $maxPrice] = [$maxPrice, $minPrice];
+        }
+
+        if (! in_array($sort, ['latest', 'price_asc', 'price_desc', 'name'], true)) {
+            $sort = 'latest';
+        }
+
+        if ($sort === 'latest' && (is_numeric($minPrice) || is_numeric($maxPrice))) {
+            $sort = 'price_asc';
+        }
+
         return [
             'q' => trim((string) $request->query('q', '')),
             'category' => trim((string) $request->query('category', '')),
-            'min_price' => $request->query('min_price'),
-            'max_price' => $request->query('max_price'),
-            'sort' => $request->query('sort', 'latest'),
+            'min_price' => $minPrice,
+            'max_price' => $maxPrice,
+            'sort' => $sort,
         ];
     }
 
