@@ -55,6 +55,56 @@ document.addEventListener("DOMContentLoaded", () => {
     showSiteLoader();
   });
 
+  const cookieConsent = document.querySelector("[data-cookie-consent]");
+  const cookieAccept = document.querySelector("[data-cookie-accept]");
+  const cookieReject = document.querySelector("[data-cookie-reject]");
+  const cookieToggle = document.querySelector("[data-cookie-toggle]");
+  const cookieCloseTargets = document.querySelectorAll("[data-cookie-close]");
+  const cookieCustomize = document.querySelector("[data-cookie-customize]");
+  const cookieAnalytics = document.querySelector("[data-cookie-analytics]");
+  const cookieMarketing = document.querySelector("[data-cookie-marketing]");
+  const cookieStorageKey = "arete_cookie_preferences";
+
+  const openCookieConsent = () => {
+    if (!cookieConsent) return;
+    cookieConsent.classList.add("is-visible");
+    cookieConsent.setAttribute("aria-hidden", "false");
+  };
+
+  const closeCookieConsent = () => {
+    if (!cookieConsent) return;
+    cookieConsent.classList.remove("is-visible");
+    cookieConsent.setAttribute("aria-hidden", "true");
+  };
+
+  const saveCookiePreferences = (preferences) => {
+    localStorage.setItem(cookieStorageKey, JSON.stringify({
+      ...preferences,
+      necessary: true,
+      savedAt: new Date().toISOString(),
+    }));
+    closeCookieConsent();
+  };
+
+  if (cookieConsent && !localStorage.getItem(cookieStorageKey)) {
+    window.setTimeout(openCookieConsent, 1700);
+  }
+
+  cookieCloseTargets.forEach((target) => target.addEventListener("click", closeCookieConsent));
+  cookieAccept?.addEventListener("click", () => saveCookiePreferences({ analytics: true, marketing: true }));
+  cookieReject?.addEventListener("click", () => saveCookiePreferences({ analytics: false, marketing: false }));
+  cookieToggle?.addEventListener("click", () => {
+    const isOpen = cookieCustomize?.classList.toggle("is-open");
+    cookieToggle.textContent = isOpen ? "Save Preferences" : "Customize";
+
+    if (!isOpen) {
+      saveCookiePreferences({
+        analytics: Boolean(cookieAnalytics?.checked),
+        marketing: Boolean(cookieMarketing?.checked),
+      });
+    }
+  });
+
   const autoDismissAlerts = (selector, delay = 4000) => {
     document.querySelectorAll(selector).forEach((alert) => {
       window.setTimeout(() => {

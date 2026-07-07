@@ -48,7 +48,20 @@
   </main>
   @include('frontend.inc.footer')
 
-  
+  <div class="cookie-consent" data-cookie-consent aria-hidden="true">
+    <div class="cookie-consent-backdrop" data-cookie-close></div>
+    <section class="cookie-card" role="dialog" aria-modal="true" aria-labelledby="cookieTitle">
+      <div class="cookie-icon" aria-hidden="true"><i class="fa-solid fa-cookie-bite"></i></div>
+      <h2 id="cookieTitle">Cookie Preferences</h2>
+      <p>We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. You can choose to accept all cookies or manage your preferences.</p>
+      <div class="cookie-divider"></div>
+      <div class="cookie-actions">
+        <button type="button" class="cookie-btn cookie-btn-primary" data-cookie-accept>Accept All</button>
+        <button type="button" class="cookie-btn cookie-btn-light" data-cookie-reject>Reject</button>
+      </div>
+      <a class="cookie-policy" href="{{ route('frontend.index') }}#contact"><i class="fa-solid fa-shield-halved"></i> Privacy Policy</a>
+    </section>
+  </div>
 
   <div class="search-panel" aria-hidden="true">
     <button class="panel-close search-close" type="button" aria-label="Close search"><i class="fa-solid fa-xmark"></i></button>
