@@ -1,4 +1,60 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const siteLoader = document.querySelector("[data-site-loader]");
+  const loaderProgress = document.querySelector("[data-loader-progress]");
+  const loaderPercent = document.querySelector("[data-loader-percent]");
+  let loaderValue = 0;
+  let loaderTimer = null;
+
+  const setLoaderProgress = (value) => {
+    loaderValue = Math.max(loaderValue, Math.min(100, Math.round(value)));
+    if (loaderProgress) loaderProgress.style.width = `${loaderValue}%`;
+    if (loaderPercent) loaderPercent.textContent = `${loaderValue}%`;
+  };
+
+  const hideSiteLoader = () => {
+    setLoaderProgress(100);
+    window.setTimeout(() => siteLoader?.classList.add("is-hidden"), 220);
+    if (loaderTimer) window.clearInterval(loaderTimer);
+  };
+
+  const showSiteLoader = () => {
+    loaderValue = 0;
+    siteLoader?.classList.remove("is-hidden");
+    setLoaderProgress(18);
+  };
+
+  if (siteLoader) {
+    setLoaderProgress(12);
+    loaderTimer = window.setInterval(() => {
+      if (loaderValue < 68) setLoaderProgress(loaderValue + Math.random() * 9);
+    }, 170);
+    window.setTimeout(() => setLoaderProgress(72), 620);
+    window.setTimeout(hideSiteLoader, 1450);
+    window.addEventListener("load", () => window.setTimeout(hideSiteLoader, 1450));
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) hideSiteLoader();
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a[href]");
+    if (!link || !siteLoader) return;
+
+    const href = link.getAttribute("href") || "";
+    const isNewTab = link.target && link.target !== "_self";
+    const isUtilityLink = href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:");
+
+    if (isNewTab || isUtilityLink || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    const url = new URL(link.href, window.location.href);
+    if (url.origin === window.location.origin) showSiteLoader();
+  });
+
+  document.addEventListener("submit", (event) => {
+    if (!siteLoader || event.target.matches(".search-form")) return;
+    showSiteLoader();
+  });
+
   const autoDismissAlerts = (selector, delay = 4000) => {
     document.querySelectorAll(selector).forEach((alert) => {
       window.setTimeout(() => {

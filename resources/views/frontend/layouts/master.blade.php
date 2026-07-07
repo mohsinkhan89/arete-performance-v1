@@ -18,7 +18,29 @@
     <link href="{{ url('frontend/assets/css/style.css') }}" rel="stylesheet">
 </head>
 <body class="@yield('body_class', (Request::path() === '/' ? 'home-page' : str_replace('/', '-', Request::path()) . '-page'))">
-  
+  <div class="site-loader" data-site-loader aria-live="polite" aria-label="Loading Arete Performance">
+    <div class="loader-smoke loader-smoke-left" aria-hidden="true"></div>
+    <div class="loader-smoke loader-smoke-right" aria-hidden="true"></div>
+    <div class="site-loader-content">
+      <div class="loader-logo-ring" aria-hidden="true">
+        <span></span>
+        <span></span>
+      </div>
+      <img class="loader-logo" src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
+      <p>Preparing your performance...</p>
+      <div class="loader-progress">
+        <div class="loader-progress-track"><span data-loader-progress></span></div>
+        <b data-loader-percent>0%</b>
+      </div>
+      <div class="loader-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="loader-features" aria-label="Store benefits">
+        <div><i class="fa-solid fa-shield-halved"></i><span>Premium<br>Quality</span></div>
+        <div><i class="fa-solid fa-flask-vial"></i><span>Lab<br>Tested</span></div>
+        <div><i class="fa-solid fa-box-open"></i><span>Discreet<br>Shipping</span></div>
+        <div><i class="fa-solid fa-headset"></i><span>24/7<br>Support</span></div>
+      </div>
+    </div>
+  </div>
 
   @include('frontend.inc.header')
   <main>
