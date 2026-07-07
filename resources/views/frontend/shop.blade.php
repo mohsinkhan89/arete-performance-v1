@@ -1,13 +1,6 @@
 @extends('frontend.layouts.master')
 
-@section('metas')
-@endsection
-
-@section('css')
-@endsection
-
 @section('body')
-
     <section class="shop-hero">
       <div class="container">
         <div class="shop-hero-inner">
@@ -30,81 +23,111 @@
       <div class="container">
         <div class="shop-layout">
           <aside class="shop-sidebar reveal-on-scroll" aria-label="Shop filters">
-            <div class="filter-block">
-              <h2>Categories</h2>
-              <a class="active" href="shop.html"><span>All Products</span><strong>(28)</strong></a>
-              <a href="shop.html#orals"><span>Orals</span><strong>(6)</strong></a>
-              <a href="shop.html#fat-burners"><span>Fat Burners</span><strong>(5)</strong></a>
-              <a href="shop.html#post-cycle-therapy"><span>Post Cycle Therapy</span><strong>(4)</strong></a>
-              <a href="shop.html#hormones"><span>Hormones</span><strong>(3)</strong></a>
-              <a href="shop.html#peptides"><span>Peptides</span><strong>(4)</strong></a>
-              <a href="shop.html#sexual-health"><span>Sexual Health</span><strong>(4)</strong></a>
-              <a href="shop.html#syringes-needles"><span>Syringes &amp; Needles</span><strong>(2)</strong></a>
-            </div>
-            <div class="filter-block">
-              <h2>Price Range</h2>
-              <div class="price-range"><span></span></div>
-              <div class="price-values"><strong>$0</strong><strong>$200</strong></div>
-            </div>
-            <div class="filter-block">
-              <h2>Brand</h2>
-              <label><input type="checkbox"> Arete Performance <strong>(24)</strong></label>
-              <label><input type="checkbox"> Premium Labs <strong>(2)</strong></label>
-              <label><input type="checkbox"> Elite Formulations <strong>(2)</strong></label>
-            </div>
-            <div class="filter-block">
-              <h2>Form</h2>
-              <label><input type="checkbox"> Capsule <strong>(12)</strong></label>
-              <label><input type="checkbox"> Tablet <strong>(6)</strong></label>
-              <label><input type="checkbox"> Liquid <strong>(4)</strong></label>
-              <label><input type="checkbox"> Powder <strong>(4)</strong></label>
-              <label><input type="checkbox"> Injection <strong>(2)</strong></label>
-            </div>
-            <div class="filter-block">
-              <h2>Lab Tested</h2>
-              <label><input type="checkbox"> Yes <strong>(28)</strong></label>
-            </div>
-            <button class="clear-filters" type="button">Clear filters <i class="fa-solid fa-rotate-right"></i></button>
+            <form method="GET" action="{{ route('frontend.shop') }}">
+              @if (! empty($filters['q']))
+                <input type="hidden" name="q" value="{{ $filters['q'] }}">
+              @endif
+              @if (! empty($filters['sort']))
+                <input type="hidden" name="sort" value="{{ $filters['sort'] }}" data-price-sort-field>
+              @endif
+
+              <div class="filter-block">
+                <h2>Categories</h2>
+                <a class="{{ empty($filters['category']) ? 'active' : '' }}" href="{{ route('frontend.shop', array_filter(['q' => $filters['q'] ?? null, 'sort' => $filters['sort'] ?? null, 'min_price' => $filters['min_price'] ?? null, 'max_price' => $filters['max_price'] ?? null])) }}"><span>All Products</span><strong>({{ $totalProducts }})</strong></a>
+                @foreach ($categories as $category)
+                  <a class="{{ ($filters['category'] ?? '') === $category->slug ? 'active' : '' }}" href="{{ route('frontend.shop', array_filter(['category' => $category->slug, 'q' => $filters['q'] ?? null, 'sort' => $filters['sort'] ?? null, 'min_price' => $filters['min_price'] ?? null, 'max_price' => $filters['max_price'] ?? null])) }}"><span>{{ $category->name }}</span><strong>({{ $category->products_count }})</strong></a>
+                @endforeach
+              </div>
+
+              <div class="filter-block">
+                <h2>Price Range</h2>
+                @php
+                  $minBound = $priceBounds['min'] ?? 0;
+                  $maxBound = $priceBounds['max'] ?? 400;
+                  $selectedMin = is_numeric($filters['min_price']) ? (int) $filters['min_price'] : $minBound;
+                  $selectedMax = is_numeric($filters['max_price']) ? (int) $filters['max_price'] : $maxBound;
+                @endphp
+                <div class="price-range-control" data-price-range>
+                  <input type="range" min="{{ $minBound }}" max="{{ $maxBound }}" value="{{ $selectedMin }}" data-price-min-range aria-label="Minimum price">
+                  <input type="range" min="{{ $minBound }}" max="{{ $maxBound }}" value="{{ $selectedMax }}" data-price-max-range aria-label="Maximum price">
+                  <div class="price-range"><span data-price-range-fill></span></div>
+                </div>
+                <div class="price-values"><strong>£<span data-price-min-label>{{ $selectedMin }}</span></strong><strong>£<span data-price-max-label>{{ $selectedMax }}</span></strong></div>
+                <div class="filter-fields">
+                  <input type="number" name="min_price" min="{{ $minBound }}" max="{{ $maxBound }}" placeholder="Min" value="{{ $filters['min_price'] }}" data-price-min-input>
+                  <input type="number" name="max_price" min="{{ $minBound }}" max="{{ $maxBound }}" placeholder="Max" value="{{ $filters['max_price'] }}" data-price-max-input>
+                </div>
+              </div>
+
+              <div class="filter-block">
+                <h2>Lab Tested</h2>
+                <label><input type="checkbox" checked> Yes <strong>({{ $totalProducts }})</strong></label>
+              </div>
+
+              <button class="clear-filters" type="submit">Apply filters <i class="fa-solid fa-filter"></i></button>
+              <a class="clear-filters filter-reset" href="{{ route('frontend.shop') }}">Clear filters <i class="fa-solid fa-rotate-right"></i></a>
+            </form>
           </aside>
 
           <div class="shop-products">
             <div class="shop-toolbar reveal-on-scroll">
-              <p>Showing 1-12 of 28 results</p>
-              <button type="button">Sort by: Best Selling <i class="fa-solid fa-chevron-down"></i></button>
+              <p>Showing {{ $products->firstItem() ?? 0 }}-{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p>
+              <form method="GET" action="{{ route('frontend.shop') }}" class="sort-form">
+                @foreach (['q', 'category', 'min_price', 'max_price'] as $filterKey)
+                  @if (! empty($filters[$filterKey]))
+                    <input type="hidden" name="{{ $filterKey }}" value="{{ $filters[$filterKey] }}">
+                  @endif
+                @endforeach
+                <label class="visually-hidden" for="shopSort">Sort products</label>
+                <select id="shopSort" name="sort" onchange="this.form.submit()">
+                  <option value="latest" @selected(($filters['sort'] ?? 'latest') === 'latest')>Sort by: Latest</option>
+                  <option value="name" @selected(($filters['sort'] ?? '') === 'name')>Sort by: Name</option>
+                  <option value="price_asc" @selected(($filters['sort'] ?? '') === 'price_asc')>Price: Low to high</option>
+                  <option value="price_desc" @selected(($filters['sort'] ?? '') === 'price_desc')>Price: High to low</option>
+                </select>
+              </form>
             </div>
+
             <div class="shop-grid reveal-group">
-              <article class="shop-product-card product-card" data-product-id="cardarine"><span class="tag">Best seller</span><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Cardarine"><small>Fat Burners</small><h3>Cardarine (GW-501516)</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span>(128)</span></div><div><strong>$69.99</strong><button aria-label="Add Cardarine to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-              <article class="shop-product-card product-card bottle-gold" data-product-id="anavar-50"><span class="tag tag-green">New</span><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Anavar 50"><small>Orals</small><h3>Anavar 50 (Oxandrolone)</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span>(94)</span></div><div><strong>$59.99</strong><button aria-label="Add Anavar 50 to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-              <article class="shop-product-card product-card" data-product-id="pct-complete-stack"><img src="{{ url('frontend/assets/images/category-boxes.svg') }}" alt="PCT complete stack"><small>Post Cycle Therapy</small><h3>PCT Complete Stack</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span>(72)</span></div><div><strong>$89.99</strong><button aria-label="Add PCT Complete Stack to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-              <article class="shop-product-card product-card" data-product-id="testosterone-enanthate"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Testosterone Enanthate"><small>Hormones</small><h3>Testosterone Enanthate</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span>(68)</span></div><div><strong>$49.99</strong><button aria-label="Add Testosterone Enanthate to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-              <article class="shop-product-card product-card bottle-silver" data-product-id="bpc-157"><span class="tag tag-red">Save 15%</span><img src="{{ url('frontend/assets/images/categories-imgs/peptides.png') }}" alt="BPC-157"><small>Peptides</small><h3>BPC-157 5mg</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9734; <span>(60)</span></div><div><strong>$59.99 <del>$69.99</del></strong><button aria-label="Add BPC-157 to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-              <article class="shop-product-card product-card" data-product-id="male-enhancement-stack"><img src="{{ url('frontend/assets/images/categories-imgs/sexual-health.png') }}" alt="Male enhancement stack"><small>Sexual Health</small><h3>Male Enhancement Stack</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span>(51)</span></div><div><strong>$79.99</strong><button aria-label="Add Male Enhancement Stack to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-              <article class="shop-product-card product-card bottle-gold" data-product-id="clenbuterol"><img src="{{ url('frontend/assets/images/categories-imgs/fat-burrners.png') }}" alt="Clenbuterol"><small>Fat Burners</small><h3>Clenbuterol 40mcg</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span>(67)</span></div><div><strong>$49.99</strong><button aria-label="Add Clenbuterol to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-              <article class="shop-product-card product-card" data-product-id="insulin-syringes"><img src="{{ url('frontend/assets/images/categories-imgs/injection.png') }}" alt="Insulin syringes"><small>Syringes &amp; Needles</small><h3>Insulin Syringes 1ml</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9734; <span>(33)</span></div><div><strong>$9.99</strong><button aria-label="Add Insulin Syringes to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-              <article class="shop-product-card product-card" data-product-id="winstrol"><span class="tag">Lab tested</span><img src="{{ url('frontend/assets/images/categories-imgs/orals.png') }}" alt="Winstrol"><small>Orals</small><h3>Winstrol 10mg</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9734; <span>(46)</span></div><div><strong>$54.99</strong><button aria-label="Add Winstrol to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-              <article class="shop-product-card product-card bottle-silver" data-product-id="cjc-1295"><img src="{{ url('frontend/assets/images/categories-imgs/peptides.png') }}" alt="CJC-1295"><small>Peptides</small><h3>CJC-1295 2mg</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9734; <span>(37)</span></div><div><strong>$74.99</strong><button aria-label="Add CJC-1295 to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-              <article class="shop-product-card product-card bottle-gold" data-product-id="trenbolone-acetate"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Trenbolone Acetate"><small>Hormones</small><h3>Trenbolone Acetate</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span>(42)</span></div><div><strong>$64.99</strong><button aria-label="Add Trenbolone Acetate to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
-              <article class="shop-product-card product-card bottle-silver" data-product-id="nolvadex-20"><img src="{{ url('frontend/assets/images/categories-imgs/post-cycle-therapy.png') }}" alt="Nolvadex 20"><small>Post Cycle Therapy</small><h3>Nolvadex 20 (Tamoxifen)</h3><div class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span>(53)</span></div><div><strong>$49.99</strong><button aria-label="Add Nolvadex 20 to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article>
+              @forelse ($products as $product)
+                <article class="shop-product-card product-card" id="{{ $product->category?->slug }}" data-product-id="{{ $product->id }}">
+                  @if ($product->is_featured)<span class="tag">Popular</span>@endif
+                  <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
+                  <small>{{ $product->category?->name }}</small>
+                  <h3>{{ $product->name }}</h3>
+                  <div class="rating">★★★★★ <span>({{ $product->stock }})</span></div>
+                  <div class="product-card-tools">
+                    <div class="product-card-qty" aria-label="{{ $product->name }} quantity"><button type="button" data-card-qty-dec>-</button><span data-card-qty>1</span><button type="button" data-card-qty-inc>+</button></div>
+                    @if ($product->test_report_image)
+                      <button class="test-report-icon" type="button" data-test-report="{{ url($product->test_report_image) }}" data-test-report-title="{{ $product->name }} test report" aria-label="View {{ $product->name }} test report"><i class="fa-solid fa-flask-vial"></i></button>
+                    @endif
+                  </div>
+                  <div><strong>£{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong><button type="button" data-cart-add="{{ $product->id }}" aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button></div>
+                </article>
+              @empty
+                <p>No products found.</p>
+              @endforelse
             </div>
+
+            @if ($products->hasPages())
+              <div class="shop-pagination" aria-label="Shop pagination">
+                {{ $products->onEachSide(1)->links('pagination::bootstrap-5') }}
+              </div>
+            @endif
           </div>
         </div>
 
         <section class="bundle-banner reveal-on-scroll" aria-label="Bundle offer">
-          <div>
-          </div>
+          <div></div>
           <div>
             <p class="eyebrow">Bundle &amp; save</p>
             <h2>Buy More. Save More.</h2>
             <p>Stack your results with premium bundles and exclusive savings.</p>
-            <a class="btn btn-gold" href="shop.html">View bundles <i class="fa-solid fa-arrow-right"></i></a>
+            <a class="btn btn-gold" href="{{ route('frontend.shop') }}">View bundles <i class="fa-solid fa-arrow-right"></i></a>
           </div>
         </section>
       </div>
     </section>
 
     @include('frontend.inc.delivery-trusted')
-
-@endsection
-
-@section('js')
 @endsection

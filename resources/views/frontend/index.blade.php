@@ -1,13 +1,6 @@
 @extends('frontend.layouts.master')
 
-@section('metas')
-@endsection
-
-@section('css')
-@endsection
-
 @section('body')
-
     <section class="hero" id="home">
       <div class="container hero-content">
         <div class="row align-items-center min-vh-hero">
@@ -17,14 +10,9 @@
             <p class="hero-copy reveal-up delay-2">Science-backed products designed to help you perform, recover and grow.</p>
             <div class="d-flex flex-wrap gap-3 mt-4 reveal-up delay-3">
               <a class="btn btn-gold" href="#products">Shop now <i class="fa-solid fa-arrow-right"></i></a>
-              <a class="btn btn-outline-light-custom" href="index.html#about">Learn more</a>
+              <a class="btn btn-outline-light-custom" href="#about">Learn more</a>
             </div>
           </div>
-          <!-- <div class="col-lg-6 col-xl-7 d-none d-lg-block">
-            <div class="hero-product-stage reveal-up delay-2" aria-hidden="true">
-              <img class="hero-shirt-logo" src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="">
-            </div>
-          </div> -->
         </div>
         <div class="hero-features row g-0 reveal-up delay-4">
           <div class="col-6 col-lg-3"><div class="hero-feature"><i class="fa-solid fa-medal"></i><span>Premium<br>quality</span></div></div>
@@ -39,16 +27,17 @@
       <div class="container">
         <div class="section-heading d-flex flex-wrap justify-content-between align-items-end gap-3 reveal-on-scroll">
           <div><p class="eyebrow">Browse categories</p><h2>What are you looking for?</h2></div>
-          <a class="btn btn-light-outline" href="#bestsellers">View all categories <i class="fa-solid fa-arrow-right"></i></a>
+          <a class="btn btn-light-outline" href="{{ route('frontend.shop') }}">View all categories <i class="fa-solid fa-arrow-right"></i></a>
         </div>
         <div class="row g-3 mt-3 reveal-group">
-          <div class="col-6 col-md-4 col-lg-3"><article class="category-card"><img src="{{ url('frontend/assets/images/categories-imgs/orals.png') }}" alt="Orals"><div><h3>Orals</h3><i class="fa-solid fa-chevron-right"></i></div></article></div>
-          <div class="col-6 col-md-4 col-lg-3"><article class="category-card bottle-dark"><img src="{{ url('frontend/assets/images/categories-imgs/fat-burrners.png') }}" alt="Fat burners"><div><h3>Fat Burners</h3><i class="fa-solid fa-chevron-right"></i></div></article></div>
-          <div class="col-6 col-md-4 col-lg-3"><article class="category-card bottle-blue"><img src="{{ url('frontend/assets/images/categories-imgs/post-cycle-therapy.png') }}" alt="Post cycle therapy"><div><h3>Post Cycle Therapy</h3><i class="fa-solid fa-chevron-right"></i></div></article></div>
-          <div class="col-6 col-md-4 col-lg-3"><article class="category-card bottle-gold"><img src="{{ url('frontend/assets/images/categories-imgs/orals.png') }}" alt="Human growth hormone"><div><h3>Growth Hormone</h3><i class="fa-solid fa-chevron-right"></i></div></article></div>
-          <div class="col-6 col-md-4 col-lg-3"><article class="category-card bottle-silver"><img src="{{ url('frontend/assets/images/categories-imgs/peptides.png') }}" alt="Peptides"><div><h3>Peptides</h3><i class="fa-solid fa-chevron-right"></i></div></article></div>
-          <div class="col-6 col-md-4 col-lg-3"><article class="category-card"><img class="category-art" src="{{ url('frontend/assets/images/categories-imgs/sexual-health.png') }}" alt="Sexual health products"><div><h3>Sexual Health</h3><i class="fa-solid fa-chevron-right"></i></div></article></div>
-          <div class="col-12 col-md-8 col-lg-6"><article class="category-card wide-card"><img class="category-art syringe-art" src="{{ url('frontend/assets/images/categories-imgs/injection.png') }}" alt="Syringes and needles"><div><h3>Syringes &amp; Needles</h3><i class="fa-solid fa-chevron-right"></i></div></article></div>
+          @foreach ($categories as $category)
+            <div class="col-6 col-md-4 col-lg-3">
+              <article class="category-card" data-category-url="{{ route('frontend.shop', ['category' => $category->slug]) }}">
+                <img src="{{ url($category->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $category->name }}">
+                <div><h3>{{ $category->name }}</h3><i class="fa-solid fa-chevron-right"></i></div>
+              </article>
+            </div>
+          @endforeach
         </div>
       </div>
     </section>
@@ -73,16 +62,28 @@
       <div class="container">
         <div class="section-heading light d-flex justify-content-between align-items-end reveal-on-scroll">
           <div><p class="eyebrow">Bestsellers</p><h2>Our Top Picks</h2></div>
-          <a href="#products">View all <i class="fa-solid fa-arrow-right"></i></a>
+          <a href="{{ route('frontend.shop') }}">View all <i class="fa-solid fa-arrow-right"></i></a>
         </div>
         <div class="product-slider">
           <button class="slider-arrow slider-prev" type="button" aria-label="Previous product"><i class="fa-solid fa-chevron-left"></i></button>
           <div class="row g-3 mt-3 reveal-group product-track">
-            <div class="col-6 col-md-4 col-lg"><article class="product-card bottle-blue"><span class="tag">Popular</span><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Anavar 50"><h3>Anavar 50</h3><small>Oxandrolone</small><div><strong>$59.99</strong><button aria-label="Add Anavar 50 to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article></div>
-            <div class="col-6 col-md-4 col-lg"><article class="product-card bottle-silver"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Cardarine"><h3>Cardarine</h3><small>GW-501516</small><div><strong>$69.99</strong><button aria-label="Add Cardarine to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article></div>
-            <div class="col-6 col-md-4 col-lg"><article class="product-card bottle-gold"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Nolvadex 20"><h3>Nolvadex 20</h3><small>Tamoxifen</small><div><strong>$49.99</strong><button aria-label="Add Nolvadex to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article></div>
-            <div class="col-6 col-md-4 col-lg"><article class="product-card bottle-dark"><span class="tag">New</span><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="HGH 191AA"><h3>HGH 191AA</h3><small>10 IU</small><div><strong>$149.99</strong><button aria-label="Add HGH to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article></div>
-            <div class="col-6 col-md-4 col-lg"><article class="product-card"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="BPC-157"><h3>BPC-157</h3><small>5mg</small><div><strong>$59.99</strong><button aria-label="Add BPC-157 to cart"><i class="fa-solid fa-cart-plus"></i></button></div></article></div>
+            @foreach ($featuredProducts as $product)
+              <div class="col-6 col-md-4 col-lg">
+                <article class="product-card" data-product-id="{{ $product->id }}">
+                  @if ($product->is_featured)<span class="tag">Popular</span>@endif
+                  <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
+                  <h3>{{ $product->name }}</h3>
+                  <small>{{ $product->category?->name }}</small>
+                  <div class="product-card-tools">
+                    <div class="product-card-qty" aria-label="{{ $product->name }} quantity"><button type="button" data-card-qty-dec>-</button><span data-card-qty>1</span><button type="button" data-card-qty-inc>+</button></div>
+                    @if ($product->test_report_image)
+                      <button class="test-report-icon" type="button" data-test-report="{{ url($product->test_report_image) }}" data-test-report-title="{{ $product->name }} test report" aria-label="View {{ $product->name }} test report"><i class="fa-solid fa-flask-vial"></i></button>
+                    @endif
+                  </div>
+                  <div><strong>£{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong><button type="button" data-cart-add="{{ $product->id }}" aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button></div>
+                </article>
+              </div>
+            @endforeach
           </div>
           <button class="slider-arrow slider-next" type="button" aria-label="Next product"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
@@ -100,11 +101,18 @@
           <button class="testimonial-nav testimonial-prev" type="button" aria-label="Previous testimonial"><i class="fa-solid fa-chevron-left"></i></button>
           <div class="testimonial-viewport">
             <div class="testimonial-track reveal-group">
-              <article class="testimonial-slide"><figure class="quote-card"><i class="fa-solid fa-quote-left"></i><p>"Daily multivitamin meri morning routine ka important part ban chuka hai. Easy to take, gentle, aur overall wellness ke liye perfect."</p><figcaption><img src="{{ url('frontend/assets/images/testimonials/oliviacarter.png') }}" alt="Olivia Carter."><div><strong>Olivia Carter.</strong><small>Bodybuilder</small><span class="rating" aria-label="5 star rating">★★★★★</span></div></figcaption></figure></article>
-              <article class="testimonial-slide is-featured"><figure class="quote-card"><i class="fa-solid fa-quote-left"></i><p>"Quality you can trust and results you can see."</p><figcaption><img src="{{ url('frontend/assets/images/testimonials/miker.png') }}" alt="Mike R."><div><strong>Mike R.</strong><small>Fitness Coach</small><span class="rating" aria-label="5 star rating">★★★★★</span></div></figcaption></figure></article>
-              <article class="testimonial-slide"><figure class="quote-card"><i class="fa-solid fa-quote-left"></i><p>"This supplement fits perfectly into my daily wellness lifestyle. Packaging looks premium and the capsules are very easy to take."</p><figcaption><img src="{{ url('frontend/assets/images/testimonials/sophiabennett.png') }}" alt="Sophia Bennett."><div><strong>Sophia Bennett.</strong><small>Athlete</small><span class="rating" aria-label="5 star rating">★★★★★</span></div></figcaption></figure></article>
-              <article class="testimonial-slide"><figure class="quote-card"><i class="fa-solid fa-quote-left"></i><p>"The packaging was clean, private, and the whole order felt professional."</p><figcaption><img src="{{ url('frontend/assets/images/testimonials/danielk.png') }}" alt="Daniel K."><div><strong>Daniel K.</strong><small>Powerlifter</small><span class="rating" aria-label="5 star rating">★★★★★</span></div></figcaption></figure></article>
-              <article class="testimonial-slide"><figure class="quote-card"><i class="fa-solid fa-quote-left"></i><p>"After workouts, I like keeping my routine healthy and balanced. These supplements are easy to use and feel great for daily support."</p><figcaption><img src="{{ url('frontend/assets/images/testimonials/avamitchell.png') }}" alt="Ava Mitchell."><div><strong>Ava Mitchell.</strong><small>Trainer</small><span class="rating" aria-label="5 star rating">★★★★★</span></div></figcaption></figure></article>
+              @foreach ($reviews as $review)
+                <article class="testimonial-slide {{ $review->is_featured ? 'is-featured' : '' }}">
+                  <figure class="quote-card">
+                    <i class="fa-solid fa-quote-left"></i>
+                    <p>"{{ $review->comment }}"</p>
+                    <figcaption>
+                      <img src="{{ url($review->avatar ?: 'frontend/assets/images/testimonials/miker.png') }}" alt="{{ $review->customer_name }}">
+                      <div><strong>{{ $review->customer_name }}</strong><small>{{ $review->customer_title }}</small><span class="rating" aria-label="{{ $review->rating }} star rating">{{ str_repeat('★', $review->rating) }}</span></div>
+                    </figcaption>
+                  </figure>
+                </article>
+              @endforeach
             </div>
           </div>
           <button class="testimonial-nav testimonial-next" type="button" aria-label="Next testimonial"><i class="fa-solid fa-chevron-right"></i></button>
@@ -118,8 +126,4 @@
         </div>
       </div>
     </section>
-
-@endsection
-
-@section('js')
 @endsection

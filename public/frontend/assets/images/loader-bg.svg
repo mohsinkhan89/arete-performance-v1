@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="centerFade" cx="50%" cy="50%" r="55%">
+      <stop offset="0" stop-color="#020202"/>
+      <stop offset=".58" stop-color="#050403"/>
+      <stop offset="1" stop-color="#000"/>
+    </radialGradient>
+    <radialGradient id="goldHazeLeft" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(425 500) rotate(58) scale(330 135)">
+      <stop offset="0" stop-color="#ffb000" stop-opacity=".42"/>
+      <stop offset=".42" stop-color="#8a5a00" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="goldHazeRight" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1540 610) rotate(58) scale(370 155)">
+      <stop offset="0" stop-color="#ffb000" stop-opacity=".46"/>
+      <stop offset=".38" stop-color="#8a5a00" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="wideGlow" x="-70%" y="-70%" width="240%" height="240%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff9f00" stop-opacity="0"/>
+      <stop offset=".34" stop-color="#ffae00" stop-opacity=".45"/>
+      <stop offset=".52" stop-color="#ffd24c"/>
+      <stop offset=".7" stop-color="#ffae00" stop-opacity=".48"/>
+      <stop offset="1" stop-color="#ff9f00" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="thinBeam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb000" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#ffc21a" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#ffb000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#centerFade)"/>
+  <rect width="1920" height="1080" fill="url(#goldHazeLeft)" opacity=".72"/>
+  <rect width="1920" height="1080" fill="url(#goldHazeRight)" opacity=".78"/>
+
+  <g opacity=".22">
+    <circle cx="1240" cy="240" r="1.5" fill="#f5a817"/>
+    <circle cx="1300" cy="300" r="1" fill="#f5a817"/>
+    <circle cx="1370" cy="352" r="1.3" fill="#f5a817"/>
+    <circle cx="1490" cy="390" r="1" fill="#f5a817"/>
+    <circle cx="320" cy="790" r="1.1" fill="#f5a817"/>
+    <circle cx="95" cy="850" r="1.6" fill="#f5a817"/>
+    <circle cx="560" cy="285" r="1" fill="#f5a817"/>
+    <circle cx="610" cy="330" r="1.4" fill="#f5a817"/>
+  </g>
+
+  <g transform="rotate(-48 360 520)" filter="url(#wideGlow)">
+    <rect x="-210" y="420" width="980" height="5" fill="url(#beam)" opacity=".95"/>
+    <rect x="-160" y="373" width="760" height="2.2" fill="url(#thinBeam)" opacity=".78"/>
+    <rect x="-260" y="477" width="900" height="2" fill="url(#thinBeam)" opacity=".42"/>
+    <rect x="-120" y="528" width="650" height="1.5" fill="url(#thinBeam)" opacity=".28"/>
+    <rect x="-70" y="325" width="520" height="1.4" fill="url(#thinBeam)" opacity=".3"/>
+  </g>
+
+  <g transform="rotate(-48 1580 650)" filter="url(#wideGlow)">
+    <rect x="1195" y="598" width="950" height="4.6" fill="url(#beam)" opacity=".94"/>
+    <rect x="1270" y="548" width="770" height="2.1" fill="url(#thinBeam)" opacity=".58"/>
+    <rect x="1320" y="660" width="820" height="2.5" fill="url(#thinBeam)" opacity=".7"/>
+    <rect x="1410" y="712" width="640" height="1.6" fill="url(#thinBeam)" opacity=".52"/>
+    <rect x="1500" y="766" width="520" height="1.4" fill="url(#thinBeam)" opacity=".36"/>
+  </g>
+
+  <g opacity=".2" filter="url(#softGlow)">
+    <path d="M390 420c80-60 155-62 220-8 32 27 72 37 126 26-68 35-125 35-174-2-56-42-112-47-172-16z" fill="#fff"/>
+    <path d="M1380 485c82-56 156-55 222 2 31 27 73 38 126 27-66 35-124 33-174-5-55-42-112-49-174-24z" fill="#fff"/>
+  </g>
+
+  <rect width="1920" height="1080" fill="none"/>
+  <rect width="1920" height="1080" fill="url(#centerFade)" opacity=".28"/>
+</svg>

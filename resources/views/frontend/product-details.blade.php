@@ -11,7 +11,7 @@
 <main class="product-detail-main">
     <section class="product-detail-top">
       <div class="container">
-        <nav class="product-breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><i class="fa-solid fa-chevron-right"></i><a href="shop.html">Orals</a><i class="fa-solid fa-chevron-right"></i><span>Anavar 50 (Oxandrolone)</span></nav>
+        <nav class="product-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i><a href="{{ route('frontend.shop') }}#orals">Orals</a><i class="fa-solid fa-chevron-right"></i><span>Anavar 50 (Oxandrolone)</span></nav>
 
         <div class="product-detail-layout">
           <div class="product-gallery">
@@ -238,7 +238,7 @@
               <i class="fa-solid fa-headset"></i>
               <h3>Still Have Questions?</h3>
               <p>Our support team is here to help you.</p>
-              <a class="btn buy-now-btn" href="index.html#contact">Contact support</a>
+              <a class="btn buy-now-btn" href="{{ route('frontend.index') }}#contact">Contact support</a>
             </aside>
           </div>
         </article>

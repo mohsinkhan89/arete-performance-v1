@@ -15,7 +15,7 @@
     <div class="admin-shell">
         <aside class="admin-sidebar" id="adminSidebar">
             <a class="brand" href="{{ route('backend.dashboard') }}" aria-label="Arete Performance Admin">
-                <img src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
+                <img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
             </a>
 
             @php
@@ -27,6 +27,7 @@
                     ['label' => 'Users', 'icon' => 'fa-users', 'url' => route('backend.page', 'users')],
                     ['label' => 'Reviews', 'icon' => 'fa-star', 'url' => route('backend.page', 'reviews')],
                     ['label' => 'Reports', 'icon' => 'fa-chart-column', 'url' => route('backend.page', 'reports')],
+                    ['label' => 'Settings', 'icon' => 'fa-gear', 'url' => route('backend.page', 'settings')],
                 ];
             @endphp
 
@@ -71,10 +72,32 @@
                     <button class="icon-btn theme-toggle" type="button" aria-label="Toggle dark mode">
                         <i class="fa-regular fa-moon"></i>
                     </button>
-                    <button class="icon-btn has-badge" type="button" aria-label="Notifications">
-                        <i class="fa-regular fa-bell"></i>
-                        <span>3</span>
-                    </button>
+                    <div class="notification-dropdown">
+                        <button class="icon-btn has-badge notification-toggle" type="button" aria-label="Notifications" aria-expanded="false">
+                            <i class="fa-regular fa-bell"></i>
+                            <span data-notification-count>{{ $orderNotificationCount ?? 0 }}</span>
+                        </button>
+                        <div class="notification-panel" aria-hidden="true">
+                            <div class="notification-head">
+                                <strong>Live Orders</strong>
+                                <small>Runtime updates</small>
+                            </div>
+                            <div class="notification-list" data-order-notifications>
+                                @forelse (($orderNotifications ?? collect()) as $order)
+                                    <a class="notification-item" href="{{ route('backend.orders.show', $order) }}">
+                                        <span class="notification-dot payment-status-{{ $order->payment_status ?? 'unpaid' }}"></span>
+                                        <div>
+                                            <strong>#{{ $order->order_number }} &middot; {{ $order->customer_name }}</strong>
+                                            <small>{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }} &middot; {{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }} &middot; &pound;{{ number_format((float) $order->total, 2) }}</small>
+                                        </div>
+                                    </a>
+                                @empty
+                                    <div class="notification-empty">No orders yet.</div>
+                                @endforelse
+                            </div>
+                            <a class="notification-all" href="{{ route('backend.page', 'orders') }}">View all orders</a>
+                        </div>
+                    </div>
                     <div class="profile-dropdown">
                         <button class="profile-menu" type="button" aria-expanded="false" aria-haspopup="true">
                             <span class="avatar small"><i class="fa-solid fa-user"></i></span>
@@ -115,6 +138,11 @@
         </main>
     </div>
 
+    <script>
+        window.adminRoutes = {
+            orderNotifications: "{{ route('backend.notifications.orders') }}"
+        };
+    </script>
     <script src="{{ url('backend/assets/js/main.js') }}"></script>
     @yield('js')
 </body>

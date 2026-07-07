@@ -1,4 +1,121 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const siteLoader = document.querySelector("[data-site-loader]");
+  const loaderProgress = document.querySelector("[data-loader-progress]");
+  const loaderPercent = document.querySelector("[data-loader-percent]");
+  let loaderValue = 0;
+  let loaderTimer = null;
+
+  const setLoaderProgress = (value) => {
+    loaderValue = Math.max(loaderValue, Math.min(100, Math.round(value)));
+    if (loaderProgress) loaderProgress.style.width = `${loaderValue}%`;
+    if (loaderPercent) loaderPercent.textContent = `${loaderValue}%`;
+  };
+
+  const hideSiteLoader = () => {
+    setLoaderProgress(100);
+    window.setTimeout(() => siteLoader?.classList.add("is-hidden"), 220);
+    if (loaderTimer) window.clearInterval(loaderTimer);
+  };
+
+  const showSiteLoader = () => {
+    loaderValue = 0;
+    siteLoader?.classList.remove("is-hidden");
+    setLoaderProgress(18);
+  };
+
+  if (siteLoader) {
+    setLoaderProgress(12);
+    loaderTimer = window.setInterval(() => {
+      if (loaderValue < 68) setLoaderProgress(loaderValue + Math.random() * 9);
+    }, 170);
+    window.setTimeout(() => setLoaderProgress(72), 620);
+    window.setTimeout(hideSiteLoader, 1450);
+    window.addEventListener("load", () => window.setTimeout(hideSiteLoader, 1450));
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) hideSiteLoader();
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a[href]");
+    if (!link || !siteLoader) return;
+
+    const href = link.getAttribute("href") || "";
+    const isNewTab = link.target && link.target !== "_self";
+    const isUtilityLink = href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:");
+
+    if (isNewTab || isUtilityLink || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    const url = new URL(link.href, window.location.href);
+    if (url.origin === window.location.origin) showSiteLoader();
+  });
+
+  document.addEventListener("submit", (event) => {
+    if (!siteLoader || event.target.matches(".search-form")) return;
+    showSiteLoader();
+  });
+
+  const cookieConsent = document.querySelector("[data-cookie-consent]");
+  const cookieAccept = document.querySelector("[data-cookie-accept]");
+  const cookieReject = document.querySelector("[data-cookie-reject]");
+  const cookieToggle = document.querySelector("[data-cookie-toggle]");
+  const cookieCloseTargets = document.querySelectorAll("[data-cookie-close]");
+  const cookieCustomize = document.querySelector("[data-cookie-customize]");
+  const cookieAnalytics = document.querySelector("[data-cookie-analytics]");
+  const cookieMarketing = document.querySelector("[data-cookie-marketing]");
+  const cookieStorageKey = "arete_cookie_preferences";
+
+  const openCookieConsent = () => {
+    if (!cookieConsent) return;
+    cookieConsent.classList.add("is-visible");
+    cookieConsent.setAttribute("aria-hidden", "false");
+  };
+
+  const closeCookieConsent = () => {
+    if (!cookieConsent) return;
+    cookieConsent.classList.remove("is-visible");
+    cookieConsent.setAttribute("aria-hidden", "true");
+  };
+
+  const saveCookiePreferences = (preferences) => {
+    localStorage.setItem(cookieStorageKey, JSON.stringify({
+      ...preferences,
+      necessary: true,
+      savedAt: new Date().toISOString(),
+    }));
+    closeCookieConsent();
+  };
+
+  if (cookieConsent && !localStorage.getItem(cookieStorageKey)) {
+    window.setTimeout(openCookieConsent, 1700);
+  }
+
+  cookieCloseTargets.forEach((target) => target.addEventListener("click", closeCookieConsent));
+  cookieAccept?.addEventListener("click", () => saveCookiePreferences({ analytics: true, marketing: true }));
+  cookieReject?.addEventListener("click", () => saveCookiePreferences({ analytics: false, marketing: false }));
+  cookieToggle?.addEventListener("click", () => {
+    const isOpen = cookieCustomize?.classList.toggle("is-open");
+    cookieToggle.textContent = isOpen ? "Save Preferences" : "Customize";
+
+    if (!isOpen) {
+      saveCookiePreferences({
+        analytics: Boolean(cookieAnalytics?.checked),
+        marketing: Boolean(cookieMarketing?.checked),
+      });
+    }
+  });
+
+  const autoDismissAlerts = (selector, delay = 4000) => {
+    document.querySelectorAll(selector).forEach((alert) => {
+      window.setTimeout(() => {
+        alert.classList.add("is-hiding");
+        alert.addEventListener("animationend", () => alert.remove(), { once: true });
+      }, delay);
+    });
+  };
+
+  autoDismissAlerts(".alert, .track-alert");
+
   const products = [
     { id: "anavar-50", name: "Anavar 50", meta: "Oxandrolone", price: 59.99, image: "assets/images/product-bottle.png" },
     { id: "cardarine", name: "Cardarine", meta: "GW-501516", price: 69.99, image: "assets/images/product-bottle.png" },
@@ -57,10 +174,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartCount = document.querySelector(".cart-count");
   const cartSubtotal = document.querySelector(".cart-subtotal");
   const productTrack = document.querySelector(".product-track");
+  const reportLightbox = document.querySelector(".report-lightbox");
+  const reportLightboxImage = document.querySelector("[data-report-lightbox-image]");
+  const reportLightboxTitle = document.querySelector("[data-report-lightbox-title]");
 
-  const money = (value) => `$${value.toFixed(2)}`;
+  const money = (value) => `£${Number(value || 0).toFixed(2)}`;
   const findProduct = (id) => products.find((product) => product.id === id);
   const cartQty = () => [...cart.values()].reduce((total, qty) => total + qty, 0);
+  const csrfToken = document.querySelector("meta[name='csrf-token']")?.content || "";
 
   function prepareAnimatedHeadings() {
     document.querySelectorAll(".section-heading h2, .why-intro h2").forEach((heading) => {
@@ -158,6 +279,24 @@ document.addEventListener("DOMContentLoaded", () => {
     toast.show();
   }
 
+  function openReportLightbox(src, title = "Test Report") {
+    if (!reportLightbox || !reportLightboxImage) return;
+    reportLightboxImage.src = src;
+    reportLightboxImage.alt = title;
+    if (reportLightboxTitle) reportLightboxTitle.textContent = title;
+    reportLightbox.classList.add("is-open");
+    reportLightbox.setAttribute("aria-hidden", "false");
+    document.body.classList.add("panel-open");
+  }
+
+  function closeReportLightbox() {
+    if (!reportLightbox) return;
+    reportLightbox.classList.remove("is-open");
+    reportLightbox.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("panel-open");
+    if (reportLightboxImage) reportLightboxImage.src = "";
+  }
+
   function syncBodyLock() {
     const hasOpenPanel = searchPanel.classList.contains("is-open") || cartDrawer.classList.contains("is-open");
     document.body.classList.toggle("panel-open", hasOpenPanel);
@@ -184,8 +323,31 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = url;
   }
 
-  function openCart() {
-    renderCart();
+  const routes = window.appRoutes || {};
+  const route = (name, fallback) => routes[name] || fallback;
+
+  function endpoint(base, id) {
+    return `${base}/${id}`;
+  }
+
+  async function cartRequest(url, method = "GET", body = null) {
+    const response = await fetch(url, {
+      method,
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": csrfToken
+      },
+      body: body ? JSON.stringify(body) : null
+    });
+
+    if (!response.ok) throw new Error("Cart request failed.");
+
+    return response.json();
+  }
+
+  async function openCart() {
+    await renderCart();
     cartOverlay.classList.add("is-open");
     cartOverlay.setAttribute("aria-hidden", "false");
     setPanelState(cartDrawer, true);
@@ -197,50 +359,75 @@ document.addEventListener("DOMContentLoaded", () => {
     setPanelState(cartDrawer, false);
   }
 
-  function addToCart(id, quantity = 1) {
-    const product = findProduct(id);
-    if (!product) return;
+  async function addToCart(id, quantity = 1) {
+    if (!id) return;
     const safeQty = Math.max(1, Number(quantity) || 1);
-    cart.set(id, (cart.get(id) || 0) + safeQty);
-    renderCart();
-    showToast(`${product.name}${safeQty > 1 ? ` x${safeQty}` : ""} added to your cart.`);
-  }
-
-  function updateQty(id, direction) {
-    const nextQty = (cart.get(id) || 0) + direction;
-    if (nextQty <= 0) {
-      cart.delete(id);
-    } else {
-      cart.set(id, nextQty);
+    try {
+      const data = await cartRequest(endpoint(route("cartAddBase", "/cart/add"), id), "POST", { quantity: safeQty });
+      await renderCart(data);
+      cartOverlay.classList.add("is-open");
+      cartOverlay.setAttribute("aria-hidden", "false");
+      setPanelState(cartDrawer, true);
+      showToast("Product added to your cart.");
+    } catch (error) {
+      showToast("Unable to update cart right now.");
     }
-    renderCart();
   }
 
-  function renderCart() {
-    const entries = [...cart.entries()];
-    const subtotal = entries.reduce((total, [id, qty]) => total + findProduct(id).price * qty, 0);
+  async function updateQty(id, direction, currentQty = null) {
+    const nextQty = Math.max(0, Number(currentQty ?? 1) + direction);
+    try {
+      const data = await cartRequest(endpoint(route("cartUpdateBase", "/cart/update"), id), "PATCH", { quantity: nextQty });
+      renderCart(data);
+      if (document.querySelector("[data-cart-row]")) window.location.reload();
+    } catch (error) {
+      showToast("Unable to update quantity.");
+    }
+  }
 
-    cartItems.innerHTML = entries.map(([id, qty]) => {
-      const product = findProduct(id);
+  async function removeFromCart(id) {
+    try {
+      const data = await cartRequest(endpoint(route("cartRemoveBase", "/cart/remove"), id), "DELETE");
+      renderCart(data);
+      if (document.querySelector("[data-cart-row]")) window.location.reload();
+    } catch (error) {
+      showToast("Unable to remove item.");
+    }
+  }
+
+  async function clearServerCart() {
+    try {
+      const data = await cartRequest(route("cartClear", "/cart/clear"), "DELETE");
+      renderCart(data);
+      if (document.querySelector("[data-cart-row]")) window.location.reload();
+    } catch (error) {
+      showToast("Unable to clear cart.");
+    }
+  }
+
+  async function renderCart(cartData = null) {
+    const data = cartData || await cartRequest(route("cartJson", "/cart/json"));
+
+    cartItems.innerHTML = data.items.map((product) => {
       return `
         <article class="cart-item">
           <img src="${product.image}" alt="${product.name}">
           <div>
             <h3>${product.name}</h3>
-            <small>${product.meta} - ${money(product.price)}</small>
+            <small>${product.meta} - ${money(product.unit_price)}</small>
             <div class="qty-control" aria-label="Quantity controls">
-              <button type="button" data-cart-dec="${product.id}" aria-label="Decrease ${product.name}">-</button>
-              <span>${qty}</span>
-              <button type="button" data-cart-inc="${product.id}" aria-label="Increase ${product.name}">+</button>
+              <button type="button" data-cart-dec="${product.id}" data-cart-qty="${product.quantity}" aria-label="Decrease ${product.name}">-</button>
+              <span>${product.quantity}</span>
+              <button type="button" data-cart-inc="${product.id}" data-cart-qty="${product.quantity}" aria-label="Increase ${product.name}">+</button>
             </div>
           </div>
           <button class="remove-item" type="button" data-cart-remove="${product.id}" aria-label="Remove ${product.name}"><i class="fa-solid fa-trash-can"></i></button>
         </article>`;
     }).join("");
 
-    cartCount.textContent = cartQty();
-    cartSubtotal.textContent = money(subtotal);
-    cartEmpty.classList.toggle("is-visible", entries.length === 0);
+    cartCount.textContent = data.item_count;
+    cartSubtotal.textContent = money(data.subtotal);
+    cartEmpty.classList.toggle("is-visible", data.is_empty);
   }
 
   function renderSearchResults(query) {
@@ -257,6 +444,28 @@ document.addEventListener("DOMContentLoaded", () => {
         <button type="button" data-search-add="${product.id}" aria-label="Add ${product.name}"><i class="fa-solid fa-cart-plus"></i></button>
       </article>`).join("") : '<p class="no-results">No products found. Try searching "Peptides" or "HGH".</p>';
   }
+
+  // Set active link on page load
+  const currentPathname = window.location.pathname;
+  const currentHashname = window.location.hash;
+
+  navLinks.forEach((link) => {
+    const linkUrl = new URL(link.href, window.location.origin);
+    const linkPathname = linkUrl.pathname;
+    const linkHashname = linkUrl.hash;
+
+    let isActive = false;
+
+    if (linkHashname === "#contact") {
+      isActive = (currentPathname === linkPathname && currentHashname === "#contact");
+    } else if (linkPathname === "/") {
+      isActive = (currentPathname === "/" && (currentHashname === "" || currentHashname === "#home" || !currentHashname));
+    } else {
+      isActive = (currentPathname === linkPathname);
+    }
+
+    link.classList.toggle("active", isActive);
+  });
 
   navLinks.forEach((link) => {
     link.addEventListener("click", () => {
@@ -281,7 +490,8 @@ document.addEventListener("DOMContentLoaded", () => {
   searchInput.addEventListener("input", (event) => renderSearchResults(event.target.value));
   searchForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    goToPage("search.html");
+    const query = searchInput.value.trim();
+    goToPage(`${route("search", "/search")}${query ? `?q=${encodeURIComponent(query)}` : ""}`);
   });
 
   document.querySelector(".cart-btn").addEventListener("click", openCart);
@@ -367,14 +577,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document.addEventListener("click", (event) => {
+  document.addEventListener("click", async (event) => {
     const productCard = event.target.closest(".product-card");
     const relatedCard = event.target.closest(".related-card");
     const categoryCard = event.target.closest(".category-card");
     const addFromSearch = event.target.closest("[data-search-add]");
     const goTrigger = event.target.closest("[data-go]");
     const accountButton = event.target.closest(".icon-btn[aria-label='Account']");
-    const clearFilters = event.target.closest(".clear-filters");
+    const clearFilters = event.target.closest("[data-clear-filters]");
     const clearSearch = event.target.closest("[aria-label='Clear search']");
     const sortButton = event.target.closest(".shop-toolbar button");
     const productThumb = event.target.closest("[data-product-image]");
@@ -382,39 +592,67 @@ document.addEventListener("DOMContentLoaded", () => {
     const buyNow = event.target.closest("[data-buy-now]");
     const productQtyInc = event.target.closest("[data-product-qty-inc]");
     const productQtyDec = event.target.closest("[data-product-qty-dec]");
+    const cardQtyInc = event.target.closest("[data-card-qty-inc]");
+    const cardQtyDec = event.target.closest("[data-card-qty-dec]");
+    const testReport = event.target.closest("[data-test-report]");
     const productZoom = event.target.closest("[data-product-zoom]");
     const labReport = event.target.closest("[data-lab-report]");
     const detailTapCard = event.target.closest(".product-benefit-strip > div, .description-assurance > div, .benefit-list > div, .dosage-steps > div, .ingredient-certifications > div, .review-card, .shop-trust-grid > div");
     const inc = event.target.closest("[data-cart-inc]");
     const dec = event.target.closest("[data-cart-dec]");
     const remove = event.target.closest("[data-cart-remove]");
+    const clearCart = event.target.closest("[data-cart-clear]");
     const drawerCheckout = event.target.closest(".cart-summary .btn");
 
     const qtyOutput = document.querySelector("[data-product-qty]");
     const getProductQty = () => Math.max(1, Number(qtyOutput?.textContent) || 1);
+    const getCardQty = (button) => Math.max(1, Number(button?.closest(".product-card")?.querySelector("[data-card-qty]")?.textContent) || 1);
+    const setCardQty = (button, qty) => {
+      const output = button?.closest(".product-card")?.querySelector("[data-card-qty]");
+      if (!output) return;
+      output.textContent = String(Math.max(1, Math.min(99, qty)));
+    };
     const setProductQty = (qty) => {
       if (!qtyOutput) return;
       qtyOutput.textContent = String(Math.max(1, Math.min(99, qty)));
     };
 
     if (goTrigger) goToPage(goTrigger.dataset.go);
-    if (accountButton) goToPage("my-cart.html");
-    if (clearFilters) goToPage(document.body.classList.contains("search-page") ? "search.html" : "shop.html");
-    if (clearSearch) goToPage("search.html");
-    if (sortButton) goToPage(document.body.classList.contains("search-page") ? "search.html" : "shop.html");
-    if (categoryCard && !event.target.closest("button, a")) goToPage("shop.html");
+    if (accountButton) goToPage(route("cart", "/my-cart"));
+    if (clearFilters) goToPage(document.body.classList.contains("search-page") ? route("search", "/search") : route("shop", "/shop"));
+    if (clearSearch) goToPage(route("search", "/search"));
+    if (sortButton) goToPage(document.body.classList.contains("search-page") ? route("search", "/search") : route("shop", "/shop"));
+    if (categoryCard && !event.target.closest("button, a")) goToPage(categoryCard.dataset.categoryUrl || route("shop", "/shop"));
 
-    if (productCard && event.target.closest("button")) {
+    if (testReport) {
+      openReportLightbox(testReport.dataset.testReport, testReport.dataset.testReportTitle || "Test Report");
+      return;
+    }
+
+    if (cardQtyInc) {
+      setCardQty(cardQtyInc, getCardQty(cardQtyInc) + 1);
+      return;
+    }
+
+    if (cardQtyDec) {
+      setCardQty(cardQtyDec, getCardQty(cardQtyDec) - 1);
+      return;
+    }
+
+    if (event.target.closest("[data-cart-add]")) {
+      const addButton = event.target.closest("[data-cart-add]");
+      await addToCart(addButton.dataset.cartAdd, getCardQty(addButton));
+    } else if (productCard && event.target.closest("button") && !event.target.closest("[data-card-qty-inc], [data-card-qty-dec], [data-test-report]")) {
       const index = [...document.querySelectorAll(".product-card")].indexOf(productCard);
-      addToCart(productCard.dataset.productId || products[index]?.id);
+      await addToCart(productCard.dataset.productId || products[index]?.id);
     } else if (productCard && !event.target.closest("a")) {
-      goToPage("product-detail.html");
+      goToPage(route("productDetails", "/product-details"));
     }
 
     if (relatedCard && event.target.closest("button")) {
-      addToCart(relatedCard.dataset.productId);
+      await addToCart(relatedCard.dataset.productId);
     } else if (relatedCard) {
-      goToPage("product-detail.html");
+      goToPage(route("productDetails", "/product-details"));
     }
 
     if (productThumb) {
@@ -431,13 +669,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (productQtyInc) setProductQty(getProductQty() + 1);
     if (productQtyDec) setProductQty(getProductQty() - 1);
-    if (productAdd) addToCart(productAdd.dataset.productAdd, getProductQty());
+    if (productAdd) await addToCart(productAdd.dataset.productAdd, getProductQty());
     if (buyNow) {
-      addToCart(buyNow.dataset.buyNow, getProductQty());
-      window.location.href = "checkout.html";
+      await addToCart(buyNow.dataset.buyNow, getProductQty());
+      window.location.href = route("checkout", "/checkout");
     }
-    if (labReport) showToast("Lab report preview is opening soon.");
-    if (drawerCheckout) goToPage("checkout.html");
+    if (labReport) {
+      const detailReport = document.querySelector("[data-product-report]");
+      if (detailReport?.dataset.productReport) {
+        openReportLightbox(detailReport.dataset.productReport, detailReport.dataset.productReportTitle || "Test Report");
+      } else {
+        showToast("Lab report preview is opening soon.");
+      }
+    }
+    if (drawerCheckout) goToPage(route("checkout", "/checkout"));
 
     if (detailTapCard && !event.target.closest("button, a, summary")) {
       detailTapCard.classList.remove("is-tapped");
@@ -450,10 +695,11 @@ document.addEventListener("DOMContentLoaded", () => {
       productZoom.setAttribute("aria-pressed", String(isZoomed));
     }
 
-    if (addFromSearch) addToCart(addFromSearch.dataset.searchAdd);
-    if (inc) updateQty(inc.dataset.cartInc, 1);
-    if (dec) updateQty(dec.dataset.cartDec, -1);
-    if (remove) updateQty(remove.dataset.cartRemove, -999);
+    if (addFromSearch) await addToCart(addFromSearch.dataset.searchAdd);
+    if (inc) updateQty(inc.dataset.cartInc, 1, inc.dataset.cartQty || inc.parentElement?.querySelector("span")?.textContent);
+    if (dec) updateQty(dec.dataset.cartDec, -1, dec.dataset.cartQty || dec.parentElement?.querySelector("span")?.textContent);
+    if (remove) removeFromCart(remove.dataset.cartRemove);
+    if (clearCart) clearServerCart();
   });
 
   document.querySelector("[data-product-zoom]")?.addEventListener("keydown", (event) => {
@@ -464,15 +710,251 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
+      closeReportLightbox();
       closeSearch();
       closeCart();
     }
+  });
+
+  document.querySelector(".report-lightbox-close")?.addEventListener("click", closeReportLightbox);
+  reportLightbox?.addEventListener("click", (event) => {
+    if (event.target === reportLightbox) closeReportLightbox();
   });
 
   document.querySelector(".newsletter")?.addEventListener("submit", (event) => {
     event.preventDefault();
     showToast("Thanks for joining our newsletter.");
     event.currentTarget.reset();
+  });
+
+  document.querySelectorAll("[data-uk-postcode]").forEach((input) => {
+    input.addEventListener("input", () => {
+      let value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 7);
+      if (value.length > 3) value = `${value.slice(0, -3)} ${value.slice(-3)}`;
+      input.value = value;
+    });
+
+    input.addEventListener("change", async () => {
+      const postcode = input.value.trim();
+      if (!postcode) return;
+      try {
+        const response = await fetch(`${route("postcodeLookup", "/checkout/postcode")}?postcode=${encodeURIComponent(postcode)}`, {
+          headers: { Accept: "application/json" },
+        });
+        const data = await response.json();
+        if (response.ok && data.found && Array.isArray(data.addresses) && data.addresses.length > 0) {
+          const address = data.addresses[0];
+          const cityInput = document.querySelector("#city");
+          const countyInput = document.querySelector("#state");
+          if (cityInput && !cityInput.value) cityInput.value = address.city || "";
+          if (countyInput && !countyInput.value) countyInput.value = address.state || "";
+        }
+      } catch (e) {
+        // silent fail
+      }
+    });
+  });
+
+  const manualAddress = document.querySelector("[data-manual-address]");
+  const postcodeStatus = document.querySelector("[data-postcode-status]");
+  const postcodeInput = document.querySelector("[data-uk-postcode]");
+  const postcodePicker = document.querySelector("[data-postcode-address-picker]");
+  const postcodeSelect = document.querySelector("[data-postcode-address]");
+  const findPostcodeButton = document.querySelector("[data-find-postcode]");
+  const enterManualButton = document.querySelector("[data-enter-manual]");
+  const usePostcodeButton = document.querySelector("[data-use-postcode]");
+  const streetInput = document.querySelector("#streetAddress");
+  const addressTwoInput = document.querySelector("#addressTwo");
+  const cityInput = document.querySelector("#city");
+  const countyInput = document.querySelector("#state");
+
+  function setAddressFieldsVisible(visible) {
+    if (!manualAddress) return;
+    manualAddress.classList.toggle("is-visible", visible);
+    manualAddress.querySelectorAll("[data-address-required]").forEach((input) => {
+      input.toggleAttribute("required", visible);
+    });
+  }
+
+  function setPostcodePickerVisible(visible) {
+    if (!postcodePicker) return;
+    postcodePicker.hidden = !visible;
+    if (!visible && postcodeSelect) {
+      postcodeSelect.innerHTML = '<option value="">Select your address</option>';
+    }
+  }
+
+  function clearAddressFields() {
+    [streetInput, addressTwoInput, cityInput, countyInput].forEach((input) => {
+      if (input) input.value = "";
+    });
+  }
+
+  function setPostcodeMode(mode) {
+    const manualMode = mode === "manual";
+    if (findPostcodeButton) findPostcodeButton.hidden = manualMode;
+    if (enterManualButton) enterManualButton.hidden = manualMode;
+    if (usePostcodeButton) usePostcodeButton.hidden = !manualMode;
+    if (manualMode) setPostcodePickerVisible(false);
+  }
+
+  function fillAddress(address) {
+    if (streetInput) streetInput.value = address.address || address.label || "";
+    if (addressTwoInput) addressTwoInput.value = address.address_2 || "";
+    if (cityInput) cityInput.value = address.city || "";
+    if (countyInput) countyInput.value = address.state || "";
+  }
+
+  setAddressFieldsVisible(manualAddress?.classList.contains("is-visible"));
+  setPostcodeMode(manualAddress?.classList.contains("is-visible") ? "manual" : "search");
+
+  enterManualButton?.addEventListener("click", () => {
+    setPostcodeMode("manual");
+    setAddressFieldsVisible(true);
+    setPostcodePickerVisible(false);
+    if (postcodeStatus) postcodeStatus.textContent = "Enter your address manually.";
+    streetInput?.focus();
+  });
+
+  usePostcodeButton?.addEventListener("click", () => {
+    setPostcodeMode("search");
+    setAddressFieldsVisible(false);
+    setPostcodePickerVisible(false);
+    clearAddressFields();
+    if (postcodeStatus) postcodeStatus.textContent = "Enter a UK post code and click Find Post Code.";
+    postcodeInput?.focus();
+  });
+
+  findPostcodeButton?.addEventListener("click", async () => {
+    const postcode = postcodeInput?.value.trim();
+    setAddressFieldsVisible(false);
+    setPostcodePickerVisible(false);
+    clearAddressFields();
+
+    if (!postcode) {
+      if (postcodeStatus) postcodeStatus.textContent = "Please enter a UK post code first.";
+      postcodeInput?.focus();
+      return;
+    }
+
+    if (postcodeStatus) postcodeStatus.textContent = "Finding post code...";
+
+    try {
+      const response = await fetch(`${route("postcodeLookup", "/checkout/postcode")}?postcode=${encodeURIComponent(postcode)}`, {
+        headers: { Accept: "application/json" },
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.found || !Array.isArray(data.addresses) || data.addresses.length === 0) {
+        throw new Error("Post code not found.");
+      }
+
+      postcodeSelect.innerHTML = '<option value="">Select your address</option>';
+      data.addresses.forEach((address, index) => {
+        const option = document.createElement("option");
+        option.value = String(index);
+        option.textContent = address.label || `Address ${index + 1}`;
+        option.dataset.address = JSON.stringify(address);
+        postcodeSelect.append(option);
+      });
+
+      setPostcodePickerVisible(true);
+      if (postcodeStatus) postcodeStatus.textContent = data.source === "addresses" ? "Post code found. Select your address." : "Post code found. Full address list needs an address API key; use Enter Manually for street details.";
+      postcodeSelect?.focus();
+    } catch (error) {
+      setAddressFieldsVisible(false);
+      setPostcodePickerVisible(false);
+      if (postcodeStatus) postcodeStatus.textContent = "Post code not found. Check the UK post code or use Enter Manually.";
+      postcodeInput?.focus();
+    }
+  });
+
+  postcodeSelect?.addEventListener("change", () => {
+    const option = postcodeSelect.selectedOptions[0];
+    if (!option?.dataset.address) {
+      setAddressFieldsVisible(false);
+      return;
+    }
+
+    const selectedAddress = JSON.parse(option.dataset.address);
+    selectedAddress.label = selectedAddress.label || option.textContent.trim();
+    fillAddress(selectedAddress);
+    setAddressFieldsVisible(false);
+    if (postcodeStatus) postcodeStatus.textContent = streetInput?.value ? "Address selected." : "Address selected. Use Enter Manually if you need to add street details.";
+  });
+
+  document.querySelectorAll("[data-price-range]").forEach((range) => {
+    const minRange = range.querySelector("[data-price-min-range]");
+    const maxRange = range.querySelector("[data-price-max-range]");
+    const form = range.closest("form");
+    const minInput = form?.querySelector("[data-price-min-input]");
+    const maxInput = form?.querySelector("[data-price-max-input]");
+    const minLabel = form?.querySelector("[data-price-min-label]");
+    const maxLabel = form?.querySelector("[data-price-max-label]");
+    const sortInput = form?.querySelector("[data-price-sort-field]");
+    const fill = range.querySelector("[data-price-range-fill]");
+
+    if (!minRange || !maxRange || !minInput || !maxInput) return;
+
+    const minLimit = Number(minRange.min || 0);
+    const maxLimit = Number(maxRange.max || 0);
+    const hasInitialMin = minInput.value !== "";
+    const hasInitialMax = maxInput.value !== "";
+
+    function clampValues(source, syncInputs = true) {
+      let minValue = Number(minRange.value || minLimit);
+      let maxValue = Number(maxRange.value || maxLimit);
+
+      if (minValue > maxValue) {
+        if (source === "min") maxValue = minValue;
+        else minValue = maxValue;
+      }
+
+      minRange.value = minValue;
+      maxRange.value = maxValue;
+      if (syncInputs) {
+        minInput.value = minValue;
+        maxInput.value = maxValue;
+      }
+      if (source && sortInput) sortInput.value = "price_asc";
+      if (minLabel) minLabel.textContent = minValue;
+      if (maxLabel) maxLabel.textContent = maxValue;
+
+      const span = Math.max(1, maxLimit - minLimit);
+      const left = ((minValue - minLimit) / span) * 100;
+      const right = 100 - ((maxValue - minLimit) / span) * 100;
+      if (fill) {
+        fill.style.left = `${left}%`;
+        fill.style.right = `${right}%`;
+      }
+    }
+
+    minRange.addEventListener("input", () => clampValues("min"));
+    maxRange.addEventListener("input", () => clampValues("max"));
+    minInput.addEventListener("input", () => {
+      minRange.value = minInput.value || minLimit;
+      clampValues("min");
+    });
+    maxInput.addEventListener("input", () => {
+      maxRange.value = maxInput.value || maxLimit;
+      clampValues("max");
+    });
+
+    clampValues(null, hasInitialMin || hasInitialMax);
+  });
+
+  document.querySelectorAll("[data-uk-phone]").forEach((input) => {
+    input.addEventListener("input", () => {
+      let value = input.value.replace(/[^\d+]/g, "");
+      if (value.startsWith("+44")) {
+        const digits = value.replace(/\D/g, "").slice(0, 12);
+        value = `+44 ${digits.slice(2, 6)} ${digits.slice(6, 9)} ${digits.slice(9, 12)}`.trim();
+      } else {
+        const digits = value.replace(/\D/g, "").slice(0, 11);
+        value = [digits.slice(0, 5), digits.slice(5, 8), digits.slice(8, 11)].filter(Boolean).join(" ");
+      }
+      input.value = value;
+    });
   });
 
   const tabCards = [...document.querySelectorAll(".tab-content-card")];

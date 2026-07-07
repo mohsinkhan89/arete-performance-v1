@@ -13,7 +13,7 @@
         <p>{{ $isEdit ? 'Update' : 'Create' }} {{ strtolower($singular) }} details for your Arete admin panel.</p>
     </div>
 
-    <article class="panel form-panel">
+    <article class="panel form-panel {{ in_array($resource, ['products', 'categories'], true) ? 'form-panel-full' : '' }}">
         <form action="{{ $isEdit ? route('backend.resource.update', ['resource' => $resource, 'id' => $record->id]) : route('backend.resource.store', ['resource' => $resource]) }}" method="POST" class="admin-form" enctype="multipart/form-data">
             @csrf
             @if ($isEdit)
@@ -22,7 +22,7 @@
 
             @if ($resource === 'products')
                 <div class="form-grid">
-                    <label>Product Name
+                    <label class="field-medium">Product Name
                         <input name="name" value="{{ old('name', $record->name ?? '') }}" required>
                         @error('name')<span>{{ $message }}</span>@enderror
                     </label>
@@ -87,11 +87,11 @@
                             </div>
                         @endif
                     </div>
-                    <label class="wide">Short Description
+                    <label class="field-medium">Short Description
                         <input name="short_description" value="{{ old('short_description', $record->short_description ?? '') }}">
                     </label>
-                    <label class="wide">Description
-                        <textarea name="description" rows="4">{{ old('description', $record->description ?? '') }}</textarea>
+                    <label class="wide rich-field">Description
+                        <textarea class="rich-text-source" name="description" rows="4" data-rich-text>{{ old('description', $record->description ?? '') }}</textarea>
                     </label>
                     <label class="switch-row">
                         <input type="checkbox" name="is_featured" value="1" @checked(old('is_featured', $record->is_featured ?? false))>
@@ -100,7 +100,7 @@
                 </div>
             @elseif ($resource === 'categories')
                 <div class="form-grid">
-                    <label>Name
+                    <label class="field-medium">Name
                         <input name="name" value="{{ old('name', $record->name ?? '') }}" required>
                         @error('name')<span>{{ $message }}</span>@enderror
                     </label>
@@ -133,8 +133,52 @@
                             </label>
                         </div>
                     @endif
-                    <label class="wide">Description
-                        <textarea name="description" rows="4">{{ old('description', $record->description ?? '') }}</textarea>
+                    <label class="wide rich-field">Description
+                        <textarea class="rich-text-source" name="description" rows="4" data-rich-text>{{ old('description', $record->description ?? '') }}</textarea>
+                    </label>
+                </div>
+            @elseif ($resource === 'reviews')
+                <div class="form-grid">
+                    <label class="field-medium">Customer Name
+                        <input name="customer_name" value="{{ old('customer_name', $record->customer_name ?? '') }}" required>
+                        @error('customer_name')<span>{{ $message }}</span>@enderror
+                    </label>
+                    <label class="field-medium">Customer Title
+                        <input name="customer_title" value="{{ old('customer_title', $record->customer_title ?? '') }}" placeholder="Fitness Coach, Athlete, Customer...">
+                        @error('customer_title')<span>{{ $message }}</span>@enderror
+                    </label>
+                    <label>Product
+                        <select name="product_id">
+                            <option value="">No product</option>
+                            @foreach ($products ?? [] as $product)
+                                <option value="{{ $product->id }}" @selected((string) old('product_id', $record->product_id ?? '') === (string) $product->id)>{{ $product->name }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label>Rating
+                        <select name="rating" required>
+                            @for ($rating = 5; $rating >= 1; $rating--)
+                                <option value="{{ $rating }}" @selected((int) old('rating', $record->rating ?? 5) === $rating)>{{ $rating }} Star{{ $rating > 1 ? 's' : '' }}</option>
+                            @endfor
+                        </select>
+                    </label>
+                    <label>Status
+                        <select name="status" required>
+                            <option value="active" @selected(old('status', $record->status ?? 'active') === 'active')>Active</option>
+                            <option value="inactive" @selected(old('status', $record->status ?? '') === 'inactive')>Inactive</option>
+                        </select>
+                    </label>
+                    <label>Avatar Path
+                        <input name="avatar" value="{{ old('avatar', $record->avatar ?? '') }}" placeholder="frontend/assets/images/testimonials/name.png">
+                        @error('avatar')<span>{{ $message }}</span>@enderror
+                    </label>
+                    <label class="wide">Review
+                        <textarea name="comment" rows="5" required>{{ old('comment', $record->comment ?? '') }}</textarea>
+                        @error('comment')<span>{{ $message }}</span>@enderror
+                    </label>
+                    <label class="switch-row">
+                        <input type="checkbox" name="is_featured" value="1" @checked(old('is_featured', $record->is_featured ?? false))>
+                        <span>Featured review</span>
                     </label>
                 </div>
             @else

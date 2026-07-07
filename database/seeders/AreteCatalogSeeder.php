@@ -71,14 +71,14 @@ class AreteCatalogSeeder extends Seeder
         ];
 
         $categoryImages = [
-            'Injectables' => 'frontend/assets/images/categories-imgs/injection.png',
-            'Orals' => 'frontend/assets/images/categories-imgs/orals.png',
-            'Fat Burners' => 'frontend/assets/images/categories-imgs/fat-burrners.png',
-            'Post Cycle Therapy' => 'frontend/assets/images/categories-imgs/post-cycle-therapy.png',
-            'Human Growth Hormone' => 'frontend/assets/images/product-bottle.png',
-            'Peptides' => 'frontend/assets/images/categories-imgs/peptides.png',
-            'Sexual Health' => 'frontend/assets/images/categories-imgs/sexual-health.png',
-            'Syringes & Needles' => 'frontend/assets/images/categories-imgs/injection.png',
+            'Injectables' => 'backend/assets/imgs/uploads/category-injectables.png',
+            'Orals' => 'backend/assets/imgs/uploads/category-orals.png',
+            'Fat Burners' => 'backend/assets/imgs/uploads/category-fat-burners.png',
+            'Post Cycle Therapy' => 'backend/assets/imgs/uploads/category-post-cycle-therapy.png',
+            'Human Growth Hormone' => 'backend/assets/imgs/uploads/category-human-growth-hormone.png',
+            'Peptides' => 'backend/assets/imgs/uploads/category-peptides.png',
+            'Sexual Health' => 'backend/assets/imgs/uploads/category-sexual-health.png',
+            'Syringes & Needles' => 'backend/assets/imgs/uploads/category-syringes-needles.png',
         ];
 
         foreach ($catalog as $categoryName => $products) {

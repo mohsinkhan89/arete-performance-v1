@@ -1,4 +1,4 @@
-@extends('backend.layouts.master')
+﻿@extends('backend.layouts.master')
 
 @section('title', $pageTitle)
 
@@ -8,14 +8,86 @@
         <p>Manage {{ strtolower($pageTitle) }} from your Arete Performance admin panel.</p>
     </div>
 
-    @if (in_array($page, ['products', 'categories', 'users'], true))
+    @if ($page === 'reports')
+        <div class="stats-grid">
+            <article class="stat-card">
+                <div>
+                    <span>Paid Orders</span>
+                    <strong>{{ number_format($reportStats['paid_count']) }}</strong>
+                    <small class="up"><i class="fa-solid fa-check-circle"></i> £{{ number_format((float) $reportStats['paid_total'], 2) }}</small>
+                    <em>payment received</em>
+                </div>
+                <i class="stat-icon fa-solid fa-wallet"></i>
+                <svg viewBox="0 0 180 42" aria-hidden="true"><path d="M2 33 C22 31 34 18 52 23 S82 34 102 20 S132 17 150 22 S171 17 178 10"/></svg>
+            </article>
+            <article class="stat-card">
+                <div>
+                    <span>Proof Submitted</span>
+                    <strong>{{ number_format($reportStats['proof_count']) }}</strong>
+                    <small class="up"><i class="fa-solid fa-receipt"></i> £{{ number_format((float) $reportStats['proof_total'], 2) }}</small>
+                    <em>waiting verification</em>
+                </div>
+                <i class="stat-icon fa-solid fa-file-invoice"></i>
+                <svg viewBox="0 0 180 42" aria-hidden="true"><path d="M2 34 C23 33 37 22 55 25 S82 36 103 22 S134 13 150 18 S169 20 178 12"/></svg>
+            </article>
+            <article class="stat-card">
+                <div>
+                    <span>Unpaid Orders</span>
+                    <strong>{{ number_format($reportStats['unpaid_count']) }}</strong>
+                    <small class="down"><i class="fa-solid fa-clock"></i> £{{ number_format((float) $reportStats['unpaid_total'], 2) }}</small>
+                    <em>payment pending</em>
+                </div>
+                <i class="stat-icon fa-solid fa-hourglass-half"></i>
+                <svg viewBox="0 0 180 42" aria-hidden="true"><path d="M2 32 C22 31 34 17 53 24 S84 34 104 18 S134 16 151 20 S171 18 178 9"/></svg>
+            </article>
+            <article class="stat-card">
+                <div>
+                    <span>Total Orders</span>
+                    <strong>{{ number_format($reportStats['orders']) }}</strong>
+                    <small class="down"><i class="fa-solid fa-ban"></i> {{ number_format($reportStats['cancelled_count']) }}</small>
+                    <em>cancelled orders</em>
+                </div>
+                <i class="stat-icon fa-solid fa-chart-column"></i>
+                <svg viewBox="0 0 180 42" aria-hidden="true"><path d="M2 33 C23 32 36 21 55 23 S84 36 104 23 S133 11 150 18 S170 21 178 11"/></svg>
+            </article>
+        </div>
+
+        <article class="panel resource-panel">
+            <div class="panel-head">
+                <h2>Payment Report</h2>
+                <a href="{{ route('backend.page', 'orders') }}"><i class="fa-solid fa-clipboard-list"></i> Orders</a>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Created</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($reportStats['recent'] as $order)
+                            <tr>
+                                <td>{{ $order->order_number }}</td>
+                                <td>{{ $order->customer_name }}</td>
+                                <td>£{{ number_format((float) $order->total, 2) }}</td>
+                                <td><span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
+                                <td>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</td>
+                                <td>{{ $order->created_at?->format('M d, Y') }}</td>
+                                <td><div class="action-group"><a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a></div></td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="7" class="empty-cell">No report data found.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    @elseif (in_array($page, ['products', 'categories', 'users', 'reviews', 'orders'], true))
         @php
             $canManage = $page !== 'users' || $canManageUsers;
         @endphp
-        <article class="panel resource-panel">
+        <article class="panel resource-panel {{ $page === 'orders' ? 'compact-orders-resource' : '' }}">
             <div class="panel-head">
                 <h2>{{ $pageTitle }} Table</h2>
-                @if ($canManage)
+                @if ($canManage && in_array($page, ['products', 'categories', 'users', 'reviews'], true))
                     <a href="{{ route('backend.resource.create', ['resource' => $page]) }}"><i class="fa-solid fa-plus"></i> Add New</a>
                 @endif
             </div>
@@ -68,11 +140,12 @@
                 @elseif ($page === 'categories')
                     <table>
                         <thead>
-                            <tr><th>Name</th><th>Slug</th><th>Products</th><th>Sort</th><th>Status</th><th>Created</th><th>Action</th></tr>
+                            <tr><th>Image</th><th>Name</th><th>Slug</th><th>Products</th><th>Sort</th><th>Status</th><th>Created</th><th>Action</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $category)
                                 <tr>
+                                    <td><img class="category-thumb" src="{{ url($category->image ?: 'backend/assets/imgs/product-bottle.png') }}" alt="{{ $category->name }}"></td>
                                     <td>{{ $category->name }}</td>
                                     <td>{{ $category->slug }}</td>
                                     <td>{{ $category->products_count }}</td>
@@ -100,11 +173,11 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="7" class="empty-cell">No categories found.</td></tr>
+                                <tr><td colspan="8" class="empty-cell">No categories found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
-                @else
+                @elseif ($page === 'users')
                     <table>
                         <thead>
                             <tr><th>User</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Joined</th><th>Action</th></tr>
@@ -153,6 +226,98 @@
                             @endforelse
                         </tbody>
                     </table>
+                @elseif ($page === 'orders')
+                    <table class="orders-table-compact">
+                        <thead>
+                            <tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($records as $order)
+                                <tr>
+                                    <td>
+                                        <strong>{{ $order->order_number }}</strong>
+                                        <small class="table-subtext">{{ $order->created_at?->format('M d, Y') }}</small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ $order->customer_name }}</strong>
+                                        <small class="table-subtext">{{ $order->email }}</small>
+                                    </td>
+                                    <td>{{ $order->items_count }}</td>
+                                    <td>£{{ number_format((float) $order->total, 2) }}</td>
+                                    <td>
+                                        <div class="payment-cell-actions">
+                                            <span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span>
+                                            @if (($order->payment_status ?? 'unpaid') !== 'paid')
+                                                <a class="inline-update-btn" href="{{ route('backend.orders.show', $order) }}"><i class="fa-solid fa-pen-to-square"></i> Update</a>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</strong>
+                                        <small class="table-subtext">{{ $order->tracking_number ?: 'Label pending' }}</small>
+                                    </td>
+                                    <td>
+                                        @php
+                                            $phone = preg_replace('/\D+/', '', $order->phone ?? '');
+                                            $trackUrl = route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email]);
+                                            $waMessage = "Hi {$order->customer_name},\n\nPlease send/upload your payment proof for Arete Performance order #{$order->order_number}.\nTotal: £" . number_format((float) $order->total, 2) . "\n\nUpload here: {$trackUrl}\n\nOnce submitted, we will verify the payment and process your order.";
+                                            $waUrl = 'https://wa.me/' . $phone . '?text=' . rawurlencode($waMessage);
+                                        @endphp
+                                        <div class="action-group">
+                                            <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
+                                            <a href="{{ $waUrl }}" target="_blank" rel="noopener" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="7" class="empty-cell">No orders found.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                @else
+                    <table>
+                        <thead>
+                            <tr><th>Customer</th><th>Product</th><th>Rating</th><th>Review</th><th>Status</th><th>Created</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($records as $review)
+                                <tr>
+                                    <td>
+                                        <span class="table-media">
+                                            <img src="{{ url($review->avatar ?: 'frontend/assets/images/testimonials/miker.png') }}" alt="{{ $review->customer_name }}">
+                                            {{ $review->customer_name }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $review->product?->name ?? '-' }}</td>
+                                    <td><span class="rating-stars">{{ str_repeat('★', $review->rating) }}</span></td>
+                                    <td>{{ \Illuminate\Support\Str::limit($review->comment, 70) }}</td>
+                                    <td>
+                                        <form action="{{ route('backend.resource.status', ['resource' => 'reviews', 'id' => $review->id]) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button class="status-toggle {{ $review->status === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status">
+                                                <i class="fa-solid {{ $review->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
+                                                {{ ucfirst($review->status) }}
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td>{{ $review->created_at?->format('M d, Y') }}</td>
+                                    <td>
+                                        <div class="action-group">
+                                            <a href="{{ route('backend.resource.edit', ['resource' => 'reviews', 'id' => $review->id]) }}" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                                            <form action="{{ route('backend.resource.destroy', ['resource' => 'reviews', 'id' => $review->id]) }}" method="POST" onsubmit="return confirm('Delete this review?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="7" class="empty-cell">No reviews found.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 @endif
             </div>
 
@@ -168,3 +333,4 @@
         </article>
     @endif
 @endsection
+
