@@ -59,7 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const cookieAccept = document.querySelector("[data-cookie-accept]");
   const cookieReject = document.querySelector("[data-cookie-reject]");
   const cookieToggle = document.querySelector("[data-cookie-toggle]");
-  const cookieCloseTargets = document.querySelectorAll("[data-cookie-close]");
   const cookieCustomize = document.querySelector("[data-cookie-customize]");
   const cookieAnalytics = document.querySelector("[data-cookie-analytics]");
   const cookieMarketing = document.querySelector("[data-cookie-marketing]");
@@ -90,7 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.setTimeout(openCookieConsent, 1700);
   }
 
-  cookieCloseTargets.forEach((target) => target.addEventListener("click", closeCookieConsent));
   cookieAccept?.addEventListener("click", () => saveCookiePreferences({ analytics: true, marketing: true }));
   cookieReject?.addEventListener("click", () => saveCookiePreferences({ analytics: false, marketing: false }));
   cookieToggle?.addEventListener("click", () => {

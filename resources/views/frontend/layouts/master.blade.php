@@ -49,7 +49,7 @@
   @include('frontend.inc.footer')
 
   <div class="cookie-consent" data-cookie-consent aria-hidden="true">
-    <div class="cookie-consent-backdrop" data-cookie-close></div>
+    <div class="cookie-consent-backdrop" aria-hidden="true"></div>
     <section class="cookie-card" role="dialog" aria-modal="true" aria-labelledby="cookieTitle">
       <div class="cookie-icon" aria-hidden="true"><i class="fa-solid fa-cookie-bite"></i></div>
       <h2 id="cookieTitle">Cookie Preferences</h2>
