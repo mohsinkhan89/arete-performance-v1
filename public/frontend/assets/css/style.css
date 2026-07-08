@@ -2630,7 +2630,8 @@ button.is-loading .fa-spinner {
   content: "";
   position: absolute;
   inset: -18%;
-  background: linear-gradient(128deg, transparent 34%, rgba(245, 168, 23, .1) 37%, rgba(245, 168, 23, .45) 38%, transparent 39%, transparent 46%, rgba(245, 168, 23, .32) 48%, transparent 50%, transparent 58%, rgba(245, 168, 23, .28) 60%, transparent 62%);
+  background: linear-gradient(105deg, transparent 0 43%, rgba(245, 168, 23, .08) 46%, rgba(255, 193, 77, .7) 48%, rgba(245, 168, 23, .1) 50%, transparent 54% 100%);
+  /* background: linear-gradient(128deg, transparent 34%, rgba(245, 168, 23, .1) 37%, rgba(245, 168, 23, .45) 38%, transparent 39%, transparent 46%, rgba(245, 168, 23, .32) 48%, transparent 50%, transparent 58%, rgba(245, 168, 23, .28) 60%, transparent 62%); */
   pointer-events: none;
 }
 
@@ -5264,15 +5265,16 @@ button.is-loading .fa-spinner {
 .cart-hero::before,
 .checkout-hero::before,
 .search-hero::before {
-  animation: heroVignetteBreath 7s ease-in-out infinite alternate;
+  animation: heroBackdropDrift 18s ease-in-out infinite alternate;
+  /* animation: heroVignetteBreath 7s ease-in-out infinite alternate; */
 }
 
 .success-hero::before {
-  animation: successLightDriftLeft 9s cubic-bezier(.55, 0, .28, 1) infinite;
+  animation: heroBackdropDrift 18s ease-in-out infinite alternate;
 }
 
 .success-hero::after {
-  animation: successLightDriftRight 9s cubic-bezier(.55, 0, .28, 1) infinite .4s;
+  animation: heroBackdropDrift 18s ease-in-out infinite alternate;
 }
 
 .shop-hero-copy,
@@ -8575,6 +8577,16 @@ button:not(.navbar-toggler):not(.panel-close):not(.slider-arrow):not(.testimonia
   }
 }
 
+@keyframes successHeroBackdropDrift {
+  from {
+    background-position: right 35% bottom;
+  }
+
+  to {
+    background-position: right 43% bottom;
+  }
+}
+
 @media (max-width: 767.98px) {
   .hero h1 {
     font-size: clamp(2.25rem, 10.4vw, 3.8rem);
@@ -8618,7 +8630,8 @@ button:not(.navbar-toggler):not(.panel-close):not(.slider-arrow):not(.testimonia
   content: "" !important;
   position: absolute !important;
   inset: -18% !important;
-  background: linear-gradient(128deg, transparent 34%, rgba(245, 168, 23, .1) 37%, rgba(245, 168, 23, .45) 38%, transparent 39%, transparent 46%, rgba(245, 168, 23, .32) 48%, transparent 50%, transparent 58%, rgba(245, 168, 23, .28) 60%, transparent 62%) !important;
+  background: linear-gradient(105deg, transparent 0 43%, rgba(245, 168, 23, .08) 46%, rgba(255, 193, 77, .7) 48%, rgba(245, 168, 23, .1) 50%, transparent 54% 100%);
+  /* background: linear-gradient(128deg, transparent 34%, rgba(245, 168, 23, .1) 37%, rgba(245, 168, 23, .45) 38%, transparent 39%, transparent 46%, rgba(245, 168, 23, .32) 48%, transparent 50%, transparent 58%, rgba(245, 168, 23, .28) 60%, transparent 62%) !important; */
   pointer-events: none !important;
   z-index: 0 !important;
 }
@@ -8635,7 +8648,7 @@ button:not(.navbar-toggler):not(.panel-close):not(.slider-arrow):not(.testimonia
 .cart-hero-copy,
 .search-hero-copy {
   max-width: 520px !important;
-  padding: 102px 0 78px !important;
+  padding: 0px 0 78px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
@@ -8664,6 +8677,34 @@ button:not(.navbar-toggler):not(.panel-close):not(.slider-arrow):not(.testimonia
 .search-hero-copy h1 span,
 .success-hero-copy h1 span {
   color: var(--color-primary) !important;
+}
+
+.success-hero {
+  position: relative !important;
+  /* background: var(--color-black) url("../images/hero-performance.png") right 35% bottom/auto 120% no-repeat !important; */
+  animation: successHeroBackdropDrift 18s ease-in-out infinite alternate !important;
+}
+
+.success-hero::before {
+  inset: 0 !important;
+  background: radial-gradient(circle at 76% 48%, rgba(245, 168, 23, .12), transparent 25%), linear-gradient(90deg, rgba(0, 0, 0, .98) 0%, rgba(0, 0, 0, .9) 30%, rgba(0, 0, 0, .28) 64%, rgba(0, 0, 0, .05)) !important;
+  animation: heroVignetteBreath 7s ease-in-out infinite alternate !important;
+}
+
+.success-hero::after {
+  inset: -25% !important;
+  background: linear-gradient(120deg, transparent 31%, rgba(245, 168, 23, .08) 35%, rgba(255, 193, 77, .44) 36%, rgba(245, 168, 23, .07) 37%, transparent 42%, transparent 49%, rgba(255, 193, 77, .35) 50%, transparent 52%, transparent 59%, rgba(255, 193, 77, .32) 60%, transparent 62%) !important;
+  transform: translate3d(-46%, 0, 0) skewX(-8deg) !important;
+  animation: heroLightSweep 8.5s cubic-bezier(.55, 0, .28, 1) infinite !important;
+  mix-blend-mode: screen !important;
+}
+
+.success-hero-copy {
+  animation: heroContentReveal .95s cubic-bezier(.18, .82, .24, 1) both !important;
+}
+
+.success-hero-copy h1 span {
+  animation: heroGoldFocus 2.4s ease both .55s !important;
 }
 
 /* Breadcrumbs aligned left with custom colors */

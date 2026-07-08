@@ -105,36 +105,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const toggle = document.querySelector('.sidebar-toggle');
   const sidebar = document.querySelector('#adminSidebar');
+  const closeSidebar = () => {
+    sidebar?.classList.remove('is-open');
+    document.body.classList.remove('sidebar-open');
+    toggle?.setAttribute('aria-expanded', 'false');
+  };
 
   if (toggle && sidebar) {
+    toggle.setAttribute('aria-expanded', 'false');
     toggle.addEventListener('click', () => {
-      sidebar.classList.toggle('is-open');
+      const isOpen = sidebar.classList.toggle('is-open');
+      document.body.classList.toggle('sidebar-open', isOpen);
+      toggle.setAttribute('aria-expanded', String(isOpen));
     });
   }
 
   const profileDropdown = document.querySelector('.profile-dropdown');
   const profileButton = document.querySelector('.profile-menu');
+  const notificationDropdown = document.querySelector('.notification-dropdown');
+  const notificationButton = document.querySelector('.notification-toggle');
+  const notificationPanel = document.querySelector('.notification-panel');
+
+  const closeProfile = () => {
+    if (!profileDropdown || !profileButton) return;
+    profileDropdown.classList.remove('is-open');
+    profileButton.setAttribute('aria-expanded', 'false');
+    profileDropdown.querySelector('.profile-panel')?.setAttribute('aria-hidden', 'true');
+  };
+
+  const closeNotifications = () => {
+    if (!notificationDropdown || !notificationButton) return;
+    notificationDropdown.classList.remove('is-open');
+    notificationButton.setAttribute('aria-expanded', 'false');
+    notificationPanel?.setAttribute('aria-hidden', 'true');
+  };
 
   if (profileDropdown && profileButton) {
     profileButton.addEventListener('click', (event) => {
       event.stopPropagation();
+      closeNotifications();
       const isOpen = profileDropdown.classList.toggle('is-open');
       profileButton.setAttribute('aria-expanded', String(isOpen));
       profileDropdown.querySelector('.profile-panel')?.setAttribute('aria-hidden', String(!isOpen));
     });
-
-    document.addEventListener('click', (event) => {
-      if (!profileDropdown.contains(event.target)) {
-        profileDropdown.classList.remove('is-open');
-        profileButton.setAttribute('aria-expanded', 'false');
-        profileDropdown.querySelector('.profile-panel')?.setAttribute('aria-hidden', 'true');
-      }
-    });
   }
 
-  const notificationDropdown = document.querySelector('.notification-dropdown');
-  const notificationButton = document.querySelector('.notification-toggle');
-  const notificationPanel = document.querySelector('.notification-panel');
   const notificationList = document.querySelector('[data-order-notifications]');
   const notificationCount = document.querySelector('[data-notification-count]');
 
@@ -193,21 +208,46 @@ document.addEventListener('DOMContentLoaded', () => {
   if (notificationDropdown && notificationButton) {
     notificationButton.addEventListener('click', (event) => {
       event.stopPropagation();
+      closeProfile();
       const isOpen = notificationDropdown.classList.toggle('is-open');
       notificationButton.setAttribute('aria-expanded', String(isOpen));
       notificationPanel?.setAttribute('aria-hidden', String(!isOpen));
       if (isOpen) refreshNotifications();
     });
 
-    document.addEventListener('click', (event) => {
-      if (!notificationDropdown.contains(event.target)) {
-        notificationDropdown.classList.remove('is-open');
-        notificationButton.setAttribute('aria-expanded', 'false');
-        notificationPanel?.setAttribute('aria-hidden', 'true');
-      }
-    });
-
     refreshNotifications();
     setInterval(refreshNotifications, 30000);
   }
+
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+
+    if (profileDropdown && !profileDropdown.contains(target)) {
+      closeProfile();
+    }
+
+    if (notificationDropdown && !notificationDropdown.contains(target)) {
+      closeNotifications();
+    }
+
+    if (
+      document.body.classList.contains('sidebar-open') &&
+      sidebar &&
+      !sidebar.contains(target) &&
+      !toggle?.contains(target)
+    ) {
+      closeSidebar();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    closeProfile();
+    closeNotifications();
+    closeSidebar();
+  });
+
+  document.querySelectorAll('.admin-nav a').forEach((link) => {
+    link.addEventListener('click', closeSidebar);
+  });
 });
