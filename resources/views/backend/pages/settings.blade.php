@@ -44,6 +44,22 @@
                 </div>
             </section>
 
+            <section class="settings-panel">
+                <div class="settings-panel-head">
+                    <div>
+                        <span class="eyebrow">WhatsApp</span>
+                        <h2>Company Number</h2>
+                    </div>
+                </div>
+
+                <label>
+                    <span>Company WhatsApp Number</span>
+                    <input type="text" name="company_whatsapp_number" value="{{ old('company_whatsapp_number', $settings['company_whatsapp_number'] ?? '') }}" placeholder="+44 7123 456789">
+                    <small>WhatsApp opens on the admin device. Send from this company number by logging WhatsApp Web/Desktop into this number.</small>
+                    @error('company_whatsapp_number') <small class="field-error">{{ $message }}</small> @enderror
+                </label>
+            </section>
+
         </div>
 
         <div class="form-actions sticky-actions">

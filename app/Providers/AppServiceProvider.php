@@ -44,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
         return array_merge([
             'header_logo' => 'frontend/assets/images/logo/logo-transperent.png',
             'footer_logo' => 'frontend/assets/images/logo/logo.png',
+            'company_whatsapp_number' => '',
         ], SiteSetting::allKeyed());
     }
 }

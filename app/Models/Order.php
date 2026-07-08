@@ -69,6 +69,7 @@ class Order extends Model
     {
         $order = $this->relationLoaded('items') ? $this : $this->loadMissing('items');
         $items = $order->items instanceof Collection ? $order->items : collect();
+        $companyWhatsapp = trim((string) SiteSetting::getValue('company_whatsapp_number', ''));
         $trackUrl = route('frontend.track-order', [
             'order_number' => $this->order_number,
             'email' => $this->email,
@@ -90,7 +91,9 @@ class Order extends Model
             $this->country,
         ])->filter()->implode(', ');
 
-        return trim("Hi {$this->customer_name},\n\nArete Performance order #{$this->order_number}\n\nItems:\n{$itemLines}\n\nSubtotal: £" . number_format((float) $this->subtotal, 2) . "\nShipping: £" . number_format((float) $this->shipping_total, 2) . "\nTotal: £" . number_format((float) $this->total, 2) . "\n\nPayment: " . str_replace('_', ' ', ucfirst($this->payment_status ?? 'unpaid')) . "\nTracking: " . str_replace('_', ' ', ucfirst($this->tracking_status ?? 'placed')) . "\nRoyal Mail ID: " . ($this->tracking_number ?: 'Pending') . "\n\nDelivery address:\n{$address}\n\nTrack or upload payment proof:\n{$trackUrl}\n\nThank you for ordering with Arete Performance.");
+        $companyLine = $companyWhatsapp ? "\nCompany WhatsApp: {$companyWhatsapp}" : '';
+
+        return trim("Hi {$this->customer_name},\n\nArete Performance order #{$this->order_number}\n\nItems:\n{$itemLines}\n\nSubtotal: £" . number_format((float) $this->subtotal, 2) . "\nShipping: £" . number_format((float) $this->shipping_total, 2) . "\nTotal: £" . number_format((float) $this->total, 2) . "\n\nPayment: " . str_replace('_', ' ', ucfirst($this->payment_status ?? 'unpaid')) . "\nTracking: " . str_replace('_', ' ', ucfirst($this->tracking_status ?? 'placed')) . "\nRoyal Mail ID: " . ($this->tracking_number ?: 'Pending') . "\n\nDelivery address:\n{$address}\n\nTrack or upload payment proof:\n{$trackUrl}{$companyLine}\n\nThank you for ordering with Arete Performance.");
     }
 
     public function whatsappUrl(): string

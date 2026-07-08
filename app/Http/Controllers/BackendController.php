@@ -207,9 +207,11 @@ class BackendController extends Controller
         $request->validate([
             'header_logo_file' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
             'footer_logo_file' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
+            'company_whatsapp_number' => ['nullable', 'string', 'max:40', 'regex:/^[0-9+\s().-]+$/'],
         ]);
 
         $settings = $this->siteSettings();
+        SiteSetting::setValue('company_whatsapp_number', trim((string) $request->input('company_whatsapp_number')));
 
         foreach (['header_logo' => 'header_logo_file', 'footer_logo' => 'footer_logo_file'] as $settingKey => $fileKey) {
             if (! $request->hasFile($fileKey)) {
@@ -583,6 +585,7 @@ class BackendController extends Controller
         return array_merge([
             'header_logo' => 'frontend/assets/images/logo/logo-transperent.png',
             'footer_logo' => 'frontend/assets/images/logo/logo.png',
+            'company_whatsapp_number' => '',
         ], SiteSetting::allKeyed());
     }
 }
