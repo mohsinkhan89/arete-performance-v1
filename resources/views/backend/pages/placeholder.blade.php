@@ -52,9 +52,12 @@
             </article>
         </div>
 
-        <article class="panel resource-panel">
+        <article class="panel resource-panel resource-panel-polished resource-reports">
             <div class="panel-head">
-                <h2>Payment Report</h2>
+                <div>
+                    <span class="eyebrow">{{ $reportStats['orders'] }} orders</span>
+                    <h2>Payment Report</h2>
+                </div>
                 <a href="{{ route('backend.page', 'orders') }}"><i class="fa-solid fa-clipboard-list"></i> Orders</a>
             </div>
             <div class="table-wrap">
@@ -84,9 +87,15 @@
         @php
             $canManage = $page !== 'users' || $canManageUsers;
         @endphp
-        <article class="panel resource-panel {{ $page === 'orders' ? 'compact-orders-resource' : '' }}">
+        <article class="panel resource-panel resource-panel-polished resource-{{ $page }} {{ $page === 'orders' ? 'compact-orders-resource' : '' }}">
             <div class="panel-head">
-                <h2>{{ $pageTitle }} Table</h2>
+                <div>
+                    <span class="eyebrow">{{ $records->total() ?? 0 }} records</span>
+                    <h2>{{ $pageTitle }} Table</h2>
+                    @if (! empty($search))
+                        <small>Filtered by "{{ $search }}"</small>
+                    @endif
+                </div>
                 @if ($canManage && in_array($page, ['products', 'categories', 'users', 'reviews'], true))
                     <a href="{{ route('backend.resource.create', ['resource' => $page]) }}"><i class="fa-solid fa-plus"></i> Add New</a>
                 @endif

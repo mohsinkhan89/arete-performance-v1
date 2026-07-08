@@ -19,7 +19,7 @@
         @csrf
 
         <div class="site-settings-grid">
-            <section class="settings-panel">
+            <section class="settings-panel form-section">
                 <div class="settings-panel-head">
                     <div>
                         <span class="eyebrow">Logos</span>
@@ -44,7 +44,7 @@
                 </div>
             </section>
 
-            <section class="settings-panel">
+            <section class="settings-panel form-section">
                 <div class="settings-panel-head">
                     <div>
                         <span class="eyebrow">WhatsApp</span>

@@ -18,25 +18,25 @@
         </section>
 
         <section class="compact-stats">
-            <article class="compact-stat is-gold">
+            <article class="compact-stat metric-revenue">
                 <span>Total Revenue</span>
                 <strong>&pound;{{ number_format((float) $totalRevenue, 2) }}</strong>
                 <small>&pound;{{ number_format((float) $averageOrderValue, 2) }} average order</small>
                 <i class="fa-solid fa-chart-line"></i>
             </article>
-            <article class="compact-stat is-warning">
+            <article class="compact-stat metric-proof">
                 <span>Proofs To Review</span>
                 <strong>{{ number_format($proofSubmittedOrders) }}</strong>
                 <small>&pound;{{ number_format((float) $proofSubmittedTotal, 2) }} waiting</small>
                 <i class="fa-solid fa-receipt"></i>
             </article>
-            <article class="compact-stat">
+            <article class="compact-stat metric-orders">
                 <span>Today Orders</span>
                 <strong>{{ number_format($todayOrders) }}</strong>
                 <small>{{ number_format($totalOrders) }} all time orders</small>
                 <i class="fa-solid fa-calendar-day"></i>
             </article>
-            <article class="compact-stat">
+            <article class="compact-stat metric-stock">
                 <span>Stock Units</span>
                 <strong>{{ number_format($totalInventory) }}</strong>
                 <small>&pound;{{ number_format((float) $inventoryValue, 2) }} inventory</small>
