@@ -1036,6 +1036,27 @@ img {
   filter: saturate(1.08);
 }
 
+button.is-loading,
+button:disabled {
+  cursor: wait;
+  opacity: .78;
+  pointer-events: none;
+}
+
+button.is-loading span,
+.postcode-action-btn span,
+[data-place-order] span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+button.is-loading i,
+button.is-loading .fa-spinner {
+  margin-left: 0;
+}
+
 .btn-outline-light-custom {
   color: var(--color-white);
   border: 1px solid #777;

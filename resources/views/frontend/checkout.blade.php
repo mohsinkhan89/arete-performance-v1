@@ -50,7 +50,7 @@
 
                   <label class="checkout-field" for="zip"><span>Post Code</span><input id="zip" name="zip" type="text" value="{{ old('zip') }}" data-uk-postcode required></label>
                   <div class="postcode-actions">
-                    <button class="postcode-action-btn" type="button" data-find-postcode><i class="fa-solid fa-magnifying-glass"></i> Find Post Code</button>
+                    <button class="postcode-action-btn" type="button" data-find-postcode><span><i class="fa-solid fa-magnifying-glass"></i> Find Post Code</span></button>
                     <button class="postcode-action-btn" type="button" data-enter-manual>Enter Manually</button>
                     <button class="postcode-action-btn postcode-action-alt" type="button" data-use-postcode hidden><i class="fa-solid fa-magnifying-glass"></i> Use Post Code Search</button>
                   </div>
@@ -109,7 +109,7 @@
                 <div><span>UK tracked postage <i class="fa-regular fa-circle-question"></i></span><strong>£4.99</strong></div>
               </div>
               <div class="checkout-total"><span>Total</span><strong>£{{ number_format($cart['subtotal'] + 4.99, 2) }}</strong></div>
-              <button class="btn btn-gold w-100" type="submit" form="checkoutForm">Place order <i class="fa-solid fa-lock"></i></button>
+              <button class="btn btn-gold w-100" type="submit" form="checkoutForm" data-place-order><span>Place order <i class="fa-solid fa-lock"></i></span></button>
               <p class="checkout-secure"><i class="fa-solid fa-shield-halved"></i> Secure checkout</p>
             </aside>
           </div>

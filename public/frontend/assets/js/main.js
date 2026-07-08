@@ -357,6 +357,21 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${base}/${id}`;
   }
 
+  function setButtonLoading(button, isLoading, loadingText = "Please wait") {
+    if (!button) return;
+
+    if (!button.dataset.originalHtml) {
+      button.dataset.originalHtml = button.innerHTML;
+    }
+
+    button.disabled = isLoading;
+    button.classList.toggle("is-loading", isLoading);
+    button.setAttribute("aria-busy", String(isLoading));
+    button.innerHTML = isLoading
+      ? `<span><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> ${loadingText}</span>`
+      : button.dataset.originalHtml;
+  }
+
   function escapeHtml(value) {
     const div = document.createElement("div");
     div.textContent = value ?? "";
@@ -821,6 +836,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const findPostcodeButton = document.querySelector("[data-find-postcode]");
   const enterManualButton = document.querySelector("[data-enter-manual]");
   const usePostcodeButton = document.querySelector("[data-use-postcode]");
+  const checkoutForm = document.querySelector("#checkoutForm");
+  const placeOrderButton = document.querySelector("[data-place-order]");
   const streetInput = document.querySelector("#streetAddress");
   const addressTwoInput = document.querySelector("#addressTwo");
   const cityInput = document.querySelector("#city");
@@ -895,6 +912,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    setButtonLoading(findPostcodeButton, true);
     if (postcodeStatus) postcodeStatus.textContent = "Finding post code...";
 
     try {
@@ -924,7 +942,18 @@ document.addEventListener("DOMContentLoaded", () => {
       setPostcodePickerVisible(false);
       if (postcodeStatus) postcodeStatus.textContent = "Post code not found. Check the UK post code or use Enter Manually.";
       postcodeInput?.focus();
+    } finally {
+      setButtonLoading(findPostcodeButton, false);
     }
+  });
+
+  checkoutForm?.addEventListener("submit", () => {
+    if (!checkoutForm.checkValidity()) {
+      setButtonLoading(placeOrderButton, false);
+      return;
+    }
+
+    setButtonLoading(placeOrderButton, true);
   });
 
   postcodeSelect?.addEventListener("change", () => {
