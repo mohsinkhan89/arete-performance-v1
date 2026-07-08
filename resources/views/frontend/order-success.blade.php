@@ -1,16 +1,24 @@
 @extends('frontend.layouts.master')
 
 @section('body')
+    @php($customerWhatsappUrl = $order?->customerWhatsappUrl())
+
     <section class="success-hero">
       <div class="container">
-        <div class="success-hero-copy reveal-up">
+        <div class="success-hero-copy reveal-up" @if($customerWhatsappUrl) data-whatsapp-redirect="{{ $customerWhatsappUrl }}" @endif>
           <div class="success-check" aria-hidden="true"><i class="fa-solid fa-check"></i></div>
           <h1>Order Placed <span>Successfully!</span></h1>
           @if ($order)
             <p>Thank you for your order. Your purchase has been confirmed and saved.</p>
             <p class="success-order-id">Order <strong>#{{ $order->order_number }}</strong></p>
+            @if ($customerWhatsappUrl)
+              <p class="success-whatsapp-redirect">WhatsApp will open in <strong data-whatsapp-countdown>10</strong> seconds so you can send this order to us.</p>
+            @endif
             <div class="success-actions">
               <a class="btn btn-gold" href="#orderDetails">View order details <i class="fa-solid fa-arrow-right"></i></a>
+              @if ($customerWhatsappUrl)
+                <a class="btn btn-outline-light" href="{{ $customerWhatsappUrl }}" target="_blank" rel="noopener">Send on WhatsApp <i class="fa-brands fa-whatsapp"></i></a>
+              @endif
               <a class="btn btn-outline-light" href="{{ route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email]) }}">Track order <i class="fa-solid fa-truck-fast"></i></a>
             </div>
           @else
@@ -36,24 +44,6 @@
                 @include('frontend.partials.order-timeline', ['order' => $order])
               </article>
 
-              <article class="success-card reveal-on-scroll">
-                <h2><i class="fa-solid fa-receipt"></i> Payment Proof</h2>
-                <p>Status: <strong>{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</strong></p>
-                @if (($order->payment_status ?? 'unpaid') !== 'paid')
-                  <form class="payment-proof-form" action="{{ route('frontend.payment-proof.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="order_number" value="{{ $order->order_number }}">
-                    <input type="hidden" name="email" value="{{ $order->email }}">
-                    <label>
-                      <span>Upload screenshot or PDF</span>
-                      <input type="file" name="payment_proof" accept=".jpg,.jpeg,.png,.webp,.pdf" required>
-                    </label>
-                    <button class="btn btn-gold" type="submit">Submit proof <i class="fa-solid fa-upload"></i></button>
-                  </form>
-                @else
-                  <p>Your payment has been verified.</p>
-                @endif
-              </article>
             </aside>
 
             <section class="success-card order-detail-card reveal-on-scroll" id="orderDetails">
@@ -94,4 +84,29 @@
     @endif
 
     @include('frontend.inc.delivery-trusted')
+@endsection
+
+@section('js')
+  @if ($customerWhatsappUrl)
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const redirectTarget = document.querySelector('[data-whatsapp-redirect]');
+        const countdown = document.querySelector('[data-whatsapp-countdown]');
+        const whatsappUrl = redirectTarget?.dataset.whatsappRedirect;
+
+        if (!whatsappUrl) return;
+
+        let seconds = 10;
+        const timer = window.setInterval(() => {
+          seconds -= 1;
+          if (countdown) countdown.textContent = String(Math.max(seconds, 0));
+
+          if (seconds <= 0) {
+            window.clearInterval(timer);
+            window.location.href = whatsappUrl;
+          }
+        }, 1000);
+      });
+    </script>
+  @endif
 @endsection

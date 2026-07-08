@@ -167,33 +167,6 @@ class FrontendController extends Controller
         ]);
     }
 
-    public function submitPaymentProof(Request $request): RedirectResponse
-    {
-        $data = $request->validate([
-            'order_number' => ['required', 'string', 'exists:orders,order_number'],
-            'email' => ['required', 'email', 'max:255'],
-            'payment_proof' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:4096'],
-        ]);
-
-        $order = Order::where('order_number', $data['order_number'])
-            ->where('email', $data['email'])
-            ->firstOrFail();
-
-        $file = $request->file('payment_proof');
-        $filename = 'payment-proof-' . Str::slug($order->order_number) . '-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('backend/assets/imgs/uploads'), $filename);
-
-        $order->update([
-            'payment_proof' => 'backend/assets/imgs/uploads/' . $filename,
-            'payment_status' => 'proof_submitted',
-            'payment_proof_submitted_at' => now(),
-        ]);
-
-        return redirect()
-            ->route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email])
-            ->with('success', 'Payment proof submitted successfully. Admin will verify it shortly.');
-    }
-
     public function productDetails()
     {
         return view('frontend.product-details');

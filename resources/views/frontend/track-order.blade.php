@@ -47,18 +47,6 @@
               <div><dt>Address</dt><dd>{{ $order->address }}, {{ $order->city }}, {{ $order->zip }}</dd></div>
             </dl>
 
-            @if (($order->payment_status ?? 'unpaid') !== 'paid')
-              <form class="payment-proof-form" action="{{ route('frontend.payment-proof.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <input type="hidden" name="order_number" value="{{ $order->order_number }}">
-                <input type="hidden" name="email" value="{{ $order->email }}">
-                <label>
-                  <span>Payment proof screenshot/PDF</span>
-                  <input type="file" name="payment_proof" accept=".jpg,.jpeg,.png,.webp,.pdf" required>
-                </label>
-                <button class="btn btn-gold" type="submit">Submit payment proof <i class="fa-solid fa-upload"></i></button>
-              </form>
-            @endif
           </section>
 
           <aside class="success-card success-summary">

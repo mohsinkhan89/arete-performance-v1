@@ -56,7 +56,17 @@ class Order extends Model
 
     public function whatsappPhone(): string
     {
-        $phone = preg_replace('/\D+/', '', (string) $this->phone);
+        return $this->normalizeWhatsappPhone((string) $this->phone);
+    }
+
+    public function companyWhatsappPhone(): string
+    {
+        return $this->normalizeWhatsappPhone((string) SiteSetting::getValue('company_whatsapp_number', ''));
+    }
+
+    private function normalizeWhatsappPhone(string $phone): string
+    {
+        $phone = preg_replace('/\D+/', '', $phone);
 
         if (str_starts_with($phone, '0')) {
             return '44' . substr($phone, 1);
@@ -93,11 +103,40 @@ class Order extends Model
 
         $companyLine = $companyWhatsapp ? "\nCompany WhatsApp: {$companyWhatsapp}" : '';
 
-        return trim("Hi {$this->customer_name},\n\nArete Performance order #{$this->order_number}\n\nItems:\n{$itemLines}\n\nSubtotal: £" . number_format((float) $this->subtotal, 2) . "\nShipping: £" . number_format((float) $this->shipping_total, 2) . "\nTotal: £" . number_format((float) $this->total, 2) . "\n\nPayment: " . str_replace('_', ' ', ucfirst($this->payment_status ?? 'unpaid')) . "\nTracking: " . str_replace('_', ' ', ucfirst($this->tracking_status ?? 'placed')) . "\nRoyal Mail ID: " . ($this->tracking_number ?: 'Pending') . "\n\nDelivery address:\n{$address}\n\nTrack or upload payment proof:\n{$trackUrl}{$companyLine}\n\nThank you for ordering with Arete Performance.");
+        return trim("Hi {$this->customer_name},\n\nArete Performance order #{$this->order_number}\n\nItems:\n{$itemLines}\n\nSubtotal: £" . number_format((float) $this->subtotal, 2) . "\nShipping: £" . number_format((float) $this->shipping_total, 2) . "\nTotal: £" . number_format((float) $this->total, 2) . "\n\nPayment: " . str_replace('_', ' ', ucfirst($this->payment_status ?? 'unpaid')) . "\nTracking: " . str_replace('_', ' ', ucfirst($this->tracking_status ?? 'placed')) . "\nRoyal Mail ID: " . ($this->tracking_number ?: 'Pending') . "\n\nDelivery address:\n{$address}\n\nTrack order:\n{$trackUrl}{$companyLine}\n\nThank you for ordering with Arete Performance.");
     }
 
     public function whatsappUrl(): string
     {
         return 'https://wa.me/' . $this->whatsappPhone() . '?text=' . rawurlencode($this->whatsappMessage());
+    }
+
+    public function customerWhatsappMessage(): string
+    {
+        $order = $this->relationLoaded('items') ? $this : $this->loadMissing('items');
+        $items = $order->items instanceof Collection ? $order->items : collect();
+        $trackUrl = route('frontend.track-order', [
+            'order_number' => $this->order_number,
+            'email' => $this->email,
+        ]);
+
+        $itemLines = $items->map(function (OrderItem $item) {
+            return '- ' . $item->product_name
+                . ' x ' . $item->quantity
+                . ' = GBP ' . number_format((float) $item->line_total, 2);
+        })->implode("\n");
+
+        return trim("Hi Arete Performance,\n\nI have placed order #{$this->order_number}.\n\nName: {$this->customer_name}\nEmail: {$this->email}\nPhone: {$this->phone}\n\nItems:\n{$itemLines}\n\nTotal: GBP " . number_format((float) $this->total, 2) . "\nPayment: " . str_replace('_', ' ', ucfirst($this->payment_status ?? 'unpaid')) . "\nRoyal Mail ID: " . ($this->tracking_number ?: 'Pending') . "\n\nTrack order:\n{$trackUrl}\n\nPlease confirm my order.");
+    }
+
+    public function customerWhatsappUrl(): ?string
+    {
+        $companyPhone = $this->companyWhatsappPhone();
+
+        if (! $companyPhone) {
+            return null;
+        }
+
+        return 'https://wa.me/' . $companyPhone . '?text=' . rawurlencode($this->customerWhatsappMessage());
     }
 }

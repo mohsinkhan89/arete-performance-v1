@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\PaymentProofStatusMail;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -15,7 +14,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -35,12 +33,11 @@ class BackendController extends Controller
         $inactiveCategories = Category::where('status', 'inactive')->count();
         $activeUsers = User::where('status', 'active')->count();
         $paidOrders = Order::where('payment_status', 'paid')->count();
-        $unpaidOrders = Order::whereIn('payment_status', ['unpaid', 'proof_submitted'])->count();
-        $proofSubmittedOrders = Order::where('payment_status', 'proof_submitted')->count();
+        $unpaidOrders = Order::where('payment_status', 'unpaid')->count();
         $totalOrders = Order::count();
         $totalRevenue = Order::sum('total');
         $trackingStatuses = ['placed', 'processing', 'packed', 'dispatched', 'out_for_delivery', 'delivered', 'cancelled'];
-        $paymentStatuses = ['unpaid', 'proof_submitted', 'paid', 'failed', 'refunded'];
+        $paymentStatuses = ['unpaid', 'paid', 'failed', 'refunded'];
         $topProducts = OrderItem::query()
             ->selectRaw('product_id, product_name, product_sku, product_image, SUM(quantity) as sold_quantity, SUM(line_total) as sold_total')
             ->groupBy('product_id', 'product_name', 'product_sku', 'product_image')
@@ -58,10 +55,8 @@ class BackendController extends Controller
             'averageOrderValue' => $totalOrders > 0 ? $totalRevenue / $totalOrders : 0,
             'paidOrders' => $paidOrders,
             'unpaidOrders' => $unpaidOrders,
-            'proofSubmittedOrders' => $proofSubmittedOrders,
             'paidRevenue' => Order::where('payment_status', 'paid')->sum('total'),
-            'pendingRevenue' => Order::whereIn('payment_status', ['unpaid', 'proof_submitted'])->sum('total'),
-            'proofSubmittedTotal' => Order::where('payment_status', 'proof_submitted')->sum('total'),
+            'pendingRevenue' => Order::where('payment_status', 'unpaid')->sum('total'),
             'activeProducts' => $activeProducts,
             'inactiveProducts' => $inactiveProducts,
             'activeCategories' => $activeCategories,
@@ -76,7 +71,6 @@ class BackendController extends Controller
             'recentCategories' => Category::withCount('products')->latest()->take(5)->get(),
             'recentUsers' => User::latest()->take(5)->get(),
             'recentOrders' => Order::with('items')->latest()->take(5)->get(),
-            'recentPaymentProofs' => Order::with('items')->where('payment_status', 'proof_submitted')->latest('payment_proof_submitted_at')->take(5)->get(),
             'trackingBreakdown' => collect($trackingStatuses)->mapWithKeys(fn ($status) => [$status => Order::where('tracking_status', $status)->count()]),
             'paymentBreakdown' => collect($paymentStatuses)->mapWithKeys(fn ($status) => [$status => Order::where('payment_status', $status)->count()]),
             'lowStockProducts' => Product::with('category')->where('stock', '<=', 5)->orderBy('stock')->take(5)->get(),
@@ -149,8 +143,6 @@ class BackendController extends Controller
             'orders' => Order::count(),
             'paid_count' => Order::where('payment_status', 'paid')->count(),
             'paid_total' => Order::where('payment_status', 'paid')->sum('total'),
-            'proof_count' => Order::where('payment_status', 'proof_submitted')->count(),
-            'proof_total' => Order::where('payment_status', 'proof_submitted')->sum('total'),
             'unpaid_count' => Order::where('payment_status', 'unpaid')->count(),
             'unpaid_total' => Order::where('payment_status', 'unpaid')->sum('total'),
             'cancelled_count' => Order::where('status', 'cancelled')->count(),
@@ -254,8 +246,6 @@ class BackendController extends Controller
 
     public function updateOrder(Request $request, Order $order): RedirectResponse
     {
-        $previousPaymentStatus = $order->payment_status;
-
         $data = $request->validate([
             'customer_name' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
@@ -266,7 +256,7 @@ class BackendController extends Controller
             'state' => ['nullable', 'string', 'max:120'],
             'zip' => ['nullable', 'string', 'max:20'],
             'status' => ['required', Rule::in(['pending', 'processing', 'shipped', 'delivered', 'cancelled'])],
-            'payment_status' => ['required', Rule::in(['unpaid', 'proof_submitted', 'paid', 'failed', 'refunded'])],
+            'payment_status' => ['required', Rule::in(['unpaid', 'paid', 'failed', 'refunded'])],
             'tracking_status' => ['required', Rule::in(['placed', 'processing', 'packed', 'dispatched', 'out_for_delivery', 'delivered', 'cancelled'])],
             'tracking_number' => ['nullable', 'string', 'max:120'],
             'tracking_note' => ['nullable', 'string', 'max:1000'],
@@ -282,10 +272,6 @@ class BackendController extends Controller
         }
 
         $order->update($data);
-
-        if ($previousPaymentStatus !== $order->payment_status && in_array($order->payment_status, ['paid', 'failed'], true)) {
-            Mail::to($order->email)->send(new PaymentProofStatusMail($order->fresh(), $order->payment_status === 'paid' ? 'accepted' : 'rejected'));
-        }
 
         return back()->with('success', 'Order updated successfully.');
     }

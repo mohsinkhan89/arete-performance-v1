@@ -15,7 +15,6 @@
         ];
         $paymentLabels = [
             'unpaid' => 'Unpaid',
-            'proof_submitted' => 'Proof Submitted',
             'paid' => 'Paid',
             'failed' => 'Rejected',
             'refunded' => 'Refunded',
@@ -29,8 +28,6 @@
             'delivered' => 'Delivered',
             'cancelled' => 'Cancelled',
         ];
-        $proofExtension = $order->payment_proof ? strtolower(pathinfo($order->payment_proof, PATHINFO_EXTENSION)) : null;
-        $proofIsImage = in_array($proofExtension, ['jpg', 'jpeg', 'png', 'webp'], true);
     @endphp
 
     <div class="page-heading compact-heading">
@@ -40,7 +37,6 @@
         </div>
         <div class="action-group">
             <a href="{{ route('backend.page', 'orders') }}" title="Back"><i class="fa-solid fa-arrow-left"></i></a>
-            <a href="{{ $order->whatsappUrl() }}" target="_blank" rel="noopener" title="Send order on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
             <a href="{{ $trackUrl }}" target="_blank" rel="noopener" title="Customer tracking page"><i class="fa-solid fa-truck-fast"></i></a>
             <a href="{{ $labelUrl }}" target="_blank" rel="noopener" title="Print Royal Mail label"><i class="fa-solid fa-tag"></i></a>
         </div>
@@ -61,64 +57,6 @@
                 <div><span>Label</span><strong><a href="{{ $labelUrl }}" target="_blank" rel="noopener">Print shipping label</a></strong></div>
                 <div class="wide"><span>Address</span><strong>{{ $order->address }}@if($order->address_2), {{ $order->address_2 }}@endif, {{ $order->city }}, {{ $order->state }} {{ $order->zip }}, {{ $order->country }}</strong></div>
                 <div class="wide"><span>Notes</span><strong>{{ $order->order_notes ?: '-' }}</strong></div>
-            </div>
-        </article>
-
-        <article class="panel proof-panel">
-            <div class="panel-head">
-                <h2>Payment Proof</h2>
-                @if ($order->payment_proof)
-                    <a href="{{ url($order->payment_proof) }}" target="_blank" rel="noopener"><i class="fa-solid fa-up-right-from-square"></i> Open</a>
-                @endif
-            </div>
-            @if ($order->payment_proof)
-                <div class="proof-preview">
-                    @if ($proofIsImage)
-                        <img src="{{ url($order->payment_proof) }}" alt="Payment proof for order {{ $order->order_number }}">
-                    @else
-                        <div class="proof-file">
-                            <i class="fa-regular fa-file-pdf"></i>
-                            <strong>{{ strtoupper($proofExtension ?? 'FILE') }} proof uploaded</strong>
-                            <a href="{{ url($order->payment_proof) }}" target="_blank" rel="noopener">View file</a>
-                        </div>
-                    @endif
-                </div>
-                <p class="proof-time">Submitted {{ $order->payment_proof_submitted_at?->format('M d, Y h:i A') ?? 'recently' }}</p>
-            @else
-                <div class="proof-empty">
-                    <i class="fa-regular fa-file-lines"></i>
-                    <strong>No proof submitted yet</strong>
-                    <span>Use WhatsApp to ask the customer for payment proof.</span>
-                </div>
-            @endif
-
-            <div class="proof-decision-block">
-                <h3>Payment Decision</h3>
-                <div class="decision-actions">
-                    <form action="{{ route('backend.orders.update', $order) }}" method="POST">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="status" value="processing">
-                        <input type="hidden" name="payment_status" value="paid">
-                        <input type="hidden" name="tracking_status" value="{{ $order->tracking_status ?? 'processing' }}">
-                        <input type="hidden" name="tracking_number" value="{{ $order->tracking_number }}">
-                        <input type="hidden" name="tracking_note" value="{{ $order->tracking_note }}">
-                        <input type="hidden" name="admin_note" value="{{ $order->admin_note }}">
-                        <button class="decision-btn accept" type="submit"><i class="fa-solid fa-check"></i> Accept proof</button>
-                    </form>
-                    <form action="{{ route('backend.orders.update', $order) }}" method="POST">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="status" value="{{ $order->status }}">
-                        <input type="hidden" name="payment_status" value="failed">
-                        <input type="hidden" name="tracking_status" value="{{ $order->tracking_status ?? 'placed' }}">
-                        <input type="hidden" name="tracking_number" value="{{ $order->tracking_number }}">
-                        <input type="hidden" name="tracking_note" value="{{ $order->tracking_note }}">
-                        <input type="hidden" name="admin_note" value="{{ $order->admin_note ?: 'Payment proof could not be verified. Please upload a clearer proof.' }}">
-                        <button class="decision-btn reject" type="submit"><i class="fa-solid fa-xmark"></i> Reject proof</button>
-                    </form>
-                </div>
-                <p>Accept or reject sends an email to the customer automatically.</p>
             </div>
         </article>
 

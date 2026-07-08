@@ -4367,6 +4367,32 @@ button.is-loading .fa-spinner {
   color: var(--color-primary);
 }
 
+.success-whatsapp-redirect {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: none !important;
+  margin-top: 16px !important;
+  padding: 10px 14px;
+  color: #fff !important;
+  background: rgba(37, 211, 102, .14);
+  border: 1px solid rgba(37, 211, 102, .38);
+  border-radius: 999px;
+  font-size: .86rem !important;
+  line-height: 1.35 !important;
+}
+
+.success-whatsapp-redirect strong {
+  display: inline-grid;
+  min-width: 24px;
+  height: 24px;
+  place-items: center;
+  color: #07140c;
+  background: #25d366;
+  border-radius: 50%;
+  font-weight: 900;
+}
+
 .success-hero .btn {
   min-width: 235px;
   margin-top: 22px;
@@ -8770,8 +8796,7 @@ body:not(.home-page) .site-header {
   gap: 0px;
 }
 
-.track-order-form input,
-.payment-proof-form input[type="file"] {
+.track-order-form input {
   width: 100%;
   min-height: 52px;
   border: 1px solid #dedede;
@@ -8780,18 +8805,6 @@ body:not(.home-page) .site-header {
   color: #111;
   padding: 12px 14px;
   font: inherit;
-}
-
-.payment-proof-form {
-  display: grid;
-  gap: 14px;
-  margin-top: 16px;
-}
-
-.payment-proof-form label {
-  display: grid;
-  gap: 8px;
-  font-weight: 700;
 }
 
 .track-alert {

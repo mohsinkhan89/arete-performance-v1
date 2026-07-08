@@ -22,16 +22,6 @@
             </article>
             <article class="stat-card">
                 <div>
-                    <span>Proof Submitted</span>
-                    <strong>{{ number_format($reportStats['proof_count']) }}</strong>
-                    <small class="up"><i class="fa-solid fa-receipt"></i> £{{ number_format((float) $reportStats['proof_total'], 2) }}</small>
-                    <em>waiting verification</em>
-                </div>
-                <i class="stat-icon fa-solid fa-file-invoice"></i>
-                <svg viewBox="0 0 180 42" aria-hidden="true"><path d="M2 34 C23 33 37 22 55 25 S82 36 103 22 S134 13 150 18 S169 20 178 12"/></svg>
-            </article>
-            <article class="stat-card">
-                <div>
                     <span>Unpaid Orders</span>
                     <strong>{{ number_format($reportStats['unpaid_count']) }}</strong>
                     <small class="down"><i class="fa-solid fa-clock"></i> £{{ number_format((float) $reportStats['unpaid_total'], 2) }}</small>
@@ -254,12 +244,7 @@
                                     <td>{{ $order->items_count }}</td>
                                     <td>£{{ number_format((float) $order->total, 2) }}</td>
                                     <td>
-                                        <div class="payment-cell-actions">
-                                            <span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span>
-                                            @if (($order->payment_status ?? 'unpaid') !== 'paid')
-                                                <a class="inline-update-btn" href="{{ route('backend.orders.show', $order) }}"><i class="fa-solid fa-pen-to-square"></i> Update</a>
-                                            @endif
-                                        </div>
+                                        <span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span>
                                     </td>
                                     <td>
                                         <strong>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</strong>
@@ -268,7 +253,6 @@
                                     <td>
                                         <div class="action-group">
                                             <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
-                                            <a href="{{ $order->whatsappUrl() }}" target="_blank" rel="noopener" title="Send order on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
                                         </div>
                                     </td>
                                 </tr>

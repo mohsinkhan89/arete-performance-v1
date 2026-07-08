@@ -17,7 +17,6 @@ Route::get('checkout/postcode', [FrontendController::class, 'lookupPostcode'])->
 Route::post('checkout', [FrontendController::class, 'placeOrder'])->name('frontend.order.store');
 Route::get('order-success', [FrontendController::class, 'orderSuccess'])->name('frontend.order-success');
 Route::get('track-order', [FrontendController::class, 'trackOrder'])->name('frontend.track-order');
-Route::post('track-order/payment-proof', [FrontendController::class, 'submitPaymentProof'])->name('frontend.payment-proof.store');
 Route::get('product-details', [FrontendController::class, 'productDetails'])->name('frontend.product-details');
 Route::get('search', [FrontendController::class, 'search'])->name('frontend.search');
 Route::get('search/products', [FrontendController::class, 'searchProducts'])->name('frontend.search.products');

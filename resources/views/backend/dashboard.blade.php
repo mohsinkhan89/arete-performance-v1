@@ -25,10 +25,10 @@
                 <i class="fa-solid fa-chart-line"></i>
             </article>
             <article class="compact-stat metric-proof">
-                <span>Proofs To Review</span>
-                <strong>{{ number_format($proofSubmittedOrders) }}</strong>
-                <small>&pound;{{ number_format((float) $proofSubmittedTotal, 2) }} waiting</small>
-                <i class="fa-solid fa-receipt"></i>
+                <span>Unpaid Orders</span>
+                <strong>{{ number_format($unpaidOrders) }}</strong>
+                <small>&pound;{{ number_format((float) $pendingRevenue, 2) }} pending</small>
+                <i class="fa-solid fa-hourglass-half"></i>
             </article>
             <article class="compact-stat metric-orders">
                 <span>Today Orders</span>
@@ -45,31 +45,6 @@
         </section>
 
         <section class="dashboard-workbench">
-            <article class="panel proof-queue-panel">
-                <div class="panel-head">
-                    <h2>Payment Proof Queue</h2>
-                    <a href="{{ route('backend.page', 'reports') }}">View report</a>
-                </div>
-                <div class="queue-list">
-                    @forelse ($recentPaymentProofs as $order)
-                        <a class="queue-item" href="{{ route('backend.orders.show', $order) }}">
-                            <span class="queue-icon"><i class="fa-solid fa-receipt"></i></span>
-                            <div>
-                                <strong>#{{ $order->order_number }}</strong>
-                                <small>{{ $order->customer_name }} &middot; {{ $order->payment_proof_submitted_at?->diffForHumans() ?? 'recently' }}</small>
-                            </div>
-                            <b>&pound;{{ number_format((float) $order->total, 2) }}</b>
-                        </a>
-                    @empty
-                        <div class="empty-queue">
-                            <i class="fa-solid fa-circle-check"></i>
-                            <strong>No proofs waiting</strong>
-                            <span>New uploads will appear here.</span>
-                        </div>
-                    @endforelse
-                </div>
-            </article>
-
             <article class="panel orders-panel compact-orders-panel">
                 <div class="panel-head">
                     <h2>Recent Orders</h2>
@@ -91,7 +66,6 @@
                                     <td>
                                         <div class="action-group">
                                             <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
-                                            <a href="{{ $order->whatsappUrl() }}" target="_blank" rel="noopener" title="Send order on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
                                         </div>
                                     </td>
                                 </tr>
