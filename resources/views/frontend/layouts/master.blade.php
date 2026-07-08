@@ -106,6 +106,7 @@
       home: "{{ route('frontend.index') }}",
       shop: "{{ route('frontend.shop') }}",
       search: "{{ route('frontend.search') }}",
+      searchProducts: "{{ route('frontend.search.products') }}",
       cart: "{{ route('frontend.my-cart') }}",
       checkout: "{{ route('frontend.checkout') }}",
       orderSuccess: "{{ route('frontend.order-success') }}",

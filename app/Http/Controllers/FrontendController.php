@@ -211,6 +211,30 @@ class FrontendController extends Controller
         ]);
     }
 
+    public function searchProducts(Request $request): JsonResponse
+    {
+        $filters = [
+            ...$this->filters($request),
+            'sort' => 'name',
+        ];
+
+        $products = $this->filteredProducts($filters)
+            ->take(10)
+            ->get()
+            ->map(fn (Product $product) => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'meta' => $product->category?->name ?? 'Product',
+                'price' => (float) ($product->sale_price ?: $product->price),
+                'image' => url($product->image ?: 'frontend/assets/images/product-bottle.png'),
+            ])
+            ->values();
+
+        return response()->json([
+            'products' => $products,
+        ]);
+    }
+
     public function shop(Request $request)
     {
         $filters = $this->filters($request);

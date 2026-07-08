@@ -8692,6 +8692,7 @@ body:not(.home-page) .site-header {
 
 .success-actions {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 18px;

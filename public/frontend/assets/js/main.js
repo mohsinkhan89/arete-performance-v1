@@ -323,9 +323,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const routes = window.appRoutes || {};
   const route = (name, fallback) => routes[name] || fallback;
+  let searchTimer = null;
+  let searchRequestIndex = 0;
 
   function endpoint(base, id) {
     return `${base}/${id}`;
+  }
+
+  function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = value ?? "";
+    return div.innerHTML;
   }
 
   async function cartRequest(url, method = "GET", body = null) {
@@ -358,7 +366,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function addToCart(id, quantity = 1) {
-    if (!id) return;
+    if (!id) return false;
     const safeQty = Math.max(1, Number(quantity) || 1);
     try {
       const data = await cartRequest(endpoint(route("cartAddBase", "/cart/add"), id), "POST", { quantity: safeQty });
@@ -367,8 +375,10 @@ document.addEventListener("DOMContentLoaded", () => {
       cartOverlay.setAttribute("aria-hidden", "false");
       setPanelState(cartDrawer, true);
       showToast("Product added to your cart.");
+      return true;
     } catch (error) {
       showToast("Unable to update cart right now.");
+      return false;
     }
   }
 
@@ -428,19 +438,36 @@ document.addEventListener("DOMContentLoaded", () => {
     cartEmpty.classList.toggle("is-visible", data.is_empty);
   }
 
-  function renderSearchResults(query) {
-    const normalized = query.trim().toLowerCase();
-    const matches = products.filter((product) => `${product.name} ${product.meta}`.toLowerCase().includes(normalized));
+  async function renderSearchResults(query) {
+    const requestIndex = ++searchRequestIndex;
+    const normalized = query.trim();
+    const url = new URL(route("searchProducts", "/search/products"), window.location.origin);
+    if (normalized) url.searchParams.set("q", normalized);
 
-    searchResults.innerHTML = matches.length ? matches.map((product) => `
+    searchResults.innerHTML = '<p class="no-results">Loading products...</p>';
+
+    try {
+      const response = await fetch(url, { headers: { Accept: "application/json" } });
+      if (!response.ok) throw new Error("Search request failed.");
+
+      const data = await response.json();
+      if (requestIndex !== searchRequestIndex) return;
+
+      const matches = Array.isArray(data.products) ? data.products : [];
+      searchResults.innerHTML = matches.length ? matches.map((product) => `
       <article class="search-result">
-        <img src="${product.image}" alt="${product.name}">
+        <img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}">
         <div class="me-auto">
-          <strong>${product.name}</strong>
-          <small>${product.meta} - ${money(product.price)}</small>
+          <strong>${escapeHtml(product.name)}</strong>
+          <small>${escapeHtml(product.meta)} - ${money(product.price)}</small>
         </div>
-        <button type="button" data-search-add="${product.id}" aria-label="Add ${product.name}"><i class="fa-solid fa-cart-plus"></i></button>
-      </article>`).join("") : '<p class="no-results">No products found. Try searching "Peptides" or "HGH".</p>';
+        <button type="button" data-search-add="${escapeHtml(product.id)}" aria-label="Add ${escapeHtml(product.name)}"><i class="fa-solid fa-cart-plus"></i></button>
+      </article>`).join("") : '<p class="no-results">No products found.</p>';
+    } catch (error) {
+      if (requestIndex === searchRequestIndex) {
+        searchResults.innerHTML = '<p class="no-results">Unable to load products right now.</p>';
+      }
+    }
   }
 
   // Set active link on page load
@@ -485,7 +512,10 @@ document.addEventListener("DOMContentLoaded", () => {
   searchPanel.addEventListener("click", (event) => {
     if (event.target === searchPanel) closeSearch();
   });
-  searchInput.addEventListener("input", (event) => renderSearchResults(event.target.value));
+  searchInput.addEventListener("input", (event) => {
+    window.clearTimeout(searchTimer);
+    searchTimer = window.setTimeout(() => renderSearchResults(event.target.value), 220);
+  });
   searchForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const query = searchInput.value.trim();
@@ -693,7 +723,10 @@ document.addEventListener("DOMContentLoaded", () => {
       productZoom.setAttribute("aria-pressed", String(isZoomed));
     }
 
-    if (addFromSearch) await addToCart(addFromSearch.dataset.searchAdd);
+    if (addFromSearch) {
+      const added = await addToCart(addFromSearch.dataset.searchAdd);
+      if (added) closeSearch();
+    }
     if (inc) updateQty(inc.dataset.cartInc, 1, inc.dataset.cartQty || inc.parentElement?.querySelector("span")?.textContent);
     if (dec) updateQty(dec.dataset.cartDec, -1, dec.dataset.cartQty || dec.parentElement?.querySelector("span")?.textContent);
     if (remove) removeFromCart(remove.dataset.cartRemove);

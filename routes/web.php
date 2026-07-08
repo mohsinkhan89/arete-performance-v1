@@ -20,6 +20,7 @@ Route::get('track-order', [FrontendController::class, 'trackOrder'])->name('fron
 Route::post('track-order/payment-proof', [FrontendController::class, 'submitPaymentProof'])->name('frontend.payment-proof.store');
 Route::get('product-details', [FrontendController::class, 'productDetails'])->name('frontend.product-details');
 Route::get('search', [FrontendController::class, 'search'])->name('frontend.search');
+Route::get('search/products', [FrontendController::class, 'searchProducts'])->name('frontend.search.products');
 Route::get('shop', [FrontendController::class, 'shop'])->name('frontend.shop');
 Route::get('cart/json', [FrontendController::class, 'cartJson'])->name('frontend.cart.json');
 Route::post('cart/add/{product}', [FrontendController::class, 'addCart'])->name('frontend.cart.add');
