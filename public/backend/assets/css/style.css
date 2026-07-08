@@ -3381,6 +3381,10 @@ body.admin-dark-page {
   gap: 10px;
 }
 
+.dashboard-mini-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .snapshot-grid div,
 .status-breakdown div {
   border: 1px solid #edf0f5;

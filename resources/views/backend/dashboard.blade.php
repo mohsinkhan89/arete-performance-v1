@@ -7,8 +7,8 @@
         <section class="dashboard-hero-panel">
             <div>
                 <span class="dashboard-kicker">Live Database</span>
-                <h1>Dashboard</h1>
-                <p>Every number below is calculated from orders, products, categories, users, and reviews tables.</p>
+                <h1>Operations Dashboard</h1>
+                <p>Compact overview from orders, order items, products, categories, users, and reviews tables.</p>
             </div>
             <div class="dashboard-quick-actions">
                 <a href="{{ route('backend.page', 'orders') }}"><i class="fa-solid fa-clipboard-list"></i> Orders</a>
@@ -89,14 +89,9 @@
                                     <td><span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
                                     <td>{{ $order->tracking_number ?: 'Pending label' }}</td>
                                     <td>
-                                        @php
-                                            $phone = preg_replace('/\D+/', '', $order->phone ?? '');
-                                            $trackUrl = route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email]);
-                                            $message = "Hi {$order->customer_name},\n\nPlease send/upload your payment proof for Arete Performance order #{$order->order_number}.\nTotal: £" . number_format((float) $order->total, 2) . "\n\nUpload here: {$trackUrl}\n\nOnce submitted, we will verify the payment and process your order.";
-                                        @endphp
                                         <div class="action-group">
                                             <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
-                                            <a href="https://wa.me/{{ $phone }}?text={{ rawurlencode($message) }}" target="_blank" rel="noopener" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                                            <a href="{{ $order->whatsappUrl() }}" target="_blank" rel="noopener" title="Send order on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -119,7 +114,7 @@
                     <div><span>Products</span><strong>{{ number_format($totalProducts) }}</strong><small>{{ number_format($activeProducts) }} active / {{ number_format($inactiveProducts) }} inactive</small></div>
                     <div><span>Categories</span><strong>{{ number_format($totalCategories) }}</strong><small>{{ number_format($activeCategories) }} active / {{ number_format($inactiveCategories) }} inactive</small></div>
                     <div><span>Users</span><strong>{{ number_format($totalUsers) }}</strong><small>{{ number_format($activeUsers) }} active</small></div>
-                    <div><span>Reviews</span><strong>{{ number_format($reviewsCount ?? 0) }}</strong><small>customer feedback</small></div>
+                    <div><span>Order Items</span><strong>{{ number_format($orderItemsCount ?? 0) }}</strong><small>{{ number_format($reviewsCount ?? 0) }} reviews</small></div>
                 </div>
             </article>
 
@@ -151,6 +146,26 @@
 
             <article class="panel products-panel compact-products-panel">
                 <div class="panel-head">
+                    <h2>Best Sellers</h2>
+                    <a href="{{ route('backend.page', 'reports') }}">Reports</a>
+                </div>
+                <div class="product-list">
+                    @forelse ($topProducts as $product)
+                        <div class="product-row">
+                            <img src="{{ url($product->product_image ?: 'backend/assets/imgs/product-bottle.png') }}" alt="{{ $product->product_name }}">
+                            <div><strong>{{ $product->product_name }}</strong><span>{{ $product->product_sku ?: 'Order item' }}</span></div>
+                            <em>{{ number_format((int) $product->sold_quantity) }} sold</em>
+                        </div>
+                    @empty
+                        <div class="empty-cell">No sold products yet.</div>
+                    @endforelse
+                </div>
+            </article>
+        </section>
+
+        <section class="dashboard-workbench dashboard-workbench-secondary">
+            <article class="panel products-panel compact-products-panel">
+                <div class="panel-head">
                     <h2>Low Stock</h2>
                     <a href="{{ route('backend.page', 'products') }}">Products</a>
                 </div>
@@ -164,6 +179,17 @@
                     @empty
                         <div class="empty-cell">No low-stock products.</div>
                     @endforelse
+                </div>
+            </article>
+
+            <article class="panel ops-snapshot">
+                <div class="panel-head">
+                    <h2>Revenue Split</h2>
+                    <a href="{{ route('backend.page', 'reports') }}">Reports</a>
+                </div>
+                <div class="snapshot-grid dashboard-mini-grid">
+                    <div><span>Paid</span><strong>&pound;{{ number_format((float) $paidRevenue, 2) }}</strong><small>{{ number_format($paidOrders) }} orders</small></div>
+                    <div><span>Pending</span><strong>&pound;{{ number_format((float) $pendingRevenue, 2) }}</strong><small>{{ number_format($unpaidOrders) }} orders</small></div>
                 </div>
             </article>
         </section>

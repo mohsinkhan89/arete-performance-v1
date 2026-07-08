@@ -257,15 +257,9 @@
                                         <small class="table-subtext">{{ $order->tracking_number ?: 'Label pending' }}</small>
                                     </td>
                                     <td>
-                                        @php
-                                            $phone = preg_replace('/\D+/', '', $order->phone ?? '');
-                                            $trackUrl = route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email]);
-                                            $waMessage = "Hi {$order->customer_name},\n\nPlease send/upload your payment proof for Arete Performance order #{$order->order_number}.\nTotal: £" . number_format((float) $order->total, 2) . "\n\nUpload here: {$trackUrl}\n\nOnce submitted, we will verify the payment and process your order.";
-                                            $waUrl = 'https://wa.me/' . $phone . '?text=' . rawurlencode($waMessage);
-                                        @endphp
                                         <div class="action-group">
                                             <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
-                                            <a href="{{ $waUrl }}" target="_blank" rel="noopener" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                                            <a href="{{ $order->whatsappUrl() }}" target="_blank" rel="noopener" title="Send order on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -324,12 +318,6 @@
             <div class="pagination-row">
                 {{ $records->links() }}
             </div>
-        </article>
-    @else
-        <article class="panel empty-page">
-            <i class="fa-solid fa-layer-group"></i>
-            <h2>{{ $pageTitle }} Page</h2>
-            <p>This backend page is ready for your dynamic content, forms, and tables.</p>
         </article>
     @endif
 @endsection

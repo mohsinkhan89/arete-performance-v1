@@ -41,12 +41,12 @@
             </nav>
 
             <div class="support-card">
-                <i class="fa-solid fa-headset"></i>
+                <i class="fa-solid fa-database"></i>
                 <div>
-                    <strong>Need Help?</strong>
-                    <span>We're here to help you</span>
+                    <strong>Live Store Data</strong>
+                    <span>Orders, products, users</span>
                 </div>
-                <a href="#">Contact Support</a>
+                <a href="{{ route('backend.page', 'reports') }}">Open Reports</a>
             </div>
 
             <div class="sidebar-foot">
@@ -62,9 +62,9 @@
                 </button>
 
                 <div class="topbar-actions">
-                    <form class="admin-search">
+                    <form class="admin-search" method="GET" action="{{ route('backend.page', 'orders') }}">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="search" placeholder="Search anything..." aria-label="Search anything">
+                        <input type="search" name="q" value="{{ request('q') }}" placeholder="Search orders..." aria-label="Search orders">
                         <button type="submit" aria-label="Search">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>

@@ -4,11 +4,8 @@
 
 @section('body')
     @php
-        $phone = preg_replace('/\D+/', '', $order->phone ?? '');
         $trackUrl = route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email]);
         $labelUrl = route('backend.orders.royal-mail-label', $order);
-        $proofMessage = "Hi {$order->customer_name},\n\nPlease send/upload your payment proof for Arete Performance order #{$order->order_number}.\nTotal: £" . number_format((float) $order->total, 2) . "\n\nUpload here: {$trackUrl}\n\nOnce submitted, we will verify the payment and process your order.";
-        $proofWaUrl = 'https://wa.me/' . $phone . '?text=' . rawurlencode($proofMessage);
         $statusLabels = [
             'pending' => 'Pending',
             'processing' => 'Processing',
@@ -43,7 +40,7 @@
         </div>
         <div class="action-group">
             <a href="{{ route('backend.page', 'orders') }}" title="Back"><i class="fa-solid fa-arrow-left"></i></a>
-            <a href="{{ $proofWaUrl }}" target="_blank" rel="noopener" title="Ask for payment proof"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="{{ $order->whatsappUrl() }}" target="_blank" rel="noopener" title="Send order on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
             <a href="{{ $trackUrl }}" target="_blank" rel="noopener" title="Customer tracking page"><i class="fa-solid fa-truck-fast"></i></a>
             <a href="{{ $labelUrl }}" target="_blank" rel="noopener" title="Print Royal Mail label"><i class="fa-solid fa-tag"></i></a>
         </div>

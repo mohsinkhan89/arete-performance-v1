@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\PaymentProofStatusMail;
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\SiteSetting;
@@ -40,6 +41,12 @@ class BackendController extends Controller
         $totalRevenue = Order::sum('total');
         $trackingStatuses = ['placed', 'processing', 'packed', 'dispatched', 'out_for_delivery', 'delivered', 'cancelled'];
         $paymentStatuses = ['unpaid', 'proof_submitted', 'paid', 'failed', 'refunded'];
+        $topProducts = OrderItem::query()
+            ->selectRaw('product_id, product_name, product_sku, product_image, SUM(quantity) as sold_quantity, SUM(line_total) as sold_total')
+            ->groupBy('product_id', 'product_name', 'product_sku', 'product_image')
+            ->orderByDesc('sold_quantity')
+            ->take(5)
+            ->get();
 
         return view('backend.dashboard', [
             'totalProducts' => Product::count(),
@@ -61,33 +68,29 @@ class BackendController extends Controller
             'inactiveCategories' => $inactiveCategories,
             'activeUsers' => $activeUsers,
             'reviewsCount' => Review::count(),
+            'orderItemsCount' => OrderItem::count(),
             'totalInventory' => Product::sum('stock'),
             'inventoryValue' => Product::selectRaw('SUM(price * stock) as value')->value('value') ?? 0,
-            'topProducts' => Product::with('category')->latest()->take(5)->get(),
+            'topProducts' => $topProducts,
             'recentProducts' => Product::with('category')->latest()->take(5)->get(),
             'recentCategories' => Category::withCount('products')->latest()->take(5)->get(),
             'recentUsers' => User::latest()->take(5)->get(),
-            'recentOrders' => Order::latest()->take(5)->get(),
-            'recentPaymentProofs' => Order::where('payment_status', 'proof_submitted')->latest('payment_proof_submitted_at')->take(5)->get(),
+            'recentOrders' => Order::with('items')->latest()->take(5)->get(),
+            'recentPaymentProofs' => Order::with('items')->where('payment_status', 'proof_submitted')->latest('payment_proof_submitted_at')->take(5)->get(),
             'trackingBreakdown' => collect($trackingStatuses)->mapWithKeys(fn ($status) => [$status => Order::where('tracking_status', $status)->count()]),
             'paymentBreakdown' => collect($paymentStatuses)->mapWithKeys(fn ($status) => [$status => Order::where('payment_status', $status)->count()]),
             'lowStockProducts' => Product::with('category')->where('stock', '<=', 5)->orderBy('stock')->take(5)->get(),
         ]);
     }
 
-    public function page(string $page): View
+    public function page(Request $request, string $page): View
     {
         $allowedPages = [
             'products',
             'categories',
             'users',
             'orders',
-            'customers',
-            'inventory',
-            'coupons',
             'reviews',
-            'pages',
-            'banners',
             'settings',
             'reports',
         ];
@@ -95,12 +98,50 @@ class BackendController extends Controller
         abort_unless(in_array($page, $allowedPages, true), 404);
 
         $pageTitle = ucwords(str_replace('-', ' ', $page));
+        $search = trim((string) $request->query('q', ''));
         $records = match ($page) {
-            'products' => Product::with('category')->latest()->paginate(10),
-            'categories' => Category::withCount('products')->latest()->paginate(10),
-            'users' => User::latest()->paginate(10),
-            'reviews' => Review::with('product')->latest()->paginate(10),
-            'orders' => Order::with('items')->withCount('items')->latest()->paginate(10),
+            'products' => Product::with('category')
+                ->when($search, fn ($query) => $query->where(fn ($query) => $query
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhereHas('category', fn ($query) => $query->where('name', 'like', "%{$search}%"))))
+                ->latest()
+                ->paginate(10)
+                ->withQueryString(),
+            'categories' => Category::withCount('products')
+                ->when($search, fn ($query) => $query->where(fn ($query) => $query
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('slug', 'like', "%{$search}%")))
+                ->latest()
+                ->paginate(10)
+                ->withQueryString(),
+            'users' => User::query()
+                ->when($search, fn ($query) => $query->where(fn ($query) => $query
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")))
+                ->latest()
+                ->paginate(10)
+                ->withQueryString(),
+            'reviews' => Review::with('product')
+                ->when($search, fn ($query) => $query->where(fn ($query) => $query
+                    ->where('customer_name', 'like', "%{$search}%")
+                    ->orWhere('comment', 'like', "%{$search}%")
+                    ->orWhereHas('product', fn ($query) => $query->where('name', 'like', "%{$search}%"))))
+                ->latest()
+                ->paginate(10)
+                ->withQueryString(),
+            'orders' => Order::with('items')
+                ->withCount('items')
+                ->when($search, fn ($query) => $query->where(fn ($query) => $query
+                    ->where('order_number', 'like', "%{$search}%")
+                    ->orWhere('customer_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('tracking_number', 'like', "%{$search}%")))
+                ->latest()
+                ->paginate(10)
+                ->withQueryString(),
             default => null,
         };
 
@@ -113,7 +154,7 @@ class BackendController extends Controller
             'unpaid_count' => Order::where('payment_status', 'unpaid')->count(),
             'unpaid_total' => Order::where('payment_status', 'unpaid')->sum('total'),
             'cancelled_count' => Order::where('status', 'cancelled')->count(),
-            'recent' => Order::latest()->take(10)->get(),
+            'recent' => Order::with('items')->latest()->take(10)->get(),
         ] : null;
 
         if ($page === 'settings') {
@@ -128,6 +169,7 @@ class BackendController extends Controller
             'page' => $page,
             'pageTitle' => $pageTitle,
             'records' => $records,
+            'search' => $search,
             'canManageUsers' => $this->isSuperAdmin(),
             'reportStats' => $reportStats,
         ]);
