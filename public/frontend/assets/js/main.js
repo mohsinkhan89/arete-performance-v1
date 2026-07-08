@@ -2,8 +2,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const siteLoader = document.querySelector("[data-site-loader]");
   const loaderProgress = document.querySelector("[data-loader-progress]");
   const loaderPercent = document.querySelector("[data-loader-percent]");
+  const loaderStorageKey = "arete_loader_seen";
   let loaderValue = 0;
   let loaderTimer = null;
+
+  const hasSeenLoader = () => {
+    try {
+      return localStorage.getItem(loaderStorageKey) === "true";
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const markLoaderSeen = () => {
+    try {
+      localStorage.setItem(loaderStorageKey, "true");
+    } catch (error) {
+      // Storage can be unavailable in private browsing; the loader still works normally.
+    }
+  };
 
   const setLoaderProgress = (value) => {
     loaderValue = Math.max(loaderValue, Math.min(100, Math.round(value)));
@@ -13,27 +30,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const hideSiteLoader = () => {
     setLoaderProgress(100);
-    window.setTimeout(() => siteLoader?.classList.add("is-hidden"), 220);
+    markLoaderSeen();
+    window.setTimeout(() => {
+      siteLoader?.classList.add("is-hidden");
+      document.documentElement.classList.add("loader-seen");
+    }, 220);
     if (loaderTimer) window.clearInterval(loaderTimer);
   };
 
   const showSiteLoader = () => {
+    if (hasSeenLoader()) return;
     loaderValue = 0;
     siteLoader?.classList.remove("is-hidden");
     setLoaderProgress(18);
   };
 
   if (siteLoader) {
-    setLoaderProgress(12);
-    loaderTimer = window.setInterval(() => {
-      if (loaderValue < 68) setLoaderProgress(loaderValue + Math.random() * 9);
-    }, 170);
-    window.setTimeout(() => setLoaderProgress(72), 620);
-    window.setTimeout(hideSiteLoader, 1450);
-    window.addEventListener("load", () => window.setTimeout(hideSiteLoader, 1450));
-    window.addEventListener("pageshow", (event) => {
-      if (event.persisted) hideSiteLoader();
-    });
+    if (hasSeenLoader()) {
+      siteLoader.classList.add("is-hidden");
+      document.documentElement.classList.add("loader-seen");
+    } else {
+      setLoaderProgress(12);
+      loaderTimer = window.setInterval(() => {
+        if (loaderValue < 68) setLoaderProgress(loaderValue + Math.random() * 9);
+      }, 170);
+      window.setTimeout(() => setLoaderProgress(72), 620);
+      window.setTimeout(hideSiteLoader, 1450);
+      window.addEventListener("load", () => window.setTimeout(hideSiteLoader, 1450));
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted) hideSiteLoader();
+      });
+    }
   }
 
   document.addEventListener("click", (event) => {

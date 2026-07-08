@@ -15,6 +15,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script>
+      try {
+        if (localStorage.getItem('arete_loader_seen') === 'true') {
+          document.documentElement.classList.add('loader-seen');
+        }
+      } catch (error) {}
+    </script>
     <link href="{{ url('frontend/assets/css/style.css') }}" rel="stylesheet">
 </head>
 <body class="@yield('body_class', (Request::path() === '/' ? 'home-page' : str_replace('/', '-', Request::path()) . '-page'))">

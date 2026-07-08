@@ -76,6 +76,10 @@ body {
   pointer-events: none;
 }
 
+.loader-seen .site-loader {
+  display: none;
+}
+
 .loader-smoke {
   position: absolute;
   width: clamp(160px, 18vw, 300px);
