@@ -8692,11 +8692,10 @@ button:not(.navbar-toggler):not(.panel-close):not(.slider-arrow):not(.testimonia
 }
 
 .success-hero::after {
-  inset: -25% !important;
-  background: linear-gradient(120deg, transparent 31%, rgba(245, 168, 23, .08) 35%, rgba(255, 193, 77, .44) 36%, rgba(245, 168, 23, .07) 37%, transparent 42%, transparent 49%, rgba(255, 193, 77, .35) 50%, transparent 52%, transparent 59%, rgba(255, 193, 77, .32) 60%, transparent 62%) !important;
-  transform: translate3d(-46%, 0, 0) skewX(-8deg) !important;
-  animation: heroLightSweep 8.5s cubic-bezier(.55, 0, .28, 1) infinite !important;
-  mix-blend-mode: screen !important;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 0 43%, rgba(245, 168, 23, .08) 46%, rgba(255, 193, 77, .7) 48%, rgba(245, 168, 23, .1) 50%, transparent 54% 100%);
+  transform: translate3d(-70%, 0, 0) skewX(-10deg);
+  animation: heroRibbonSweep 7.2s cubic-bezier(.6, 0, .24, 1) infinite;
 }
 
 .success-hero-copy {
