@@ -355,6 +355,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const iconForText = (text, fallback = "fa-circle-check") => {
       const value = String(text || "").toLowerCase();
       const matches = [
+        [["add to cart", "cart", "basket"], "fa-cart-plus"],
+        [["place order", "order", "checkout"], "fa-clipboard-check"],
+        [["press send", "send", "whatsapp", "message"], "fa-paper-plane"],
+        [["we confirm", "confirm", "confirmed"], "fa-circle-check"],
+        [["fast", "secure delivery", "discreet shipping", "shipping", "delivery"], "fa-truck-fast"],
+        [["delivery all over uk", "worldwide", "all over", "uk", "country", "countries", "global"], "fa-globe"],
+        [["flat delivery", "£4.99", "4.99", "price", "fee"], "fa-sterling-sign"],
+        [["pharma grade", "pharma", "grade", "premium"], "fa-prescription-bottle-medical"],
+        [["lab tested", "lab", "tested", "verified", "report"], "fa-flask-vial"],
+        [["new arrivals", "new arrival"], "fa-box-open"],
+        [["top rated", "rated", "review", "reviews"], "fa-star"],
+        [["featured", "recommended", "highly recommended"], "fa-medal"],
         [["muscle", "growth", "strength", "power"], "fa-dumbbell"],
         [["recover", "recovery", "fatigue"], "fa-bolt"],
         [["performance", "endurance", "athletic"], "fa-person-running"],
@@ -363,7 +375,6 @@ document.addEventListener("DOMContentLoaded", () => {
         [["week", "cycle", "phase", "routine"], "fa-calendar-days"],
         [["target", "goal", "result", "progress"], "fa-bullseye"],
         [["ingredient", "pure", "leaf", "natural"], "fa-leaf"],
-        [["lab", "tested", "verified", "report"], "fa-flask-vial"],
         [["safe", "quality", "trusted", "premium"], "fa-shield-halved"],
       ];
       return matches.find(([words]) => words.some((word) => value.includes(word)))?.[1] || fallback;

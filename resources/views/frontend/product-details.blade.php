@@ -51,9 +51,9 @@
           <p class="product-detail-summary">{{ $product->short_description }}</p>
           <div class="product-assurance">
             <div><i class="fa-regular fa-circle-check"></i> {{ $product->stock > 0 ? 'In Stock' : 'Out of Stock' }}</div>
-            <div><i class="fa-solid fa-truck-fast"></i> Discreet Shipping</div>
+            <div><i class="fa-solid fa-prescription-bottle-medical"></i> Pharma Grade</div>
             <div><i class="fa-solid fa-flask-vial"></i> Lab Tested</div>
-            <div><i class="fa-solid fa-globe"></i> Worldwide Delivery</div>
+            <div><i class="fa-solid fa-sterling-sign"></i> &pound;4.99 Shipping</div>
           </div>
           <div class="product-quantity">
             <span>Quantity</span>
@@ -74,10 +74,10 @@
       </div>
 
       <div class="product-benefit-strip">
-        <div><i class="fa-solid fa-shield-halved"></i><strong>Premium Quality</strong><span>Trusted product quality.</span></div>
-        <div><i class="fa-solid fa-flask-vial"></i><strong>Lab Tested</strong><span>{{ $reportImage ? 'Report available below.' : 'Batch checked selections.' }}</span></div>
-        <div><i class="fa-solid fa-truck-fast"></i><strong>Discreet Shipping</strong><span>Private and secure delivery.</span></div>
-        <div><i class="fa-solid fa-headset"></i><strong>Support</strong><span>Help whenever you need it.</span></div>
+        <div><i class="fa-solid fa-truck-fast"></i><strong>Fast &amp; Secure Delivery</strong><span>Quick, protected order delivery.</span></div>
+        <div><i class="fa-solid fa-globe"></i><strong>Delivery All Over UK</strong><span>Reliable UK-wide delivery support.</span></div>
+        <div><i class="fa-solid fa-sterling-sign"></i><strong>Flat Delivery &pound;4.99</strong><span>Simple fixed delivery price.</span></div>
+        <div><i class="fa-solid fa-flask-vial"></i><strong>Lab Tested</strong><span>Batch testing and verification.</span></div>
       </div>
     </div>
   </section>

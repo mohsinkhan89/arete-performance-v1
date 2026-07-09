@@ -12,7 +12,6 @@
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('frontend.search') ? 'active' : '' }}" href="{{ route('frontend.search') }}"><i class="fa-solid fa-magnifying-glass-chart"></i><span>Search</span></a></li>
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('frontend.track-order') ? 'active' : '' }}" href="{{ route('frontend.track-order') }}"><i class="fa-solid fa-truck-fast"></i><span>Track</span></a></li>
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('frontend.my-cart') ? 'active' : '' }}" href="{{ route('frontend.my-cart') }}"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span></a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('frontend.index') }}#contact"><i class="fa-solid fa-headset"></i><span>Contact</span></a></li>
           </ul>
           <div class="nav-actions d-flex align-items-center gap-2">
             <button class="icon-btn search-toggle" type="button" aria-label="Search products"><i class="fa-solid fa-magnifying-glass"></i></button>

@@ -10,10 +10,9 @@
             <p>Explore premium, science-backed supplements designed to help you perform, recover and grow.</p>
           </div>
           <div class="shop-hero-features reveal-up delay-2">
-            <div><i class="fa-solid fa-shield-halved"></i><span>Premium<br>quality</span></div>
-            <div><i class="fa-solid fa-flask-vial"></i><span>Lab<br>tested</span></div>
-            <div><i class="fa-solid fa-truck-fast"></i><span>Discreet<br>shipping</span></div>
-            <div><i class="fa-solid fa-headset"></i><span>24/7<br>support</span></div>
+            <div><i class="fa-solid fa-truck-fast"></i><span>Fast &amp; Secure<br>Delivery</span></div>
+            <div><i class="fa-solid fa-globe"></i><span>Delivery All<br>Over UK</span></div>
+            <div><i class="fa-solid fa-sterling-sign"></i><span>Flat Delivery<br>&pound;4.99</span></div>
           </div>
         </div>
       </div>

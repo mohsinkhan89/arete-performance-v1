@@ -41,10 +41,9 @@
       </div>
       <div class="loader-dots" aria-hidden="true"><span></span><span></span><span></span></div>
       <div class="loader-features" aria-label="Store benefits">
-        <div><i class="fa-solid fa-shield-halved"></i><span>Premium<br>Quality</span></div>
-        <div><i class="fa-solid fa-flask-vial"></i><span>Lab<br>Tested</span></div>
-        <div><i class="fa-solid fa-box-open"></i><span>Discreet<br>Shipping</span></div>
-        <div><i class="fa-solid fa-headset"></i><span>24/7<br>Support</span></div>
+        <div><i class="fa-solid fa-truck-fast"></i><span>Fast &amp; Secure<br>Delivery</span></div>
+        <div><i class="fa-solid fa-globe"></i><span>Delivery All<br>Over UK</span></div>
+        <div><i class="fa-solid fa-sterling-sign"></i><span>Flat Delivery<br>&pound;4.99</span></div>
       </div>
     </div>
   </div>
