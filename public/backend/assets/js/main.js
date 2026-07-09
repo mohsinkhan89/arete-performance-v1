@@ -13,20 +13,120 @@ document.addEventListener('DOMContentLoaded', () => {
   const richTextareas = document.querySelectorAll('textarea[data-rich-text]');
 
   const richCommands = [
-    { command: 'formatBlock', value: 'p', icon: 'fa-paragraph', label: 'Paragraph' },
-    { command: 'formatBlock', value: 'h3', icon: 'fa-heading', label: 'Heading' },
+    { type: 'select' },
     { command: 'bold', icon: 'fa-bold', label: 'Bold' },
     { command: 'italic', icon: 'fa-italic', label: 'Italic' },
     { command: 'underline', icon: 'fa-underline', label: 'Underline' },
+    { command: 'strikeThrough', icon: 'fa-strikethrough', label: 'Strike' },
     { command: 'insertUnorderedList', icon: 'fa-list-ul', label: 'Bullet list' },
     { command: 'insertOrderedList', icon: 'fa-list-ol', label: 'Numbered list' },
+    { command: 'formatBlock', value: 'blockquote', icon: 'fa-quote-left', label: 'Quote' },
+    { command: 'outdent', icon: 'fa-outdent', label: 'Outdent' },
+    { command: 'indent', icon: 'fa-indent', label: 'Indent' },
+    { command: 'justifyLeft', icon: 'fa-align-left', label: 'Align left' },
+    { command: 'justifyCenter', icon: 'fa-align-center', label: 'Align center' },
+    { command: 'justifyRight', icon: 'fa-align-right', label: 'Align right' },
     { command: 'createLink', icon: 'fa-link', label: 'Link', prompt: 'Enter link URL' },
+    { command: 'insertImage', icon: 'fa-image', label: 'Image URL', prompt: 'Enter image URL' },
+    { command: 'unlink', icon: 'fa-link-slash', label: 'Remove link' },
     { command: 'removeFormat', icon: 'fa-eraser', label: 'Clear format' },
+    { command: 'undo', icon: 'fa-rotate-left', label: 'Undo' },
+    { command: 'redo', icon: 'fa-rotate-right', label: 'Redo' },
   ];
+
+  const hasHtml = (value) => /<\/?[a-z][\s\S]*>/i.test(value || '');
+
+  const escapeMarkup = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  }[char]));
+
+  const plainTextToHtml = (value) => String(value || '')
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) => `<p>${escapeMarkup(block).replace(/\n/g, '<br>')}</p>`)
+    .join('');
+
+  const valueToHtml = (value) => {
+    const cleanValue = String(value || '').trim();
+    if (!cleanValue) return '';
+    return hasHtml(cleanValue) ? cleanValue : plainTextToHtml(cleanValue);
+  };
+
+  const setCaretInside = (element) => {
+    const selection = window.getSelection();
+    if (!selection) return;
+
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  };
+
+  const insertParagraphAfter = (target) => {
+    if (!target?.parentNode) return null;
+
+    const paragraph = document.createElement('p');
+    paragraph.innerHTML = '<br>';
+    target.parentNode.insertBefore(paragraph, target.nextSibling);
+    setCaretInside(paragraph);
+
+    return paragraph;
+  };
+
+  const closestNode = (node, selector, boundary) => {
+    const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+    if (!element) return null;
+
+    const match = element.closest(selector);
+    return match && (!boundary || boundary.contains(match)) ? match : null;
+  };
+
+  const moveAfter = (node, target) => {
+    if (!node || !target?.parentNode) return target;
+    target.parentNode.insertBefore(node, target.nextSibling);
+    return node;
+  };
+
+  const normalizeEditorStructure = (editor) => {
+    let changed = false;
+    const movableSelector = 'p, h2, h3, h4, ul, ol, blockquote, pre';
+
+    editor.querySelectorAll('.product-specs, dl').forEach((specList) => {
+      let insertionPoint = specList;
+
+      specList.querySelectorAll(`dt ${movableSelector}, dd ${movableSelector}`).forEach((block) => {
+        insertionPoint = moveAfter(block, insertionPoint);
+        changed = true;
+      });
+
+      Array.from(specList.children).forEach((child) => {
+        if (child.matches('div, dt, dd')) return;
+        if (!child.matches(movableSelector)) return;
+        insertionPoint = moveAfter(child, insertionPoint);
+        changed = true;
+      });
+    });
+
+    editor.querySelectorAll('td h2, td h3, td h4, th h2, th h3, th h4').forEach((heading) => {
+      const table = heading.closest('table');
+      if (!table || !editor.contains(table)) return;
+      moveAfter(heading, table);
+      changed = true;
+    });
+
+    return changed;
+  };
 
   richTextareas.forEach((textarea) => {
     const editorShell = document.createElement('div');
     editorShell.className = 'rich-editor';
+    editorShell.dataset.mode = 'visual';
 
     const toolbar = document.createElement('div');
     toolbar.className = 'rich-toolbar';
@@ -34,11 +134,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const editor = document.createElement('div');
     editor.className = 'rich-editor-box';
     editor.contentEditable = 'true';
-    editor.innerHTML = textarea.value || '';
+    editor.innerHTML = valueToHtml(textarea.value);
     editor.setAttribute('role', 'textbox');
     editor.setAttribute('aria-multiline', 'true');
+    editor.dataset.placeholder = 'Write product description or paste formatted HTML...';
 
-    richCommands.forEach((item) => {
+    const syncFromVisual = () => {
+      normalizeEditorStructure(editor);
+      textarea.value = editor.innerHTML.trim();
+    };
+
+    const syncToVisual = () => {
+      editor.innerHTML = valueToHtml(textarea.value);
+    };
+
+    const makeButton = (item) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.title = item.label;
@@ -46,6 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
       button.innerHTML = `<i class="fa-solid ${item.icon}"></i>`;
 
       button.addEventListener('click', () => {
+        if (editorShell.dataset.mode === 'source') {
+          syncToVisual();
+          editorShell.dataset.mode = 'visual';
+          textarea.classList.add('rich-text-hidden-source');
+        }
+
         editor.focus();
 
         if (item.prompt) {
@@ -56,25 +172,107 @@ document.addEventListener('DOMContentLoaded', () => {
           document.execCommand(item.command, false, item.value || null);
         }
 
-        textarea.value = editor.innerHTML.trim();
+        syncFromVisual();
       });
 
-      toolbar.appendChild(button);
-    });
-
-    const syncSource = () => {
-      textarea.value = editor.innerHTML.trim();
+      return button;
     };
 
-    editor.addEventListener('input', syncSource);
-    editor.addEventListener('blur', syncSource);
-    textarea.form?.addEventListener('submit', syncSource);
+    richCommands.forEach((item) => {
+      if (item.type === 'select') {
+        const select = document.createElement('select');
+        select.title = 'Format';
+        select.setAttribute('aria-label', 'Text format');
+        select.innerHTML = `
+          <option value="p">Paragraph</option>
+          <option value="h2">Heading 2</option>
+          <option value="h3">Heading 3</option>
+          <option value="h4">Heading 4</option>
+          <option value="pre">Code block</option>
+        `;
+        select.addEventListener('change', () => {
+          if (editorShell.dataset.mode === 'source') {
+            syncToVisual();
+            editorShell.dataset.mode = 'visual';
+            textarea.classList.add('rich-text-hidden-source');
+          }
+
+          editor.focus();
+          document.execCommand('formatBlock', false, select.value);
+          syncFromVisual();
+        });
+        toolbar.appendChild(select);
+        return;
+      }
+
+      toolbar.appendChild(makeButton(item));
+    });
+
+    const sourceToggle = document.createElement('button');
+    sourceToggle.type = 'button';
+    sourceToggle.className = 'rich-source-toggle';
+    sourceToggle.title = 'HTML source';
+    sourceToggle.setAttribute('aria-label', 'Toggle HTML source');
+    sourceToggle.innerHTML = '<i class="fa-solid fa-code"></i><span>HTML</span>';
+    sourceToggle.addEventListener('click', () => {
+      const nextMode = editorShell.dataset.mode === 'source' ? 'visual' : 'source';
+
+      if (nextMode === 'source') {
+        syncFromVisual();
+        textarea.classList.remove('rich-text-hidden-source');
+        textarea.focus();
+      } else {
+        syncToVisual();
+        textarea.classList.add('rich-text-hidden-source');
+        editor.focus();
+      }
+
+      editorShell.dataset.mode = nextMode;
+    });
+    toolbar.appendChild(sourceToggle);
+
+    editor.addEventListener('input', syncFromVisual);
+    editor.addEventListener('keyup', (event) => {
+      if (![' ', 'Enter'].includes(event.key)) return;
+      if (normalizeEditorStructure(editor)) syncFromVisual();
+    });
+    editor.addEventListener('blur', syncFromVisual);
+    editor.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' || event.shiftKey || event.ctrlKey || event.metaKey || event.altKey) return;
+
+      const selection = window.getSelection();
+      const focusNode = selection?.focusNode;
+      if (!focusNode || !editor.contains(focusNode)) return;
+
+      const tableCell = closestNode(focusNode, 'td, th', editor);
+      const definitionValue = closestNode(focusNode, 'dd', editor);
+      const specRow = closestNode(focusNode, '.product-specs > div, dl > div', editor);
+      const specList = closestNode(focusNode, 'table, dl, .product-specs', editor);
+      const exitTarget = specList || tableCell?.closest('table') || definitionValue?.closest('dl') || specRow;
+
+      if (!tableCell && !definitionValue && !specRow) return;
+      if (!exitTarget) return;
+
+      event.preventDefault();
+      insertParagraphAfter(exitTarget);
+      syncFromVisual();
+    });
+    textarea.addEventListener('input', () => {
+      if (editorShell.dataset.mode === 'source') return;
+      syncToVisual();
+    });
+    textarea.form?.addEventListener('submit', () => {
+      if (editorShell.dataset.mode === 'source') {
+        syncToVisual();
+      }
+      syncFromVisual();
+    });
 
     editorShell.appendChild(toolbar);
     editorShell.appendChild(editor);
 
     const label = textarea.closest('label');
-    textarea.classList.add('rich-text-hidden-source');
+    textarea.classList.add('rich-text-hidden-source', 'rich-text-source-box');
     label?.classList.add('rich-source-label');
     (label || textarea).after(editorShell);
   });

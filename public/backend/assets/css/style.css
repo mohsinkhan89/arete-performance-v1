@@ -1899,6 +1899,14 @@ td {
   pointer-events: none;
 }
 
+.rich-text-source-box:not(.rich-text-hidden-source) {
+  min-height: 240px;
+  padding: 14px;
+  font-family: Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .rich-field {
   position: relative;
 }
@@ -1921,30 +1929,58 @@ td {
 .rich-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
-  padding: 7px;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
 }
 
-.rich-toolbar button {
+.rich-toolbar button,
+.rich-toolbar select {
   display: grid;
-  width: 32px;
   height: 30px;
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 6px;
   color: #eef1f6;
   background: rgba(255, 255, 255, 0.04);
+  font-size: 12px;
   cursor: pointer;
   transition: transform .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
 }
 
-.rich-toolbar button:hover {
+.rich-toolbar button {
+  width: 32px;
+}
+
+.rich-toolbar select {
+  width: auto;
+  min-width: 132px;
+  padding: 0 9px;
+}
+
+.rich-toolbar button.rich-source-toggle {
+  display: inline-flex;
+  width: auto;
+  min-width: 72px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 10px;
+}
+
+.rich-toolbar button:hover,
+.rich-toolbar select:hover,
+.rich-editor[data-mode="source"] .rich-source-toggle {
   border-color: rgba(255, 214, 110, .58);
   color: #17120b;
   background: #ffe9a8;
   transform: translateY(-1px);
+}
+
+.rich-editor[data-mode="source"] .rich-editor-box {
+  display: none;
 }
 
 .rich-editor-box {
@@ -1958,6 +1994,12 @@ td {
   outline: 0;
 }
 
+.rich-editor-box:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(166, 171, 182, .78);
+  pointer-events: none;
+}
+
 .rich-editor-box:focus {
   box-shadow: inset 0 0 0 3px rgba(215, 168, 58, 0.1);
 }
@@ -1965,18 +2007,139 @@ td {
 .rich-editor-box p,
 .rich-editor-box ul,
 .rich-editor-box ol,
-.rich-editor-box h3 {
+.rich-editor-box h2,
+.rich-editor-box h3,
+.rich-editor-box h4,
+.rich-editor-box blockquote,
+.rich-editor-box pre {
   margin: 0 0 10px;
+}
+
+.rich-editor-box h2,
+.rich-editor-box h3,
+.rich-editor-box h4 {
+  color: inherit;
+  font-weight: 800;
+  line-height: 1.25;
+  width: 100%;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: normal;
+}
+
+.rich-editor-box h2 {
+  font-size: 1.35rem;
+}
+
+.rich-editor-box h3 {
+  font-size: 1.12rem;
+}
+
+.rich-editor-box h4 {
+  font-size: 1rem;
 }
 
 .rich-editor-box ul,
 .rich-editor-box ol {
+  width: 100%;
+  max-width: 100%;
   padding-left: 22px;
+}
+
+.rich-editor-box > p,
+.rich-editor-box > h2,
+.rich-editor-box > h3,
+.rich-editor-box > h4,
+.rich-editor-box > ul,
+.rich-editor-box > ol,
+.rich-editor-box > blockquote,
+.rich-editor-box > pre {
+  width: 100%;
+  max-width: 100%;
+}
+
+.rich-editor-box table {
+  width: auto;
+  min-width: 0;
+  margin: 14px 0;
+  border-collapse: collapse;
+}
+
+.rich-editor-box th,
+.rich-editor-box td {
+  border: 0;
+  padding: 6px 30px 6px 0;
+  color: inherit;
+  font-size: inherit;
+  vertical-align: top;
+}
+
+.rich-editor-box th:first-child,
+.rich-editor-box td:first-child {
+  min-width: 132px;
+  font-weight: 800;
+}
+
+.rich-editor-box dl,
+.rich-editor-box .product-specs {
+  display: grid;
+  gap: 0;
+  margin: 14px 0;
+}
+
+.rich-editor-box dl > div,
+.rich-editor-box .product-specs > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 132px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  padding: 5px 0;
+}
+
+.rich-editor-box dt,
+.rich-editor-box dd {
+  margin: 0;
+}
+
+.rich-editor-box dt {
+  font-weight: 800;
+}
+
+.rich-editor-box .product-specs :is(p, h2, h3, h4, ul, ol, blockquote, pre),
+.rich-editor-box dl :is(p, h2, h3, h4, ul, ol, blockquote, pre) {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 100%;
+}
+
+.rich-editor-box blockquote {
+  border-left: 3px solid #ffd66e;
+  padding: 10px 12px;
+  color: #dce1ea;
+  background: rgba(255, 214, 110, .08);
+}
+
+.rich-editor-box pre {
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 7px;
+  padding: 12px;
+  background: rgba(0, 0, 0, .18);
+  font-family: Consolas, "Liberation Mono", monospace;
+  white-space: pre-wrap;
 }
 
 .rich-editor-box a {
   color: #ffd66e;
   text-decoration: underline;
+}
+
+.rich-editor-box img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 12px 0;
+  border-radius: 8px;
 }
 
 .settings-tabs {
@@ -2548,7 +2711,14 @@ body.admin-light-page {
   background: #f9fafc;
 }
 
-.admin-light-page .rich-toolbar button {
+.admin-light-page .rich-toolbar button,
+.admin-light-page .rich-toolbar select {
+  border-color: #d8dee8;
+  color: #202938;
+  background: #fff;
+}
+
+.admin-light-page .rich-text-source-box:not(.rich-text-hidden-source) {
   border-color: #d8dee8;
   color: #202938;
   background: #fff;
@@ -2557,6 +2727,16 @@ body.admin-light-page {
 .admin-light-page .rich-editor-box {
   color: #202938;
   background: #fff;
+}
+
+.admin-light-page .rich-editor-box blockquote {
+  color: #334155;
+  background: #fff7df;
+}
+
+.admin-light-page .rich-editor-box pre {
+  border-color: #e4eaf2;
+  background: #f8fafc;
 }
 
 .admin-light-page .rich-editor-box a {
@@ -2851,6 +3031,17 @@ body.admin-dark-page {
 
 .admin-dark-page .rich-editor {
   border-color: rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.admin-dark-page .rich-toolbar select option {
+  color: #111827;
+  background: #fff;
+}
+
+.admin-dark-page .rich-text-source-box:not(.rich-text-hidden-source) {
+  border-color: rgba(255, 255, 255, 0.13);
+  color: #f4f6fb;
   background: rgba(255, 255, 255, 0.045);
 }
 
