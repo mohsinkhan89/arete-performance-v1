@@ -95,7 +95,7 @@
                 @if ($page === 'products')
                     <table>
                         <thead>
-                            <tr><th>Product</th><th>Category</th><th>SKU</th><th>Price</th><th>Stock</th><th>Status</th><th>Action</th></tr>
+                            <tr><th>Product</th><th>Category</th><th>SKU</th><th>Price</th><th>Stock</th><th>Bestseller</th><th>Status</th><th>Action</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $product)
@@ -110,6 +110,9 @@
                                     <td>{{ $product->sku }}</td>
                                     <td>£{{ number_format((float) $product->price, 2) }}</td>
                                     <td>{{ $product->stock }}</td>
+                                    <td>
+                                        <span class="badge {{ $product->is_bestseller ? 'green' : 'muted' }}">{{ $product->is_bestseller ? 'Yes' : 'No' }}</span>
+                                    </td>
                                     <td>
                                         <form action="{{ route('backend.resource.status', ['resource' => 'products', 'id' => $product->id]) }}" method="POST">
                                             @csrf
@@ -132,7 +135,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="7" class="empty-cell">No products found.</td></tr>
+                                <tr><td colspan="8" class="empty-cell">No products found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -226,32 +229,54 @@
                         </tbody>
                     </table>
                 @elseif ($page === 'orders')
-                    <table class="orders-table-compact">
+                    @php
+                        $orderRows = collect($records->items());
+                        $paidCount = $orderRows->where('payment_status', 'paid')->count();
+                        $proofCount = $orderRows->filter(fn ($order) => ! empty($order->payment_proof))->count();
+                        $unpaidCount = $orderRows->where('payment_status', 'unpaid')->count();
+                        $pageTotal = $orderRows->sum(fn ($order) => (float) $order->total);
+                    @endphp
+
+                    <div class="orders-command-bar">
+                        <div>
+                            <span class="dashboard-kicker">Orders</span>
+                            <strong>{{ number_format($records->total()) }} total orders</strong>
+                            <small>{{ $records->count() }} showing on this page</small>
+                        </div>
+                        <div class="orders-mini-stats">
+                            <span><i class="fa-solid fa-sterling-sign"></i> £{{ number_format($pageTotal, 2) }}</span>
+                            <span><i class="fa-solid fa-circle-check"></i> {{ $paidCount }} paid</span>
+                            <span><i class="fa-solid fa-receipt"></i> {{ $proofCount }} proof</span>
+                            <span><i class="fa-solid fa-clock"></i> {{ $unpaidCount }} unpaid</span>
+                        </div>
+                    </div>
+
+                    <table class="orders-table-compact orders-table-modern">
                         <thead>
                             <tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Action</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $order)
                                 <tr>
-                                    <td>
+                                    <td class="order-code-cell">
                                         <strong>{{ $order->order_number }}</strong>
                                         <small class="table-subtext">{{ $order->created_at?->format('M d, Y') }}</small>
                                     </td>
-                                    <td>
+                                    <td class="order-customer-cell">
                                         <strong>{{ $order->customer_name }}</strong>
                                         <small class="table-subtext">{{ $order->email }}</small>
                                     </td>
-                                    <td>{{ $order->items_count }}</td>
-                                    <td>£{{ number_format((float) $order->total, 2) }}</td>
+                                    <td><span class="orders-count-pill">{{ $order->items_count }}</span></td>
+                                    <td class="order-total-cell">£{{ number_format((float) $order->total, 2) }}</td>
                                     <td>
                                         <span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span>
                                     </td>
                                     <td>
-                                        <strong>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</strong>
+                                        <strong class="tracking-state">{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</strong>
                                         <small class="table-subtext">{{ $order->tracking_number ?: 'Label pending' }}</small>
                                     </td>
                                     <td>
-                                        <div class="action-group">
+                                        <div class="action-group order-row-actions">
                                             <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
                                             @include('backend.partials.payment-proof-button', ['order' => $order])
                                         </div>

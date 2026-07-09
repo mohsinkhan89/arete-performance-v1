@@ -357,6 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const paymentProofCurrent = document.querySelector('[data-payment-proof-current]');
   const paymentProofCurrentLink = document.querySelector('[data-payment-proof-current-link]');
   const paymentProofCurrentImage = document.querySelector('[data-payment-proof-current-image]');
+  const paymentProofPreview = document.querySelector('[data-payment-proof-preview]');
+  const paymentProofEmpty = document.querySelector('[data-payment-proof-empty]');
 
   const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
     '&': '&amp;',
@@ -433,13 +435,24 @@ document.addEventListener('DOMContentLoaded', () => {
       ].filter(Boolean).map(escapeHtml).join(' &middot; ');
     }
 
-    if (button.dataset.proofUrl && paymentProofCurrent && paymentProofCurrentLink) {
-      paymentProofCurrent.hidden = false;
-      paymentProofCurrentLink.href = button.dataset.proofUrl;
-      if (paymentProofCurrentImage) paymentProofCurrentImage.src = button.dataset.proofUrl;
-    } else if (paymentProofCurrent) {
-      paymentProofCurrent.hidden = true;
-      if (paymentProofCurrentLink) paymentProofCurrentLink.href = '#';
+    const proofUrl = button.dataset.proofUrl || '';
+    if (paymentProofCurrent) paymentProofCurrent.hidden = false;
+
+    if (proofUrl) {
+      if (paymentProofEmpty) paymentProofEmpty.hidden = true;
+      if (paymentProofPreview) paymentProofPreview.hidden = false;
+      if (paymentProofCurrentLink) {
+        paymentProofCurrentLink.hidden = false;
+        paymentProofCurrentLink.href = proofUrl;
+      }
+      if (paymentProofCurrentImage) paymentProofCurrentImage.src = proofUrl;
+    } else {
+      if (paymentProofEmpty) paymentProofEmpty.hidden = false;
+      if (paymentProofPreview) paymentProofPreview.hidden = true;
+      if (paymentProofCurrentLink) {
+        paymentProofCurrentLink.hidden = true;
+        paymentProofCurrentLink.href = '#';
+      }
       if (paymentProofCurrentImage) paymentProofCurrentImage.src = '';
     }
 

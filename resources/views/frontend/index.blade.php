@@ -69,7 +69,7 @@
             @foreach ($featuredProducts as $product)
               <div class="col-6 col-md-4 col-lg">
                 <article class="product-card {{ $product->stock <= 0 ? 'is-out-of-stock' : '' }}" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-url="{{ route('frontend.product-details', $product->slug) }}">
-                  @if ($product->stock <= 0)<span class="tag stock-tag">Out of Stock</span>@elseif ($product->is_featured)<span class="tag">Popular</span>@endif
+                  @if ($product->stock <= 0)<span class="tag stock-tag">Out of Stock</span>@elseif ($product->is_bestseller)<span class="tag">Bestseller</span>@endif
                   <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
                   <h3>{{ $product->name }}</h3>
                   <small>{{ $product->category?->name }}</small>

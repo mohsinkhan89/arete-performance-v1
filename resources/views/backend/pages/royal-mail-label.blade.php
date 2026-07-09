@@ -9,17 +9,18 @@
         body { margin: 0; padding: 24px; background: #eef1f5; color: #111827; font-family: Arial, Helvetica, sans-serif; }
         .label-sheet { width: 420px; min-height: 590px; margin: 0 auto; border: 2px solid #111827; background: #fff; }
         .label-head { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 2px solid #111827; }
-        .label-head h1 { margin: 0; font-size: 25px; letter-spacing: .04em; }
+        .label-head h1 { margin: 0; font-size: 25px; letter-spacing: 0; }
         .service { border: 2px solid #111827; padding: 6px 10px; font-weight: 800; }
         .label-section { padding: 16px; border-bottom: 2px solid #111827; }
-        .label-section span { display: block; margin-bottom: 8px; color: #4b5563; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+        .label-section span { display: block; margin-bottom: 8px; color: #4b5563; font-size: 11px; font-weight: 800; letter-spacing: 0; text-transform: uppercase; }
         .address { min-height: 128px; font-size: 18px; font-weight: 800; line-height: 1.45; }
         .barcode { display: grid; place-items: center; gap: 10px; padding: 22px 16px; border-bottom: 2px solid #111827; }
-        .bars { display: flex; align-items: stretch; gap: 3px; height: 82px; }
-        .bars i { display: block; width: 4px; background: #111827; }
-        .bars i:nth-child(3n) { width: 8px; }
-        .bars i:nth-child(4n) { width: 2px; }
-        .tracking { font-size: 20px; font-weight: 900; letter-spacing: .08em; }
+        .bars { display: flex; align-items: stretch; justify-content: center; gap: 3px; width: 100%; height: 82px; color: #000; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+        .bars i { display: block; width: 0; min-width: 0; border-left: 4px solid #000; }
+        .bars i:nth-child(3n) { border-left-width: 8px; }
+        .bars i:nth-child(4n) { border-left-width: 2px; }
+        .bars i:nth-child(5n) { margin-right: 2px; }
+        .tracking { font-size: 20px; font-weight: 900; letter-spacing: 0; }
         .label-grid { display: grid; grid-template-columns: 1fr 1fr; }
         .label-grid div { min-height: 82px; padding: 14px; border-right: 2px solid #111827; border-bottom: 2px solid #111827; }
         .label-grid div:nth-child(even) { border-right: 0; }
@@ -30,6 +31,8 @@
         @media print {
             body { padding: 0; background: #fff; }
             .label-sheet { margin: 0; border-color: #000; }
+            .barcode, .bars, .bars i { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            .bars i { border-left-color: #000 !important; }
             .print-actions { display: none; }
         }
     </style>

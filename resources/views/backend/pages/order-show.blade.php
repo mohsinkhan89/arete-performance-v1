@@ -30,16 +30,30 @@
         ];
     @endphp
 
-    <div class="page-heading compact-heading">
+    <div class="page-heading compact-heading order-detail-hero">
         <div>
+            <span class="dashboard-kicker">Order Workspace</span>
             <h1>{{ $pageTitle }}</h1>
-            <p>{{ $order->customer_name }} &middot; &pound;{{ number_format((float) $order->total, 2) }} &middot; Royal Mail ID {{ $order->tracking_number }}</p>
+            <p>{{ $order->customer_name }} &middot; &pound;{{ number_format((float) $order->total, 2) }} &middot; Royal Mail ID {{ $order->tracking_number ?: 'Pending' }}</p>
         </div>
-        <div class="action-group">
-            <a href="{{ route('backend.page', 'orders') }}" title="Back"><i class="fa-solid fa-arrow-left"></i></a>
-            <a href="{{ $trackUrl }}" target="_blank" rel="noopener" title="Customer tracking page"><i class="fa-solid fa-truck-fast"></i></a>
-            <a href="{{ $labelUrl }}" target="_blank" rel="noopener" title="Print Royal Mail label"><i class="fa-solid fa-tag"></i></a>
+        <div class="order-hero-side">
+            <div class="order-hero-badges">
+                <span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ $paymentLabels[$order->payment_status ?? 'unpaid'] ?? ucfirst($order->payment_status ?? 'unpaid') }}</span>
+                <span class="badge muted">{{ $trackingLabels[$order->tracking_status ?? 'placed'] ?? ucfirst($order->tracking_status ?? 'placed') }}</span>
+            </div>
+            <div class="action-group">
+                <a href="{{ route('backend.page', 'orders') }}" title="Back"><i class="fa-solid fa-arrow-left"></i></a>
+                <a href="{{ $trackUrl }}" target="_blank" rel="noopener" title="Customer tracking page"><i class="fa-solid fa-truck-fast"></i></a>
+                <a href="{{ $labelUrl }}" target="_blank" rel="noopener" title="Print Royal Mail label"><i class="fa-solid fa-tag"></i></a>
+            </div>
         </div>
+    </div>
+
+    <div class="order-detail-strip">
+        <div><span>Total</span><strong>&pound;{{ number_format((float) $order->total, 2) }}</strong></div>
+        <div><span>Items</span><strong>{{ $order->items->sum('quantity') }}</strong></div>
+        <div><span>Payment</span><strong>{{ $paymentLabels[$order->payment_status ?? 'unpaid'] ?? ucfirst($order->payment_status ?? 'unpaid') }}</strong></div>
+        <div><span>Tracking</span><strong>{{ $trackingLabels[$order->tracking_status ?? 'placed'] ?? ucfirst($order->tracking_status ?? 'placed') }}</strong></div>
     </div>
 
     <div class="order-workspace">
@@ -155,9 +169,10 @@
         </article>
     </div>
 
-    <article class="panel resource-panel">
+    <article class="panel resource-panel order-items-panel">
         <div class="panel-head">
             <h2>Items</h2>
+            <span class="badge muted">{{ $order->items->count() }} products</span>
         </div>
         <div class="table-wrap">
             <table>

@@ -499,10 +499,12 @@ class BackendController extends Controller
             'stock' => ['required', 'integer', 'min:0'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'is_featured' => ['nullable', 'boolean'],
+            'is_bestseller' => ['nullable', 'boolean'],
         ]);
 
         $data['slug'] = $this->uniqueSlug(Product::class, $data['slug'] ?: Str::slug($data['name']), $ignoreId);
         $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_bestseller'] = $request->boolean('is_bestseller');
         $data['image'] = $this->imageValue($request, 'image_file', 'remove_image', $currentImage);
         $data['test_report_image'] = $this->imageValue($request, 'test_report_image_file', 'remove_test_report_image', $currentTestReportImage);
 

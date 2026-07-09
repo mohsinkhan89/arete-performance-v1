@@ -165,11 +165,16 @@
                     <p data-payment-proof-summary>Upload proof and mark payment paid.</p>
                 </div>
             </div>
-            <div class="payment-proof-current" data-payment-proof-current hidden>
-                <div class="proof-current-preview">
+            <div class="payment-proof-current" data-payment-proof-current>
+                <div class="proof-empty-state" data-payment-proof-empty>
+                    <i class="fa-regular fa-file-image"></i>
+                    <strong>No payment proof uploaded yet</strong>
+                    <small>Upload a receipt or payment screenshot below to mark this order as paid.</small>
+                </div>
+                <div class="proof-current-preview" data-payment-proof-preview hidden>
                     <img src="" alt="Current payment proof" data-payment-proof-current-image>
                 </div>
-                <a href="#" target="_blank" rel="noopener" data-payment-proof-current-link>
+                <a href="#" target="_blank" rel="noopener" data-payment-proof-current-link hidden>
                     <i class="fa-regular fa-image"></i> Open current proof
                 </a>
             </div>

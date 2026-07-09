@@ -74,6 +74,10 @@
                                 <input type="checkbox" name="is_featured" value="1" @checked(old('is_featured', $record->is_featured ?? false))>
                                 <span>Featured product</span>
                             </label>
+                            <label class="switch-row wide">
+                                <input type="checkbox" name="is_bestseller" value="1" @checked(old('is_bestseller', $record->is_bestseller ?? false))>
+                                <span>Bestseller product</span>
+                            </label>
                         </div>
                     </section>
 
