@@ -120,6 +120,7 @@
       cartJson: "{{ route('frontend.cart.json') }}",
       postcodeLookup: "{{ route('frontend.checkout.postcode') }}",
       cartAddBase: "{{ url('cart/add') }}",
+      stockNotifyBase: "{{ url('stock-notify') }}",
       cartUpdateBase: "{{ url('cart/update') }}",
       cartRemoveBase: "{{ url('cart/remove') }}",
       cartClear: "{{ route('frontend.cart.clear') }}"

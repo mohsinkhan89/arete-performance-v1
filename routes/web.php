@@ -23,6 +23,7 @@ Route::get('search/products', [FrontendController::class, 'searchProducts'])->na
 Route::get('shop', [FrontendController::class, 'shop'])->name('frontend.shop');
 Route::get('cart/json', [FrontendController::class, 'cartJson'])->name('frontend.cart.json');
 Route::post('cart/add/{product}', [FrontendController::class, 'addCart'])->name('frontend.cart.add');
+Route::post('stock-notify/{product}', [FrontendController::class, 'notifyStock'])->name('frontend.stock.notify');
 Route::patch('cart/update/{product}', [FrontendController::class, 'updateCart'])->name('frontend.cart.update');
 Route::delete('cart/remove/{product}', [FrontendController::class, 'removeCart'])->name('frontend.cart.remove');
 Route::delete('cart/clear', [FrontendController::class, 'clearCart'])->name('frontend.cart.clear');

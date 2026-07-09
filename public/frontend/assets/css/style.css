@@ -1356,6 +1356,11 @@ button.is-loading .fa-spinner {
   box-shadow: 0 24px 44px rgba(0, 0, 0, .34);
 }
 
+.product-card.is-out-of-stock {
+  border-color: rgba(255, 255, 255, .18);
+  opacity: .82;
+}
+
 .product-card:hover::before {
   transform: translateX(120%);
 }
@@ -1534,6 +1539,32 @@ button.is-loading .fa-spinner {
   box-shadow: 0 10px 20px rgba(245, 168, 23, .32);
 }
 
+.product-card .notify-stock-btn,
+.shop-product-card.product-card .notify-stock-btn {
+  display: inline-flex;
+  width: auto;
+  min-width: 96px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  color: var(--color-primary);
+  font-size: .68rem;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+  background: #0b0b0b;
+  border: 1px solid rgba(245, 168, 23, .62);
+  border-radius: 999px;
+}
+
+.product-card .notify-stock-btn:hover,
+.shop-product-card.product-card .notify-stock-btn:hover {
+  color: var(--color-black);
+  background: var(--color-primary);
+  transform: translateY(-2px);
+}
+
 .tag {
   position: absolute;
   top: 12px;
@@ -1546,6 +1577,110 @@ button.is-loading .fa-spinner {
   text-transform: uppercase;
   background: var(--color-primary);
   border-radius: 3px;
+}
+
+.stock-tag {
+  color: #fff;
+  background: #111;
+  border: 1px solid rgba(245, 168, 23, .65);
+}
+
+.stock-notify-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 3200;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, .78);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .2s ease, visibility .2s ease;
+}
+
+.stock-notify-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.stock-notify-dialog {
+  position: relative;
+  width: min(460px, 100%);
+  padding: 28px;
+  color: #111;
+  background: #fff;
+  border: 1px solid #ffe0b5;
+  border-radius: 8px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, .45);
+}
+
+.stock-notify-dialog > span {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  margin-bottom: 14px;
+  color: var(--color-primary);
+  font-size: 1.35rem;
+  border: 1px solid #ffe0b5;
+  border-radius: 50%;
+}
+
+.stock-notify-dialog h2 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.stock-notify-dialog p {
+  margin: 0 0 18px;
+  color: #444;
+  font-size: .86rem;
+  line-height: 1.55;
+}
+
+.stock-notify-dialog form {
+  display: grid;
+  gap: 12px;
+}
+
+.stock-notify-dialog label {
+  display: grid;
+  gap: 6px;
+  color: #111;
+  font-size: .72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.stock-notify-dialog :is(input, textarea) {
+  width: 100%;
+  padding: 11px 12px;
+  color: #111;
+  font-size: .86rem;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: 0;
+}
+
+.stock-notify-dialog :is(input, textarea):focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(245, 168, 23, .16);
+}
+
+.stock-notify-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: #111;
+  background: #f7f7f7;
+  border: 0;
+  border-radius: 50%;
 }
 
 .testimonials {
@@ -3010,6 +3145,12 @@ button.is-loading .fa-spinner {
 .shop-product-card.product-card button:hover {
   color: var(--color-black);
   background: var(--color-primary);
+}
+
+.shop-product-card.product-card .notify-stock-btn {
+  color: var(--color-primary);
+  background: #0b0b0b;
+  border: 1px solid rgba(245, 168, 23, .62);
 }
 
 .shop-product-card.product-card .product-card-qty button {
@@ -5326,6 +5467,10 @@ button.is-loading .fa-spinner {
   border-radius: 8px;
 }
 
+.related-card.is-out-of-stock {
+  opacity: .82;
+}
+
 .related-card img {
   width: 105px;
   height: 125px;
@@ -5362,6 +5507,18 @@ button.is-loading .fa-spinner {
   background: var(--color-primary);
   border: 0;
   border-radius: 6px;
+}
+
+.related-card .notify-stock-btn {
+  width: auto;
+  min-width: 92px;
+  padding: 0 10px;
+  color: var(--color-primary);
+  font-size: .62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  background: #111;
+  border: 1px solid rgba(245, 168, 23, .65);
 }
 
 .product-trust {

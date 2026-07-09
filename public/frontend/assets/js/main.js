@@ -202,6 +202,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const reportLightbox = document.querySelector(".report-lightbox");
   const reportLightboxImage = document.querySelector("[data-report-lightbox-image]");
   const reportLightboxTitle = document.querySelector("[data-report-lightbox-title]");
+  const stockNotifyModal = document.createElement("div");
+  stockNotifyModal.className = "stock-notify-modal";
+  stockNotifyModal.setAttribute("aria-hidden", "true");
+  stockNotifyModal.innerHTML = `
+    <div class="stock-notify-dialog" role="dialog" aria-modal="true" aria-labelledby="stockNotifyTitle">
+      <button class="stock-notify-close" type="button" data-stock-notify-close aria-label="Close notification form"><i class="fa-solid fa-xmark"></i></button>
+      <span><i class="fa-solid fa-bell"></i></span>
+      <h2 id="stockNotifyTitle">Request Notification</h2>
+      <p data-stock-notify-product>Share your details and we will contact you as soon as stock returns.</p>
+      <form data-stock-notify-form>
+        <input type="hidden" name="product_id" data-stock-notify-id>
+        <label>Full Name<input type="text" name="name" required maxlength="120"></label>
+        <label>Email Address<input type="email" name="email" required maxlength="255"></label>
+        <label>Phone Number<input type="tel" name="phone" maxlength="30"></label>
+        <label>Required Quantity<input type="number" name="quantity" min="1" max="999" value="1"></label>
+        <label>Additional information<textarea name="message" maxlength="1000" rows="3"></textarea></label>
+        <button class="btn btn-gold" type="submit">Send Request <i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>`;
+  document.body.appendChild(stockNotifyModal);
 
   const money = (value) => `£${Number(value || 0).toFixed(2)}`;
   const findProduct = (id) => products.find((product) => product.id === id);
@@ -320,6 +340,53 @@ document.addEventListener("DOMContentLoaded", () => {
     reportLightbox.setAttribute("aria-hidden", "true");
     document.body.classList.remove("panel-open");
     if (reportLightboxImage) reportLightboxImage.src = "";
+  }
+
+  function openStockNotify(productId, productName = "Selected product") {
+    stockNotifyModal.querySelector("[data-stock-notify-id]").value = productId || "";
+    stockNotifyModal.querySelector("[data-stock-notify-product]").textContent = `${productName}: share your details and we will contact you as soon as stock returns.`;
+    stockNotifyModal.classList.add("is-open");
+    stockNotifyModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("panel-open");
+    setTimeout(() => stockNotifyModal.querySelector("input[name='name']")?.focus(), 120);
+  }
+
+  function closeStockNotify() {
+    stockNotifyModal.classList.remove("is-open");
+    stockNotifyModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("panel-open");
+    syncBodyLock();
+  }
+
+  async function submitStockNotify(form) {
+    const productId = form.querySelector("[data-stock-notify-id]")?.value;
+    if (!productId) return;
+
+    const submitButton = form.querySelector("button[type='submit']");
+    submitButton.disabled = true;
+    submitButton.innerHTML = 'Sending... <i class="fa-solid fa-spinner fa-spin"></i>';
+
+    try {
+      const response = await fetch(endpoint(route("stockNotifyBase", "/stock-notify"), productId), {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": csrfToken
+        },
+        body: JSON.stringify(Object.fromEntries(new FormData(form).entries()))
+      });
+      if (!response.ok) throw new Error("Stock notify request failed.");
+      const data = await response.json();
+      showToast(data.message || "Thanks. We will contact you when this product is available.");
+      form.reset();
+      closeStockNotify();
+    } catch (error) {
+      showToast("Unable to send request right now.");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.innerHTML = 'Send Request <i class="fa-solid fa-paper-plane"></i>';
+    }
   }
 
   function initProductDescriptionSections() {
@@ -963,7 +1030,10 @@ document.addEventListener("DOMContentLoaded", () => {
       body: body ? JSON.stringify(body) : null
     });
 
-    if (!response.ok) throw new Error("Cart request failed.");
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Cart request failed.");
+    }
 
     return response.json();
   }
@@ -993,7 +1063,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("Product added to your cart.");
       return true;
     } catch (error) {
-      showToast("Unable to update cart right now.");
+      showToast(error.message || "Unable to update cart right now.");
       return false;
     }
   }
@@ -1075,9 +1145,11 @@ document.addEventListener("DOMContentLoaded", () => {
         <img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}">
         <div class="me-auto">
           <strong>${escapeHtml(product.name)}</strong>
-          <small>${escapeHtml(product.meta)} - ${money(product.price)}</small>
+          <small>${escapeHtml(product.meta)} - ${money(product.price)}${product.in_stock ? "" : " - Out of Stock"}</small>
         </div>
-        <button type="button" data-search-add="${escapeHtml(product.id)}" aria-label="Add ${escapeHtml(product.name)}"><i class="fa-solid fa-cart-plus"></i></button>
+        ${product.in_stock
+          ? `<button type="button" data-search-add="${escapeHtml(product.id)}" aria-label="Add ${escapeHtml(product.name)}"><i class="fa-solid fa-cart-plus"></i></button>`
+          : `<button class="notify-stock-btn" type="button" data-stock-notify="${escapeHtml(product.id)}" data-product-name="${escapeHtml(product.name)}">Inform Me</button>`}
       </article>`).join("") : '<p class="no-results">No products found.</p>';
     } catch (error) {
       if (requestIndex === searchRequestIndex) {
@@ -1226,6 +1298,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const relatedCard = event.target.closest(".related-card");
     const categoryCard = event.target.closest(".category-card");
     const addFromSearch = event.target.closest("[data-search-add]");
+    const stockNotify = event.target.closest("[data-stock-notify]");
+    const stockNotifyClose = event.target.closest("[data-stock-notify-close]");
     const goTrigger = event.target.closest("[data-go]");
     const accountButton = event.target.closest(".icon-btn[aria-label='Account']");
     const clearFilters = event.target.closest("[data-clear-filters]");
@@ -1260,6 +1334,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!qtyOutput) return;
       qtyOutput.textContent = String(Math.max(1, Math.min(99, qty)));
     };
+
+    if (stockNotify) {
+      event.preventDefault();
+      openStockNotify(stockNotify.dataset.stockNotify, stockNotify.dataset.productName || stockNotify.closest("[data-product-name]")?.dataset.productName);
+      return;
+    }
+
+    if (stockNotifyClose || event.target === stockNotifyModal) {
+      closeStockNotify();
+      return;
+    }
 
     if (goTrigger) goToPage(goTrigger.dataset.go);
     if (accountButton) goToPage(route("cart", "/my-cart"));
@@ -1358,6 +1443,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       closeReportLightbox();
+      closeStockNotify();
       closeSearch();
       closeCart();
     }
@@ -1372,6 +1458,11 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
     showToast("Thanks for joining our newsletter.");
     event.currentTarget.reset();
+  });
+
+  stockNotifyModal.querySelector("[data-stock-notify-form]")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    submitStockNotify(event.currentTarget);
   });
 
   document.querySelectorAll("[data-uk-postcode]").forEach((input) => {

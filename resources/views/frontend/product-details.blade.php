@@ -55,13 +55,19 @@
             <div><i class="fa-solid fa-flask-vial"></i> Lab Tested</div>
             <div><i class="fa-solid fa-sterling-sign"></i> &pound;4.99 Shipping</div>
           </div>
-          <div class="product-quantity">
-            <span>Quantity</span>
-            <div class="cart-stepper"><button type="button" data-product-qty-dec aria-label="Decrease quantity">-</button><span data-product-qty>1</span><button type="button" data-product-qty-inc aria-label="Increase quantity">+</button></div>
-          </div>
+          @if ($product->stock > 0)
+            <div class="product-quantity">
+              <span>Quantity</span>
+              <div class="cart-stepper"><button type="button" data-product-qty-dec aria-label="Decrease quantity">-</button><span data-product-qty>1</span><button type="button" data-product-qty-inc aria-label="Increase quantity">+</button></div>
+            </div>
+          @endif
           <div class="product-actions">
-            <button class="btn btn-gold" type="button" data-product-add="{{ $product->id }}">Add to cart <i class="fa-solid fa-cart-plus"></i></button>
-            <button class="btn buy-now-btn" type="button" data-buy-now="{{ $product->id }}">Buy now <i class="fa-solid fa-bolt"></i></button>
+            @if ($product->stock > 0)
+              <button class="btn btn-gold" type="button" data-product-add="{{ $product->id }}">Add to cart <i class="fa-solid fa-cart-plus"></i></button>
+              <button class="btn buy-now-btn" type="button" data-buy-now="{{ $product->id }}">Buy now <i class="fa-solid fa-bolt"></i></button>
+            @else
+              <button class="btn btn-gold" type="button" data-stock-notify="{{ $product->id }}" data-product-name="{{ $product->name }}">Inform Me When Available <i class="fa-solid fa-bell"></i></button>
+            @endif
           </div>
           <div class="secure-payment">
             <span>Secure Checkout With</span>
@@ -172,11 +178,12 @@
           <h2>You May Also Like</h2>
           <div class="related-grid">
             @foreach ($relatedProducts as $related)
-              <article class="related-card" data-product-id="{{ $related->id }}" data-product-url="{{ route('frontend.product-details', $related->slug) }}">
+              <article class="related-card {{ $related->stock <= 0 ? 'is-out-of-stock' : '' }}" data-product-id="{{ $related->id }}" data-product-name="{{ $related->name }}" data-product-url="{{ route('frontend.product-details', $related->slug) }}">
+                @if ($related->stock <= 0)<span class="tag stock-tag">Out of Stock</span>@endif
                 <img src="{{ url($related->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $related->name }}">
                 <h3>{{ $related->name }}<br><span>{{ $related->category?->name }}</span></h3>
                 <strong>&pound;{{ number_format((float) ($related->sale_price ?: $related->price), 2) }}</strong>
-                <button type="button" aria-label="Add {{ $related->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button>
+                @if ($related->stock > 0)<button type="button" aria-label="Add {{ $related->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button>@else<button class="notify-stock-btn" type="button" data-stock-notify="{{ $related->id }}" data-product-name="{{ $related->name }}">Inform Me</button>@endif
               </article>
             @endforeach
           </div>
