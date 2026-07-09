@@ -350,6 +350,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const notificationList = document.querySelector('[data-order-notifications]');
   const notificationCount = document.querySelector('[data-notification-count]');
+  const paymentProofModal = document.querySelector('[data-payment-proof-modal]');
+  const paymentProofForm = document.querySelector('[data-payment-proof-form]');
+  const paymentProofTitle = document.querySelector('#paymentProofTitle');
+  const paymentProofSummary = document.querySelector('[data-payment-proof-summary]');
+  const paymentProofCurrent = document.querySelector('[data-payment-proof-current]');
+  const paymentProofCurrentLink = document.querySelector('[data-payment-proof-current-link]');
+  const paymentProofCurrentImage = document.querySelector('[data-payment-proof-current-image]');
 
   const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
     '&': '&amp;',
@@ -403,6 +410,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const closePaymentProofModal = () => {
+    if (!paymentProofModal) return;
+    paymentProofModal.classList.remove('is-open');
+    paymentProofModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    paymentProofForm?.reset();
+  };
+
+  const openPaymentProofModal = (button) => {
+    if (!paymentProofModal || !paymentProofForm || !button) return;
+
+    paymentProofForm.action = button.dataset.action || '';
+    if (paymentProofTitle) {
+      paymentProofTitle.textContent = `Payment Proof ${button.dataset.orderNumber ? `#${button.dataset.orderNumber}` : ''}`;
+    }
+    if (paymentProofSummary) {
+      paymentProofSummary.innerHTML = [
+        button.dataset.customer || 'Customer',
+        button.dataset.total || '',
+        button.dataset.status ? `Current: ${button.dataset.status}` : '',
+      ].filter(Boolean).map(escapeHtml).join(' &middot; ');
+    }
+
+    if (button.dataset.proofUrl && paymentProofCurrent && paymentProofCurrentLink) {
+      paymentProofCurrent.hidden = false;
+      paymentProofCurrentLink.href = button.dataset.proofUrl;
+      if (paymentProofCurrentImage) paymentProofCurrentImage.src = button.dataset.proofUrl;
+    } else if (paymentProofCurrent) {
+      paymentProofCurrent.hidden = true;
+      if (paymentProofCurrentLink) paymentProofCurrentLink.href = '#';
+      if (paymentProofCurrentImage) paymentProofCurrentImage.src = '';
+    }
+
+    paymentProofModal.classList.add('is-open');
+    paymentProofModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    window.setTimeout(() => paymentProofForm.querySelector('input[type="file"]')?.focus(), 80);
+  };
+
   if (notificationDropdown && notificationButton) {
     notificationButton.addEventListener('click', (event) => {
       event.stopPropagation();
@@ -419,6 +465,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('click', (event) => {
     const target = event.target;
+    const paymentProofTrigger = target.closest('[data-payment-proof-open]');
+    const paymentProofClose = target.closest('[data-payment-proof-close]');
+
+    if (paymentProofTrigger) {
+      event.preventDefault();
+      openPaymentProofModal(paymentProofTrigger);
+      return;
+    }
+
+    if (paymentProofClose) {
+      closePaymentProofModal();
+      return;
+    }
 
     if (profileDropdown && !profileDropdown.contains(target)) {
       closeProfile();
@@ -442,6 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (event.key !== 'Escape') return;
     closeProfile();
     closeNotifications();
+    closePaymentProofModal();
     closeSidebar();
   });
 

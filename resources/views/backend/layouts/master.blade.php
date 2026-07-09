@@ -139,6 +139,43 @@
         </main>
     </div>
 
+    <div class="admin-modal payment-proof-modal" data-payment-proof-modal aria-hidden="true">
+        <div class="admin-modal-backdrop" data-payment-proof-close></div>
+        <section class="admin-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="paymentProofTitle">
+            <button class="admin-modal-close" type="button" data-payment-proof-close aria-label="Close payment proof modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="admin-modal-head">
+                <span><i class="fa-solid fa-receipt"></i></span>
+                <div>
+                    <h2 id="paymentProofTitle">Payment Proof</h2>
+                    <p data-payment-proof-summary>Upload proof and mark payment paid.</p>
+                </div>
+            </div>
+            <div class="payment-proof-current" data-payment-proof-current hidden>
+                <div class="proof-current-preview">
+                    <img src="" alt="Current payment proof" data-payment-proof-current-image>
+                </div>
+                <a href="#" target="_blank" rel="noopener" data-payment-proof-current-link>
+                    <i class="fa-regular fa-image"></i> Open current proof
+                </a>
+            </div>
+            <form class="payment-proof-modal-form" data-payment-proof-form method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PATCH')
+                <label>
+                    <span>Payment proof image</span>
+                    <input type="file" name="payment_proof_file" accept="image/png,image/jpeg,image/webp">
+                    <small>PNG, JPG, JPEG, or WEBP up to 4MB.</small>
+                </label>
+                <button type="submit">
+                    <i class="fa-solid fa-check"></i>
+                    Save proof &amp; mark paid
+                </button>
+            </form>
+        </section>
+    </div>
+
     <script>
         window.adminRoutes = {
             orderNotifications: "{{ route('backend.notifications.orders') }}"

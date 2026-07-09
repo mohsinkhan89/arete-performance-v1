@@ -44,7 +44,7 @@
             </article>
         </section>
 
-        <section class="dashboard-workbench">
+        <section class="dashboard-command-grid">
             <article class="panel orders-panel compact-orders-panel">
                 <div class="panel-head">
                     <h2>Recent Orders</h2>
@@ -61,11 +61,12 @@
                                     <td>{{ $order->order_number }}</td>
                                     <td>{{ $order->customer_name }}</td>
                                     <td>&pound;{{ number_format((float) $order->total, 2) }}</td>
-                                    <td>@include('backend.partials.payment-proof-form', ['order' => $order])</td>
+                                    <td><span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
                                     <td>{{ $order->tracking_number ?: 'Pending label' }}</td>
                                     <td>
                                         <div class="action-group">
                                             <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
+                                            @include('backend.partials.payment-proof-button', ['order' => $order])
                                         </div>
                                     </td>
                                 </tr>
@@ -76,10 +77,47 @@
                     </table>
                 </div>
             </article>
+
+            <aside class="dashboard-side-stack">
+                <article class="panel ops-snapshot">
+                    <div class="panel-head">
+                        <h2>Order Status</h2>
+                        <a href="{{ route('backend.page', 'orders') }}">Orders</a>
+                    </div>
+                    <div class="status-breakdown status-breakdown-tight">
+                        @foreach ($trackingBreakdown as $status => $count)
+                            <div><span>{{ str_replace('_', ' ', ucfirst($status)) }}</span><strong>{{ number_format($count) }}</strong></div>
+                        @endforeach
+                    </div>
+                </article>
+
+                <article class="panel ops-snapshot">
+                    <div class="panel-head">
+                        <h2>Payment Status</h2>
+                        <a href="{{ route('backend.page', 'reports') }}">Reports</a>
+                    </div>
+                    <div class="status-breakdown status-breakdown-tight">
+                        @foreach ($paymentBreakdown as $status => $count)
+                            <div><span>{{ str_replace('_', ' ', ucfirst($status)) }}</span><strong>{{ number_format($count) }}</strong></div>
+                        @endforeach
+                    </div>
+                </article>
+
+                <article class="panel ops-snapshot">
+                    <div class="panel-head">
+                        <h2>Revenue Split</h2>
+                        <a href="{{ route('backend.page', 'reports') }}">Reports</a>
+                    </div>
+                    <div class="snapshot-grid dashboard-mini-grid">
+                        <div><span>Paid</span><strong>&pound;{{ number_format((float) $paidRevenue, 2) }}</strong><small>{{ number_format($paidOrders) }} orders</small></div>
+                        <div><span>Pending</span><strong>&pound;{{ number_format((float) $pendingRevenue, 2) }}</strong><small>{{ number_format($unpaidOrders) }} orders</small></div>
+                    </div>
+                </article>
+            </aside>
         </section>
 
-        <section class="dashboard-workbench dashboard-workbench-secondary">
-            <article class="panel ops-snapshot">
+        <section class="dashboard-dense-grid">
+            <article class="panel ops-snapshot dashboard-snapshot-panel">
                 <div class="panel-head">
                     <h2>Database Snapshot</h2>
                     <a href="{{ route('backend.page', 'products') }}">Manage</a>
@@ -89,32 +127,6 @@
                     <div><span>Categories</span><strong>{{ number_format($totalCategories) }}</strong><small>{{ number_format($activeCategories) }} active / {{ number_format($inactiveCategories) }} inactive</small></div>
                     <div><span>Users</span><strong>{{ number_format($totalUsers) }}</strong><small>{{ number_format($activeUsers) }} active</small></div>
                     <div><span>Order Items</span><strong>{{ number_format($orderItemsCount ?? 0) }}</strong><small>{{ number_format($reviewsCount ?? 0) }} reviews</small></div>
-                </div>
-            </article>
-
-            <article class="panel ops-snapshot">
-                <div class="panel-head">
-                    <h2>Order Status</h2>
-                    <a href="{{ route('backend.page', 'orders') }}">Orders</a>
-                </div>
-                <div class="status-breakdown">
-                    @foreach ($trackingBreakdown as $status => $count)
-                        <div><span>{{ str_replace('_', ' ', ucfirst($status)) }}</span><strong>{{ number_format($count) }}</strong></div>
-                    @endforeach
-                </div>
-            </article>
-        </section>
-
-        <section class="dashboard-workbench dashboard-workbench-secondary">
-            <article class="panel ops-snapshot">
-                <div class="panel-head">
-                    <h2>Payment Status</h2>
-                    <a href="{{ route('backend.page', 'reports') }}">Reports</a>
-                </div>
-                <div class="status-breakdown">
-                    @foreach ($paymentBreakdown as $status => $count)
-                        <div><span>{{ str_replace('_', ' ', ucfirst($status)) }}</span><strong>{{ number_format($count) }}</strong></div>
-                    @endforeach
                 </div>
             </article>
 
@@ -135,9 +147,7 @@
                     @endforelse
                 </div>
             </article>
-        </section>
 
-        <section class="dashboard-workbench dashboard-workbench-secondary">
             <article class="panel products-panel compact-products-panel">
                 <div class="panel-head">
                     <h2>Low Stock</h2>
@@ -153,17 +163,6 @@
                     @empty
                         <div class="empty-cell">No low-stock products.</div>
                     @endforelse
-                </div>
-            </article>
-
-            <article class="panel ops-snapshot">
-                <div class="panel-head">
-                    <h2>Revenue Split</h2>
-                    <a href="{{ route('backend.page', 'reports') }}">Reports</a>
-                </div>
-                <div class="snapshot-grid dashboard-mini-grid">
-                    <div><span>Paid</span><strong>&pound;{{ number_format((float) $paidRevenue, 2) }}</strong><small>{{ number_format($paidOrders) }} orders</small></div>
-                    <div><span>Pending</span><strong>&pound;{{ number_format((float) $pendingRevenue, 2) }}</strong><small>{{ number_format($unpaidOrders) }} orders</small></div>
                 </div>
             </article>
         </section>
