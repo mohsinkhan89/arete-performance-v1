@@ -167,9 +167,29 @@ class FrontendController extends Controller
         ]);
     }
 
-    public function productDetails()
+    public function productDetails(?string $product = null)
     {
-        return view('frontend.product-details');
+        $productQuery = Product::with('category')->where('status', 'active');
+
+        $product = $product
+            ? (clone $productQuery)->where(fn ($query) => $query->where('slug', $product)->orWhere('id', $product))->firstOrFail()
+            : (clone $productQuery)->latest()->firstOrFail();
+
+        return view('frontend.product-details', [
+            'product' => $product,
+            'relatedProducts' => Product::with('category')
+                ->where('status', 'active')
+                ->where('id', '!=', $product->id)
+                ->when($product->category_id, fn ($query) => $query->where('category_id', $product->category_id))
+                ->latest()
+                ->take(5)
+                ->get(),
+            'reviews' => Review::where('status', 'active')
+                ->where(fn ($query) => $query->where('product_id', $product->id)->orWhereNull('product_id'))
+                ->latest()
+                ->take(3)
+                ->get(),
+        ]);
     }
 
     public function search(Request $request)

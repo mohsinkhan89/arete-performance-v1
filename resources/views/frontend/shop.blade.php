@@ -90,7 +90,7 @@
 
             <div class="shop-grid reveal-group">
               @forelse ($products as $product)
-                <article class="shop-product-card product-card" id="{{ $product->category?->slug }}" data-product-id="{{ $product->id }}">
+                <article class="shop-product-card product-card" id="{{ $product->category?->slug }}" data-product-id="{{ $product->id }}" data-product-url="{{ route('frontend.product-details', $product->slug) }}">
                   @if ($product->is_featured)<span class="tag">Popular</span>@endif
                   <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
                   <small>{{ $product->category?->name }}</small>

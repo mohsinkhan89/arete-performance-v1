@@ -69,7 +69,7 @@
           <div class="row g-3 mt-3 reveal-group product-track">
             @foreach ($featuredProducts as $product)
               <div class="col-6 col-md-4 col-lg">
-                <article class="product-card" data-product-id="{{ $product->id }}">
+                <article class="product-card" data-product-id="{{ $product->id }}" data-product-url="{{ route('frontend.product-details', $product->slug) }}">
                   @if ($product->is_featured)<span class="tag">Popular</span>@endif
                   <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
                   <h3>{{ $product->name }}</h3>

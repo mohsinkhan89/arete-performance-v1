@@ -322,6 +322,128 @@ document.addEventListener("DOMContentLoaded", () => {
     if (reportLightboxImage) reportLightboxImage.src = "";
   }
 
+  function initProductDescriptionSections() {
+    const source = document.querySelector("[data-product-description-source]");
+    if (!source) return;
+
+    const targets = {
+      description: document.querySelector('[data-description-section="description"]'),
+      benefits: document.querySelector('[data-description-section="benefits"]'),
+      dosage: document.querySelector('[data-description-section="dosage"]'),
+      ingredients: document.querySelector('[data-description-section="ingredients"]'),
+      faq: document.querySelector('[data-description-section="faq"]'),
+    };
+
+    const buckets = Object.fromEntries(Object.keys(targets).map((key) => [key, []]));
+    const sectionFromHeading = (text) => {
+      const value = String(text || "").toLowerCase();
+      if (value.includes("benefit")) return "benefits";
+      if (value.includes("dosage") || value.includes("dose") || value.includes("usage")) return "dosage";
+      if (value.includes("ingredient")) return "ingredients";
+      if (value.includes("faq") || value.includes("question")) return "faq";
+      if (value.includes("description") || value.includes("about")) return "description";
+      return null;
+    };
+
+    const looksLikeSpecBlock = (node) => {
+      const text = node.textContent?.toLowerCase() || "";
+      return text.includes("product name") && text.includes("sku");
+    };
+
+    const moveAfter = (node, target) => {
+      if (!node || !target?.parentNode) return target;
+      target.parentNode.insertBefore(node, target.nextSibling);
+      return node;
+    };
+
+    const normalizeSource = () => {
+      const movableSelector = "p, h2, h3, h4, ul, ol, blockquote, pre";
+      source.querySelectorAll(".product-specs, dl").forEach((specList) => {
+        let insertionPoint = specList;
+
+        specList.querySelectorAll(`dt ${movableSelector}, dd ${movableSelector}`).forEach((block) => {
+          insertionPoint = moveAfter(block, insertionPoint);
+        });
+
+        Array.from(specList.children).forEach((child) => {
+          if (child.matches("div, dt, dd")) return;
+          if (!child.matches(movableSelector)) return;
+          insertionPoint = moveAfter(child, insertionPoint);
+        });
+      });
+
+      source.querySelectorAll("td h2, td h3, td h4, th h2, th h3, th h4").forEach((heading) => {
+        const table = heading.closest("table");
+        if (table) moveAfter(heading, table);
+      });
+    };
+
+    const buildBenefitCards = (nodes) => {
+      const wrapper = document.createElement("div");
+      nodes.forEach((node) => wrapper.appendChild(node.cloneNode(true)));
+      const listItems = [...wrapper.querySelectorAll("li")];
+      if (!listItems.length) return nodes;
+
+      return listItems.map((item) => {
+        const card = document.createElement("div");
+        const title = document.createElement("strong");
+        const copy = document.createElement("span");
+        const icon = document.createElement("i");
+        icon.className = "fa-solid fa-dumbbell";
+        title.textContent = item.querySelector("strong, b")?.textContent?.trim() || item.textContent.trim().split(/[.:-]/)[0] || "Benefit";
+        copy.textContent = item.textContent.trim();
+        card.append(icon, title, copy);
+        return card;
+      });
+    };
+
+    const buildFaqItems = (nodes) => {
+      const wrapper = document.createElement("div");
+      nodes.forEach((node) => wrapper.appendChild(node.cloneNode(true)));
+      const listItems = [...wrapper.querySelectorAll("li")];
+      if (!listItems.length) return nodes;
+
+      return listItems.map((item, index) => {
+        const details = document.createElement("details");
+        if (index === 0) details.open = true;
+        const summary = document.createElement("summary");
+        const paragraph = document.createElement("p");
+        const text = item.textContent.trim();
+        const parts = text.split("?");
+        summary.textContent = parts.length > 1 ? `${parts.shift()}?` : `Question ${index + 1}`;
+        paragraph.textContent = parts.join("?").trim() || text;
+        details.append(summary, paragraph);
+        return details;
+      });
+    };
+
+    normalizeSource();
+
+    let current = "description";
+    [...source.children].forEach((node) => {
+      if (looksLikeSpecBlock(node)) return;
+
+      const headingSection = /^H[1-6]$/.test(node.tagName) ? sectionFromHeading(node.textContent) : null;
+      if (headingSection) {
+        current = headingSection;
+        return;
+      }
+
+      buckets[current].push(node.cloneNode(true));
+    });
+
+    Object.entries(targets).forEach(([key, target]) => {
+      if (!target || !buckets[key].length) return;
+
+      const heading = target.querySelector("h2");
+      target.innerHTML = "";
+      if (heading && key === "description") target.appendChild(heading);
+
+      const nodes = key === "benefits" ? buildBenefitCards(buckets[key]) : key === "faq" ? buildFaqItems(buckets[key]) : buckets[key];
+      nodes.forEach((node) => target.appendChild(node));
+    });
+  }
+
   function syncBodyLock() {
     const hasOpenPanel = searchPanel.classList.contains("is-open") || cartDrawer.classList.contains("is-open");
     document.body.classList.toggle("panel-open", hasOpenPanel);
@@ -716,13 +838,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const index = [...document.querySelectorAll(".product-card")].indexOf(productCard);
       await addToCart(productCard.dataset.productId || products[index]?.id);
     } else if (productCard && !event.target.closest("a")) {
-      goToPage(route("productDetails", "/product-details"));
+      goToPage(productCard.dataset.productUrl || route("productDetails", "/product-details"));
     }
 
     if (relatedCard && event.target.closest("button")) {
       await addToCart(relatedCard.dataset.productId);
     } else if (relatedCard) {
-      goToPage(route("productDetails", "/product-details"));
+      goToPage(relatedCard.dataset.productUrl || route("productDetails", "/product-details"));
     }
 
     if (productThumb) {
@@ -1046,6 +1168,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const tabCards = [...document.querySelectorAll(".tab-content-card")];
   if (tabCards.length) {
+    initProductDescriptionSections();
+
     const tabIds = ["description", "benefits", "dosage", "ingredients", "reviews", "faq"];
 
     function getTabCard(id) {

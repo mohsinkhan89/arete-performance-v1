@@ -5024,6 +5024,55 @@ button.is-loading .fa-spinner {
   line-height: 1.75;
 }
 
+.product-detail-summary {
+  max-width: 520px;
+  margin: 0 0 18px;
+  color: #333;
+  font-size: .92rem;
+  line-height: 1.65;
+}
+
+.product-description :is(p, ul, ol),
+.dynamic-rich-content :is(p, ul, ol) {
+  margin: 0 0 14px;
+  color: #222;
+  font-size: .86rem;
+  line-height: 1.75;
+}
+
+.product-description :is(ul, ol),
+.dynamic-rich-content :is(ul, ol) {
+  padding-left: 20px;
+}
+
+.product-description :is(h2, h3, h4),
+.dynamic-rich-content :is(h2, h3, h4) {
+  margin: 0 0 16px;
+  color: #111;
+  font-weight: 900;
+}
+
+.dynamic-rich-content table {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #dedede;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+}
+
+.dynamic-rich-content th,
+.dynamic-rich-content td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e2e2e2;
+  color: #111;
+  font-size: .8rem;
+}
+
+.dynamic-rich-content tr:last-child td {
+  border-bottom: 0;
+}
+
 .product-specs {
   display: grid;
   align-content: start;
