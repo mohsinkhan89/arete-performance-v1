@@ -5160,6 +5160,15 @@ button.is-loading .fa-spinner {
   grid-template-columns: minmax(0, 1.2fr) minmax(260px, .9fr);
 }
 
+.product-info-grid.has-fallback-description.has-no-report {
+  grid-template-columns: 1fr;
+}
+
+.product-info-grid.has-fallback-description .product-description {
+  border-right: 0;
+  padding-right: 0;
+}
+
 /* .product-specs { */
 .product-description {
   border-right: 1px solid #dedede;

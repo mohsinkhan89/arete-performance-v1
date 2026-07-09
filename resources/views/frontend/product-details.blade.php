@@ -9,7 +9,10 @@
   $price = (float) ($product->sale_price ?: $product->price);
   $productImage = url($product->image ?: 'frontend/assets/images/product-bottle.png');
   $reportImage = $product->test_report_image ? url($product->test_report_image) : null;
-  $descriptionHtml = $product->description ?: '<p>' . e($product->short_description ?: 'Product details will be updated soon.') . '</p>';
+  $descriptionText = trim(preg_replace('/\s+/', ' ', str_replace('&nbsp;', ' ', strip_tags($product->description ?? ''))));
+  $hasDescription = $descriptionText !== '';
+  $descriptionHtml = $product->description;
+  $descriptionGridClass = $reportImage ? '' : 'has-no-report';
   $reviewCount = $reviews->count();
   $reviewAverage = $reviewCount ? round((float) $reviews->avg('rating'), 1) : 0;
   $reviewCounts = collect(range(5, 1))->mapWithKeys(fn ($rating) => [$rating => $reviews->where('rating', $rating)->count()]);
@@ -81,6 +84,7 @@
     </div>
   </section>
 
+  @if ($hasDescription)
   <section class="product-info-section">
     <div class="container">
       <div data-product-description-source hidden>{!! $descriptionHtml !!}</div>
@@ -89,7 +93,7 @@
         <nav class="product-tabs" aria-label="Description tab">
           <a class="active" href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
         </nav>
-        <div class="product-info-grid {{ $reportImage ? '' : 'has-no-report' }}">
+        <div class="product-info-grid {{ $descriptionGridClass }}">
           <div class="product-description" data-description-section="description">
             <h2 data-section-title="description"></h2>
           </div>
@@ -183,6 +187,7 @@
       @endif
     </div>
   </section>
+  @endif
 
   @include('frontend.inc.delivery-trusted')
 </div>

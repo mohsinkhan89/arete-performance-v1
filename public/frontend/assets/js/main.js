@@ -433,6 +433,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const source = document.querySelector("[data-product-description-source]");
     if (!source) return;
 
+    if (source.dataset.fallbackDescription === "1") {
+      const availableTabs = document.querySelector('[data-tab-card="reviews"]')?.dataset.serverContent === "1"
+        ? ["description", "reviews"]
+        : ["description"];
+
+      document.querySelectorAll("[data-tab-card]").forEach((card) => {
+        const key = card.dataset.tabCard;
+        card.classList.toggle("is-hidden", !availableTabs.includes(key));
+      });
+
+      document.querySelectorAll(".product-tabs").forEach((nav) => {
+        nav.style.setProperty("--visible-tabs", String(availableTabs.length));
+        nav.querySelectorAll("a").forEach((link) => {
+          const key = link.getAttribute("href")?.replace("#", "");
+          const isVisible = availableTabs.includes(key);
+          link.hidden = !isVisible;
+          link.classList.toggle("is-hidden", !isVisible);
+        });
+      });
+
+      return;
+    }
+
     const targets = {
       description: document.querySelector('[data-description-section="description"]'),
       specs: document.querySelector('[data-description-section="specs"]'),
