@@ -54,9 +54,20 @@
                 <div><span>Post Code</span><strong>{{ $order->zip }}</strong></div>
                 <div><span>Royal Mail ID</span><strong>{{ $order->tracking_number }}</strong></div>
                 <div><span>Tracking</span><strong>{{ $trackingLabels[$order->tracking_status ?? 'placed'] ?? ucfirst($order->tracking_status ?? 'placed') }}</strong></div>
+                <div>
+                    <span>Payment Proof</span>
+                    <strong>
+                        @if ($order->payment_proof)
+                            <a href="{{ url($order->payment_proof) }}" target="_blank" rel="noopener">View uploaded proof</a>
+                        @else
+                            No proof uploaded
+                        @endif
+                    </strong>
+                </div>
                 <div><span>Label</span><strong><a href="{{ $labelUrl }}" target="_blank" rel="noopener">Print shipping label</a></strong></div>
                 <div class="wide"><span>Address</span><strong>{{ $order->address }}@if($order->address_2), {{ $order->address_2 }}@endif, {{ $order->city }}, {{ $order->state }} {{ $order->zip }}, {{ $order->country }}</strong></div>
                 <div class="wide"><span>Notes</span><strong>{{ $order->order_notes ?: '-' }}</strong></div>
+                <div class="wide"><span>Update Payment</span>@include('backend.partials.payment-proof-form', ['order' => $order])</div>
             </div>
         </article>
 

@@ -61,7 +61,7 @@
                                     <td>{{ $order->order_number }}</td>
                                     <td>{{ $order->customer_name }}</td>
                                     <td>&pound;{{ number_format((float) $order->total, 2) }}</td>
-                                    <td><span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
+                                    <td>@include('backend.partials.payment-proof-form', ['order' => $order])</td>
                                     <td>{{ $order->tracking_number ?: 'Pending label' }}</td>
                                     <td>
                                         <div class="action-group">

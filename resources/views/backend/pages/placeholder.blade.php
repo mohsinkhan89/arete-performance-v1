@@ -243,9 +243,7 @@
                                     </td>
                                     <td>{{ $order->items_count }}</td>
                                     <td>£{{ number_format((float) $order->total, 2) }}</td>
-                                    <td>
-                                        <span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span>
-                                    </td>
+                                    <td>@include('backend.partials.payment-proof-form', ['order' => $order])</td>
                                     <td>
                                         <strong>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</strong>
                                         <small class="table-subtext">{{ $order->tracking_number ?: 'Label pending' }}</small>

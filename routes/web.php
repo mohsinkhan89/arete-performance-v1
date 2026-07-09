@@ -46,6 +46,7 @@ Route::prefix('admin')->name('backend.')->middleware('auth')->group(function () 
     Route::get('orders/{order}', [BackendController::class, 'showOrder'])->name('orders.show');
     Route::get('orders/{order}/royal-mail-label', [BackendController::class, 'royalMailLabel'])->name('orders.royal-mail-label');
     Route::patch('orders/{order}', [BackendController::class, 'updateOrder'])->name('orders.update');
+    Route::patch('orders/{order}/payment-proof', [BackendController::class, 'updateOrderPaymentProof'])->name('orders.payment-proof');
     Route::post('settings/site', [BackendController::class, 'updateSiteSettings'])->name('settings.site.update');
     Route::get('{resource}/create', [BackendController::class, 'create'])->name('resource.create');
     Route::post('{resource}', [BackendController::class, 'store'])->name('resource.store');

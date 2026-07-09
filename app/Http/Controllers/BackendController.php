@@ -305,6 +305,39 @@ class BackendController extends Controller
         return back()->with('success', 'Order updated successfully.');
     }
 
+    public function updateOrderPaymentProof(Request $request, Order $order): RedirectResponse
+    {
+        $request->validate([
+            'payment_proof_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+        ]);
+
+        if (! $request->hasFile('payment_proof_file') && ! $order->payment_proof) {
+            return back()
+                ->withErrors(['payment_proof_file' => 'Please upload payment proof before marking this order paid.'])
+                ->withInput();
+        }
+
+        if ($request->hasFile('payment_proof_file')) {
+            $this->deleteUploadedImage($order->payment_proof);
+
+            $file = $request->file('payment_proof_file');
+            $filename = 'payment-proof-' . $order->id . '-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('backend/assets/imgs/uploads'), $filename);
+
+            $paymentData['payment_proof'] = 'backend/assets/imgs/uploads/' . $filename;
+            $paymentData['payment_proof_submitted_at'] = now();
+        } elseif (! $order->payment_proof_submitted_at) {
+            $paymentData['payment_proof_submitted_at'] = now();
+        }
+
+        $order->update([
+            ...($paymentData ?? []),
+            'payment_status' => 'paid',
+        ]);
+
+        return back()->with('success', 'Payment proof saved and order marked paid.');
+    }
+
     public function editProfile(): View
     {
         return view('backend.profile', [
