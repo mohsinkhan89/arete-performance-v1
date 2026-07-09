@@ -328,26 +328,182 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const targets = {
       description: document.querySelector('[data-description-section="description"]'),
+      specs: document.querySelector('[data-description-section="specs"]'),
+      assurance: document.querySelector('[data-description-section="assurance"]'),
       benefits: document.querySelector('[data-description-section="benefits"]'),
       dosage: document.querySelector('[data-description-section="dosage"]'),
+      dosageSteps: document.querySelector('[data-description-section="dosage-steps"]'),
+      dosageNote: document.querySelector('[data-description-section="dosage-note"]'),
       ingredients: document.querySelector('[data-description-section="ingredients"]'),
+      ingredientCards: document.querySelector('[data-description-section="ingredient-cards"]'),
       faq: document.querySelector('[data-description-section="faq"]'),
     };
 
-    const buckets = Object.fromEntries(Object.keys(targets).map((key) => [key, []]));
+    const tabOrder = ["description", "benefits", "dosage", "ingredients", "reviews", "faq"];
+    const sectionTitles = {};
+    const buckets = Object.fromEntries(["description", "benefits", "dosage", "ingredients", "faq"].map((key) => [key, []]));
     const sectionFromHeading = (text) => {
       const value = String(text || "").toLowerCase();
-      if (value.includes("benefit")) return "benefits";
-      if (value.includes("dosage") || value.includes("dose") || value.includes("usage")) return "dosage";
-      if (value.includes("ingredient")) return "ingredients";
-      if (value.includes("faq") || value.includes("question")) return "faq";
+      if (value.includes("key benefit") || value.includes("benefit")) return "benefits";
+      if (value.includes("recommended dosage") || value.includes("recommanded dosage") || value.includes("dosage") || value.includes("dose") || value.includes("usage")) return "dosage";
+      if (value.includes("ingredient") || value.includes("composition")) return "ingredients";
+      if (value.includes("faq") || value.includes("faqs") || value.includes("question")) return "faq";
       if (value.includes("description") || value.includes("about")) return "description";
       return null;
+    };
+
+    const iconForText = (text, fallback = "fa-circle-check") => {
+      const value = String(text || "").toLowerCase();
+      const matches = [
+        [["muscle", "growth", "strength", "power"], "fa-dumbbell"],
+        [["recover", "recovery", "fatigue"], "fa-bolt"],
+        [["performance", "endurance", "athletic"], "fa-person-running"],
+        [["lean", "weight", "cut", "fat"], "fa-weight-hanging"],
+        [["dose", "dosage", "tablet", "capsule", "mg"], "fa-prescription-bottle-medical"],
+        [["week", "cycle", "phase", "routine"], "fa-calendar-days"],
+        [["target", "goal", "result", "progress"], "fa-bullseye"],
+        [["ingredient", "pure", "leaf", "natural"], "fa-leaf"],
+        [["lab", "tested", "verified", "report"], "fa-flask-vial"],
+        [["safe", "quality", "trusted", "premium"], "fa-shield-halved"],
+      ];
+      return matches.find(([words]) => words.some((word) => value.includes(word)))?.[1] || fallback;
+    };
+
+    const cleanText = (value) => String(value || "").replace(/\s+/g, " ").trim();
+
+    const sectionMarkerSelector = "strong, b, h2, h3, h4";
+    const isSectionMarker = (node) => sectionFromHeading(cleanText(node?.textContent));
+    const hasSectionMarkers = (node) => [...(node.querySelectorAll?.(sectionMarkerSelector) || [])].some(isSectionMarker);
+
+    const itemFromNode = (node, fallbackTitle = "Detail") => {
+      const clone = node.cloneNode(true);
+      const titleNode = clone.querySelector?.("strong, b, h3, h4");
+      let title = cleanText(titleNode?.textContent);
+
+      if (titleNode) titleNode.remove();
+
+      let copy = cleanText(clone.textContent);
+      if (!title) {
+        const text = cleanText(node.textContent);
+        const split = text.match(/^([^:.-]{3,70})[:.-]\s*(.+)$/);
+        title = cleanText(split?.[1]) || fallbackTitle;
+        copy = cleanText(split?.[2]) || text;
+      }
+
+      if (copy === title) copy = cleanText(node.textContent);
+
+      return { title, copy, original: node };
+    };
+
+    const textUntilNextTitle = (marker) => {
+      const parts = [];
+      let sibling = marker.nextSibling;
+
+      while (sibling) {
+        if (sibling.nodeType === Node.ELEMENT_NODE && sibling.matches(sectionMarkerSelector)) break;
+        parts.push(sibling.textContent || "");
+        sibling = sibling.nextSibling;
+      }
+
+      return cleanText(parts.join(" "));
+    };
+
+    const collectContentItems = (nodes, fallbackTitle) => {
+      const wrapper = document.createElement("div");
+      nodes.forEach((node) => wrapper.appendChild(node.cloneNode(true)));
+
+      const listItems = [...wrapper.querySelectorAll("li")];
+      if (listItems.length) return listItems.map((item) => itemFromNode(item, fallbackTitle));
+
+      const inlineTitles = [...wrapper.querySelectorAll("strong, b")]
+        .filter((title) => !isSectionMarker(title) && !title.closest("table"));
+
+      if (inlineTitles.length) {
+        return inlineTitles.map((title) => {
+          const parentCopy = textUntilNextTitle(title) || cleanText(title.parentElement?.textContent).replace(cleanText(title.textContent), "");
+          return {
+            title: cleanText(title.textContent) || fallbackTitle,
+            copy: cleanText(parentCopy),
+            original: title,
+          };
+        }).filter((item) => item.title || item.copy);
+      }
+
+      const items = [];
+      const children = [...wrapper.children];
+      for (let index = 0; index < children.length; index += 1) {
+        const child = children[index];
+        if (/^H[3-6]$/.test(child.tagName) && children[index + 1]?.tagName === "P") {
+          items.push({
+            title: cleanText(child.textContent) || fallbackTitle,
+            copy: cleanText(children[index + 1].textContent),
+            original: child,
+          });
+          index += 1;
+          continue;
+        }
+
+        if (child.tagName === "P" || child.tagName === "DIV") {
+          items.push(itemFromNode(child, fallbackTitle));
+        }
+      }
+
+      return items;
     };
 
     const looksLikeSpecBlock = (node) => {
       const text = node.textContent?.toLowerCase() || "";
       return text.includes("product name") && text.includes("sku");
+    };
+
+    const updateSpecs = (node) => {
+      if (!targets.specs || !node) return;
+
+      const rows = [];
+      node.querySelectorAll("dt").forEach((term) => {
+        const value = term.nextElementSibling?.matches("dd") ? term.nextElementSibling : null;
+        if (value) rows.push([cleanText(term.textContent), cleanText(value.textContent)]);
+      });
+
+      node.querySelectorAll("tr").forEach((row) => {
+        const cells = [...row.children].map((cell) => cleanText(cell.textContent)).filter(Boolean);
+        if (cells.length >= 2) rows.push([cells[0], cells.slice(1).join(" ")]);
+      });
+
+      if (!rows.length) {
+        const lines = cleanText(node.textContent)
+          .split(/(?=(?:Product Name|Generic Name|Strength|Form|Quantity|Category|Brand|SKU|Price|Stock)\s*:)/i)
+          .map((line) => line.trim())
+          .filter(Boolean);
+
+        lines.forEach((line) => {
+          const match = line.match(/^([^:]+):\s*(.+)$/);
+          if (match) rows.push([cleanText(match[1]) + ":", cleanText(match[2])]);
+        });
+      }
+
+      if (!rows.length) return;
+
+      targets.specs.innerHTML = "";
+      rows.forEach(([label, value]) => {
+        const item = document.createElement("div");
+        const dt = document.createElement("dt");
+        const dd = document.createElement("dd");
+        dt.textContent = label.endsWith(":") ? label : `${label}:`;
+        dd.textContent = value;
+        item.append(dt, dd);
+        targets.specs.appendChild(item);
+      });
+    };
+
+    const pullSpecsFromDescription = () => {
+      if (!targets.description) return;
+
+      targets.description.querySelectorAll("dl, table, p, div").forEach((node) => {
+        if (!looksLikeSpecBlock(node)) return;
+        updateSpecs(node);
+        node.remove();
+      });
     };
 
     const moveAfter = (node, target) => {
@@ -379,69 +535,354 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const buildBenefitCards = (nodes) => {
-      const wrapper = document.createElement("div");
-      nodes.forEach((node) => wrapper.appendChild(node.cloneNode(true)));
-      const listItems = [...wrapper.querySelectorAll("li")];
-      if (!listItems.length) return nodes;
+      const items = collectContentItems(nodes, "Benefit");
+      if (!items.length) return nodes;
 
-      return listItems.map((item) => {
+      return items.map((item) => {
         const card = document.createElement("div");
         const title = document.createElement("strong");
         const copy = document.createElement("span");
         const icon = document.createElement("i");
-        icon.className = "fa-solid fa-dumbbell";
-        title.textContent = item.querySelector("strong, b")?.textContent?.trim() || item.textContent.trim().split(/[.:-]/)[0] || "Benefit";
-        copy.textContent = item.textContent.trim();
+        icon.className = `fa-solid ${iconForText(`${item.title} ${item.copy}`, "fa-dumbbell")}`;
+        title.textContent = item.title;
+        copy.textContent = item.copy;
         card.append(icon, title, copy);
         return card;
+      });
+    };
+
+    const buildIconCards = (items, fallbackIcon = "fa-circle-check") => items.map((item) => {
+      const card = document.createElement("div");
+      const icon = document.createElement("i");
+      const title = document.createElement("strong");
+      const copy = document.createElement("span");
+      icon.className = `fa-solid ${iconForText(`${item.title} ${item.copy}`, fallbackIcon)}`;
+      title.textContent = item.title;
+      copy.textContent = item.copy;
+      card.append(icon, title, copy);
+      return card;
+    });
+
+    const appendHtmlToBucket = (html, bucketKey) => {
+      if (!bucketKey || !buckets[bucketKey] || !cleanText(html.replace(/<[^>]*>/g, " "))) return;
+      const holder = document.createElement("div");
+      holder.innerHTML = html.trim();
+      const children = [...holder.childNodes].filter((child) => cleanText(child.textContent));
+
+      if (!children.length) return;
+      children.forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          const paragraph = document.createElement("p");
+          paragraph.textContent = cleanText(child.textContent);
+          buckets[bucketKey].push(paragraph);
+          return;
+        }
+
+        buckets[bucketKey].push(child.cloneNode(true));
+      });
+    };
+
+    const splitInlineSections = (node, initialSection) => {
+      if (node.matches?.("table")) return false;
+
+      const clone = node.cloneNode(true);
+      const markers = [...clone.querySelectorAll(sectionMarkerSelector)]
+        .map((marker) => ({ marker, section: isSectionMarker(marker) }))
+        .filter((entry) => entry.section);
+
+      if (!markers.length) return false;
+
+      let markedHtml = clone.innerHTML;
+      markers.forEach(({ marker, section }) => {
+        sectionTitles[section] = sectionTitles[section] || cleanText(marker.textContent);
+        markedHtml = markedHtml.replace(marker.outerHTML, `<!--PRODUCT_SECTION:${section}-->`);
+      });
+
+      let activeSection = initialSection;
+      markedHtml.split(/<!--PRODUCT_SECTION:(description|benefits|dosage|ingredients|faq)-->/).forEach((part, index) => {
+        if (!part) return;
+        if (index % 2 === 1) {
+          activeSection = part;
+          return;
+        }
+
+        appendHtmlToBucket(part, activeSection);
+      });
+
+      return true;
+    };
+
+    const buildDosageCards = (nodes) => {
+      const items = collectContentItems(nodes, "Step");
+      if (!items.length) return [];
+
+      return items.slice(0, 4).map((item, index) => {
+        const card = document.createElement("div");
+        const icon = document.createElement("i");
+        const title = document.createElement("strong");
+        const label = document.createElement("span");
+        const copy = document.createElement("small");
+        const splitCopy = cleanText(item.copy).match(/^([^.:–-]{3,60})[.:–-]\s*(.+)$/);
+        icon.className = `fa-solid ${iconForText(`${item.title} ${item.copy}`, index === 0 ? "fa-flask-vial" : "fa-chart-line")}`;
+        title.textContent = item.title || `Step ${index + 1}`;
+        label.textContent = cleanText(splitCopy?.[1]) || item.title;
+        copy.textContent = cleanText(splitCopy?.[2]) || item.copy || item.title;
+        card.append(icon, title, label, copy);
+        return card;
+      });
+    };
+
+    const buildDosageNote = (nodes) => {
+      const noteNode = nodes.find((node) => /^note\b/i.test(cleanText(node.textContent)));
+      if (!noteNode) return false;
+
+      const text = cleanText(noteNode.textContent).replace(/^note\s*:?\s*/i, "");
+      if (!text || !targets.dosageNote) return false;
+
+      const icon = document.createElement("i");
+      const paragraph = document.createElement("p");
+      const title = document.createElement("strong");
+      icon.className = "fa-solid fa-info";
+      title.textContent = "Note:";
+      paragraph.append(title, document.createTextNode(` ${text}`));
+      targets.dosageNote.innerHTML = "";
+      targets.dosageNote.append(icon, paragraph);
+      return true;
+    };
+
+    const buildIngredientCards = (nodes) => {
+      const wrapper = document.createElement("div");
+      nodes.forEach((node) => wrapper.appendChild(node.cloneNode(true)));
+
+      const listItems = [...wrapper.querySelectorAll("li")];
+      const inlineTitles = [...wrapper.querySelectorAll("strong, b")]
+        .filter((title) => !isSectionMarker(title) && !title.closest("table"));
+      const items = listItems.length
+        ? listItems.map((item) => itemFromNode(item, "Ingredient"))
+        : inlineTitles.map((title) => ({
+            title: cleanText(title.textContent) || "Ingredient",
+            copy: textUntilNextTitle(title),
+            original: title,
+          }));
+
+      if (!items.length) return [];
+
+      return items.slice(0, 3).map((item) => {
+        const card = document.createElement("div");
+        const icon = document.createElement("i");
+        const title = document.createElement("strong");
+        const copy = document.createElement("span");
+        icon.className = `fa-solid ${iconForText(`${item.title} ${item.copy}`, "fa-leaf")}`;
+        title.textContent = item.title;
+        copy.textContent = item.copy;
+        card.append(icon, title, copy);
+        return card;
+      });
+    };
+
+    const formatIngredientTables = () => {
+      targets.ingredients?.querySelectorAll("table").forEach((table) => {
+        table.classList.add("ingredient-table");
+        const firstRow = table.querySelector("tr");
+        const firstCells = firstRow ? [...firstRow.children] : [];
+
+        if (firstCells.length && !firstCells.some((cell) => cell.tagName === "TH")) {
+          const rowText = cleanText(firstRow.textContent).toLowerCase();
+          if (rowText.includes("ingredient") || rowText.includes("amount")) {
+            firstCells.forEach((cell) => {
+              const th = document.createElement("th");
+              th.innerHTML = cell.innerHTML;
+              cell.replaceWith(th);
+            });
+          }
+        }
+
+        table.querySelectorAll("tr").forEach((row) => {
+          if (cleanText(row.firstElementChild?.textContent).toLowerCase() === "total") {
+            row.classList.add("ingredient-total-row");
+          }
+        });
+      });
+    };
+
+    const removeCardItemsFromContent = (target, sourceItems) => {
+      if (!target || !sourceItems.length) return;
+      target.querySelectorAll("ul, ol").forEach((list) => list.remove());
+
+      sourceItems.forEach((item) => {
+        const title = cleanText(item.title);
+        if (!title) return;
+
+        target.querySelectorAll("p, div").forEach((node) => {
+          const strong = node.querySelector?.("strong, b");
+          if (strong && cleanText(strong.textContent) === title && !node.querySelector("table")) {
+            node.remove();
+          }
+        });
+      });
+    };
+
+    const removeMatchingTextNodes = (target, matcher) => {
+      if (!target) return;
+      target.querySelectorAll("p, div").forEach((node) => {
+        if (!node.querySelector("table") && matcher(cleanText(node.textContent))) node.remove();
+      });
+    };
+
+    const hasSectionData = (key) => {
+      if (key === "description") return Boolean(buckets.description.length || targets.specs?.children.length);
+      if (key === "reviews") return document.querySelector('[data-tab-card="reviews"]')?.dataset.serverContent === "1";
+      return Boolean(buckets[key]?.length);
+    };
+
+    const refreshVisibleTabs = () => {
+      const availableTabs = tabOrder.filter(hasSectionData);
+      document.querySelectorAll("[data-tab-card]").forEach((card) => {
+        const key = card.dataset.tabCard;
+        card.classList.toggle("is-hidden", !availableTabs.includes(key));
+      });
+
+      document.querySelectorAll(".product-tabs").forEach((nav) => {
+        nav.style.setProperty("--visible-tabs", String(availableTabs.length || 1));
+        nav.querySelectorAll("a").forEach((link) => {
+          const key = link.getAttribute("href")?.replace("#", "");
+          const isVisible = availableTabs.includes(key);
+          link.hidden = !isVisible;
+          link.classList.toggle("is-hidden", !isVisible);
+        });
+
+        const visibleLinks = [...nav.querySelectorAll("a")].filter((link) => !link.hidden);
+        if (!visibleLinks.some((link) => link.classList.contains("active")) && visibleLinks[0]) {
+          visibleLinks[0].classList.add("active");
+        }
       });
     };
 
     const buildFaqItems = (nodes) => {
       const wrapper = document.createElement("div");
       nodes.forEach((node) => wrapper.appendChild(node.cloneNode(true)));
-      const listItems = [...wrapper.querySelectorAll("li")];
-      if (!listItems.length) return nodes;
+      const detailsItems = [...wrapper.querySelectorAll("details")];
+      if (detailsItems.length) return detailsItems;
 
-      return listItems.map((item, index) => {
+      const listItems = [...wrapper.querySelectorAll("li")];
+      const paragraphItems = [...wrapper.querySelectorAll("p")];
+      const sourceItems = listItems.length ? listItems : paragraphItems;
+      if (!sourceItems.length) return nodes;
+
+      return sourceItems.map((item, index) => {
         const details = document.createElement("details");
         if (index === 0) details.open = true;
         const summary = document.createElement("summary");
         const paragraph = document.createElement("p");
-        const text = item.textContent.trim();
+        const text = cleanText(item.textContent);
+        const titleNode = item.querySelector?.("strong, b");
         const parts = text.split("?");
-        summary.textContent = parts.length > 1 ? `${parts.shift()}?` : `Question ${index + 1}`;
-        paragraph.textContent = parts.join("?").trim() || text;
+        summary.textContent = cleanText(titleNode?.textContent) || (parts.length > 1 ? `${parts.shift()}?` : `Question ${index + 1}`);
+        paragraph.textContent = cleanText(parts.join("?")) || text.replace(summary.textContent, "").trim() || text;
         details.append(summary, paragraph);
         return details;
       });
+    };
+
+    const updateSectionTitles = () => {
+      document.querySelectorAll("[data-section-title]").forEach((title) => {
+        const key = title.dataset.sectionTitle;
+        const value = sectionTitles[key] || "";
+        title.textContent = value;
+        title.hidden = !value;
+      });
+    };
+
+    const updateAssuranceCards = () => {
+      if (!targets.assurance) return;
+
+      const sourceItems = collectContentItems(buckets.description, "Feature")
+        .filter((item) => /stock|shipping|delivery|lab|test|certified|quality|support|secure|worldwide/i.test(`${item.title} ${item.copy}`));
+
+      if (!sourceItems.length) {
+        targets.assurance.hidden = true;
+        return;
+      }
+
+      targets.assurance.innerHTML = "";
+      buildIconCards(sourceItems.slice(0, 4), "fa-shield-halved").forEach((node) => targets.assurance.appendChild(node));
+      targets.assurance.hidden = false;
+      removeCardItemsFromContent(targets.description, sourceItems);
     };
 
     normalizeSource();
 
     let current = "description";
     [...source.children].forEach((node) => {
-      if (looksLikeSpecBlock(node)) return;
+      if (looksLikeSpecBlock(node) && !hasSectionMarkers(node)) {
+        updateSpecs(node);
+        return;
+      }
+
+      if (node.matches?.("table") && /ingredient|amount per tablet|composition/i.test(node.textContent || "")) {
+        current = "ingredients";
+        buckets.ingredients.push(node.cloneNode(true));
+        return;
+      }
 
       const headingSection = /^H[1-6]$/.test(node.tagName) ? sectionFromHeading(node.textContent) : null;
       if (headingSection) {
         current = headingSection;
+        sectionTitles[current] = cleanText(node.textContent);
         return;
       }
+
+      if (splitInlineSections(node, current)) return;
 
       buckets[current].push(node.cloneNode(true));
     });
 
-    Object.entries(targets).forEach(([key, target]) => {
+    Object.entries({
+      description: targets.description,
+      benefits: targets.benefits,
+      dosage: targets.dosage,
+      ingredients: targets.ingredients,
+      faq: targets.faq,
+    }).forEach(([key, target]) => {
       if (!target || !buckets[key].length) return;
 
-      const heading = target.querySelector("h2");
+      const titleNode = target.querySelector("[data-section-title]");
       target.innerHTML = "";
-      if (heading && key === "description") target.appendChild(heading);
+      if (titleNode) target.appendChild(titleNode);
 
       const nodes = key === "benefits" ? buildBenefitCards(buckets[key]) : key === "faq" ? buildFaqItems(buckets[key]) : buckets[key];
       nodes.forEach((node) => target.appendChild(node));
     });
+
+    pullSpecsFromDescription();
+    updateSectionTitles();
+    updateAssuranceCards();
+
+    const dosageItems = collectContentItems(buckets.dosage, "Step");
+    const dosageCards = buildDosageCards(buckets.dosage);
+    if (targets.dosageSteps && dosageCards.length) {
+      targets.dosageSteps.innerHTML = "";
+      dosageCards.forEach((node) => targets.dosageSteps.appendChild(node));
+      removeCardItemsFromContent(targets.dosage, dosageItems);
+    }
+    if (!buildDosageNote(buckets.dosage) && targets.dosageNote) targets.dosageNote.hidden = true;
+    removeMatchingTextNodes(targets.dosage, (text) => /^note\b/i.test(text));
+
+    const ingredientItems = collectContentItems(buckets.ingredients, "Ingredient");
+    const ingredientCards = buildIngredientCards(buckets.ingredients);
+    if (targets.ingredientCards && ingredientCards.length) {
+      targets.ingredientCards.innerHTML = "";
+      ingredientCards.forEach((node) => targets.ingredientCards.appendChild(node));
+      removeCardItemsFromContent(targets.ingredients, ingredientItems);
+    }
+    if (targets.ingredientCards && !ingredientCards.length) targets.ingredientCards.hidden = true;
+    if (targets.dosageSteps && !dosageCards.length) targets.dosageSteps.hidden = true;
+    if (targets.specs && !targets.specs.children.length) targets.specs.hidden = true;
+    targets.dosageSteps?.closest(".dosage-tab-grid")?.classList.toggle("is-single-column", !dosageCards.length);
+    targets.ingredientCards?.closest(".ingredients-tab-grid")?.classList.toggle("is-single-column", !ingredientCards.length);
+
+    formatIngredientTables();
+    refreshVisibleTabs();
   }
 
   function syncBodyLock() {

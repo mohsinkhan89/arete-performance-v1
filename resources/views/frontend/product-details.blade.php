@@ -10,6 +10,9 @@
   $productImage = url($product->image ?: 'frontend/assets/images/product-bottle.png');
   $reportImage = $product->test_report_image ? url($product->test_report_image) : null;
   $descriptionHtml = $product->description ?: '<p>' . e($product->short_description ?: 'Product details will be updated soon.') . '</p>';
+  $reviewCount = $reviews->count();
+  $reviewAverage = $reviewCount ? round((float) $reviews->avg('rating'), 1) : 0;
+  $reviewCounts = collect(range(5, 1))->mapWithKeys(fn ($rating) => [$rating => $reviews->where('rating', $rating)->count()]);
 @endphp
 
 <div class="product-detail-main">
@@ -83,103 +86,84 @@
     <div class="container">
       <div data-product-description-source hidden>{!! $descriptionHtml !!}</div>
 
-      <article class="product-info-card tab-content-card">
+      <article class="product-info-card tab-content-card" id="description" data-tab-card="description">
         <nav class="product-tabs" aria-label="Description tab">
           <a class="active" href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
         </nav>
-        <div class="product-info-grid" id="description">
+        <div class="product-info-grid {{ $reportImage ? '' : 'has-no-report' }}">
           <div class="product-description" data-description-section="description">
-            <h2>About {{ $product->name }}</h2>
-            <p>{{ $product->short_description ?: 'Product information is being prepared.' }}</p>
+            <h2 data-section-title="description"></h2>
           </div>
-          <dl class="product-specs">
-            <div><dt>Product Name:</dt><dd>{{ $product->name }}</dd></div>
-            <div><dt>Category:</dt><dd>{{ $product->category?->name ?? 'Product' }}</dd></div>
-            <div><dt>SKU:</dt><dd>{{ $product->sku }}</dd></div>
-            <div><dt>Price:</dt><dd>&pound;{{ number_format($price, 2) }}</dd></div>
-            <div><dt>Stock:</dt><dd>{{ $product->stock }}</dd></div>
-            <div><dt>Brand:</dt><dd>Arete Performance</dd></div>
-          </dl>
-          <aside class="lab-report" data-product-report="{{ $reportImage }}" data-product-report-title="{{ $product->name }} test report">
-            <h3>Lab Tested &amp; Certified</h3>
-            <div class="report-preview"><img src="{{ $reportImage ?: url('frontend/assets/images/logo/logo-transperent.png') }}" alt="{{ $product->name }} test report"></div>
-            <button type="button" data-lab-report>{{ $reportImage ? 'View full report' : 'Report coming soon' }} <i class="fa-solid fa-download"></i></button>
-          </aside>
+          <dl class="product-specs" data-description-section="specs"></dl>
+          @if ($reportImage)
+            <aside class="lab-report" data-product-report="{{ $reportImage }}" data-product-report-title="{{ $product->name }} test report">
+              <h3>Lab Tested &amp; Certified</h3>
+              <div class="report-preview"><img src="{{ $reportImage }}" alt="{{ $product->name }} test report"></div>
+              <button type="button" data-lab-report>View full report <i class="fa-solid fa-download"></i></button>
+            </aside>
+          @endif
         </div>
-        <div class="description-assurance">
-          <div><i class="fa-solid fa-shield-halved"></i><strong>In Stock</strong><span>Order now for fast delivery</span></div>
-          <div><i class="fa-solid fa-flask-vial"></i><strong>Lab Tested</strong><span>Quality checked product</span></div>
-          <div><i class="fa-solid fa-truck-fast"></i><strong>Discreet Shipping</strong><span>Private &amp; secure delivery</span></div>
-          <div><i class="fa-solid fa-globe"></i><strong>Worldwide Delivery</strong><span>Supported regions available</span></div>
-        </div>
+        <div class="description-assurance" data-description-section="assurance"></div>
       </article>
 
-      <article class="product-info-card tab-content-card" id="benefits">
+      <article class="product-info-card tab-content-card" id="benefits" data-tab-card="benefits">
         <nav class="product-tabs" aria-label="Benefits tab">
           <a href="#description">Description</a><a class="active" href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
         </nav>
         <div class="benefits-tab-grid">
-          <div><h2>Key Benefits</h2><div class="benefit-list dynamic-rich-content" data-description-section="benefits"></div></div>
+          <div><h2 data-section-title="benefits"></h2><div class="benefit-list dynamic-rich-content" data-description-section="benefits"></div></div>
           <figure class="benefits-product-shot"><img src="{{ $productImage }}" alt="{{ $product->name }}"></figure>
         </div>
       </article>
 
-      <article class="product-info-card tab-content-card" id="dosage">
+      <article class="product-info-card tab-content-card" id="dosage" data-tab-card="dosage">
         <nav class="product-tabs" aria-label="Dosage tab">
           <a href="#description">Description</a><a href="#benefits">Benefits</a><a class="active" href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
         </nav>
         <div class="dosage-tab-grid">
-          <div class="dosage-copy"><h2>Recommended Dosage</h2><div class="dynamic-rich-content" data-description-section="dosage"><p>Dosage guidance will be updated soon.</p></div></div>
-          <div class="dosage-steps">
-            <div><i class="fa-solid fa-flask-vial"></i><strong>Step 1</strong><span>Read Label</span><small>Review instructions before use.</small></div>
-            <div><i class="fa-solid fa-chart-line"></i><strong>Step 2</strong><span>Stay Consistent</span><small>Follow a steady routine.</small></div>
-            <div><i class="fa-solid fa-bullseye"></i><strong>Step 3</strong><span>Track Progress</span><small>Monitor performance and recovery.</small></div>
-            <div><i class="fa-solid fa-rotate"></i><strong>Step 4</strong><span>Review Cycle</span><small>Adjust only with proper guidance.</small></div>
-          </div>
+          <div class="dosage-copy"><h2 data-section-title="dosage"></h2><div class="dynamic-rich-content" data-description-section="dosage"></div></div>
+          <div class="dosage-steps" data-description-section="dosage-steps"></div>
         </div>
-        <div class="dosage-note"><i class="fa-solid fa-info"></i><p><strong>Note:</strong> Do not exceed the recommended dosage. Consult a qualified professional before use.</p></div>
+        <div class="dosage-note" data-description-section="dosage-note"></div>
       </article>
 
-      <article class="product-info-card tab-content-card" id="ingredients">
+      <article class="product-info-card tab-content-card" id="ingredients" data-tab-card="ingredients">
         <nav class="product-tabs" aria-label="Ingredients tab">
           <a href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a class="active" href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
         </nav>
         <div class="ingredients-tab-grid">
-          <div><h2>Ingredients</h2><div class="dynamic-rich-content" data-description-section="ingredients"><p>Ingredient information will be updated soon.</p></div></div>
-          <aside class="ingredient-certifications">
-            <div><i class="fa-solid fa-leaf"></i><strong>Premium Selection</strong><span>Quality-focused product sourcing.</span></div>
-            <div><i class="fa-solid fa-flask-vial"></i><strong>Lab Verified</strong><span>{{ $reportImage ? 'Test report available.' : 'Testing information coming soon.' }}</span></div>
-            <div><i class="fa-solid fa-shield-halved"></i><strong>Trusted Quality</strong><span>Managed by Arete Performance.</span></div>
-          </aside>
+          <div><h2 data-section-title="ingredients"></h2><div class="dynamic-rich-content" data-description-section="ingredients"></div></div>
+          <aside class="ingredient-certifications" data-description-section="ingredient-cards"></aside>
         </div>
       </article>
 
-      <article class="product-info-card tab-content-card" id="reviews">
+      <article class="product-info-card tab-content-card" id="reviews" data-tab-card="reviews" data-server-content="{{ $reviews->isNotEmpty() ? '1' : '0' }}">
         <nav class="product-tabs" aria-label="Reviews tab">
           <a href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a class="active" href="#reviews">Reviews</a><a href="#faq">FAQ</a>
         </nav>
         <div class="reviews-tab-content">
           <h2>Customer Reviews</h2>
           <div class="reviews-grid">
-            <div class="review-score"><strong>4.9</strong><span>&#9733;&#9733;&#9733;&#9733;&#9733;</span><small>Customer feedback</small></div>
-            <div class="review-bars"><div><span>5</span><b><i style="width: 88%"></i></b><em>Top</em></div><div><span>4</span><b><i style="width: 18%"></i></b><em>Good</em></div><div><span>3</span><b><i style="width: 8%"></i></b><em>Ok</em></div></div>
-            @forelse ($reviews as $review)
+            <div class="review-score"><strong>{{ number_format($reviewAverage, 1) }}</strong><span>{!! str_repeat('&#9733;', (int) round($reviewAverage)) !!}</span><small>{{ $reviewCount }} reviews</small></div>
+            <div class="review-bars">
+              @foreach ($reviewCounts as $rating => $count)
+                <div><span>{{ $rating }}</span><b><i style="width: {{ $reviewCount ? round(($count / $reviewCount) * 100) : 0 }}%"></i></b><em>{{ $count }}</em></div>
+              @endforeach
+            </div>
+            @foreach ($reviews as $review)
               <article class="review-card"><span>{!! str_repeat('&#9733;', (int) $review->rating) !!}</span><p>"{{ $review->comment }}"</p><div><img src="{{ url($review->avatar ?: 'frontend/assets/images/testimonials/miker.png') }}" alt="{{ $review->customer_name }}"><strong>{{ $review->customer_name }}<small>{{ $review->customer_title ?: 'Verified Buyer' }}</small></strong></div></article>
-            @empty
-              <article class="review-card"><span>&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>"Premium product quality and fast service."</p><div><img src="{{ url('frontend/assets/images/testimonials/miker.png') }}" alt="Customer"><strong>Arete Customer<small>Verified Buyer</small></strong></div></article>
-            @endforelse
+            @endforeach
           </div>
           <div class="review-dots" aria-hidden="true"><span class="active"></span><span></span><span></span></div>
         </div>
       </article>
 
-      <article class="product-info-card tab-content-card" id="faq">
+      <article class="product-info-card tab-content-card" id="faq" data-tab-card="faq">
         <nav class="product-tabs" aria-label="FAQ tab">
           <a href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a class="active" href="#faq">FAQ</a>
         </nav>
         <div class="faq-tab-grid">
-          <div><h2>Frequently Asked Questions</h2><div class="faq-list" data-description-section="faq"><details open><summary>How do I use this product?</summary><p>Review the product description and dosage guidance, then consult a qualified professional before use.</p></details></div></div>
-          <aside class="faq-support"><i class="fa-solid fa-headset"></i><h3>Still Have Questions?</h3><p>Our support team is here to help you.</p><a class="btn buy-now-btn" href="{{ route('frontend.index') }}#contact">Contact support</a></aside>
+          <div><h2 data-section-title="faq"></h2><div class="faq-list" data-description-section="faq"></div></div>
         </div>
       </article>
 
