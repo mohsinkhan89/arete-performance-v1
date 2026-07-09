@@ -5686,7 +5686,7 @@ button.is-loading .fa-spinner {
 
 .ingredients-tab-grid {
   grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
-  align-items: start;
+  align-items: center;
 }
 
 .dosage-tab-grid.is-single-column,

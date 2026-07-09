@@ -464,30 +464,14 @@ document.addEventListener("DOMContentLoaded", () => {
       holder.innerHTML = source.innerHTML;
       holder.querySelectorAll(".product-tabs").forEach((sourceNav) => sourceNav.remove());
 
-      [...holder.children].forEach((child) => descriptionCard.appendChild(child.cloneNode(true)));
-
-      const hasReviews = document.querySelector('[data-tab-card="reviews"]')?.dataset.serverContent === "1";
-      const availableTabs = hasReviews ? ["description", "reviews"] : ["description"];
-
-      document.querySelectorAll("[data-tab-card]").forEach((card) => {
-        const key = card.dataset.tabCard;
-        card.classList.toggle("is-hidden", !availableTabs.includes(key));
-      });
-
-      document.querySelectorAll(".product-tabs").forEach((tabNav) => {
-        tabNav.style.setProperty("--visible-tabs", String(availableTabs.length));
-        tabNav.querySelectorAll("a").forEach((link) => {
-          const key = link.getAttribute("href")?.replace("#", "");
-          const isVisible = availableTabs.includes(key);
-          link.hidden = !isVisible;
-          link.classList.toggle("is-hidden", !isVisible);
-        });
+      holder.querySelectorAll(":scope > .product-info-grid, :scope > .description-assurance").forEach((child) => {
+        descriptionCard.appendChild(child.cloneNode(true));
       });
 
       return true;
     };
 
-    if (renderExactDescriptionLayout()) return;
+    const hasExactDescriptionLayout = renderExactDescriptionLayout();
 
     const sectionFromHeading = (text) => {
       const value = String(text || "").toLowerCase();
@@ -514,7 +498,8 @@ document.addEventListener("DOMContentLoaded", () => {
         [["new arrivals", "new arrival"], "fa-box-open"],
         [["top rated", "rated", "review", "reviews"], "fa-star"],
         [["featured", "recommended", "highly recommended"], "fa-medal"],
-        [["muscle", "growth", "strength", "power"], "fa-dumbbell"],
+        [["increased strength", "strength", "power output"], "fa-weight-hanging"],
+        [["lean muscle", "muscle growth", "muscle", "growth"], "fa-dumbbell"],
         [["recover", "recovery", "fatigue"], "fa-bolt"],
         [["performance", "endurance", "athletic"], "fa-person-running"],
         [["lean", "weight", "cut", "fat"], "fa-weight-hanging"],
@@ -709,6 +694,40 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     };
 
+    const benefitItemsFromRenderedContent = (target) => {
+      if (!target || target.querySelector(":scope > div > i")) return [];
+
+      const items = [];
+      const titleNodes = [...target.querySelectorAll("h3, h4, strong, b")]
+        .filter((node) => !node.closest("figure, table") && !isSectionMarker(node));
+
+      titleNodes.forEach((titleNode) => {
+        const title = cleanText(titleNode.textContent);
+        if (!title) return;
+
+        let sibling = titleNode.nextElementSibling;
+        while (sibling && !cleanText(sibling.textContent)) sibling = sibling.nextElementSibling;
+
+        const copy = sibling && !sibling.matches("h3, h4, strong, b")
+          ? cleanText(sibling.textContent)
+          : textUntilNextTitle(titleNode);
+
+        items.push({ title, copy, original: titleNode });
+      });
+
+      return items.filter((item) => item.title || item.copy);
+    };
+
+    const ensureBenefitIconRows = () => {
+      if (!targets.benefits) return;
+
+      const items = benefitItemsFromRenderedContent(targets.benefits);
+      if (!items.length) return;
+
+      targets.benefits.innerHTML = "";
+      buildIconCards(items, "fa-dumbbell").forEach((node) => targets.benefits.appendChild(node));
+    };
+
     const buildIconCards = (items, fallbackIcon = "fa-circle-check") => items.map((item) => {
       const card = document.createElement("div");
       const icon = document.createElement("i");
@@ -770,8 +789,76 @@ document.addEventListener("DOMContentLoaded", () => {
       return true;
     };
 
+    const dosageStepItems = (nodes) => {
+      const wrapper = document.createElement("div");
+      nodes.forEach((node) => wrapper.appendChild(node.cloneNode(true)));
+
+      const timelineTitles = [...wrapper.querySelectorAll("h3, h4, strong, b")]
+        .filter((title) => {
+          const text = cleanText(title.textContent).toLowerCase();
+          return text && !isSectionMarker(title) && /week|post\s*cycle|cycle|phase/.test(text);
+        });
+
+      if (!timelineTitles.length) return collectContentItems(nodes, "Step");
+
+      return timelineTitles.map((titleNode) => {
+        const title = cleanText(titleNode.textContent);
+        let phase = "";
+        let copy = "";
+        const container = titleNode.parentElement && titleNode.parentElement !== wrapper ? titleNode.parentElement : titleNode;
+        const containerText = cleanText(container.textContent).replace(title, "").trim();
+        let sibling = container.nextElementSibling;
+
+        if (containerText) {
+          const split = containerText.match(/^([^.:â€“-]{3,60})[.:â€“-]\s*(.+)$/);
+          phase = cleanText(split?.[1]);
+          copy = cleanText(split?.[2]) || containerText;
+        }
+
+        while (sibling && !cleanText(sibling.textContent)) sibling = sibling.nextElementSibling;
+
+        if (!copy && sibling && !sibling.matches("h3, h4, strong, b")) {
+          const phaseNode = sibling.querySelector?.("strong, b");
+          if (phaseNode && !isSectionMarker(phaseNode)) {
+            phase = cleanText(phaseNode.textContent);
+            copy = cleanText(sibling.textContent).replace(phase, "").trim();
+          } else {
+            const text = cleanText(sibling.textContent);
+            const split = text.match(/^([^.:â€“-]{3,60})[.:â€“-]\s*(.+)$/);
+            phase = cleanText(split?.[1]);
+            copy = cleanText(split?.[2]) || text;
+          }
+
+          if (!copy && sibling.nextElementSibling && !sibling.nextElementSibling.matches("h3, h4, strong, b")) {
+            copy = cleanText(sibling.nextElementSibling.textContent);
+          }
+        }
+
+        return {
+          title,
+          copy: [phase, copy].filter(Boolean).join(": "),
+          original: titleNode,
+        };
+      }).filter((item) => item.title || item.copy);
+    };
+
+    const renderDosageIntro = (nodes) => {
+      if (!targets.dosage) return;
+
+      const titleNode = targets.dosage.querySelector("[data-section-title]");
+      targets.dosage.innerHTML = "";
+      if (titleNode) targets.dosage.appendChild(titleNode);
+
+      for (const node of nodes) {
+        const text = cleanText(node.textContent);
+        if (/^note\b|week\s*\d|post\s*cycle/i.test(text)) break;
+        if (node.querySelector?.("h3, h4, strong, b") && /week\s*\d|post\s*cycle/i.test(text)) break;
+        targets.dosage.appendChild(node.cloneNode(true));
+      }
+    };
+
     const buildDosageCards = (nodes) => {
-      const items = collectContentItems(nodes, "Step");
+      const items = dosageStepItems(nodes);
       if (!items.length) return [];
 
       return items.slice(0, 4).map((item, index) => {
@@ -781,7 +868,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const label = document.createElement("span");
         const copy = document.createElement("small");
         const splitCopy = cleanText(item.copy).match(/^([^.:–-]{3,60})[.:–-]\s*(.+)$/);
-        icon.className = `fa-solid ${iconForText(`${item.title} ${item.copy}`, index === 0 ? "fa-flask-vial" : "fa-chart-line")}`;
+        const stepIcons = ["fa-flask-vial", "fa-chart-line", "fa-bullseye", "fa-rotate"];
+        icon.className = `fa-solid ${stepIcons[index] || iconForText(`${item.title} ${item.copy}`, "fa-chart-line")}`;
         title.textContent = item.title || `Step ${index + 1}`;
         label.textContent = cleanText(splitCopy?.[1]) || item.title;
         copy.textContent = cleanText(splitCopy?.[2]) || item.copy || item.title;
@@ -838,6 +926,187 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     };
 
+    const normalizePastedAdminHtml = () => {
+      if (!source.querySelector(".product-description, .product-specs") || !/key benefits|recommended dosage|ingredients/i.test(source.textContent || "")) {
+        return false;
+      }
+
+      const stripInlineFormatting = (node) => {
+        node.querySelectorAll?.("[style], font").forEach((child) => {
+          child.removeAttribute("style");
+          if (child.tagName === "FONT") {
+            child.replaceWith(...child.childNodes);
+          }
+        });
+        node.removeAttribute?.("style");
+        return node;
+      };
+
+      const textTokens = (() => {
+        const walker = document.createTreeWalker(source, NodeFilter.SHOW_TEXT);
+        const tokens = [];
+        let node = walker.nextNode();
+
+        while (node) {
+          const text = cleanText(node.textContent);
+          if (text && text !== "\u00a0") tokens.push(text);
+          node = walker.nextNode();
+        }
+
+        return tokens;
+      })();
+
+      const indexOfToken = (pattern, from = 0) => textTokens.findIndex((token, index) => index >= from && pattern.test(token));
+      const sliceBetween = (startPattern, endPattern) => {
+        const start = indexOfToken(startPattern);
+        if (start < 0) return [];
+        const end = endPattern ? indexOfToken(endPattern, start + 1) : -1;
+        return textTokens.slice(start + 1, end > start ? end : undefined);
+      };
+
+      const pairSequentialItems = (tokens) => {
+        const items = [];
+        for (let index = 0; index < tokens.length; index += 2) {
+          const title = cleanText(tokens[index]);
+          const copy = cleanText(tokens[index + 1]);
+          if (!title || /^(key benefits|recommended dosage|ingredients)$/i.test(title)) continue;
+          if (title.length > 80) continue;
+          items.push({ title, copy });
+        }
+        return items;
+      };
+
+      const appendTitle = (target, key, fallback) => {
+        const title = document.createElement("h2");
+        title.dataset.sectionTitle = key;
+        title.textContent = sectionTitles[key] || fallback;
+        target.appendChild(title);
+      };
+
+      const productDescription = source.querySelector(".product-description");
+      if (productDescription && targets.description) {
+        targets.description.innerHTML = "";
+        [...productDescription.children].forEach((child) => targets.description.appendChild(stripInlineFormatting(child.cloneNode(true))));
+      }
+
+      const specs = source.querySelector(".product-specs, dl");
+      if (specs) updateSpecs(specs);
+
+      const benefitsTokens = sliceBetween(/^key benefits$/i, /^recommended dosage$/i);
+      const benefitItems = pairSequentialItems(benefitsTokens).slice(0, 6);
+      if (benefitItems.length && targets.benefits) {
+        sectionTitles.benefits = "Key Benefits";
+        targets.benefits.innerHTML = "";
+        buildIconCards(benefitItems, "fa-dumbbell").forEach((node) => targets.benefits.appendChild(node));
+      }
+
+      const dosageTokens = sliceBetween(/^recommended dosage$/i, /^ingredients$/i);
+      if (dosageTokens.length && targets.dosage) {
+        sectionTitles.dosage = "Recommended Dosage";
+        const noteIndex = dosageTokens.findIndex((token) => /^note\b/i.test(token));
+        const cleanDosageTokens = noteIndex >= 0 ? dosageTokens.slice(0, noteIndex) : dosageTokens;
+        const noteText = noteIndex >= 0 ? dosageTokens.slice(noteIndex).join(" ").replace(/^note\s*:?\s*/i, "") : "";
+        const firstStep = cleanDosageTokens.findIndex((token) => /^(week\s*\d+|post\s*cycle)$/i.test(token));
+        const intro = firstStep > 0 ? cleanDosageTokens.slice(0, firstStep).join(" ") : cleanDosageTokens[0] || "";
+        const stepTokens = firstStep >= 0 ? cleanDosageTokens.slice(firstStep) : [];
+
+        targets.dosage.innerHTML = "";
+        appendTitle(targets.dosage, "dosage", "Recommended Dosage");
+        if (intro) {
+          const paragraph = document.createElement("p");
+          paragraph.textContent = intro;
+          targets.dosage.appendChild(paragraph);
+        }
+
+        if (targets.dosageSteps && stepTokens.length) {
+          const steps = [];
+          for (let index = 0; index < stepTokens.length; index += 3) {
+            const title = cleanText(stepTokens[index]);
+            if (!/^(week\s*\d+|post\s*cycle)$/i.test(title)) {
+              index -= 2;
+              continue;
+            }
+            steps.push({
+              title,
+              phase: cleanText(stepTokens[index + 1]),
+              copy: cleanText(stepTokens[index + 2]),
+            });
+          }
+
+          targets.dosageSteps.innerHTML = "";
+          steps.slice(0, 4).forEach((step, index) => {
+            const card = document.createElement("div");
+            const icon = document.createElement("i");
+            const title = document.createElement("strong");
+            const label = document.createElement("span");
+            const copy = document.createElement("small");
+            const stepIcons = ["fa-flask-vial", "fa-chart-line", "fa-bullseye", "fa-rotate"];
+            icon.className = `fa-solid ${stepIcons[index] || "fa-chart-line"}`;
+            title.textContent = step.title;
+            label.textContent = step.phase || step.title;
+            copy.textContent = step.copy || step.phase || step.title;
+            card.append(icon, title, label, copy);
+            targets.dosageSteps.appendChild(card);
+          });
+        }
+
+        if (targets.dosageNote) {
+          if (noteText) {
+            const icon = document.createElement("i");
+            const paragraph = document.createElement("p");
+            const title = document.createElement("strong");
+            icon.className = "fa-solid fa-info";
+            title.textContent = "Note:";
+            paragraph.append(title, document.createTextNode(` ${noteText}`));
+            targets.dosageNote.innerHTML = "";
+            targets.dosageNote.append(icon, paragraph);
+            targets.dosageNote.hidden = false;
+          } else {
+            targets.dosageNote.hidden = true;
+          }
+        }
+      }
+
+      const ingredientsTokens = sliceBetween(/^ingredients$/i);
+      if (ingredientsTokens.length && targets.ingredients) {
+        sectionTitles.ingredients = "Ingredients";
+        targets.ingredients.innerHTML = "";
+        appendTitle(targets.ingredients, "ingredients", "Ingredients");
+
+        const ingredientIntro = ingredientsTokens.find((token) => /^each\b/i.test(token));
+        if (ingredientIntro) {
+          const paragraph = document.createElement("p");
+          paragraph.textContent = ingredientIntro;
+          targets.ingredients.appendChild(paragraph);
+        }
+
+        const table = source.querySelector(".ingredient-table, table");
+        if (table) {
+          targets.ingredients.appendChild(stripInlineFormatting(table.cloneNode(true)));
+        }
+
+        if (targets.ingredientCards) {
+          const cardStart = ingredientsTokens.findIndex((token) => /pure ingredients/i.test(token));
+          const cardItems = cardStart >= 0 ? pairSequentialItems(ingredientsTokens.slice(cardStart)).slice(0, 3) : [];
+          targets.ingredientCards.innerHTML = "";
+          if (cardItems.length) {
+            buildIconCards(cardItems, "fa-leaf").forEach((node) => targets.ingredientCards.appendChild(node));
+            targets.ingredientCards.hidden = false;
+          } else {
+            targets.ingredientCards.hidden = true;
+          }
+        }
+      }
+
+      if (targets.assurance) targets.assurance.hidden = true;
+      if (targets.dosageSteps) targets.dosageSteps.hidden = !targets.dosageSteps.children.length;
+      if (targets.specs) targets.specs.hidden = !targets.specs.children.length;
+      targets.dosageSteps?.closest(".dosage-tab-grid")?.classList.toggle("is-single-column", !targets.dosageSteps?.children.length);
+      targets.ingredientCards?.closest(".ingredients-tab-grid")?.classList.toggle("is-single-column", !targets.ingredientCards?.children.length);
+
+      return true;
+    };
+
     const formatIngredientTables = () => {
       targets.ingredients?.querySelectorAll("table").forEach((table) => {
         table.classList.add("ingredient-table");
@@ -888,8 +1157,12 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const hasSectionData = (key) => {
-      if (key === "description") return Boolean(buckets.description.length || targets.specs?.children.length);
+      if (key === "description") return Boolean(hasExactDescriptionLayout || buckets.description.length || targets.description?.children.length || targets.specs?.children.length);
       if (key === "reviews") return document.querySelector('[data-tab-card="reviews"]')?.dataset.serverContent === "1";
+      if (key === "benefits") return Boolean(buckets.benefits?.length || targets.benefits?.children.length);
+      if (key === "dosage") return Boolean(buckets.dosage?.length || targets.dosage?.children.length || targets.dosageSteps?.children.length);
+      if (key === "ingredients") return Boolean(buckets.ingredients?.length || targets.ingredients?.children.length || targets.ingredientCards?.children.length);
+      if (key === "faq") return Boolean(buckets.faq?.length || targets.faq?.children.length);
       return Boolean(buckets[key]?.length);
     };
 
@@ -953,6 +1226,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const updateAssuranceCards = () => {
       if (!targets.assurance) return;
+      if (hasExactDescriptionLayout) return;
 
       const sourceItems = collectContentItems(buckets.description, "Feature")
         .filter((item) => /stock|shipping|delivery|lab|test|certified|quality|support|secure|worldwide/i.test(`${item.title} ${item.copy}`));
@@ -968,10 +1242,20 @@ document.addEventListener("DOMContentLoaded", () => {
       removeCardItemsFromContent(targets.description, sourceItems);
     };
 
+    if (normalizePastedAdminHtml()) {
+      formatIngredientTables();
+      refreshVisibleTabs();
+      return;
+    }
+
     normalizeSource();
 
     let current = "description";
     [...source.children].forEach((node) => {
+      if (hasExactDescriptionLayout && node.matches?.(".product-info-grid, .description-assurance")) {
+        return;
+      }
+
       if (looksLikeSpecBlock(node) && !hasSectionMarkers(node)) {
         updateSpecs(node);
         return;
@@ -1003,6 +1287,7 @@ document.addEventListener("DOMContentLoaded", () => {
       faq: targets.faq,
     }).forEach(([key, target]) => {
       if (!target || !buckets[key].length) return;
+      if (key === "description" && hasExactDescriptionLayout) return;
 
       const titleNode = target.querySelector("[data-section-title]");
       target.innerHTML = "";
@@ -1012,16 +1297,17 @@ document.addEventListener("DOMContentLoaded", () => {
       nodes.forEach((node) => target.appendChild(node));
     });
 
+    ensureBenefitIconRows();
     pullSpecsFromDescription();
     updateSectionTitles();
     updateAssuranceCards();
 
-    const dosageItems = collectContentItems(buckets.dosage, "Step");
+    const dosageItems = dosageStepItems(buckets.dosage);
     const dosageCards = buildDosageCards(buckets.dosage);
     if (targets.dosageSteps && dosageCards.length) {
       targets.dosageSteps.innerHTML = "";
       dosageCards.forEach((node) => targets.dosageSteps.appendChild(node));
-      removeCardItemsFromContent(targets.dosage, dosageItems);
+      renderDosageIntro(buckets.dosage);
     }
     if (!buildDosageNote(buckets.dosage) && targets.dosageNote) targets.dosageNote.hidden = true;
     removeMatchingTextNodes(targets.dosage, (text) => /^note\b/i.test(text));
