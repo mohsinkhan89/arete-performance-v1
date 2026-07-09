@@ -63,9 +63,22 @@
                 </button>
 
                 <div class="topbar-actions">
-                    <form class="admin-search" method="GET" action="{{ route('backend.page', 'orders') }}">
+                    @php
+                        $searchablePages = [
+                            'products' => 'Search products...',
+                            'categories' => 'Search categories...',
+                            'orders' => 'Search orders...',
+                            'stock-notifications' => 'Search stock requests...',
+                            'users' => 'Search users...',
+                            'reviews' => 'Search reviews...',
+                        ];
+                        $activeSearchPage = request()->routeIs('backend.page') && isset($searchablePages[request()->route('page')])
+                            ? request()->route('page')
+                            : 'orders';
+                    @endphp
+                    <form class="admin-search" method="GET" action="{{ route('backend.page', $activeSearchPage) }}">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="search" name="q" value="{{ request('q') }}" placeholder="Search orders..." aria-label="Search orders">
+                        <input type="search" name="q" value="{{ request('q') }}" placeholder="{{ $searchablePages[$activeSearchPage] }}" aria-label="{{ $searchablePages[$activeSearchPage] }}">
                         <button type="submit" aria-label="Search">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
