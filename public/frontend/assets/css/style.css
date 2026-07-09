@@ -1565,6 +1565,16 @@ button.is-loading .fa-spinner {
   transform: translateY(-2px);
 }
 
+[data-stock-notify].is-notified,
+[data-stock-notify]:disabled {
+  cursor: not-allowed;
+  color: #155724;
+  background: #d4edda;
+  border-color: rgba(21, 87, 36, .28);
+  box-shadow: none;
+  transform: none;
+}
+
 .tag {
   position: absolute;
   top: 12px;

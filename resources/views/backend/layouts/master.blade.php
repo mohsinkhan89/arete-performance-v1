@@ -24,6 +24,7 @@
                     ['label' => 'Products', 'icon' => 'fa-cube', 'url' => route('backend.page', 'products')],
                     ['label' => 'Categories', 'icon' => 'fa-table-cells', 'url' => route('backend.page', 'categories')],
                     ['label' => 'Orders', 'icon' => 'fa-clipboard-list', 'url' => route('backend.page', 'orders')],
+                    ['label' => 'Stock Requests', 'icon' => 'fa-bell', 'url' => route('backend.page', 'stock-notifications'), 'active' => request()->is('admin/stock-notifications')],
                     ['label' => 'Users', 'icon' => 'fa-users', 'url' => route('backend.page', 'users')],
                     ['label' => 'Reviews', 'icon' => 'fa-star', 'url' => route('backend.page', 'reviews')],
                     ['label' => 'Reports', 'icon' => 'fa-chart-column', 'url' => route('backend.page', 'reports')],

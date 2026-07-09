@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\StockNotification;
 use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -280,17 +281,35 @@ class FrontendController extends Controller
             'message' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $adminEmail = config('mail.from.address');
-        Mail::raw(
-            "Stock notification request\n\nProduct: {$product->name}\nSKU: {$product->sku}\nRequested quantity: " . ($data['quantity'] ?? 1) . "\n\nCustomer: {$data['name']}\nEmail: {$data['email']}\nPhone: " . ($data['phone'] ?? 'N/A') . "\n\nMessage:\n" . ($data['message'] ?? 'N/A'),
-            fn ($message) => $message
-                ->to($adminEmail)
-                ->replyTo($data['email'], $data['name'])
-                ->subject("Stock request: {$product->name}")
+        $stockNotification = StockNotification::updateOrCreate(
+            [
+                'product_id' => $product->id,
+                'email' => strtolower($data['email']),
+            ],
+            [
+                'customer_name' => $data['name'],
+                'phone' => $data['phone'] ?? null,
+                'quantity' => $data['quantity'] ?? 1,
+                'message' => $data['message'] ?? null,
+                'status' => 'pending',
+                'notified_at' => null,
+            ]
         );
 
+        $adminEmail = config('mail.from.address');
+        if ($adminEmail) {
+            Mail::raw(
+                "Stock notification request\n\nProduct: {$product->name}\nSKU: {$product->sku}\nRequested quantity: {$stockNotification->quantity}\n\nCustomer: {$stockNotification->customer_name}\nEmail: {$stockNotification->email}\nPhone: " . ($stockNotification->phone ?? 'N/A') . "\n\nMessage:\n" . ($stockNotification->message ?? 'N/A'),
+                fn ($message) => $message
+                    ->to($adminEmail)
+                    ->replyTo($stockNotification->email, $stockNotification->customer_name)
+                    ->subject("Stock request: {$product->name}")
+            );
+        }
+
         return response()->json([
-            'message' => 'Thanks. We will contact you when this product is available.',
+            'message' => 'Thanks. You will be notified when this product is available.',
+            'status' => 'notified',
         ]);
     }
 

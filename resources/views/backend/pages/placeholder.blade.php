@@ -73,7 +73,7 @@
                 </table>
             </div>
         </article>
-    @elseif (in_array($page, ['products', 'categories', 'users', 'reviews', 'orders'], true))
+    @elseif (in_array($page, ['products', 'categories', 'users', 'reviews', 'orders', 'stock-notifications'], true))
         @php
             $canManage = $page !== 'users' || $canManageUsers;
         @endphp
@@ -258,6 +258,55 @@
                                 </tr>
                             @empty
                                 <tr><td colspan="7" class="empty-cell">No orders found.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                @elseif ($page === 'stock-notifications')
+                    <table>
+                        <thead>
+                            <tr><th>Customer</th><th>Product</th><th>Qty</th><th>Message</th><th>Status</th><th>Requested</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($records as $request)
+                                <tr>
+                                    <td>
+                                        <strong>{{ $request->customer_name }}</strong>
+                                        <small class="table-subtext">{{ $request->email }}</small>
+                                        <small class="table-subtext">{{ $request->phone ?: '-' }}</small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ $request->product?->name ?? 'Deleted product' }}</strong>
+                                        <small class="table-subtext">{{ $request->product?->sku ?? '-' }}</small>
+                                    </td>
+                                    <td>{{ $request->quantity }}</td>
+                                    <td>{{ \Illuminate\Support\Str::limit($request->message ?: '-', 70) }}</td>
+                                    <td>
+                                        <span class="badge {{ $request->status === 'notified' ? 'green' : 'payment-status-unpaid' }}">
+                                            {{ str_replace('_', ' ', ucfirst($request->status)) }}
+                                        </span>
+                                        @if ($request->notified_at)
+                                            <small class="table-subtext">{{ $request->notified_at->format('M d, Y') }}</small>
+                                        @endif
+                                    </td>
+                                    <td>{{ $request->created_at?->format('M d, Y') }}</td>
+                                    <td>
+                                        @if ($request->status === 'notified')
+                                            <span class="view-only"><i class="fa-solid fa-check"></i> Sent</span>
+                                        @elseif ($request->product)
+                                            <form action="{{ route('backend.stock-notifications.notify', $request) }}" method="POST">
+                                                @csrf
+                                                <button class="status-toggle is-active" type="submit" title="Notify customer">
+                                                    <i class="fa-solid fa-paper-plane"></i>
+                                                    Notify
+                                                </button>
+                                            </form>
+                                        @else
+                                            <span class="view-only"><i class="fa-regular fa-eye"></i> Product missing</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="7" class="empty-cell">No stock requests found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

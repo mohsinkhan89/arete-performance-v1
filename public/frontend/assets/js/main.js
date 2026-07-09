@@ -227,6 +227,41 @@ document.addEventListener("DOMContentLoaded", () => {
   const findProduct = (id) => products.find((product) => product.id === id);
   const cartQty = () => [...cart.values()].reduce((total, qty) => total + qty, 0);
   const csrfToken = document.querySelector("meta[name='csrf-token']")?.content || "";
+  const stockNotifyStorageKey = "arete_stock_notified_products";
+  let activeStockNotifyButton = null;
+
+  function notifiedProductIds() {
+    try {
+      return JSON.parse(localStorage.getItem(stockNotifyStorageKey) || "[]");
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function rememberStockNotified(productId) {
+    if (!productId) return;
+    const ids = new Set(notifiedProductIds().map(String));
+    ids.add(String(productId));
+    localStorage.setItem(stockNotifyStorageKey, JSON.stringify([...ids]));
+  }
+
+  function setStockButtonNotified(button) {
+    if (!button) return;
+    button.disabled = true;
+    button.classList.add("is-notified");
+    button.setAttribute("aria-disabled", "true");
+    button.innerHTML = 'Notified <i class="fa-solid fa-check"></i>';
+  }
+
+  function applyStockNotifiedState(root = document) {
+    const ids = new Set(notifiedProductIds().map(String));
+    if (!ids.size) return;
+    root.querySelectorAll("[data-stock-notify]").forEach((button) => {
+      if (ids.has(String(button.dataset.stockNotify))) {
+        setStockButtonNotified(button);
+      }
+    });
+  }
 
   function prepareAnimatedHeadings() {
     document.querySelectorAll(".section-heading h2, .why-intro h2").forEach((heading) => {
@@ -342,7 +377,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (reportLightboxImage) reportLightboxImage.src = "";
   }
 
-  function openStockNotify(productId, productName = "Selected product") {
+  function openStockNotify(productId, productName = "Selected product", triggerButton = null) {
+    activeStockNotifyButton = triggerButton;
     stockNotifyModal.querySelector("[data-stock-notify-id]").value = productId || "";
     stockNotifyModal.querySelector("[data-stock-notify-product]").textContent = `${productName}: share your details and we will contact you as soon as stock returns.`;
     stockNotifyModal.classList.add("is-open");
@@ -379,6 +415,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!response.ok) throw new Error("Stock notify request failed.");
       const data = await response.json();
       showToast(data.message || "Thanks. We will contact you when this product is available.");
+      rememberStockNotified(productId);
+      setStockButtonNotified(activeStockNotifyButton);
+      applyStockNotifiedState();
       form.reset();
       closeStockNotify();
     } catch (error) {
@@ -386,6 +425,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } finally {
       submitButton.disabled = false;
       submitButton.innerHTML = 'Send Request <i class="fa-solid fa-paper-plane"></i>';
+      activeStockNotifyButton = null;
     }
   }
 
@@ -1151,6 +1191,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ? `<button type="button" data-search-add="${escapeHtml(product.id)}" aria-label="Add ${escapeHtml(product.name)}"><i class="fa-solid fa-cart-plus"></i></button>`
           : `<button class="notify-stock-btn" type="button" data-stock-notify="${escapeHtml(product.id)}" data-product-name="${escapeHtml(product.name)}">Inform Me</button>`}
       </article>`).join("") : '<p class="no-results">No products found.</p>';
+      applyStockNotifiedState(searchResults);
     } catch (error) {
       if (requestIndex === searchRequestIndex) {
         searchResults.innerHTML = '<p class="no-results">Unable to load products right now.</p>';
@@ -1337,7 +1378,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (stockNotify) {
       event.preventDefault();
-      openStockNotify(stockNotify.dataset.stockNotify, stockNotify.dataset.productName || stockNotify.closest("[data-product-name]")?.dataset.productName);
+      if (stockNotify.disabled) return;
+      openStockNotify(stockNotify.dataset.stockNotify, stockNotify.dataset.productName || stockNotify.closest("[data-product-name]")?.dataset.productName, stockNotify);
       return;
     }
 
@@ -1772,5 +1814,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderCart();
+  applyStockNotifiedState();
   updateHeaderState();
 });

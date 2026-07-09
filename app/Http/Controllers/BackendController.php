@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\StockAvailableMail;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\SiteSetting;
+use App\Models\StockNotification;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -85,6 +88,7 @@ class BackendController extends Controller
             'users',
             'orders',
             'reviews',
+            'stock-notifications',
             'settings',
             'reports',
         ];
@@ -122,6 +126,15 @@ class BackendController extends Controller
                     ->where('customer_name', 'like', "%{$search}%")
                     ->orWhere('comment', 'like', "%{$search}%")
                     ->orWhereHas('product', fn ($query) => $query->where('name', 'like', "%{$search}%"))))
+                ->latest()
+                ->paginate(10)
+                ->withQueryString(),
+            'stock-notifications' => StockNotification::with('product')
+                ->when($search, fn ($query) => $query->where(fn ($query) => $query
+                    ->where('customer_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhereHas('product', fn ($query) => $query->where('name', 'like', "%{$search}%")->orWhere('sku', 'like', "%{$search}%"))))
                 ->latest()
                 ->paginate(10)
                 ->withQueryString(),
@@ -165,6 +178,22 @@ class BackendController extends Controller
             'canManageUsers' => $this->isSuperAdmin(),
             'reportStats' => $reportStats,
         ]);
+    }
+
+    public function notifyStockCustomer(StockNotification $stockNotification): RedirectResponse
+    {
+        $stockNotification->load('product');
+
+        abort_unless($stockNotification->product, 404);
+
+        Mail::to($stockNotification->email)->send(new StockAvailableMail($stockNotification));
+
+        $stockNotification->update([
+            'status' => 'notified',
+            'notified_at' => now(),
+        ]);
+
+        return back()->with('success', 'Customer notified successfully.');
     }
 
     public function profile(): View
