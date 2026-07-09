@@ -102,7 +102,6 @@
             </aside>
           @endif
         </div>
-        <div class="description-assurance" data-description-section="assurance"></div>
       </article>
 
       <article class="product-info-card tab-content-card" id="benefits" data-tab-card="benefits">

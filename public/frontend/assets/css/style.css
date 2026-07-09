@@ -5160,8 +5160,8 @@ button.is-loading .fa-spinner {
   grid-template-columns: minmax(0, 1.2fr) minmax(260px, .9fr);
 }
 
-.product-description,
-.product-specs {
+/* .product-specs { */
+.product-description {
   border-right: 1px solid #dedede;
   padding-right: 34px;
 }

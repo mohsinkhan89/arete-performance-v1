@@ -436,7 +436,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const targets = {
       description: document.querySelector('[data-description-section="description"]'),
       specs: document.querySelector('[data-description-section="specs"]'),
-      assurance: document.querySelector('[data-description-section="assurance"]'),
+      // assurance: document.querySelector('[data-description-section="assurance"]'),
       benefits: document.querySelector('[data-description-section="benefits"]'),
       dosage: document.querySelector('[data-description-section="dosage"]'),
       dosageSteps: document.querySelector('[data-description-section="dosage-steps"]'),
@@ -449,6 +449,46 @@ document.addEventListener("DOMContentLoaded", () => {
     const tabOrder = ["description", "benefits", "dosage", "ingredients", "reviews", "faq"];
     const sectionTitles = {};
     const buckets = Object.fromEntries(["description", "benefits", "dosage", "ingredients", "faq"].map((key) => [key, []]));
+    const renderExactDescriptionLayout = () => {
+      if (!source.querySelector(".product-info-grid")) return false;
+
+      const descriptionCard = document.querySelector('[data-tab-card="description"]');
+      const nav = descriptionCard?.querySelector(".product-tabs");
+      if (!descriptionCard || !nav) return false;
+
+      [...descriptionCard.children].forEach((child) => {
+        if (child !== nav) child.remove();
+      });
+
+      const holder = document.createElement("div");
+      holder.innerHTML = source.innerHTML;
+      holder.querySelectorAll(".product-tabs").forEach((sourceNav) => sourceNav.remove());
+
+      [...holder.children].forEach((child) => descriptionCard.appendChild(child.cloneNode(true)));
+
+      const hasReviews = document.querySelector('[data-tab-card="reviews"]')?.dataset.serverContent === "1";
+      const availableTabs = hasReviews ? ["description", "reviews"] : ["description"];
+
+      document.querySelectorAll("[data-tab-card]").forEach((card) => {
+        const key = card.dataset.tabCard;
+        card.classList.toggle("is-hidden", !availableTabs.includes(key));
+      });
+
+      document.querySelectorAll(".product-tabs").forEach((tabNav) => {
+        tabNav.style.setProperty("--visible-tabs", String(availableTabs.length));
+        tabNav.querySelectorAll("a").forEach((link) => {
+          const key = link.getAttribute("href")?.replace("#", "");
+          const isVisible = availableTabs.includes(key);
+          link.hidden = !isVisible;
+          link.classList.toggle("is-hidden", !isVisible);
+        });
+      });
+
+      return true;
+    };
+
+    if (renderExactDescriptionLayout()) return;
+
     const sectionFromHeading = (text) => {
       const value = String(text || "").toLowerCase();
       if (value.includes("key benefit") || value.includes("benefit")) return "benefits";
@@ -1356,7 +1396,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const testReport = event.target.closest("[data-test-report]");
     const productZoom = event.target.closest("[data-product-zoom]");
     const labReport = event.target.closest("[data-lab-report]");
-    const detailTapCard = event.target.closest(".product-benefit-strip > div, .description-assurance > div, .benefit-list > div, .dosage-steps > div, .ingredient-certifications > div, .review-card, .shop-trust-grid > div");
+    const detailTapCard = event.target.closest(".product-benefit-strip > div > div, .benefit-list > div, .dosage-steps > div, .ingredient-certifications > div, .review-card, .shop-trust-grid > div");
     const inc = event.target.closest("[data-cart-inc]");
     const dec = event.target.closest("[data-cart-dec]");
     const remove = event.target.closest("[data-cart-remove]");
