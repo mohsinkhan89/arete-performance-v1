@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\SiteSetting;
 use App\Services\CartService;
@@ -27,6 +28,16 @@ class AppServiceProvider extends ServiceProvider
             $view->with([
                 'cartSummary' => app(CartService::class)->summary(),
                 'siteSettings' => $this->siteSettings(),
+            ]);
+        });
+
+        View::composer('frontend.inc.footer', function ($view) {
+            $view->with([
+                'footerCategories' => Category::withCount(['products' => fn ($query) => $query->where('status', 'active')])
+                    ->where('status', 'active')
+                    ->orderBy('sort_order')
+                    ->take(12)
+                    ->get(),
             ]);
         });
 
