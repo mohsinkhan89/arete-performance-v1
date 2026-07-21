@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\StockNotification;
 use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -23,7 +24,13 @@ class FrontendController extends Controller
     {
         return view('frontend.index', [
             'categories' => Category::withCount('products')->where('status', 'active')->orderBy('sort_order')->take(8)->get(),
-            'featuredProducts' => Product::with('category')->where('status', 'active')->where('is_featured', true)->latest()->take(5)->get(),
+            'featuredProducts' => Product::with('category')
+                ->where('status', 'active')
+                ->orderByDesc('is_bestseller')
+                ->orderByRaw('stock > 0 desc')
+                ->latest()
+                ->take(5)
+                ->get(),
             'reviews' => Review::where('status', 'active')->latest()->take(5)->get(),
         ]);
     }
@@ -167,36 +174,30 @@ class FrontendController extends Controller
         ]);
     }
 
-    public function submitPaymentProof(Request $request): RedirectResponse
+    public function productDetails(?string $product = null)
     {
-        $data = $request->validate([
-            'order_number' => ['required', 'string', 'exists:orders,order_number'],
-            'email' => ['required', 'email', 'max:255'],
-            'payment_proof' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:4096'],
+        $productQuery = Product::with('category')->where('status', 'active');
+
+        $product = $product
+            ? (clone $productQuery)->where(fn ($query) => $query->where('slug', $product)->orWhere('id', $product))->firstOrFail()
+            : (clone $productQuery)->latest()->firstOrFail();
+
+        return view('frontend.product-details', [
+            'product' => $product,
+            'relatedProducts' => Product::with('category')
+                ->where('status', 'active')
+                ->where('id', '!=', $product->id)
+                ->when($product->category_id, fn ($query) => $query->where('category_id', $product->category_id))
+                ->orderByRaw('stock > 0 desc')
+                ->latest()
+                ->take(5)
+                ->get(),
+            'reviews' => Review::where('status', 'active')
+                ->where(fn ($query) => $query->where('product_id', $product->id)->orWhereNull('product_id'))
+                ->latest()
+                ->take(3)
+                ->get(),
         ]);
-
-        $order = Order::where('order_number', $data['order_number'])
-            ->where('email', $data['email'])
-            ->firstOrFail();
-
-        $file = $request->file('payment_proof');
-        $filename = 'payment-proof-' . Str::slug($order->order_number) . '-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('backend/assets/imgs/uploads'), $filename);
-
-        $order->update([
-            'payment_proof' => 'backend/assets/imgs/uploads/' . $filename,
-            'payment_status' => 'proof_submitted',
-            'payment_proof_submitted_at' => now(),
-        ]);
-
-        return redirect()
-            ->route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email])
-            ->with('success', 'Payment proof submitted successfully. Admin will verify it shortly.');
-    }
-
-    public function productDetails()
-    {
-        return view('frontend.product-details');
     }
 
     public function search(Request $request)
@@ -208,6 +209,32 @@ class FrontendController extends Controller
             'categories' => Category::withCount(['products' => fn ($query) => $query->where('status', 'active')])->where('status', 'active')->orderBy('sort_order')->get(),
             'products' => $products,
             'filters' => $filters,
+        ]);
+    }
+
+    public function searchProducts(Request $request): JsonResponse
+    {
+        $filters = [
+            ...$this->filters($request),
+            'sort' => 'name',
+        ];
+
+        $products = $this->filteredProducts($filters)
+            ->take(10)
+            ->get()
+            ->map(fn (Product $product) => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'meta' => $product->category?->name ?? 'Product',
+                'price' => (float) ($product->sale_price ?: $product->price),
+                'stock' => $product->stock,
+                'in_stock' => $product->stock > 0,
+                'image' => url($product->image ?: 'frontend/assets/images/product-bottle.png'),
+            ])
+            ->values();
+
+        return response()->json([
+            'products' => $products,
         ]);
     }
 
@@ -241,8 +268,55 @@ class FrontendController extends Controller
     {
         $product = $this->cartProduct($product);
         abort_unless($product->status === 'active', 404);
+        abort_if($product->stock <= 0, 409, 'This product is currently out of stock.');
 
         return response()->json($this->cartPayload($cart->add($product, (int) $request->input('quantity', 1))));
+    }
+
+    public function notifyStock(Request $request, string $product): JsonResponse
+    {
+        $product = Product::where('status', 'active')
+            ->where(fn ($query) => $query->where('id', $product)->orWhere('slug', $product))
+            ->firstOrFail();
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'email', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'quantity' => ['nullable', 'integer', 'min:1', 'max:999'],
+            'message' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $stockNotification = StockNotification::updateOrCreate(
+            [
+                'product_id' => $product->id,
+                'email' => strtolower($data['email']),
+            ],
+            [
+                'customer_name' => $data['name'],
+                'phone' => $data['phone'] ?? null,
+                'quantity' => $data['quantity'] ?? 1,
+                'message' => $data['message'] ?? null,
+                'status' => 'pending',
+                'notified_at' => null,
+            ]
+        );
+
+        $adminEmail = config('mail.from.address');
+        if ($adminEmail) {
+            Mail::raw(
+                "Stock notification request\n\nProduct: {$product->name}\nSKU: {$product->sku}\nRequested quantity: {$stockNotification->quantity}\n\nCustomer: {$stockNotification->customer_name}\nEmail: {$stockNotification->email}\nPhone: " . ($stockNotification->phone ?? 'N/A') . "\n\nMessage:\n" . ($stockNotification->message ?? 'N/A'),
+                fn ($message) => $message
+                    ->to($adminEmail)
+                    ->replyTo($stockNotification->email, $stockNotification->customer_name)
+                    ->subject("Stock request: {$product->name}")
+            );
+        }
+
+        return response()->json([
+            'message' => 'Thanks. You will be notified when this product is available.',
+            'status' => 'notified',
+        ]);
     }
 
     public function updateCart(Request $request, string $product, CartService $cart): JsonResponse
@@ -376,6 +450,7 @@ class FrontendController extends Controller
             ->when($filters['category'], fn ($query, string $slug) => $query->whereHas('category', fn ($query) => $query->where('slug', $slug)))
             ->when(is_numeric($filters['min_price']), fn ($query) => $query->whereRaw('COALESCE(sale_price, price) >= ?', [(float) $filters['min_price']]))
             ->when(is_numeric($filters['max_price']), fn ($query) => $query->whereRaw('COALESCE(sale_price, price) <= ?', [(float) $filters['max_price']]))
+            ->orderByRaw('stock > 0 desc')
             ->when($filters['sort'] === 'price_asc', fn ($query) => $query->orderByRaw('COALESCE(sale_price, price) asc'))
             ->when($filters['sort'] === 'price_desc', fn ($query) => $query->orderByRaw('COALESCE(sale_price, price) desc'))
             ->when($filters['sort'] === 'name', fn ($query) => $query->orderBy('name'))

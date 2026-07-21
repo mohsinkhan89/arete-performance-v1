@@ -15,6 +15,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script>
+      try {
+        if (localStorage.getItem('arete_loader_seen') === 'true') {
+          document.documentElement.classList.add('loader-seen');
+        }
+      } catch (error) {}
+    </script>
     <link href="{{ url('frontend/assets/css/style.css') }}" rel="stylesheet">
 </head>
 <body class="@yield('body_class', (Request::path() === '/' ? 'home-page' : str_replace('/', '-', Request::path()) . '-page'))">
@@ -34,10 +41,9 @@
       </div>
       <div class="loader-dots" aria-hidden="true"><span></span><span></span><span></span></div>
       <div class="loader-features" aria-label="Store benefits">
-        <div><i class="fa-solid fa-shield-halved"></i><span>Premium<br>Quality</span></div>
-        <div><i class="fa-solid fa-flask-vial"></i><span>Lab<br>Tested</span></div>
-        <div><i class="fa-solid fa-box-open"></i><span>Discreet<br>Shipping</span></div>
-        <div><i class="fa-solid fa-headset"></i><span>24/7<br>Support</span></div>
+        <div><i class="fa-solid fa-truck-fast"></i><span>Fast &amp; Secure<br>Delivery</span></div>
+        <div><i class="fa-solid fa-globe"></i><span>Delivery All<br>Over UK</span></div>
+        <div><i class="fa-solid fa-sterling-sign"></i><span>Flat Delivery<br>&pound;4.99</span></div>
       </div>
     </div>
   </div>
@@ -49,7 +55,7 @@
   @include('frontend.inc.footer')
 
   <div class="cookie-consent" data-cookie-consent aria-hidden="true">
-    <div class="cookie-consent-backdrop" data-cookie-close></div>
+    <div class="cookie-consent-backdrop" aria-hidden="true"></div>
     <section class="cookie-card" role="dialog" aria-modal="true" aria-labelledby="cookieTitle">
       <div class="cookie-icon" aria-hidden="true"><i class="fa-solid fa-cookie-bite"></i></div>
       <h2 id="cookieTitle">Cookie Preferences</h2>
@@ -106,6 +112,7 @@
       home: "{{ route('frontend.index') }}",
       shop: "{{ route('frontend.shop') }}",
       search: "{{ route('frontend.search') }}",
+      searchProducts: "{{ route('frontend.search.products') }}",
       cart: "{{ route('frontend.my-cart') }}",
       checkout: "{{ route('frontend.checkout') }}",
       orderSuccess: "{{ route('frontend.order-success') }}",
@@ -113,6 +120,7 @@
       cartJson: "{{ route('frontend.cart.json') }}",
       postcodeLookup: "{{ route('frontend.checkout.postcode') }}",
       cartAddBase: "{{ url('cart/add') }}",
+      stockNotifyBase: "{{ url('stock-notify') }}",
       cartUpdateBase: "{{ url('cart/update') }}",
       cartRemoveBase: "{{ url('cart/remove') }}",
       cartClear: "{{ route('frontend.cart.clear') }}"

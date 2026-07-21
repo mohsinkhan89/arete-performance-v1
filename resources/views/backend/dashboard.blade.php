@@ -7,8 +7,8 @@
         <section class="dashboard-hero-panel">
             <div>
                 <span class="dashboard-kicker">Live Database</span>
-                <h1>Dashboard</h1>
-                <p>Every number below is calculated from orders, products, categories, users, and reviews tables.</p>
+                <h1>Operations Dashboard</h1>
+                <p>Compact overview from orders, order items, products, categories, users, and reviews tables.</p>
             </div>
             <div class="dashboard-quick-actions">
                 <a href="{{ route('backend.page', 'orders') }}"><i class="fa-solid fa-clipboard-list"></i> Orders</a>
@@ -18,25 +18,25 @@
         </section>
 
         <section class="compact-stats">
-            <article class="compact-stat is-gold">
+            <article class="compact-stat metric-revenue">
                 <span>Total Revenue</span>
                 <strong>&pound;{{ number_format((float) $totalRevenue, 2) }}</strong>
                 <small>&pound;{{ number_format((float) $averageOrderValue, 2) }} average order</small>
                 <i class="fa-solid fa-chart-line"></i>
             </article>
-            <article class="compact-stat is-warning">
-                <span>Proofs To Review</span>
-                <strong>{{ number_format($proofSubmittedOrders) }}</strong>
-                <small>&pound;{{ number_format((float) $proofSubmittedTotal, 2) }} waiting</small>
-                <i class="fa-solid fa-receipt"></i>
+            <article class="compact-stat metric-proof">
+                <span>Unpaid Orders</span>
+                <strong>{{ number_format($unpaidOrders) }}</strong>
+                <small>&pound;{{ number_format((float) $pendingRevenue, 2) }} pending</small>
+                <i class="fa-solid fa-hourglass-half"></i>
             </article>
-            <article class="compact-stat">
+            <article class="compact-stat metric-orders">
                 <span>Today Orders</span>
                 <strong>{{ number_format($todayOrders) }}</strong>
                 <small>{{ number_format($totalOrders) }} all time orders</small>
                 <i class="fa-solid fa-calendar-day"></i>
             </article>
-            <article class="compact-stat">
+            <article class="compact-stat metric-stock">
                 <span>Stock Units</span>
                 <strong>{{ number_format($totalInventory) }}</strong>
                 <small>&pound;{{ number_format((float) $inventoryValue, 2) }} inventory</small>
@@ -44,32 +44,7 @@
             </article>
         </section>
 
-        <section class="dashboard-workbench">
-            <article class="panel proof-queue-panel">
-                <div class="panel-head">
-                    <h2>Payment Proof Queue</h2>
-                    <a href="{{ route('backend.page', 'reports') }}">View report</a>
-                </div>
-                <div class="queue-list">
-                    @forelse ($recentPaymentProofs as $order)
-                        <a class="queue-item" href="{{ route('backend.orders.show', $order) }}">
-                            <span class="queue-icon"><i class="fa-solid fa-receipt"></i></span>
-                            <div>
-                                <strong>#{{ $order->order_number }}</strong>
-                                <small>{{ $order->customer_name }} &middot; {{ $order->payment_proof_submitted_at?->diffForHumans() ?? 'recently' }}</small>
-                            </div>
-                            <b>&pound;{{ number_format((float) $order->total, 2) }}</b>
-                        </a>
-                    @empty
-                        <div class="empty-queue">
-                            <i class="fa-solid fa-circle-check"></i>
-                            <strong>No proofs waiting</strong>
-                            <span>New uploads will appear here.</span>
-                        </div>
-                    @endforelse
-                </div>
-            </article>
-
+        <section class="dashboard-command-grid">
             <article class="panel orders-panel compact-orders-panel">
                 <div class="panel-head">
                     <h2>Recent Orders</h2>
@@ -89,14 +64,9 @@
                                     <td><span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
                                     <td>{{ $order->tracking_number ?: 'Pending label' }}</td>
                                     <td>
-                                        @php
-                                            $phone = preg_replace('/\D+/', '', $order->phone ?? '');
-                                            $trackUrl = route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email]);
-                                            $message = "Hi {$order->customer_name},\n\nPlease send/upload your payment proof for Arete Performance order #{$order->order_number}.\nTotal: £" . number_format((float) $order->total, 2) . "\n\nUpload here: {$trackUrl}\n\nOnce submitted, we will verify the payment and process your order.";
-                                        @endphp
                                         <div class="action-group">
                                             <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
-                                            <a href="https://wa.me/{{ $phone }}?text={{ rawurlencode($message) }}" target="_blank" rel="noopener" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                                            @include('backend.partials.payment-proof-button', ['order' => $order])
                                         </div>
                                     </td>
                                 </tr>
@@ -107,10 +77,47 @@
                     </table>
                 </div>
             </article>
+
+            <aside class="dashboard-side-stack">
+                <article class="panel ops-snapshot">
+                    <div class="panel-head">
+                        <h2>Order Status</h2>
+                        <a href="{{ route('backend.page', 'orders') }}">Orders</a>
+                    </div>
+                    <div class="status-breakdown status-breakdown-tight">
+                        @foreach ($trackingBreakdown as $status => $count)
+                            <div><span>{{ str_replace('_', ' ', ucfirst($status)) }}</span><strong>{{ number_format($count) }}</strong></div>
+                        @endforeach
+                    </div>
+                </article>
+
+                <article class="panel ops-snapshot">
+                    <div class="panel-head">
+                        <h2>Payment Status</h2>
+                        <a href="{{ route('backend.page', 'reports') }}">Reports</a>
+                    </div>
+                    <div class="status-breakdown status-breakdown-tight">
+                        @foreach ($paymentBreakdown as $status => $count)
+                            <div><span>{{ str_replace('_', ' ', ucfirst($status)) }}</span><strong>{{ number_format($count) }}</strong></div>
+                        @endforeach
+                    </div>
+                </article>
+
+                <article class="panel ops-snapshot">
+                    <div class="panel-head">
+                        <h2>Revenue Split</h2>
+                        <a href="{{ route('backend.page', 'reports') }}">Reports</a>
+                    </div>
+                    <div class="snapshot-grid dashboard-mini-grid">
+                        <div><span>Paid</span><strong>&pound;{{ number_format((float) $paidRevenue, 2) }}</strong><small>{{ number_format($paidOrders) }} orders</small></div>
+                        <div><span>Pending</span><strong>&pound;{{ number_format((float) $pendingRevenue, 2) }}</strong><small>{{ number_format($unpaidOrders) }} orders</small></div>
+                    </div>
+                </article>
+            </aside>
         </section>
 
-        <section class="dashboard-workbench dashboard-workbench-secondary">
-            <article class="panel ops-snapshot">
+        <section class="dashboard-dense-grid">
+            <article class="panel ops-snapshot dashboard-snapshot-panel">
                 <div class="panel-head">
                     <h2>Database Snapshot</h2>
                     <a href="{{ route('backend.page', 'products') }}">Manage</a>
@@ -119,33 +126,25 @@
                     <div><span>Products</span><strong>{{ number_format($totalProducts) }}</strong><small>{{ number_format($activeProducts) }} active / {{ number_format($inactiveProducts) }} inactive</small></div>
                     <div><span>Categories</span><strong>{{ number_format($totalCategories) }}</strong><small>{{ number_format($activeCategories) }} active / {{ number_format($inactiveCategories) }} inactive</small></div>
                     <div><span>Users</span><strong>{{ number_format($totalUsers) }}</strong><small>{{ number_format($activeUsers) }} active</small></div>
-                    <div><span>Reviews</span><strong>{{ number_format($reviewsCount ?? 0) }}</strong><small>customer feedback</small></div>
+                    <div><span>Order Items</span><strong>{{ number_format($orderItemsCount ?? 0) }}</strong><small>{{ number_format($reviewsCount ?? 0) }} reviews</small></div>
                 </div>
             </article>
 
-            <article class="panel ops-snapshot">
+            <article class="panel products-panel compact-products-panel">
                 <div class="panel-head">
-                    <h2>Order Status</h2>
-                    <a href="{{ route('backend.page', 'orders') }}">Orders</a>
-                </div>
-                <div class="status-breakdown">
-                    @foreach ($trackingBreakdown as $status => $count)
-                        <div><span>{{ str_replace('_', ' ', ucfirst($status)) }}</span><strong>{{ number_format($count) }}</strong></div>
-                    @endforeach
-                </div>
-            </article>
-        </section>
-
-        <section class="dashboard-workbench dashboard-workbench-secondary">
-            <article class="panel ops-snapshot">
-                <div class="panel-head">
-                    <h2>Payment Status</h2>
+                    <h2>Best Sellers</h2>
                     <a href="{{ route('backend.page', 'reports') }}">Reports</a>
                 </div>
-                <div class="status-breakdown">
-                    @foreach ($paymentBreakdown as $status => $count)
-                        <div><span>{{ str_replace('_', ' ', ucfirst($status)) }}</span><strong>{{ number_format($count) }}</strong></div>
-                    @endforeach
+                <div class="product-list">
+                    @forelse ($topProducts as $product)
+                        <div class="product-row">
+                            <img src="{{ url($product->product_image ?: 'backend/assets/imgs/product-bottle.png') }}" alt="{{ $product->product_name }}">
+                            <div><strong>{{ $product->product_name }}</strong><span>{{ $product->product_sku ?: 'Order item' }}</span></div>
+                            <em>{{ number_format((int) $product->sold_quantity) }} sold</em>
+                        </div>
+                    @empty
+                        <div class="empty-cell">No sold products yet.</div>
+                    @endforelse
                 </div>
             </article>
 

@@ -1,267 +1,194 @@
 @extends('frontend.layouts.master')
 
 @section('metas')
-@endsection
-
-@section('css')
+  <meta name="description" content="{{ $product->short_description ?: strip_tags($product->description ?? '') }}">
 @endsection
 
 @section('body')
+@php
+  $price = (float) ($product->sale_price ?: $product->price);
+  $productImage = url($product->image ?: 'frontend/assets/images/product-bottle.png');
+  $reportImage = $product->test_report_image ? url($product->test_report_image) : null;
+  $descriptionText = trim(preg_replace('/\s+/', ' ', str_replace('&nbsp;', ' ', strip_tags($product->description ?? ''))));
+  $hasDescription = $descriptionText !== '';
+  $descriptionHtml = $product->description;
+  $descriptionGridClass = $reportImage ? '' : 'has-no-report';
+  $reviewCount = $reviews->count();
+  $reviewAverage = $reviewCount ? round((float) $reviews->avg('rating'), 1) : 0;
+  $reviewCounts = collect(range(5, 1))->mapWithKeys(fn ($rating) => [$rating => $reviews->where('rating', $rating)->count()]);
+@endphp
 
-<main class="product-detail-main">
-    <section class="product-detail-top">
-      <div class="container">
-        <nav class="product-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i><a href="{{ route('frontend.shop') }}#orals">Orals</a><i class="fa-solid fa-chevron-right"></i><span>Anavar 50 (Oxandrolone)</span></nav>
+<div class="product-detail-main">
+  <section class="product-detail-top">
+    <div class="container">
+      <nav class="product-breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i>
+        <a href="{{ route('frontend.shop', array_filter(['category' => $product->category?->slug])) }}">{{ $product->category?->name ?? 'Shop' }}</a><i class="fa-solid fa-chevron-right"></i>
+        <span>{{ $product->name }}</span>
+      </nav>
 
-        <div class="product-detail-layout">
-          <div class="product-gallery">
-            <div class="product-thumbs" aria-label="Product thumbnails">
-              <button class="active" type="button" data-product-image="{{ url('frontend/assets/images/product-bottle.png') }}" data-product-alt="Anavar 50 bottle front"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Bottle front"></button>
-              <button type="button" data-product-image="{{ url('frontend/assets/images/categories-imgs/orals.png') }}" data-product-alt="Anavar 50 oral tablets"><img src="{{ url('frontend/assets/images/categories-imgs/orals.png') }}" alt="Bottle side"></button>
-              <button type="button" data-product-image="{{ url('frontend/assets/images/product-bottle.png') }}" data-product-alt="Anavar 50 tablet view"><span class="tablet-dots"></span></button>
-              <button type="button" data-product-image="{{ url('frontend/assets/images/category-boxes.svg') }}" data-product-alt="Anavar 50 product box"><img src="{{ url('frontend/assets/images/category-boxes.svg') }}" alt="Product box"></button>
-            </div>
-            <figure class="product-main-image" data-product-zoom role="button" tabindex="0" aria-label="Zoom product image" aria-pressed="false">
-              <span class="tag">Best seller</span>
-              <img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Anavar 50 bottle" data-product-main-image>
-            </figure>
+      <div class="product-detail-layout">
+        <div class="product-gallery">
+          <div class="product-thumbs" aria-label="Product media">
+            <button class="active" type="button" data-product-image="{{ $productImage }}" data-product-alt="{{ $product->name }}">
+              <img src="{{ $productImage }}" alt="{{ $product->name }}">
+            </button>
+            @if ($reportImage)
+              <button type="button" data-product-image="{{ $reportImage }}" data-product-alt="{{ $product->name }} test report">
+                <img src="{{ $reportImage }}" alt="{{ $product->name }} test report">
+              </button>
+            @endif
           </div>
+          <figure class="product-main-image" data-product-zoom role="button" tabindex="0" aria-label="Zoom product image" aria-pressed="false">
+            @if ($product->is_featured)<span class="tag">Popular</span>@endif
+            <img src="{{ $productImage }}" alt="{{ $product->name }}" data-product-main-image>
+            <figcaption><span><i class="fa-solid fa-magnifying-glass-plus"></i> Click to zoom</span><span>{{ $reportImage ? '2 images' : '1 image' }}</span></figcaption>
+          </figure>
+        </div>
 
-          <aside class="product-purchase">
-            <span class="product-category-pill">Orals</span>
-            <h1>Anavar 50 <span>(Oxandrolone)</span></h1>
-            <div class="product-rating"><span>&#9733;&#9733;&#9733;&#9733;&#9733;</span><small>(128 Reviews)</small></div>
-            <strong class="product-price">$59.99</strong>
-            <div class="product-assurance">
-              <div><i class="fa-regular fa-circle-check"></i> In Stock</div>
-              <div><i class="fa-solid fa-truck-fast"></i> Discreet Shipping</div>
-              <div><i class="fa-solid fa-flask-vial"></i> Lab Tested</div>
-              <div><i class="fa-solid fa-globe"></i> Worldwide Delivery</div>
-            </div>
+        <aside class="product-purchase">
+          <span class="product-category-pill">{{ $product->category?->name ?? 'Product' }}</span>
+          <h1>{{ $product->name }}</h1>
+          <div class="product-rating"><span>&#9733;&#9733;&#9733;&#9733;&#9733;</span><small>({{ $product->stock }} in stock)</small></div>
+          <strong class="product-price">&pound;{{ number_format($price, 2) }}</strong>
+          <p class="product-detail-summary">{{ $product->short_description }}</p>
+          <div class="product-assurance">
+            <div><i class="fa-regular fa-circle-check"></i> {{ $product->stock > 0 ? 'In Stock' : 'Out of Stock' }}</div>
+            <div><i class="fa-solid fa-prescription-bottle-medical"></i> Pharma Grade</div>
+            <div><i class="fa-solid fa-flask-vial"></i> Lab Tested</div>
+            <div><i class="fa-solid fa-sterling-sign"></i> &pound;4.99 Shipping</div>
+          </div>
+          @if ($product->stock > 0)
             <div class="product-quantity">
               <span>Quantity</span>
               <div class="cart-stepper"><button type="button" data-product-qty-dec aria-label="Decrease quantity">-</button><span data-product-qty>1</span><button type="button" data-product-qty-inc aria-label="Increase quantity">+</button></div>
             </div>
-            <div class="product-actions">
-              <button class="btn btn-gold" type="button" data-product-add="anavar-50">Add to cart <i class="fa-solid fa-cart-plus"></i></button>
-              <button class="btn buy-now-btn" type="button" data-buy-now="anavar-50">Buy now <i class="fa-solid fa-bolt"></i></button>
+          @endif
+          <div class="product-actions">
+            @if ($product->stock > 0)
+              <button class="btn btn-gold" type="button" data-product-add="{{ $product->id }}">Add to cart <i class="fa-solid fa-cart-plus"></i></button>
+              <button class="btn buy-now-btn" type="button" data-buy-now="{{ $product->id }}">Buy now <i class="fa-solid fa-bolt"></i></button>
+            @else
+              <button class="btn btn-gold" type="button" data-stock-notify="{{ $product->id }}" data-product-name="{{ $product->name }}">Inform Me When Available <i class="fa-solid fa-bell"></i></button>
+            @endif
+          </div>
+          <div class="secure-payment">
+            <span>Secure Checkout With</span>
+            <div class="payment-badges cart-payments" aria-label="Accepted payment methods">
+              <span class="payment-image"><img src="{{ url('frontend/assets/images/google-pay.webp') }}" alt="Google Pay"></span>
+              <span class="payment-image"><img src="{{ url('frontend/assets/images/apple-pay.webp') }}" alt="Apple Pay"></span>
             </div>
-            <div class="secure-payment">
-              <span>Secure Checkout With</span>
-              <div class="payment-badges cart-payments" aria-label="Accepted payment methods">
-                <span class="payment-image"><img src="{{ url('frontend/assets/images/google-pay.webp') }}" alt="Google Pay"></span>
-                <span class="payment-image"><img src="{{ url('frontend/assets/images/apple-pay.webp') }}" alt="Apple Pay"></span>
-              </div>
-            </div>
-          </aside>
-        </div>
-
-        <div class="product-benefit-strip">
-          <div><i class="fa-solid fa-dumbbell"></i><strong>Lean Muscle Growth</strong><span>Promotes lean muscle mass and strength.</span></div>
-          <div><i class="fa-solid fa-weight-hanging"></i><strong>Increased Strength</strong><span>Enhances power and performance.</span></div>
-          <div><i class="fa-solid fa-bolt"></i><strong>Faster Recovery</strong><span>Reduces recovery time and muscle fatigue.</span></div>
-          <div><i class="fa-solid fa-person-running"></i><strong>Improved Performance</strong><span>Boosts endurance and athletic output.</span></div>
-        </div>
+          </div>
+        </aside>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="product-info-section">
-      <div class="container">
-        <article class="product-info-card tab-content-card">
-          <nav class="product-tabs" aria-label="Description tab">
-            <a class="active" href="#description">Description</a>
-            <a href="#benefits">Benefits</a>
-            <a href="#dosage">Dosage</a>
-            <a href="#ingredients">Ingredients</a>
-            <a href="#reviews">Reviews</a>
-            <a href="#faq">FAQ</a>
-          </nav>
-          <div class="product-info-grid" id="description">
-            <div class="product-description">
-              <h2>About Anavar 50 (Oxandrolone)</h2>
-              <p>Anavar (Oxandrolone) is a mild yet highly effective anabolic steroid widely used for lean muscle retention, strength gains, and enhanced recovery. It is ideal for both cutting cycles and performance enhancement without causing significant water retention or estrogenic side effects.</p>
-              <p>Each tablet contains 50mg of pure Oxandrolone, manufactured in GMP certified facilities and lab tested for purity and potency.</p>
-            </div>
-            <dl class="product-specs">
-              <div><dt>Product Name:</dt><dd>Anavar 50</dd></div>
-              <div><dt>Generic Name:</dt><dd>Oxandrolone</dd></div>
-              <div><dt>Strength:</dt><dd>50mg</dd></div>
-              <div><dt>Form:</dt><dd>Tablet</dd></div>
-              <div><dt>Quantity:</dt><dd>50 Tablets</dd></div>
-              <div><dt>Category:</dt><dd>Oral Steroid</dd></div>
-              <div><dt>Brand:</dt><dd>Arete Performance</dd></div>
-              <div><dt>SKU:</dt><dd>AR-OR-ANV50</dd></div>
-            </dl>
-            <aside class="lab-report">
+  @if ($hasDescription)
+  <section class="product-info-section">
+    <div class="container">
+      <div data-product-description-source hidden>{!! $descriptionHtml !!}</div>
+
+      <article class="product-info-card tab-content-card" id="description" data-tab-card="description">
+        <nav class="product-tabs" aria-label="Description tab">
+          <a class="active" href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
+        </nav>
+        <div class="product-info-grid {{ $descriptionGridClass }}">
+          <div class="product-description" data-description-section="description">
+            <h2 data-section-title="description"></h2>
+          </div>
+          <dl class="product-specs" data-description-section="specs"></dl>
+          @if ($reportImage)
+            <aside class="lab-report" data-product-report="{{ $reportImage }}" data-product-report-title="{{ $product->name }} test report">
               <h3>Lab Tested &amp; Certified</h3>
-              <div class="report-preview"><img src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete lab report"></div>
+              <div class="report-preview"><img src="{{ $reportImage }}" alt="{{ $product->name }} test report"></div>
               <button type="button" data-lab-report>View full report <i class="fa-solid fa-download"></i></button>
             </aside>
-          </div>
-          <div class="description-assurance">
-            <div><i class="fa-solid fa-shield-halved"></i><strong>In Stock</strong><span>Order now and get fast delivery</span></div>
-            <div><i class="fa-solid fa-flask-vial"></i><strong>Lab Tested</strong><span>Every batch is lab verified</span></div>
-            <div><i class="fa-solid fa-truck-fast"></i><strong>Discreet Shipping</strong><span>Private &amp; secure worldwide delivery</span></div>
-            <div><i class="fa-solid fa-globe"></i><strong>Worldwide Delivery</strong><span>We ship to 100+ countries</span></div>
-          </div>
-        </article>
+          @endif
+        </div>
+      </article>
 
-        <article class="product-info-card tab-content-card" id="benefits">
-          <nav class="product-tabs" aria-label="Benefits tab">
-            <a href="#description">Description</a>
-            <a class="active" href="#benefits">Benefits</a>
-            <a href="#dosage">Dosage</a>
-            <a href="#ingredients">Ingredients</a>
-            <a href="#reviews">Reviews</a>
-            <a href="#faq">FAQ</a>
-          </nav>
-          <div class="benefits-tab-grid">
-            <div>
-              <h2>Key Benefits</h2>
-              <div class="benefit-list">
-                <div><i class="fa-solid fa-dumbbell"></i><strong>Lean Muscle Growth</strong><span>Promotes lean muscle mass without water retention.</span></div>
-                <div><i class="fa-solid fa-weight-hanging"></i><strong>Increased Strength</strong><span>Enhances physical strength and power output.</span></div>
-                <div><i class="fa-solid fa-bolt"></i><strong>Faster Recovery</strong><span>Reduces muscle recovery time and fatigue.</span></div>
-                <div><i class="fa-solid fa-person-running"></i><strong>Improved Performance</strong><span>Boosts endurance and athletic performance.</span></div>
-              </div>
-            </div>
-            <figure class="benefits-product-shot"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Anavar 50 with tablets"></figure>
-          </div>
-        </article>
+      <article class="product-info-card tab-content-card" id="benefits" data-tab-card="benefits">
+        <nav class="product-tabs" aria-label="Benefits tab">
+          <a href="#description">Description</a><a class="active" href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
+        </nav>
+        <div class="benefits-tab-grid">
+          <div><h2 data-section-title="benefits"></h2><div class="benefit-list dynamic-rich-content" data-description-section="benefits"></div></div>
+          <figure class="benefits-product-shot"><img src="{{ $productImage }}" alt="{{ $product->name }}"></figure>
+        </div>
+      </article>
 
-        <article class="product-info-card tab-content-card" id="dosage">
-          <nav class="product-tabs" aria-label="Dosage tab">
-            <a href="#description">Description</a>
-            <a href="#benefits">Benefits</a>
-            <a class="active" href="#dosage">Dosage</a>
-            <a href="#ingredients">Ingredients</a>
-            <a href="#reviews">Reviews</a>
-            <a href="#faq">FAQ</a>
-          </nav>
-          <div class="dosage-tab-grid">
-            <div class="dosage-copy">
-              <h2>Recommended Dosage</h2>
-              <p>Take 1-2 tablets daily with plenty of water. For best results, follow a proper training and nutrition plan.</p>
-            </div>
-            <div class="dosage-steps">
-              <div><i class="fa-solid fa-flask-vial"></i><strong>Week 1</strong><span>Adaptation Phase</span><small>Your body adjusts to the compound.</small></div>
-              <div><i class="fa-solid fa-chart-line"></i><strong>Week 4</strong><span>Visible Progress</span><small>Strength and lean mass improvements.</small></div>
-              <div><i class="fa-solid fa-bullseye"></i><strong>Week 8</strong><span>Optimal Results</span><small>Achieve your desired physique and performance.</small></div>
-              <div><i class="fa-solid fa-rotate"></i><strong>Post Cycle</strong><span>Maintain Results</span><small>Follow PCT to maintain gains and health.</small></div>
-            </div>
-          </div>
-          <div class="dosage-note"><i class="fa-solid fa-info"></i><p><strong>Note:</strong> Do not exceed the recommended dosage. Results may vary based on individual genetics, diet, and training intensity. Consult your physician before use.</p></div>
-        </article>
+      <article class="product-info-card tab-content-card" id="dosage" data-tab-card="dosage">
+        <nav class="product-tabs" aria-label="Dosage tab">
+          <a href="#description">Description</a><a href="#benefits">Benefits</a><a class="active" href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
+        </nav>
+        <div class="dosage-tab-grid">
+          <div class="dosage-copy"><h2 data-section-title="dosage"></h2><div class="dynamic-rich-content" data-description-section="dosage"></div></div>
+          <div class="dosage-steps" data-description-section="dosage-steps"></div>
+        </div>
+        <div class="dosage-note" data-description-section="dosage-note"></div>
+      </article>
 
-        <article class="product-info-card tab-content-card" id="ingredients">
-          <nav class="product-tabs" aria-label="Ingredients tab">
-            <a href="#description">Description</a>
-            <a href="#benefits">Benefits</a>
-            <a href="#dosage">Dosage</a>
-            <a class="active" href="#ingredients">Ingredients</a>
-            <a href="#reviews">Reviews</a>
-            <a href="#faq">FAQ</a>
-          </nav>
-          <div class="ingredients-tab-grid">
-            <div>
-              <h2>Ingredients</h2>
-              <p>Each tablet is formulated with premium quality ingredients to ensure maximum purity, potency, and safety.</p>
-              <table class="ingredient-table">
-                <thead><tr><th>Ingredient</th><th>Amount Per Tablet</th></tr></thead>
-                <tbody>
-                  <tr><td>Oxandrolone</td><td>50mg</td></tr>
-                  <tr><td>Microcrystalline Cellulose</td><td>150mg</td></tr>
-                  <tr><td>Lactose Monohydrate</td><td>100mg</td></tr>
-                  <tr><td>Povidone</td><td>50mg</td></tr>
-                  <tr><td>Magnesium Stearate</td><td>5mg</td></tr>
-                  <tr><td><strong>Total</strong></td><td><strong>355mg</strong></td></tr>
-                </tbody>
-              </table>
-            </div>
-            <aside class="ingredient-certifications">
-              <div><i class="fa-solid fa-leaf"></i><strong>100% Pure Ingredients</strong><span>No fillers, No additives, Just pure results.</span></div>
-              <div><i class="fa-solid fa-flask-vial"></i><strong>Lab Verified</strong><span>Every batch is tested for purity and safety.</span></div>
-              <div><i class="fa-solid fa-shield-halved"></i><strong>Safe &amp; Effective</strong><span>Manufactured in GMP certified facilities.</span></div>
-            </aside>
-          </div>
-        </article>
+      <article class="product-info-card tab-content-card" id="ingredients" data-tab-card="ingredients">
+        <nav class="product-tabs" aria-label="Ingredients tab">
+          <a href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a class="active" href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
+        </nav>
+        <div class="ingredients-tab-grid">
+          <div><h2 data-section-title="ingredients"></h2><div class="dynamic-rich-content" data-description-section="ingredients"></div></div>
+          <aside class="ingredient-certifications" data-description-section="ingredient-cards"></aside>
+        </div>
+      </article>
 
-        <article class="product-info-card tab-content-card" id="reviews">
-          <nav class="product-tabs" aria-label="Reviews tab">
-            <a href="#description">Description</a>
-            <a href="#benefits">Benefits</a>
-            <a href="#dosage">Dosage</a>
-            <a href="#ingredients">Ingredients</a>
-            <a class="active" href="#reviews">Reviews</a>
-            <a href="#faq">FAQ</a>
-          </nav>
-          <div class="reviews-tab-content">
-            <h2>Customer Reviews</h2>
-            <div class="reviews-grid">
-            <div class="review-score"><strong>4.9</strong><span>&#9733;&#9733;&#9733;&#9733;&#9733;</span><small>Based on 128 Reviews</small></div>
+      <article class="product-info-card tab-content-card" id="reviews" data-tab-card="reviews" data-server-content="{{ $reviews->isNotEmpty() ? '1' : '0' }}">
+        <nav class="product-tabs" aria-label="Reviews tab">
+          <a href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a class="active" href="#reviews">Reviews</a><a href="#faq">FAQ</a>
+        </nav>
+        <div class="reviews-tab-content">
+          <h2>Customer Reviews</h2>
+          <div class="reviews-grid">
+            <div class="review-score"><strong>{{ number_format($reviewAverage, 1) }}</strong><span>{!! str_repeat('&#9733;', (int) round($reviewAverage)) !!}</span><small>{{ $reviewCount }} reviews</small></div>
             <div class="review-bars">
-              <div><span>5</span><b><i style="width: 88%"></i></b><em>114</em></div>
-              <div><span>4</span><b><i style="width: 18%"></i></b><em>10</em></div>
-              <div><span>3</span><b><i style="width: 8%"></i></b><em>3</em></div>
-              <div><span>2</span><b><i style="width: 3%"></i></b><em>1</em></div>
-              <div><span>1</span><b><i style="width: 0%"></i></b><em>0</em></div>
+              @foreach ($reviewCounts as $rating => $count)
+                <div><span>{{ $rating }}</span><b><i style="width: {{ $reviewCount ? round(($count / $reviewCount) * 100) : 0 }}%"></i></b><em>{{ $count }}</em></div>
+              @endforeach
             </div>
-            <article class="review-card"><span>&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>"Excellent quality and fast results. Helped me gain lean muscle without any bloating."</p><div><img src="{{ url('frontend/assets/images/testimonials/miker.png') }}" alt="John D."><strong>John D.<small>Verified Buyer</small></strong></div></article>
-            <article class="review-card"><span>&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>"Trusted brand with top notch products. Anavar 50 is 100% authentic."</p><div><img src="{{ url('frontend/assets/images/testimonials/danielk.png') }}" alt="Mike R."><strong>Mike R.<small>Verified Buyer</small></strong></div></article>
-            <article class="review-card"><span>&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>"Great for cutting cycles. Strength increased and recovery improved."</p><div><img src="{{ url('frontend/assets/images/testimonials/avamitchell.png') }}" alt="Alex P."><strong>Alex P.<small>Verified Buyer</small></strong></div></article>
-            </div>
-            <div class="review-dots" aria-hidden="true"><span class="active"></span><span></span><span></span><span></span><span></span></div>
+            @foreach ($reviews as $review)
+              <article class="review-card"><span>{!! str_repeat('&#9733;', (int) $review->rating) !!}</span><p>"{{ $review->comment }}"</p><div><img src="{{ url($review->avatar ?: 'frontend/assets/images/testimonials/miker.png') }}" alt="{{ $review->customer_name }}"><strong>{{ $review->customer_name }}<small>{{ $review->customer_title ?: 'Verified Buyer' }}</small></strong></div></article>
+            @endforeach
           </div>
-        </article>
+          <div class="review-dots" aria-hidden="true"><span class="active"></span><span></span><span></span></div>
+        </div>
+      </article>
 
-        <article class="product-info-card tab-content-card" id="faq">
-          <nav class="product-tabs" aria-label="FAQ tab">
-            <a href="#description">Description</a>
-            <a href="#benefits">Benefits</a>
-            <a href="#dosage">Dosage</a>
-            <a href="#ingredients">Ingredients</a>
-            <a href="#reviews">Reviews</a>
-            <a class="active" href="#faq">FAQ</a>
-          </nav>
-          <div class="faq-tab-grid">
-            <div>
-              <h2>Frequently Asked Questions</h2>
-              <div class="faq-list">
-                <details open><summary>What is Anavar 50 used for?</summary><p>Anavar 50 (Oxandrolone) is used to promote lean muscle growth, improve strength, enhance recovery, and boost overall performance.</p></details>
-                <details><summary>Is Anavar 50 safe?</summary><p>It should be used responsibly and only after consulting a qualified healthcare professional.</p></details>
-                <details><summary>What is the recommended dosage?</summary><p>The sample recommendation is 1-2 tablets daily with plenty of water.</p></details>
-                <details><summary>How long does it take to see results?</summary><p>Many users track visible progress around week 4 when combined with training and nutrition.</p></details>
-                <details><summary>Do you ship internationally?</summary><p>Worldwide shipping is available to supported regions with discreet packaging.</p></details>
-              </div>
-            </div>
-            <aside class="faq-support">
-              <i class="fa-solid fa-headset"></i>
-              <h3>Still Have Questions?</h3>
-              <p>Our support team is here to help you.</p>
-              <a class="btn buy-now-btn" href="{{ route('frontend.index') }}#contact">Contact support</a>
-            </aside>
-          </div>
-        </article>
+      <article class="product-info-card tab-content-card" id="faq" data-tab-card="faq">
+        <nav class="product-tabs" aria-label="FAQ tab">
+          <a href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a class="active" href="#faq">FAQ</a>
+        </nav>
+        <div class="faq-tab-grid">
+          <div><h2 data-section-title="faq"></h2><div class="faq-list" data-description-section="faq"></div></div>
+        </div>
+      </article>
 
+      @if ($relatedProducts->isNotEmpty())
         <section class="related-products">
           <h2>You May Also Like</h2>
           <div class="related-grid">
-            <article class="related-card" data-product-id="cardarine"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Cardarine"><h3>Cardarine<br><span>(GW-501516)</span></h3><strong>$69.99</strong><button type="button"><i class="fa-solid fa-cart-plus"></i></button></article>
-            <article class="related-card" data-product-id="ostarine"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Ostarine"><h3>Ostarine MK-2866<br><span>(Enobosarm)</span></h3><strong>$49.99</strong><button type="button"><i class="fa-solid fa-cart-plus"></i></button></article>
-            <article class="related-card" data-product-id="clenbuterol"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Clenbuterol"><h3>Clenbuterol<br><span>(Clenbut)</span></h3><strong>$39.99</strong><button type="button"><i class="fa-solid fa-cart-plus"></i></button></article>
-            <article class="related-card" data-product-id="testosterone-enanthate"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Testosterone Enanthate"><h3>Testosterone Enanthate<br><span>250mg</span></h3><strong>$59.99</strong><button type="button"><i class="fa-solid fa-cart-plus"></i></button></article>
-            <article class="related-card" data-product-id="bpc-157"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="BPC-157"><h3>BPC-157<br><span>5mg</span></h3><strong>$59.99</strong><button type="button"><i class="fa-solid fa-cart-plus"></i></button></article>
+            @foreach ($relatedProducts as $related)
+              <article class="related-card {{ $related->stock <= 0 ? 'is-out-of-stock' : '' }}" data-product-id="{{ $related->id }}" data-product-name="{{ $related->name }}" data-product-url="{{ route('frontend.product-details', $related->slug) }}">
+                @if ($related->stock <= 0)<span class="tag stock-tag">Out of Stock</span>@endif
+                <img src="{{ url($related->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $related->name }}">
+                <h3>{{ $related->name }}<br><span>{{ $related->category?->name }}</span></h3>
+                <strong>&pound;{{ number_format((float) ($related->sale_price ?: $related->price), 2) }}</strong>
+                @if ($related->stock > 0)<button type="button" aria-label="Add {{ $related->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button>@else<button class="notify-stock-btn" type="button" data-stock-notify="{{ $related->id }}" data-product-name="{{ $related->name }}">Inform Me</button>@endif
+              </article>
+            @endforeach
           </div>
         </section>
+      @endif
+    </div>
+  </section>
+  @endif
 
-      </div>
-    </section>
-
-    @include('frontend.inc.delivery-trusted')
-
-</main>
-    
-@endsection
-
-@section('js')
+  @include('frontend.inc.delivery-trusted')
+</div>
 @endsection

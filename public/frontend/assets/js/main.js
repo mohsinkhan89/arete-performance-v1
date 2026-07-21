@@ -2,8 +2,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const siteLoader = document.querySelector("[data-site-loader]");
   const loaderProgress = document.querySelector("[data-loader-progress]");
   const loaderPercent = document.querySelector("[data-loader-percent]");
+  const loaderStorageKey = "arete_loader_seen";
   let loaderValue = 0;
   let loaderTimer = null;
+
+  const hasSeenLoader = () => {
+    try {
+      return localStorage.getItem(loaderStorageKey) === "true";
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const markLoaderSeen = () => {
+    try {
+      localStorage.setItem(loaderStorageKey, "true");
+    } catch (error) {
+      // Storage can be unavailable in private browsing; the loader still works normally.
+    }
+  };
 
   const setLoaderProgress = (value) => {
     loaderValue = Math.max(loaderValue, Math.min(100, Math.round(value)));
@@ -13,27 +30,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const hideSiteLoader = () => {
     setLoaderProgress(100);
-    window.setTimeout(() => siteLoader?.classList.add("is-hidden"), 220);
+    markLoaderSeen();
+    window.setTimeout(() => {
+      siteLoader?.classList.add("is-hidden");
+      document.documentElement.classList.add("loader-seen");
+    }, 220);
     if (loaderTimer) window.clearInterval(loaderTimer);
   };
 
   const showSiteLoader = () => {
+    if (hasSeenLoader()) return;
     loaderValue = 0;
     siteLoader?.classList.remove("is-hidden");
     setLoaderProgress(18);
   };
 
   if (siteLoader) {
-    setLoaderProgress(12);
-    loaderTimer = window.setInterval(() => {
-      if (loaderValue < 68) setLoaderProgress(loaderValue + Math.random() * 9);
-    }, 170);
-    window.setTimeout(() => setLoaderProgress(72), 620);
-    window.setTimeout(hideSiteLoader, 1450);
-    window.addEventListener("load", () => window.setTimeout(hideSiteLoader, 1450));
-    window.addEventListener("pageshow", (event) => {
-      if (event.persisted) hideSiteLoader();
-    });
+    if (hasSeenLoader()) {
+      siteLoader.classList.add("is-hidden");
+      document.documentElement.classList.add("loader-seen");
+    } else {
+      setLoaderProgress(12);
+      loaderTimer = window.setInterval(() => {
+        if (loaderValue < 68) setLoaderProgress(loaderValue + Math.random() * 9);
+      }, 170);
+      window.setTimeout(() => setLoaderProgress(72), 620);
+      window.setTimeout(hideSiteLoader, 1450);
+      window.addEventListener("load", () => window.setTimeout(hideSiteLoader, 1450));
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted) hideSiteLoader();
+      });
+    }
   }
 
   document.addEventListener("click", (event) => {
@@ -59,7 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const cookieAccept = document.querySelector("[data-cookie-accept]");
   const cookieReject = document.querySelector("[data-cookie-reject]");
   const cookieToggle = document.querySelector("[data-cookie-toggle]");
-  const cookieCloseTargets = document.querySelectorAll("[data-cookie-close]");
   const cookieCustomize = document.querySelector("[data-cookie-customize]");
   const cookieAnalytics = document.querySelector("[data-cookie-analytics]");
   const cookieMarketing = document.querySelector("[data-cookie-marketing]");
@@ -90,7 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.setTimeout(openCookieConsent, 1700);
   }
 
-  cookieCloseTargets.forEach((target) => target.addEventListener("click", closeCookieConsent));
   cookieAccept?.addEventListener("click", () => saveCookiePreferences({ analytics: true, marketing: true }));
   cookieReject?.addEventListener("click", () => saveCookiePreferences({ analytics: false, marketing: false }));
   cookieToggle?.addEventListener("click", () => {
@@ -177,11 +202,66 @@ document.addEventListener("DOMContentLoaded", () => {
   const reportLightbox = document.querySelector(".report-lightbox");
   const reportLightboxImage = document.querySelector("[data-report-lightbox-image]");
   const reportLightboxTitle = document.querySelector("[data-report-lightbox-title]");
+  const stockNotifyModal = document.createElement("div");
+  stockNotifyModal.className = "stock-notify-modal";
+  stockNotifyModal.setAttribute("aria-hidden", "true");
+  stockNotifyModal.innerHTML = `
+    <div class="stock-notify-dialog" role="dialog" aria-modal="true" aria-labelledby="stockNotifyTitle">
+      <button class="stock-notify-close" type="button" data-stock-notify-close aria-label="Close notification form"><i class="fa-solid fa-xmark"></i></button>
+      <span><i class="fa-solid fa-bell"></i></span>
+      <h2 id="stockNotifyTitle">Request Notification</h2>
+      <p data-stock-notify-product>Share your details and we will contact you as soon as stock returns.</p>
+      <form data-stock-notify-form>
+        <input type="hidden" name="product_id" data-stock-notify-id>
+        <label>Full Name<input type="text" name="name" required maxlength="120"></label>
+        <label>Email Address<input type="email" name="email" required maxlength="255"></label>
+        <label>Phone Number<input type="tel" name="phone" maxlength="30"></label>
+        <label>Required Quantity<input type="number" name="quantity" min="1" max="999" value="1"></label>
+        <label>Additional information<textarea name="message" maxlength="1000" rows="3"></textarea></label>
+        <button class="btn btn-gold" type="submit">Send Request <i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>`;
+  document.body.appendChild(stockNotifyModal);
 
   const money = (value) => `£${Number(value || 0).toFixed(2)}`;
   const findProduct = (id) => products.find((product) => product.id === id);
   const cartQty = () => [...cart.values()].reduce((total, qty) => total + qty, 0);
   const csrfToken = document.querySelector("meta[name='csrf-token']")?.content || "";
+  const stockNotifyStorageKey = "arete_stock_notified_products";
+  let activeStockNotifyButton = null;
+
+  function notifiedProductIds() {
+    try {
+      return JSON.parse(localStorage.getItem(stockNotifyStorageKey) || "[]");
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function rememberStockNotified(productId) {
+    if (!productId) return;
+    const ids = new Set(notifiedProductIds().map(String));
+    ids.add(String(productId));
+    localStorage.setItem(stockNotifyStorageKey, JSON.stringify([...ids]));
+  }
+
+  function setStockButtonNotified(button) {
+    if (!button) return;
+    button.disabled = true;
+    button.classList.add("is-notified");
+    button.setAttribute("aria-disabled", "true");
+    button.innerHTML = 'Notified <i class="fa-solid fa-check"></i>';
+  }
+
+  function applyStockNotifiedState(root = document) {
+    const ids = new Set(notifiedProductIds().map(String));
+    if (!ids.size) return;
+    root.querySelectorAll("[data-stock-notify]").forEach((button) => {
+      if (ids.has(String(button.dataset.stockNotify))) {
+        setStockButtonNotified(button);
+      }
+    });
+  }
 
   function prepareAnimatedHeadings() {
     document.querySelectorAll(".section-heading h2, .why-intro h2").forEach((heading) => {
@@ -297,6 +377,981 @@ document.addEventListener("DOMContentLoaded", () => {
     if (reportLightboxImage) reportLightboxImage.src = "";
   }
 
+  function openStockNotify(productId, productName = "Selected product", triggerButton = null) {
+    activeStockNotifyButton = triggerButton;
+    stockNotifyModal.querySelector("[data-stock-notify-id]").value = productId || "";
+    stockNotifyModal.querySelector("[data-stock-notify-product]").textContent = `${productName}: share your details and we will contact you as soon as stock returns.`;
+    stockNotifyModal.classList.add("is-open");
+    stockNotifyModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("panel-open");
+    setTimeout(() => stockNotifyModal.querySelector("input[name='name']")?.focus(), 120);
+  }
+
+  function closeStockNotify() {
+    stockNotifyModal.classList.remove("is-open");
+    stockNotifyModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("panel-open");
+    syncBodyLock();
+  }
+
+  async function submitStockNotify(form) {
+    const productId = form.querySelector("[data-stock-notify-id]")?.value;
+    if (!productId) return;
+
+    const submitButton = form.querySelector("button[type='submit']");
+    submitButton.disabled = true;
+    submitButton.innerHTML = 'Sending... <i class="fa-solid fa-spinner fa-spin"></i>';
+
+    try {
+      const response = await fetch(endpoint(route("stockNotifyBase", "/stock-notify"), productId), {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": csrfToken
+        },
+        body: JSON.stringify(Object.fromEntries(new FormData(form).entries()))
+      });
+      if (!response.ok) throw new Error("Stock notify request failed.");
+      const data = await response.json();
+      showToast(data.message || "Thanks. We will contact you when this product is available.");
+      rememberStockNotified(productId);
+      setStockButtonNotified(activeStockNotifyButton);
+      applyStockNotifiedState();
+      form.reset();
+      closeStockNotify();
+    } catch (error) {
+      showToast("Unable to send request right now.");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.innerHTML = 'Send Request <i class="fa-solid fa-paper-plane"></i>';
+      activeStockNotifyButton = null;
+    }
+  }
+
+  function initProductDescriptionSections() {
+    const source = document.querySelector("[data-product-description-source]");
+    if (!source) return;
+
+    if (source.dataset.fallbackDescription === "1") {
+      const availableTabs = document.querySelector('[data-tab-card="reviews"]')?.dataset.serverContent === "1"
+        ? ["description", "reviews"]
+        : ["description"];
+
+      document.querySelectorAll("[data-tab-card]").forEach((card) => {
+        const key = card.dataset.tabCard;
+        card.classList.toggle("is-hidden", !availableTabs.includes(key));
+      });
+
+      document.querySelectorAll(".product-tabs").forEach((nav) => {
+        nav.style.setProperty("--visible-tabs", String(availableTabs.length));
+        nav.querySelectorAll("a").forEach((link) => {
+          const key = link.getAttribute("href")?.replace("#", "");
+          const isVisible = availableTabs.includes(key);
+          link.hidden = !isVisible;
+          link.classList.toggle("is-hidden", !isVisible);
+        });
+      });
+
+      return;
+    }
+
+    const targets = {
+      description: document.querySelector('[data-description-section="description"]'),
+      specs: document.querySelector('[data-description-section="specs"]'),
+      // assurance: document.querySelector('[data-description-section="assurance"]'),
+      benefits: document.querySelector('[data-description-section="benefits"]'),
+      dosage: document.querySelector('[data-description-section="dosage"]'),
+      dosageSteps: document.querySelector('[data-description-section="dosage-steps"]'),
+      dosageNote: document.querySelector('[data-description-section="dosage-note"]'),
+      ingredients: document.querySelector('[data-description-section="ingredients"]'),
+      ingredientCards: document.querySelector('[data-description-section="ingredient-cards"]'),
+      faq: document.querySelector('[data-description-section="faq"]'),
+    };
+
+    const tabOrder = ["description", "benefits", "dosage", "ingredients", "reviews", "faq"];
+    const sectionTitles = {};
+    const buckets = Object.fromEntries(["description", "benefits", "dosage", "ingredients", "faq"].map((key) => [key, []]));
+    const renderExactDescriptionLayout = () => {
+      if (!source.querySelector(".product-info-grid")) return false;
+
+      const descriptionCard = document.querySelector('[data-tab-card="description"]');
+      const nav = descriptionCard?.querySelector(".product-tabs");
+      if (!descriptionCard || !nav) return false;
+
+      [...descriptionCard.children].forEach((child) => {
+        if (child !== nav) child.remove();
+      });
+
+      const holder = document.createElement("div");
+      holder.innerHTML = source.innerHTML;
+      holder.querySelectorAll(".product-tabs").forEach((sourceNav) => sourceNav.remove());
+
+      holder.querySelectorAll(":scope > .product-info-grid, :scope > .description-assurance").forEach((child) => {
+        descriptionCard.appendChild(child.cloneNode(true));
+      });
+
+      return true;
+    };
+
+    const hasExactDescriptionLayout = renderExactDescriptionLayout();
+
+    const sectionFromHeading = (text) => {
+      const value = String(text || "").toLowerCase();
+      if (value.includes("key benefit") || value.includes("benefit")) return "benefits";
+      if (value.includes("recommended dosage") || value.includes("recommanded dosage") || value.includes("dosage") || value.includes("dose") || value.includes("usage")) return "dosage";
+      if (value.includes("ingredient") || value.includes("composition")) return "ingredients";
+      if (value.includes("faq") || value.includes("faqs") || value.includes("question")) return "faq";
+      if (value.includes("description") || value.includes("about")) return "description";
+      return null;
+    };
+
+    const iconForText = (text, fallback = "fa-circle-check") => {
+      const value = String(text || "").toLowerCase();
+      const matches = [
+        [["add to cart", "cart", "basket"], "fa-cart-plus"],
+        [["place order", "order", "checkout"], "fa-clipboard-check"],
+        [["press send", "send", "whatsapp", "message"], "fa-paper-plane"],
+        [["we confirm", "confirm", "confirmed"], "fa-circle-check"],
+        [["fast", "secure delivery", "discreet shipping", "shipping", "delivery"], "fa-truck-fast"],
+        [["delivery all over uk", "worldwide", "all over", "uk", "country", "countries", "global"], "fa-globe"],
+        [["flat delivery", "£4.99", "4.99", "price", "fee"], "fa-sterling-sign"],
+        [["pharma grade", "pharma", "grade", "premium"], "fa-prescription-bottle-medical"],
+        [["lab tested", "lab", "tested", "verified", "report"], "fa-flask-vial"],
+        [["new arrivals", "new arrival"], "fa-box-open"],
+        [["top rated", "rated", "review", "reviews"], "fa-star"],
+        [["featured", "recommended", "highly recommended"], "fa-medal"],
+        [["increased strength", "strength", "power output"], "fa-weight-hanging"],
+        [["lean muscle", "muscle growth", "muscle", "growth"], "fa-dumbbell"],
+        [["recover", "recovery", "fatigue"], "fa-bolt"],
+        [["performance", "endurance", "athletic"], "fa-person-running"],
+        [["lean", "weight", "cut", "fat"], "fa-weight-hanging"],
+        [["dose", "dosage", "tablet", "capsule", "mg"], "fa-prescription-bottle-medical"],
+        [["week", "cycle", "phase", "routine"], "fa-calendar-days"],
+        [["target", "goal", "result", "progress"], "fa-bullseye"],
+        [["ingredient", "pure", "leaf", "natural"], "fa-leaf"],
+        [["safe", "quality", "trusted", "premium"], "fa-shield-halved"],
+      ];
+      return matches.find(([words]) => words.some((word) => value.includes(word)))?.[1] || fallback;
+    };
+
+    const cleanText = (value) => String(value || "").replace(/\s+/g, " ").trim();
+
+    const sectionMarkerSelector = "strong, b, h2, h3, h4";
+    const isSectionMarker = (node) => sectionFromHeading(cleanText(node?.textContent));
+    const hasSectionMarkers = (node) => [...(node.querySelectorAll?.(sectionMarkerSelector) || [])].some(isSectionMarker);
+
+    const itemFromNode = (node, fallbackTitle = "Detail") => {
+      const clone = node.cloneNode(true);
+      const titleNode = clone.querySelector?.("strong, b, h3, h4");
+      let title = cleanText(titleNode?.textContent);
+
+      if (titleNode) titleNode.remove();
+
+      let copy = cleanText(clone.textContent);
+      if (!title) {
+        const text = cleanText(node.textContent);
+        const split = text.match(/^([^:.-]{3,70})[:.-]\s*(.+)$/);
+        title = cleanText(split?.[1]) || fallbackTitle;
+        copy = cleanText(split?.[2]) || text;
+      }
+
+      if (copy === title) copy = cleanText(node.textContent);
+
+      return { title, copy, original: node };
+    };
+
+    const textUntilNextTitle = (marker) => {
+      const parts = [];
+      let sibling = marker.nextSibling;
+
+      while (sibling) {
+        if (sibling.nodeType === Node.ELEMENT_NODE && sibling.matches(sectionMarkerSelector)) break;
+        parts.push(sibling.textContent || "");
+        sibling = sibling.nextSibling;
+      }
+
+      return cleanText(parts.join(" "));
+    };
+
+    const collectContentItems = (nodes, fallbackTitle) => {
+      const wrapper = document.createElement("div");
+      nodes.forEach((node) => wrapper.appendChild(node.cloneNode(true)));
+
+      const listItems = [...wrapper.querySelectorAll("li")];
+      if (listItems.length) return listItems.map((item) => itemFromNode(item, fallbackTitle));
+
+      const inlineTitles = [...wrapper.querySelectorAll("strong, b")]
+        .filter((title) => !isSectionMarker(title) && !title.closest("table"));
+
+      if (inlineTitles.length) {
+        return inlineTitles.map((title) => {
+          const parentCopy = textUntilNextTitle(title) || cleanText(title.parentElement?.textContent).replace(cleanText(title.textContent), "");
+          return {
+            title: cleanText(title.textContent) || fallbackTitle,
+            copy: cleanText(parentCopy),
+            original: title,
+          };
+        }).filter((item) => item.title || item.copy);
+      }
+
+      const items = [];
+      const children = [...wrapper.children];
+      for (let index = 0; index < children.length; index += 1) {
+        const child = children[index];
+        if (/^H[3-6]$/.test(child.tagName) && children[index + 1]?.tagName === "P") {
+          items.push({
+            title: cleanText(child.textContent) || fallbackTitle,
+            copy: cleanText(children[index + 1].textContent),
+            original: child,
+          });
+          index += 1;
+          continue;
+        }
+
+        if (child.tagName === "P" || child.tagName === "DIV") {
+          items.push(itemFromNode(child, fallbackTitle));
+        }
+      }
+
+      return items;
+    };
+
+    const looksLikeSpecBlock = (node) => {
+      const text = node.textContent?.toLowerCase() || "";
+      return text.includes("product name") && text.includes("sku");
+    };
+
+    const updateSpecs = (node) => {
+      if (!targets.specs || !node) return;
+
+      const rows = [];
+      node.querySelectorAll("dt").forEach((term) => {
+        const value = term.nextElementSibling?.matches("dd") ? term.nextElementSibling : null;
+        if (value) rows.push([cleanText(term.textContent), cleanText(value.textContent)]);
+      });
+
+      node.querySelectorAll("tr").forEach((row) => {
+        const cells = [...row.children].map((cell) => cleanText(cell.textContent)).filter(Boolean);
+        if (cells.length >= 2) rows.push([cells[0], cells.slice(1).join(" ")]);
+      });
+
+      if (!rows.length) {
+        const lines = cleanText(node.textContent)
+          .split(/(?=(?:Product Name|Generic Name|Strength|Form|Quantity|Category|Brand|SKU|Price|Stock)\s*:)/i)
+          .map((line) => line.trim())
+          .filter(Boolean);
+
+        lines.forEach((line) => {
+          const match = line.match(/^([^:]+):\s*(.+)$/);
+          if (match) rows.push([cleanText(match[1]) + ":", cleanText(match[2])]);
+        });
+      }
+
+      if (!rows.length) return;
+
+      targets.specs.innerHTML = "";
+      rows.forEach(([label, value]) => {
+        const item = document.createElement("div");
+        const dt = document.createElement("dt");
+        const dd = document.createElement("dd");
+        dt.textContent = label.endsWith(":") ? label : `${label}:`;
+        dd.textContent = value;
+        item.append(dt, dd);
+        targets.specs.appendChild(item);
+      });
+    };
+
+    const pullSpecsFromDescription = () => {
+      if (!targets.description) return;
+
+      targets.description.querySelectorAll("dl, table, p, div").forEach((node) => {
+        if (!looksLikeSpecBlock(node)) return;
+        updateSpecs(node);
+        node.remove();
+      });
+    };
+
+    const moveAfter = (node, target) => {
+      if (!node || !target?.parentNode) return target;
+      target.parentNode.insertBefore(node, target.nextSibling);
+      return node;
+    };
+
+    const normalizeSource = () => {
+      const movableSelector = "p, h2, h3, h4, ul, ol, blockquote, pre";
+      source.querySelectorAll(".product-specs, dl").forEach((specList) => {
+        let insertionPoint = specList;
+
+        specList.querySelectorAll(`dt ${movableSelector}, dd ${movableSelector}`).forEach((block) => {
+          insertionPoint = moveAfter(block, insertionPoint);
+        });
+
+        Array.from(specList.children).forEach((child) => {
+          if (child.matches("div, dt, dd")) return;
+          if (!child.matches(movableSelector)) return;
+          insertionPoint = moveAfter(child, insertionPoint);
+        });
+      });
+
+      source.querySelectorAll("td h2, td h3, td h4, th h2, th h3, th h4").forEach((heading) => {
+        const table = heading.closest("table");
+        if (table) moveAfter(heading, table);
+      });
+    };
+
+    const buildBenefitCards = (nodes) => {
+      const items = collectContentItems(nodes, "Benefit");
+      if (!items.length) return nodes;
+
+      return items.map((item) => {
+        const card = document.createElement("div");
+        const title = document.createElement("strong");
+        const copy = document.createElement("span");
+        const icon = document.createElement("i");
+        icon.className = `fa-solid ${iconForText(`${item.title} ${item.copy}`, "fa-dumbbell")}`;
+        title.textContent = item.title;
+        copy.textContent = item.copy;
+        card.append(icon, title, copy);
+        return card;
+      });
+    };
+
+    const benefitItemsFromRenderedContent = (target) => {
+      if (!target || target.querySelector(":scope > div > i")) return [];
+
+      const items = [];
+      const titleNodes = [...target.querySelectorAll("h3, h4, strong, b")]
+        .filter((node) => !node.closest("figure, table") && !isSectionMarker(node));
+
+      titleNodes.forEach((titleNode) => {
+        const title = cleanText(titleNode.textContent);
+        if (!title) return;
+
+        let sibling = titleNode.nextElementSibling;
+        while (sibling && !cleanText(sibling.textContent)) sibling = sibling.nextElementSibling;
+
+        const copy = sibling && !sibling.matches("h3, h4, strong, b")
+          ? cleanText(sibling.textContent)
+          : textUntilNextTitle(titleNode);
+
+        items.push({ title, copy, original: titleNode });
+      });
+
+      return items.filter((item) => item.title || item.copy);
+    };
+
+    const ensureBenefitIconRows = () => {
+      if (!targets.benefits) return;
+
+      const items = benefitItemsFromRenderedContent(targets.benefits);
+      if (!items.length) return;
+
+      targets.benefits.innerHTML = "";
+      buildIconCards(items, "fa-dumbbell").forEach((node) => targets.benefits.appendChild(node));
+    };
+
+    const buildIconCards = (items, fallbackIcon = "fa-circle-check") => items.map((item) => {
+      const card = document.createElement("div");
+      const icon = document.createElement("i");
+      const title = document.createElement("strong");
+      const copy = document.createElement("span");
+      icon.className = `fa-solid ${iconForText(`${item.title} ${item.copy}`, fallbackIcon)}`;
+      title.textContent = item.title;
+      copy.textContent = item.copy;
+      card.append(icon, title, copy);
+      return card;
+    });
+
+    const appendHtmlToBucket = (html, bucketKey) => {
+      if (!bucketKey || !buckets[bucketKey] || !cleanText(html.replace(/<[^>]*>/g, " "))) return;
+      const holder = document.createElement("div");
+      holder.innerHTML = html.trim();
+      const children = [...holder.childNodes].filter((child) => cleanText(child.textContent));
+
+      if (!children.length) return;
+      children.forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          const paragraph = document.createElement("p");
+          paragraph.textContent = cleanText(child.textContent);
+          buckets[bucketKey].push(paragraph);
+          return;
+        }
+
+        buckets[bucketKey].push(child.cloneNode(true));
+      });
+    };
+
+    const splitInlineSections = (node, initialSection) => {
+      if (node.matches?.("table")) return false;
+
+      const clone = node.cloneNode(true);
+      const markers = [...clone.querySelectorAll(sectionMarkerSelector)]
+        .map((marker) => ({ marker, section: isSectionMarker(marker) }))
+        .filter((entry) => entry.section);
+
+      if (!markers.length) return false;
+
+      let markedHtml = clone.innerHTML;
+      markers.forEach(({ marker, section }) => {
+        sectionTitles[section] = sectionTitles[section] || cleanText(marker.textContent);
+        markedHtml = markedHtml.replace(marker.outerHTML, `<!--PRODUCT_SECTION:${section}-->`);
+      });
+
+      let activeSection = initialSection;
+      markedHtml.split(/<!--PRODUCT_SECTION:(description|benefits|dosage|ingredients|faq)-->/).forEach((part, index) => {
+        if (!part) return;
+        if (index % 2 === 1) {
+          activeSection = part;
+          return;
+        }
+
+        appendHtmlToBucket(part, activeSection);
+      });
+
+      return true;
+    };
+
+    const dosageStepItems = (nodes) => {
+      const wrapper = document.createElement("div");
+      nodes.forEach((node) => wrapper.appendChild(node.cloneNode(true)));
+
+      const timelineTitles = [...wrapper.querySelectorAll("h3, h4, strong, b")]
+        .filter((title) => {
+          const text = cleanText(title.textContent).toLowerCase();
+          return text && !isSectionMarker(title) && /week|post\s*cycle|cycle|phase/.test(text);
+        });
+
+      if (!timelineTitles.length) return collectContentItems(nodes, "Step");
+
+      return timelineTitles.map((titleNode) => {
+        const title = cleanText(titleNode.textContent);
+        let phase = "";
+        let copy = "";
+        const container = titleNode.parentElement && titleNode.parentElement !== wrapper ? titleNode.parentElement : titleNode;
+        const containerText = cleanText(container.textContent).replace(title, "").trim();
+        let sibling = container.nextElementSibling;
+
+        if (containerText) {
+          const split = containerText.match(/^([^.:â€“-]{3,60})[.:â€“-]\s*(.+)$/);
+          phase = cleanText(split?.[1]);
+          copy = cleanText(split?.[2]) || containerText;
+        }
+
+        while (sibling && !cleanText(sibling.textContent)) sibling = sibling.nextElementSibling;
+
+        if (!copy && sibling && !sibling.matches("h3, h4, strong, b")) {
+          const phaseNode = sibling.querySelector?.("strong, b");
+          if (phaseNode && !isSectionMarker(phaseNode)) {
+            phase = cleanText(phaseNode.textContent);
+            copy = cleanText(sibling.textContent).replace(phase, "").trim();
+          } else {
+            const text = cleanText(sibling.textContent);
+            const split = text.match(/^([^.:â€“-]{3,60})[.:â€“-]\s*(.+)$/);
+            phase = cleanText(split?.[1]);
+            copy = cleanText(split?.[2]) || text;
+          }
+
+          if (!copy && sibling.nextElementSibling && !sibling.nextElementSibling.matches("h3, h4, strong, b")) {
+            copy = cleanText(sibling.nextElementSibling.textContent);
+          }
+        }
+
+        return {
+          title,
+          copy: [phase, copy].filter(Boolean).join(": "),
+          original: titleNode,
+        };
+      }).filter((item) => item.title || item.copy);
+    };
+
+    const renderDosageIntro = (nodes) => {
+      if (!targets.dosage) return;
+
+      const titleNode = targets.dosage.querySelector("[data-section-title]");
+      targets.dosage.innerHTML = "";
+      if (titleNode) targets.dosage.appendChild(titleNode);
+
+      for (const node of nodes) {
+        const text = cleanText(node.textContent);
+        if (/^note\b|week\s*\d|post\s*cycle/i.test(text)) break;
+        if (node.querySelector?.("h3, h4, strong, b") && /week\s*\d|post\s*cycle/i.test(text)) break;
+        targets.dosage.appendChild(node.cloneNode(true));
+      }
+    };
+
+    const buildDosageCards = (nodes) => {
+      const items = dosageStepItems(nodes);
+      if (!items.length) return [];
+
+      return items.slice(0, 4).map((item, index) => {
+        const card = document.createElement("div");
+        const icon = document.createElement("i");
+        const title = document.createElement("strong");
+        const label = document.createElement("span");
+        const copy = document.createElement("small");
+        const splitCopy = cleanText(item.copy).match(/^([^.:–-]{3,60})[.:–-]\s*(.+)$/);
+        const stepIcons = ["fa-flask-vial", "fa-chart-line", "fa-bullseye", "fa-rotate"];
+        icon.className = `fa-solid ${stepIcons[index] || iconForText(`${item.title} ${item.copy}`, "fa-chart-line")}`;
+        title.textContent = item.title || `Step ${index + 1}`;
+        label.textContent = cleanText(splitCopy?.[1]) || item.title;
+        copy.textContent = cleanText(splitCopy?.[2]) || item.copy || item.title;
+        card.append(icon, title, label, copy);
+        return card;
+      });
+    };
+
+    const buildDosageNote = (nodes) => {
+      const noteNode = nodes.find((node) => /^note\b/i.test(cleanText(node.textContent)));
+      if (!noteNode) return false;
+
+      const text = cleanText(noteNode.textContent).replace(/^note\s*:?\s*/i, "");
+      if (!text || !targets.dosageNote) return false;
+
+      const icon = document.createElement("i");
+      const paragraph = document.createElement("p");
+      const title = document.createElement("strong");
+      icon.className = "fa-solid fa-info";
+      title.textContent = "Note:";
+      paragraph.append(title, document.createTextNode(` ${text}`));
+      targets.dosageNote.innerHTML = "";
+      targets.dosageNote.append(icon, paragraph);
+      return true;
+    };
+
+    const buildIngredientCards = (nodes) => {
+      const wrapper = document.createElement("div");
+      nodes.forEach((node) => wrapper.appendChild(node.cloneNode(true)));
+
+      const listItems = [...wrapper.querySelectorAll("li")];
+      const inlineTitles = [...wrapper.querySelectorAll("strong, b")]
+        .filter((title) => !isSectionMarker(title) && !title.closest("table"));
+      const items = listItems.length
+        ? listItems.map((item) => itemFromNode(item, "Ingredient"))
+        : inlineTitles.map((title) => ({
+            title: cleanText(title.textContent) || "Ingredient",
+            copy: textUntilNextTitle(title),
+            original: title,
+          }));
+
+      if (!items.length) return [];
+
+      return items.slice(0, 3).map((item) => {
+        const card = document.createElement("div");
+        const icon = document.createElement("i");
+        const title = document.createElement("strong");
+        const copy = document.createElement("span");
+        icon.className = `fa-solid ${iconForText(`${item.title} ${item.copy}`, "fa-leaf")}`;
+        title.textContent = item.title;
+        copy.textContent = item.copy;
+        card.append(icon, title, copy);
+        return card;
+      });
+    };
+
+    const normalizePastedAdminHtml = () => {
+      if (!source.querySelector(".product-description, .product-specs") || !/key benefits|recommended dosage|ingredients/i.test(source.textContent || "")) {
+        return false;
+      }
+
+      const stripInlineFormatting = (node) => {
+        node.querySelectorAll?.("[style], font").forEach((child) => {
+          child.removeAttribute("style");
+          if (child.tagName === "FONT") {
+            child.replaceWith(...child.childNodes);
+          }
+        });
+        node.removeAttribute?.("style");
+        return node;
+      };
+
+      const textTokens = (() => {
+        const walker = document.createTreeWalker(source, NodeFilter.SHOW_TEXT);
+        const tokens = [];
+        let node = walker.nextNode();
+
+        while (node) {
+          const text = cleanText(node.textContent);
+          if (text && text !== "\u00a0") tokens.push(text);
+          node = walker.nextNode();
+        }
+
+        return tokens;
+      })();
+
+      const indexOfToken = (pattern, from = 0) => textTokens.findIndex((token, index) => index >= from && pattern.test(token));
+      const sliceBetween = (startPattern, endPattern) => {
+        const start = indexOfToken(startPattern);
+        if (start < 0) return [];
+        const end = endPattern ? indexOfToken(endPattern, start + 1) : -1;
+        return textTokens.slice(start + 1, end > start ? end : undefined);
+      };
+
+      const pairSequentialItems = (tokens) => {
+        const items = [];
+        for (let index = 0; index < tokens.length; index += 2) {
+          const title = cleanText(tokens[index]);
+          const copy = cleanText(tokens[index + 1]);
+          if (!title || /^(key benefits|recommended dosage|ingredients)$/i.test(title)) continue;
+          if (title.length > 80) continue;
+          items.push({ title, copy });
+        }
+        return items;
+      };
+
+      const appendTitle = (target, key, fallback) => {
+        const title = document.createElement("h2");
+        title.dataset.sectionTitle = key;
+        title.textContent = sectionTitles[key] || fallback;
+        target.appendChild(title);
+      };
+
+      const productDescription = source.querySelector(".product-description");
+      if (productDescription && targets.description) {
+        targets.description.innerHTML = "";
+        [...productDescription.children].forEach((child) => targets.description.appendChild(stripInlineFormatting(child.cloneNode(true))));
+      }
+
+      const specs = source.querySelector(".product-specs, dl");
+      if (specs) updateSpecs(specs);
+
+      const benefitsTokens = sliceBetween(/^key benefits$/i, /^recommended dosage$/i);
+      const benefitItems = pairSequentialItems(benefitsTokens).slice(0, 6);
+      if (benefitItems.length && targets.benefits) {
+        sectionTitles.benefits = "Key Benefits";
+        targets.benefits.innerHTML = "";
+        buildIconCards(benefitItems, "fa-dumbbell").forEach((node) => targets.benefits.appendChild(node));
+      }
+
+      const dosageTokens = sliceBetween(/^recommended dosage$/i, /^ingredients$/i);
+      if (dosageTokens.length && targets.dosage) {
+        sectionTitles.dosage = "Recommended Dosage";
+        const noteIndex = dosageTokens.findIndex((token) => /^note\b/i.test(token));
+        const cleanDosageTokens = noteIndex >= 0 ? dosageTokens.slice(0, noteIndex) : dosageTokens;
+        const noteText = noteIndex >= 0 ? dosageTokens.slice(noteIndex).join(" ").replace(/^note\s*:?\s*/i, "") : "";
+        const firstStep = cleanDosageTokens.findIndex((token) => /^(week\s*\d+|post\s*cycle)$/i.test(token));
+        const intro = firstStep > 0 ? cleanDosageTokens.slice(0, firstStep).join(" ") : cleanDosageTokens[0] || "";
+        const stepTokens = firstStep >= 0 ? cleanDosageTokens.slice(firstStep) : [];
+
+        targets.dosage.innerHTML = "";
+        appendTitle(targets.dosage, "dosage", "Recommended Dosage");
+        if (intro) {
+          const paragraph = document.createElement("p");
+          paragraph.textContent = intro;
+          targets.dosage.appendChild(paragraph);
+        }
+
+        if (targets.dosageSteps && stepTokens.length) {
+          const steps = [];
+          for (let index = 0; index < stepTokens.length; index += 3) {
+            const title = cleanText(stepTokens[index]);
+            if (!/^(week\s*\d+|post\s*cycle)$/i.test(title)) {
+              index -= 2;
+              continue;
+            }
+            steps.push({
+              title,
+              phase: cleanText(stepTokens[index + 1]),
+              copy: cleanText(stepTokens[index + 2]),
+            });
+          }
+
+          targets.dosageSteps.innerHTML = "";
+          steps.slice(0, 4).forEach((step, index) => {
+            const card = document.createElement("div");
+            const icon = document.createElement("i");
+            const title = document.createElement("strong");
+            const label = document.createElement("span");
+            const copy = document.createElement("small");
+            const stepIcons = ["fa-flask-vial", "fa-chart-line", "fa-bullseye", "fa-rotate"];
+            icon.className = `fa-solid ${stepIcons[index] || "fa-chart-line"}`;
+            title.textContent = step.title;
+            label.textContent = step.phase || step.title;
+            copy.textContent = step.copy || step.phase || step.title;
+            card.append(icon, title, label, copy);
+            targets.dosageSteps.appendChild(card);
+          });
+        }
+
+        if (targets.dosageNote) {
+          if (noteText) {
+            const icon = document.createElement("i");
+            const paragraph = document.createElement("p");
+            const title = document.createElement("strong");
+            icon.className = "fa-solid fa-info";
+            title.textContent = "Note:";
+            paragraph.append(title, document.createTextNode(` ${noteText}`));
+            targets.dosageNote.innerHTML = "";
+            targets.dosageNote.append(icon, paragraph);
+            targets.dosageNote.hidden = false;
+          } else {
+            targets.dosageNote.hidden = true;
+          }
+        }
+      }
+
+      const ingredientsTokens = sliceBetween(/^ingredients$/i);
+      if (ingredientsTokens.length && targets.ingredients) {
+        sectionTitles.ingredients = "Ingredients";
+        targets.ingredients.innerHTML = "";
+        appendTitle(targets.ingredients, "ingredients", "Ingredients");
+
+        const ingredientIntro = ingredientsTokens.find((token) => /^each\b/i.test(token));
+        if (ingredientIntro) {
+          const paragraph = document.createElement("p");
+          paragraph.textContent = ingredientIntro;
+          targets.ingredients.appendChild(paragraph);
+        }
+
+        const table = source.querySelector(".ingredient-table, table");
+        if (table) {
+          targets.ingredients.appendChild(stripInlineFormatting(table.cloneNode(true)));
+        }
+
+        if (targets.ingredientCards) {
+          const cardStart = ingredientsTokens.findIndex((token) => /pure ingredients/i.test(token));
+          const cardItems = cardStart >= 0 ? pairSequentialItems(ingredientsTokens.slice(cardStart)).slice(0, 3) : [];
+          targets.ingredientCards.innerHTML = "";
+          if (cardItems.length) {
+            buildIconCards(cardItems, "fa-leaf").forEach((node) => targets.ingredientCards.appendChild(node));
+            targets.ingredientCards.hidden = false;
+          } else {
+            targets.ingredientCards.hidden = true;
+          }
+        }
+      }
+
+      if (targets.assurance) targets.assurance.hidden = true;
+      if (targets.dosageSteps) targets.dosageSteps.hidden = !targets.dosageSteps.children.length;
+      if (targets.specs) targets.specs.hidden = !targets.specs.children.length;
+      targets.dosageSteps?.closest(".dosage-tab-grid")?.classList.toggle("is-single-column", !targets.dosageSteps?.children.length);
+      targets.ingredientCards?.closest(".ingredients-tab-grid")?.classList.toggle("is-single-column", !targets.ingredientCards?.children.length);
+
+      return true;
+    };
+
+    const formatIngredientTables = () => {
+      targets.ingredients?.querySelectorAll("table").forEach((table) => {
+        table.classList.add("ingredient-table");
+        const firstRow = table.querySelector("tr");
+        const firstCells = firstRow ? [...firstRow.children] : [];
+
+        if (firstCells.length && !firstCells.some((cell) => cell.tagName === "TH")) {
+          const rowText = cleanText(firstRow.textContent).toLowerCase();
+          if (rowText.includes("ingredient") || rowText.includes("amount")) {
+            firstCells.forEach((cell) => {
+              const th = document.createElement("th");
+              th.innerHTML = cell.innerHTML;
+              cell.replaceWith(th);
+            });
+          }
+        }
+
+        table.querySelectorAll("tr").forEach((row) => {
+          if (cleanText(row.firstElementChild?.textContent).toLowerCase() === "total") {
+            row.classList.add("ingredient-total-row");
+          }
+        });
+      });
+    };
+
+    const removeCardItemsFromContent = (target, sourceItems) => {
+      if (!target || !sourceItems.length) return;
+      target.querySelectorAll("ul, ol").forEach((list) => list.remove());
+
+      sourceItems.forEach((item) => {
+        const title = cleanText(item.title);
+        if (!title) return;
+
+        target.querySelectorAll("p, div").forEach((node) => {
+          const strong = node.querySelector?.("strong, b");
+          if (strong && cleanText(strong.textContent) === title && !node.querySelector("table")) {
+            node.remove();
+          }
+        });
+      });
+    };
+
+    const removeMatchingTextNodes = (target, matcher) => {
+      if (!target) return;
+      target.querySelectorAll("p, div").forEach((node) => {
+        if (!node.querySelector("table") && matcher(cleanText(node.textContent))) node.remove();
+      });
+    };
+
+    const hasSectionData = (key) => {
+      if (key === "description") return Boolean(hasExactDescriptionLayout || buckets.description.length || targets.description?.children.length || targets.specs?.children.length);
+      if (key === "reviews") return document.querySelector('[data-tab-card="reviews"]')?.dataset.serverContent === "1";
+      if (key === "benefits") return Boolean(buckets.benefits?.length || targets.benefits?.children.length);
+      if (key === "dosage") return Boolean(buckets.dosage?.length || targets.dosage?.children.length || targets.dosageSteps?.children.length);
+      if (key === "ingredients") return Boolean(buckets.ingredients?.length || targets.ingredients?.children.length || targets.ingredientCards?.children.length);
+      if (key === "faq") return Boolean(buckets.faq?.length || targets.faq?.children.length);
+      return Boolean(buckets[key]?.length);
+    };
+
+    const refreshVisibleTabs = () => {
+      const availableTabs = tabOrder.filter(hasSectionData);
+      document.querySelectorAll("[data-tab-card]").forEach((card) => {
+        const key = card.dataset.tabCard;
+        card.classList.toggle("is-hidden", !availableTabs.includes(key));
+      });
+
+      document.querySelectorAll(".product-tabs").forEach((nav) => {
+        nav.style.setProperty("--visible-tabs", String(availableTabs.length || 1));
+        nav.querySelectorAll("a").forEach((link) => {
+          const key = link.getAttribute("href")?.replace("#", "");
+          const isVisible = availableTabs.includes(key);
+          link.hidden = !isVisible;
+          link.classList.toggle("is-hidden", !isVisible);
+        });
+
+        const visibleLinks = [...nav.querySelectorAll("a")].filter((link) => !link.hidden);
+        if (!visibleLinks.some((link) => link.classList.contains("active")) && visibleLinks[0]) {
+          visibleLinks[0].classList.add("active");
+        }
+      });
+    };
+
+    const buildFaqItems = (nodes) => {
+      const wrapper = document.createElement("div");
+      nodes.forEach((node) => wrapper.appendChild(node.cloneNode(true)));
+      const detailsItems = [...wrapper.querySelectorAll("details")];
+      if (detailsItems.length) return detailsItems;
+
+      const listItems = [...wrapper.querySelectorAll("li")];
+      const paragraphItems = [...wrapper.querySelectorAll("p")];
+      const sourceItems = listItems.length ? listItems : paragraphItems;
+      if (!sourceItems.length) return nodes;
+
+      return sourceItems.map((item, index) => {
+        const details = document.createElement("details");
+        if (index === 0) details.open = true;
+        const summary = document.createElement("summary");
+        const paragraph = document.createElement("p");
+        const text = cleanText(item.textContent);
+        const titleNode = item.querySelector?.("strong, b");
+        const parts = text.split("?");
+        summary.textContent = cleanText(titleNode?.textContent) || (parts.length > 1 ? `${parts.shift()}?` : `Question ${index + 1}`);
+        paragraph.textContent = cleanText(parts.join("?")) || text.replace(summary.textContent, "").trim() || text;
+        details.append(summary, paragraph);
+        return details;
+      });
+    };
+
+    const updateSectionTitles = () => {
+      document.querySelectorAll("[data-section-title]").forEach((title) => {
+        const key = title.dataset.sectionTitle;
+        const value = sectionTitles[key] || "";
+        title.textContent = value;
+        title.hidden = !value;
+      });
+    };
+
+    const updateAssuranceCards = () => {
+      if (!targets.assurance) return;
+      if (hasExactDescriptionLayout) return;
+
+      const sourceItems = collectContentItems(buckets.description, "Feature")
+        .filter((item) => /stock|shipping|delivery|lab|test|certified|quality|support|secure|worldwide/i.test(`${item.title} ${item.copy}`));
+
+      if (!sourceItems.length) {
+        targets.assurance.hidden = true;
+        return;
+      }
+
+      targets.assurance.innerHTML = "";
+      buildIconCards(sourceItems.slice(0, 4), "fa-shield-halved").forEach((node) => targets.assurance.appendChild(node));
+      targets.assurance.hidden = false;
+      removeCardItemsFromContent(targets.description, sourceItems);
+    };
+
+    if (normalizePastedAdminHtml()) {
+      formatIngredientTables();
+      refreshVisibleTabs();
+      return;
+    }
+
+    normalizeSource();
+
+    let current = "description";
+    [...source.children].forEach((node) => {
+      if (hasExactDescriptionLayout && node.matches?.(".product-info-grid, .description-assurance")) {
+        return;
+      }
+
+      if (looksLikeSpecBlock(node) && !hasSectionMarkers(node)) {
+        updateSpecs(node);
+        return;
+      }
+
+      if (node.matches?.("table") && /ingredient|amount per tablet|composition/i.test(node.textContent || "")) {
+        current = "ingredients";
+        buckets.ingredients.push(node.cloneNode(true));
+        return;
+      }
+
+      const headingSection = /^H[1-6]$/.test(node.tagName) ? sectionFromHeading(node.textContent) : null;
+      if (headingSection) {
+        current = headingSection;
+        sectionTitles[current] = cleanText(node.textContent);
+        return;
+      }
+
+      if (splitInlineSections(node, current)) return;
+
+      buckets[current].push(node.cloneNode(true));
+    });
+
+    Object.entries({
+      description: targets.description,
+      benefits: targets.benefits,
+      dosage: targets.dosage,
+      ingredients: targets.ingredients,
+      faq: targets.faq,
+    }).forEach(([key, target]) => {
+      if (!target || !buckets[key].length) return;
+      if (key === "description" && hasExactDescriptionLayout) return;
+
+      const titleNode = target.querySelector("[data-section-title]");
+      target.innerHTML = "";
+      if (titleNode) target.appendChild(titleNode);
+
+      const nodes = key === "benefits" ? buildBenefitCards(buckets[key]) : key === "faq" ? buildFaqItems(buckets[key]) : buckets[key];
+      nodes.forEach((node) => target.appendChild(node));
+    });
+
+    ensureBenefitIconRows();
+    pullSpecsFromDescription();
+    updateSectionTitles();
+    updateAssuranceCards();
+
+    const dosageItems = dosageStepItems(buckets.dosage);
+    const dosageCards = buildDosageCards(buckets.dosage);
+    if (targets.dosageSteps && dosageCards.length) {
+      targets.dosageSteps.innerHTML = "";
+      dosageCards.forEach((node) => targets.dosageSteps.appendChild(node));
+      renderDosageIntro(buckets.dosage);
+    }
+    if (!buildDosageNote(buckets.dosage) && targets.dosageNote) targets.dosageNote.hidden = true;
+    removeMatchingTextNodes(targets.dosage, (text) => /^note\b/i.test(text));
+
+    const ingredientItems = collectContentItems(buckets.ingredients, "Ingredient");
+    const ingredientCards = buildIngredientCards(buckets.ingredients);
+    if (targets.ingredientCards && ingredientCards.length) {
+      targets.ingredientCards.innerHTML = "";
+      ingredientCards.forEach((node) => targets.ingredientCards.appendChild(node));
+      removeCardItemsFromContent(targets.ingredients, ingredientItems);
+    }
+    if (targets.ingredientCards && !ingredientCards.length) targets.ingredientCards.hidden = true;
+    if (targets.dosageSteps && !dosageCards.length) targets.dosageSteps.hidden = true;
+    if (targets.specs && !targets.specs.children.length) targets.specs.hidden = true;
+    targets.dosageSteps?.closest(".dosage-tab-grid")?.classList.toggle("is-single-column", !dosageCards.length);
+    targets.ingredientCards?.closest(".ingredients-tab-grid")?.classList.toggle("is-single-column", !ingredientCards.length);
+
+    formatIngredientTables();
+    refreshVisibleTabs();
+  }
+
   function syncBodyLock() {
     const hasOpenPanel = searchPanel.classList.contains("is-open") || cartDrawer.classList.contains("is-open");
     document.body.classList.toggle("panel-open", hasOpenPanel);
@@ -325,9 +1380,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const routes = window.appRoutes || {};
   const route = (name, fallback) => routes[name] || fallback;
+  let searchTimer = null;
+  let searchRequestIndex = 0;
 
   function endpoint(base, id) {
     return `${base}/${id}`;
+  }
+
+  function setButtonLoading(button, isLoading, loadingText = "Please wait") {
+    if (!button) return;
+
+    if (!button.dataset.originalHtml) {
+      button.dataset.originalHtml = button.innerHTML;
+    }
+
+    button.disabled = isLoading;
+    button.classList.toggle("is-loading", isLoading);
+    button.setAttribute("aria-busy", String(isLoading));
+    button.innerHTML = isLoading
+      ? `<span><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> ${loadingText}</span>`
+      : button.dataset.originalHtml;
+  }
+
+  function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = value ?? "";
+    return div.innerHTML;
   }
 
   async function cartRequest(url, method = "GET", body = null) {
@@ -341,7 +1419,10 @@ document.addEventListener("DOMContentLoaded", () => {
       body: body ? JSON.stringify(body) : null
     });
 
-    if (!response.ok) throw new Error("Cart request failed.");
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Cart request failed.");
+    }
 
     return response.json();
   }
@@ -360,7 +1441,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function addToCart(id, quantity = 1) {
-    if (!id) return;
+    if (!id) return false;
     const safeQty = Math.max(1, Number(quantity) || 1);
     try {
       const data = await cartRequest(endpoint(route("cartAddBase", "/cart/add"), id), "POST", { quantity: safeQty });
@@ -369,8 +1450,10 @@ document.addEventListener("DOMContentLoaded", () => {
       cartOverlay.setAttribute("aria-hidden", "false");
       setPanelState(cartDrawer, true);
       showToast("Product added to your cart.");
+      return true;
     } catch (error) {
-      showToast("Unable to update cart right now.");
+      showToast(error.message || "Unable to update cart right now.");
+      return false;
     }
   }
 
@@ -430,19 +1513,39 @@ document.addEventListener("DOMContentLoaded", () => {
     cartEmpty.classList.toggle("is-visible", data.is_empty);
   }
 
-  function renderSearchResults(query) {
-    const normalized = query.trim().toLowerCase();
-    const matches = products.filter((product) => `${product.name} ${product.meta}`.toLowerCase().includes(normalized));
+  async function renderSearchResults(query) {
+    const requestIndex = ++searchRequestIndex;
+    const normalized = query.trim();
+    const url = new URL(route("searchProducts", "/search/products"), window.location.origin);
+    if (normalized) url.searchParams.set("q", normalized);
 
-    searchResults.innerHTML = matches.length ? matches.map((product) => `
+    searchResults.innerHTML = '<p class="no-results">Loading products...</p>';
+
+    try {
+      const response = await fetch(url, { headers: { Accept: "application/json" } });
+      if (!response.ok) throw new Error("Search request failed.");
+
+      const data = await response.json();
+      if (requestIndex !== searchRequestIndex) return;
+
+      const matches = Array.isArray(data.products) ? data.products : [];
+      searchResults.innerHTML = matches.length ? matches.map((product) => `
       <article class="search-result">
-        <img src="${product.image}" alt="${product.name}">
+        <img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}">
         <div class="me-auto">
-          <strong>${product.name}</strong>
-          <small>${product.meta} - ${money(product.price)}</small>
+          <strong>${escapeHtml(product.name)}</strong>
+          <small>${escapeHtml(product.meta)} - ${money(product.price)}${product.in_stock ? "" : " - Out of Stock"}</small>
         </div>
-        <button type="button" data-search-add="${product.id}" aria-label="Add ${product.name}"><i class="fa-solid fa-cart-plus"></i></button>
-      </article>`).join("") : '<p class="no-results">No products found. Try searching "Peptides" or "HGH".</p>';
+        ${product.in_stock
+          ? `<button type="button" data-search-add="${escapeHtml(product.id)}" aria-label="Add ${escapeHtml(product.name)}"><i class="fa-solid fa-cart-plus"></i></button>`
+          : `<button class="notify-stock-btn" type="button" data-stock-notify="${escapeHtml(product.id)}" data-product-name="${escapeHtml(product.name)}">Inform Me</button>`}
+      </article>`).join("") : '<p class="no-results">No products found.</p>';
+      applyStockNotifiedState(searchResults);
+    } catch (error) {
+      if (requestIndex === searchRequestIndex) {
+        searchResults.innerHTML = '<p class="no-results">Unable to load products right now.</p>';
+      }
+    }
   }
 
   // Set active link on page load
@@ -487,7 +1590,10 @@ document.addEventListener("DOMContentLoaded", () => {
   searchPanel.addEventListener("click", (event) => {
     if (event.target === searchPanel) closeSearch();
   });
-  searchInput.addEventListener("input", (event) => renderSearchResults(event.target.value));
+  searchInput.addEventListener("input", (event) => {
+    window.clearTimeout(searchTimer);
+    searchTimer = window.setTimeout(() => renderSearchResults(event.target.value), 220);
+  });
   searchForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const query = searchInput.value.trim();
@@ -582,6 +1688,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const relatedCard = event.target.closest(".related-card");
     const categoryCard = event.target.closest(".category-card");
     const addFromSearch = event.target.closest("[data-search-add]");
+    const stockNotify = event.target.closest("[data-stock-notify]");
+    const stockNotifyClose = event.target.closest("[data-stock-notify-close]");
     const goTrigger = event.target.closest("[data-go]");
     const accountButton = event.target.closest(".icon-btn[aria-label='Account']");
     const clearFilters = event.target.closest("[data-clear-filters]");
@@ -597,7 +1705,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const testReport = event.target.closest("[data-test-report]");
     const productZoom = event.target.closest("[data-product-zoom]");
     const labReport = event.target.closest("[data-lab-report]");
-    const detailTapCard = event.target.closest(".product-benefit-strip > div, .description-assurance > div, .benefit-list > div, .dosage-steps > div, .ingredient-certifications > div, .review-card, .shop-trust-grid > div");
+    const detailTapCard = event.target.closest(".product-benefit-strip > div > div, .benefit-list > div, .dosage-steps > div, .ingredient-certifications > div, .review-card, .shop-trust-grid > div");
     const inc = event.target.closest("[data-cart-inc]");
     const dec = event.target.closest("[data-cart-dec]");
     const remove = event.target.closest("[data-cart-remove]");
@@ -616,6 +1724,18 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!qtyOutput) return;
       qtyOutput.textContent = String(Math.max(1, Math.min(99, qty)));
     };
+
+    if (stockNotify) {
+      event.preventDefault();
+      if (stockNotify.disabled) return;
+      openStockNotify(stockNotify.dataset.stockNotify, stockNotify.dataset.productName || stockNotify.closest("[data-product-name]")?.dataset.productName, stockNotify);
+      return;
+    }
+
+    if (stockNotifyClose || event.target === stockNotifyModal) {
+      closeStockNotify();
+      return;
+    }
 
     if (goTrigger) goToPage(goTrigger.dataset.go);
     if (accountButton) goToPage(route("cart", "/my-cart"));
@@ -646,13 +1766,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const index = [...document.querySelectorAll(".product-card")].indexOf(productCard);
       await addToCart(productCard.dataset.productId || products[index]?.id);
     } else if (productCard && !event.target.closest("a")) {
-      goToPage(route("productDetails", "/product-details"));
+      goToPage(productCard.dataset.productUrl || route("productDetails", "/product-details"));
     }
 
     if (relatedCard && event.target.closest("button")) {
       await addToCart(relatedCard.dataset.productId);
     } else if (relatedCard) {
-      goToPage(route("productDetails", "/product-details"));
+      goToPage(relatedCard.dataset.productUrl || route("productDetails", "/product-details"));
     }
 
     if (productThumb) {
@@ -695,7 +1815,10 @@ document.addEventListener("DOMContentLoaded", () => {
       productZoom.setAttribute("aria-pressed", String(isZoomed));
     }
 
-    if (addFromSearch) await addToCart(addFromSearch.dataset.searchAdd);
+    if (addFromSearch) {
+      const added = await addToCart(addFromSearch.dataset.searchAdd);
+      if (added) closeSearch();
+    }
     if (inc) updateQty(inc.dataset.cartInc, 1, inc.dataset.cartQty || inc.parentElement?.querySelector("span")?.textContent);
     if (dec) updateQty(dec.dataset.cartDec, -1, dec.dataset.cartQty || dec.parentElement?.querySelector("span")?.textContent);
     if (remove) removeFromCart(remove.dataset.cartRemove);
@@ -711,6 +1834,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       closeReportLightbox();
+      closeStockNotify();
       closeSearch();
       closeCart();
     }
@@ -725,6 +1849,11 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
     showToast("Thanks for joining our newsletter.");
     event.currentTarget.reset();
+  });
+
+  stockNotifyModal.querySelector("[data-stock-notify-form]")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    submitStockNotify(event.currentTarget);
   });
 
   document.querySelectorAll("[data-uk-postcode]").forEach((input) => {
@@ -763,6 +1892,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const findPostcodeButton = document.querySelector("[data-find-postcode]");
   const enterManualButton = document.querySelector("[data-enter-manual]");
   const usePostcodeButton = document.querySelector("[data-use-postcode]");
+  const checkoutForm = document.querySelector("#checkoutForm");
+  const placeOrderButton = document.querySelector("[data-place-order]");
   const streetInput = document.querySelector("#streetAddress");
   const addressTwoInput = document.querySelector("#addressTwo");
   const cityInput = document.querySelector("#city");
@@ -837,6 +1968,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    setButtonLoading(findPostcodeButton, true);
     if (postcodeStatus) postcodeStatus.textContent = "Finding post code...";
 
     try {
@@ -866,7 +1998,18 @@ document.addEventListener("DOMContentLoaded", () => {
       setPostcodePickerVisible(false);
       if (postcodeStatus) postcodeStatus.textContent = "Post code not found. Check the UK post code or use Enter Manually.";
       postcodeInput?.focus();
+    } finally {
+      setButtonLoading(findPostcodeButton, false);
     }
+  });
+
+  checkoutForm?.addEventListener("submit", () => {
+    if (!checkoutForm.checkValidity()) {
+      setButtonLoading(placeOrderButton, false);
+      return;
+    }
+
+    setButtonLoading(placeOrderButton, true);
   });
 
   postcodeSelect?.addEventListener("change", () => {
@@ -959,6 +2102,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const tabCards = [...document.querySelectorAll(".tab-content-card")];
   if (tabCards.length) {
+    initProductDescriptionSections();
+
     const tabIds = ["description", "benefits", "dosage", "ingredients", "reviews", "faq"];
 
     function getTabCard(id) {
@@ -1018,5 +2163,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderCart();
+  applyStockNotifiedState();
   updateHeaderState();
 });

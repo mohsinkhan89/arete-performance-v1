@@ -24,6 +24,7 @@
                     ['label' => 'Products', 'icon' => 'fa-cube', 'url' => route('backend.page', 'products')],
                     ['label' => 'Categories', 'icon' => 'fa-table-cells', 'url' => route('backend.page', 'categories')],
                     ['label' => 'Orders', 'icon' => 'fa-clipboard-list', 'url' => route('backend.page', 'orders')],
+                    ['label' => 'Stock Requests', 'icon' => 'fa-bell', 'url' => route('backend.page', 'stock-notifications'), 'active' => request()->is('admin/stock-notifications')],
                     ['label' => 'Users', 'icon' => 'fa-users', 'url' => route('backend.page', 'users')],
                     ['label' => 'Reviews', 'icon' => 'fa-star', 'url' => route('backend.page', 'reviews')],
                     ['label' => 'Reports', 'icon' => 'fa-chart-column', 'url' => route('backend.page', 'reports')],
@@ -40,14 +41,14 @@
                 @endforeach
             </nav>
 
-            <div class="support-card">
-                <i class="fa-solid fa-headset"></i>
+            {{-- <div class="support-card">
+                <i class="fa-solid fa-database"></i>
                 <div>
-                    <strong>Need Help?</strong>
-                    <span>We're here to help you</span>
+                    <strong>Live Store Data</strong>
+                    <span>Orders, products, users</span>
                 </div>
-                <a href="#">Contact Support</a>
-            </div>
+                <a href="{{ route('backend.page', 'reports') }}">Open Reports</a>
+            </div> --}}
 
             <div class="sidebar-foot">
                 <span>Arete Admin</span>
@@ -62,9 +63,22 @@
                 </button>
 
                 <div class="topbar-actions">
-                    <form class="admin-search">
+                    @php
+                        $searchablePages = [
+                            'products' => 'Search products...',
+                            'categories' => 'Search categories...',
+                            'orders' => 'Search orders...',
+                            'stock-notifications' => 'Search stock requests...',
+                            'users' => 'Search users...',
+                            'reviews' => 'Search reviews...',
+                        ];
+                        $activeSearchPage = request()->routeIs('backend.page') && isset($searchablePages[request()->route('page')])
+                            ? request()->route('page')
+                            : 'orders';
+                    @endphp
+                    <form class="admin-search" method="GET" action="{{ route('backend.page', $activeSearchPage) }}">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="search" placeholder="Search anything..." aria-label="Search anything">
+                        <input type="search" name="q" value="{{ request('q') }}" placeholder="{{ $searchablePages[$activeSearchPage] }}" aria-label="{{ $searchablePages[$activeSearchPage] }}">
                         <button type="submit" aria-label="Search">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
@@ -136,6 +150,48 @@
                 @yield('body')
             </section>
         </main>
+    </div>
+
+    <div class="admin-modal payment-proof-modal" data-payment-proof-modal aria-hidden="true">
+        <div class="admin-modal-backdrop" data-payment-proof-close></div>
+        <section class="admin-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="paymentProofTitle">
+            <button class="admin-modal-close" type="button" data-payment-proof-close aria-label="Close payment proof modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="admin-modal-head">
+                <span><i class="fa-solid fa-receipt"></i></span>
+                <div>
+                    <h2 id="paymentProofTitle">Payment Proof</h2>
+                    <p data-payment-proof-summary>Upload proof and mark payment paid.</p>
+                </div>
+            </div>
+            <div class="payment-proof-current" data-payment-proof-current>
+                <div class="proof-empty-state" data-payment-proof-empty>
+                    <i class="fa-regular fa-file-image"></i>
+                    <strong>No payment proof uploaded yet</strong>
+                    <small>Upload a receipt or payment screenshot below to mark this order as paid.</small>
+                </div>
+                <div class="proof-current-preview" data-payment-proof-preview hidden>
+                    <img src="" alt="Current payment proof" data-payment-proof-current-image>
+                </div>
+                <a href="#" target="_blank" rel="noopener" data-payment-proof-current-link hidden>
+                    <i class="fa-regular fa-image"></i> Open current proof
+                </a>
+            </div>
+            <form class="payment-proof-modal-form" data-payment-proof-form method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PATCH')
+                <label>
+                    <span>Payment proof image</span>
+                    <input type="file" name="payment_proof_file" accept="image/png,image/jpeg,image/webp">
+                    <small>PNG, JPG, JPEG, or WEBP up to 4MB.</small>
+                </label>
+                <button type="submit">
+                    <i class="fa-solid fa-check"></i>
+                    Save proof &amp; mark paid
+                </button>
+            </form>
+        </section>
     </div>
 
     <script>

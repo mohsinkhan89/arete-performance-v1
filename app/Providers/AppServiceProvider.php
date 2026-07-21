@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\SiteSetting;
 use App\Services\CartService;
@@ -30,6 +31,16 @@ class AppServiceProvider extends ServiceProvider
             ]);
         });
 
+        View::composer('frontend.inc.footer', function ($view) {
+            $view->with([
+                'footerCategories' => Category::withCount(['products' => fn ($query) => $query->where('status', 'active')])
+                    ->where('status', 'active')
+                    ->orderBy('sort_order')
+                    ->take(12)
+                    ->get(),
+            ]);
+        });
+
         View::composer('backend.layouts.master', function ($view) {
             $view->with([
                 'orderNotifications' => Order::latest()->take(50)->get(),
@@ -44,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
         return array_merge([
             'header_logo' => 'frontend/assets/images/logo/logo-transperent.png',
             'footer_logo' => 'frontend/assets/images/logo/logo.png',
+            'company_whatsapp_number' => '',
         ], SiteSetting::allKeyed());
     }
 }

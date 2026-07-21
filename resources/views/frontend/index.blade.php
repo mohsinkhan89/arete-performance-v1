@@ -15,10 +15,9 @@
           </div>
         </div>
         <div class="hero-features row g-0 reveal-up delay-4">
-          <div class="col-6 col-lg-3"><div class="hero-feature"><i class="fa-solid fa-medal"></i><span>Premium<br>quality</span></div></div>
-          <div class="col-6 col-lg-3"><div class="hero-feature"><i class="fa-solid fa-flask-vial"></i><span>Lab<br>tested</span></div></div>
-          <div class="col-6 col-lg-3"><div class="hero-feature"><i class="fa-solid fa-shield-halved"></i><span>Discreet<br>shipping</span></div></div>
-          <div class="col-6 col-lg-3"><div class="hero-feature border-0"><i class="fa-solid fa-headset"></i><span>24/7<br>support</span></div></div>
+          <div class="col-6 col-lg-4"><div class="hero-feature"><i class="fa-solid fa-truck-fast"></i><span>Fast &amp; Secure<br>Delivery</span></div></div>
+          <div class="col-6 col-lg-4"><div class="hero-feature"><i class="fa-solid fa-globe"></i><span>Delivery All<br>Over UK</span></div></div>
+          <div class="col-12 col-lg-4"><div class="hero-feature border-0"><i class="fa-solid fa-sterling-sign"></i><span>Flat Delivery<br>&pound;4.99</span></div></div>
         </div>
       </div>
     </section>
@@ -50,10 +49,10 @@
             <h2>Your Goals.<br>Our Mission.</h2>
             <p>Premium quality products, backed by science and trusted by athletes worldwide.</p>
           </div>
-          <div class="col-6 col-lg"><div class="benefit"><i class="fa-solid fa-shield-halved"></i><h3>Premium<br>Quality</h3><p>Top-tier products you can trust.</p></div></div>
-          <div class="col-6 col-lg"><div class="benefit"><i class="fa-solid fa-flask-vial"></i><h3>Lab<br>Tested</h3><p>Every batch is lab verified.</p></div></div>
-          <div class="col-6 col-lg"><div class="benefit"><i class="fa-solid fa-truck-fast"></i><h3>Discreet<br>Shipping</h3><p>Private and secure delivery.</p></div></div>
-          <div class="col-6 col-lg"><div class="benefit border-0"><i class="fa-solid fa-headset"></i><h3>24/7<br>Support</h3><p>We're here to help you succeed.</p></div></div>
+          <div class="col-6 col-lg"><div class="benefit"><i class="fa-solid fa-prescription-bottle-medical"></i><h3>Pharma<br>Grade</h3><p>Quality-focused product standards.</p></div></div>
+          <div class="col-6 col-lg"><div class="benefit"><i class="fa-solid fa-flask-vial"></i><h3>Lab<br>Tested</h3><p>Batch testing and verification.</p></div></div>
+          <div class="col-6 col-lg"><div class="benefit"><i class="fa-solid fa-sterling-sign"></i><h3>&pound;4.99<br>Shipping</h3><p>Flat delivery across the UK.</p></div></div>
+          <div class="col-6 col-lg"><div class="benefit border-0"><i class="fa-solid fa-truck-fast"></i><h3>Fast &amp; Secure<br>Delivery</h3><p>Quick, protected order handling.</p></div></div>
         </div>
       </div>
     </section>
@@ -69,18 +68,20 @@
           <div class="row g-3 mt-3 reveal-group product-track">
             @foreach ($featuredProducts as $product)
               <div class="col-6 col-md-4 col-lg">
-                <article class="product-card" data-product-id="{{ $product->id }}">
-                  @if ($product->is_featured)<span class="tag">Popular</span>@endif
+                <article class="product-card {{ $product->stock <= 0 ? 'is-out-of-stock' : '' }}" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-url="{{ route('frontend.product-details', $product->slug) }}">
+                  @if ($product->stock <= 0)<span class="tag stock-tag">Out of Stock</span>@elseif ($product->is_bestseller)<span class="tag">Bestseller</span>@endif
                   <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
                   <h3>{{ $product->name }}</h3>
                   <small>{{ $product->category?->name }}</small>
                   <div class="product-card-tools">
-                    <div class="product-card-qty" aria-label="{{ $product->name }} quantity"><button type="button" data-card-qty-dec>-</button><span data-card-qty>1</span><button type="button" data-card-qty-inc>+</button></div>
+                    @if ($product->stock > 0)
+                      <div class="product-card-qty" aria-label="{{ $product->name }} quantity"><button type="button" data-card-qty-dec>-</button><span data-card-qty>1</span><button type="button" data-card-qty-inc>+</button></div>
+                    @endif
                     @if ($product->test_report_image)
                       <button class="test-report-icon" type="button" data-test-report="{{ url($product->test_report_image) }}" data-test-report-title="{{ $product->name }} test report" aria-label="View {{ $product->name }} test report"><i class="fa-solid fa-flask-vial"></i></button>
                     @endif
                   </div>
-                  <div><strong>£{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong><button type="button" data-cart-add="{{ $product->id }}" aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button></div>
+                  <div><strong>&pound;{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong>@if ($product->stock > 0)<button type="button" data-cart-add="{{ $product->id }}" aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button>@else<button class="notify-stock-btn" type="button" data-stock-notify="{{ $product->id }}" data-product-name="{{ $product->name }}">Inform Me</button>@endif</div>
                 </article>
               </div>
             @endforeach

@@ -1,10 +1,10 @@
  <section class="shop-trust">
       <div class="container">
         <div class="shop-trust-grid">
-          <div><i class="fa-solid fa-shield-halved"></i><strong>Premium Quality</strong><span>Top-tier products you can trust.</span></div>
-          <div><i class="fa-solid fa-flask-vial"></i><strong>Lab Tested</strong><span>Every batch is lab verified.</span></div>
-          <div><i class="fa-solid fa-truck-fast"></i><strong>Discreet Shipping</strong><span>Private and secure worldwide delivery.</span></div>
-          <div><i class="fa-solid fa-headset"></i><strong>24/7 Support</strong><span>We're here to help you succeed.</span></div>
+          <div><i class="fa-solid fa-truck-fast"></i><strong>Fast &amp; Secure Delivery</strong><span>Quick, protected order delivery.</span></div>
+          <div><i class="fa-solid fa-globe"></i><strong>Delivery All Over UK</strong><span>Reliable UK-wide delivery support.</span></div>
+          <div><i class="fa-solid fa-sterling-sign"></i><strong>Flat Delivery &pound;4.99</strong><span>Simple fixed delivery price.</span></div>
+          <div><i class="fa-solid fa-flask-vial"></i><strong>Lab Tested</strong><span>Batch testing and verification.</span></div>
         </div>
       </div>
     </section>
