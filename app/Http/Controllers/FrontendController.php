@@ -24,7 +24,13 @@ class FrontendController extends Controller
     {
         return view('frontend.index', [
             'categories' => Category::withCount('products')->where('status', 'active')->orderBy('sort_order')->take(8)->get(),
-            'featuredProducts' => Product::with('category')->where('status', 'active')->where('is_bestseller', true)->orderByRaw('stock > 0 desc')->latest()->take(5)->get(),
+            'featuredProducts' => Product::with('category')
+                ->where('status', 'active')
+                ->orderByDesc('is_bestseller')
+                ->orderByRaw('stock > 0 desc')
+                ->latest()
+                ->take(5)
+                ->get(),
             'reviews' => Review::where('status', 'active')->latest()->take(5)->get(),
         ]);
     }

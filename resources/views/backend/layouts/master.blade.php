@@ -41,14 +41,14 @@
                 @endforeach
             </nav>
 
-            <div class="support-card">
+            {{-- <div class="support-card">
                 <i class="fa-solid fa-database"></i>
                 <div>
                     <strong>Live Store Data</strong>
                     <span>Orders, products, users</span>
                 </div>
                 <a href="{{ route('backend.page', 'reports') }}">Open Reports</a>
-            </div>
+            </div> --}}
 
             <div class="sidebar-foot">
                 <span>Arete Admin</span>
