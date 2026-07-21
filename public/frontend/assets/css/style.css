@@ -2020,7 +2020,7 @@ button.is-loading .fa-spinner {
 
 .footer-copy {
   max-width: 330px;
-  margin: 32px 0 34px;
+  margin: 10px 0 34px;
   color: #c6c6c6;
   font-size: 1rem;
   line-height: 1.75;
@@ -2061,13 +2061,13 @@ button.is-loading .fa-spinner {
 
 .footer-brand {
   width: 238px;
-  height: 136px;
+  height: 70px;
 }
 
 .footer-brand img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: left center;
 }
 
@@ -2098,10 +2098,10 @@ button.is-loading .fa-spinner {
 
 .footer-links a {
   position: relative;
-  display: flex;
+  /* display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 12px; */
   margin-bottom: 22px;
   padding-left: 18px;
   color: #bdbdbd;
@@ -6478,7 +6478,7 @@ button.is-loading .fa-spinner {
   }
 
   .footer-copy {
-    margin: 22px 0 24px;
+    margin: 10px 0 24px;
     font-size: .92rem;
   }
 
@@ -8133,8 +8133,9 @@ button.is-loading .fa-spinner {
 }
 
 .site-header .brand {
-  width: auto;
-  height: 80px;
+  /* width: auto; */
+  width: 170px;
+  height: auto;
   padding: 4px 0;
   transition: transform .25s ease, filter .25s ease;
 }

@@ -14,9 +14,9 @@
                     @forelse ($footerCategories ?? collect() as $category)
                         <a href="{{ route('frontend.shop', ['category' => $category->slug]) }}">
                             {{ $category->name }}
-                            @if (isset($category->products_count))
+                            {{-- @if (isset($category->products_count))
                                 <span>{{ $category->products_count }}</span>
-                            @endif
+                            @endif --}}
                         </a>
                     @empty
                         <a href="{{ route('frontend.shop') }}">Shop Products</a>
