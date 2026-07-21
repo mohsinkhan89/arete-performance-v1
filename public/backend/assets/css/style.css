@@ -6080,3 +6080,99 @@ body.admin-dark-page .order-detail-strip span {
     font-size: 23px;
   }
 }
+
+.recent-order-list {
+  display: grid;
+  gap: 8px;
+}
+
+.recent-order-card {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(120px, 1.1fr) minmax(70px, .55fr) minmax(90px, .7fr) minmax(150px, 1.2fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e3e7ee;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.recent-order-card:hover {
+  border-color: rgba(215, 168, 58, .7);
+  box-shadow: 0 7px 18px rgba(18, 25, 36, .07);
+  transform: translateY(-1px);
+}
+
+.recent-order-card > div:not(.action-group) {
+  min-width: 0;
+}
+
+.recent-order-card > div > span:first-child {
+  display: block;
+  margin-bottom: 4px;
+  color: #70798a;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.recent-order-card > div > strong {
+  display: block;
+  overflow: hidden;
+  color: #202938;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-order-primary > strong {
+  color: #8a5a00 !important;
+}
+
+.recent-order-card .badge {
+  min-width: 72px;
+  min-height: 24px;
+  font-size: 9px;
+}
+
+.recent-order-actions {
+  justify-self: end;
+}
+
+body.admin-dark-page .recent-order-card {
+  border-color: rgba(255, 255, 255, .1);
+  background: rgba(255, 255, 255, .04);
+}
+
+body.admin-dark-page .recent-order-card > div > strong {
+  color: #f7f7f7;
+}
+
+body.admin-dark-page .recent-order-card > div > span:first-child {
+  color: #a6abb6;
+}
+
+@media only screen and (min-width: 1300px) and (max-width: 1550px) {
+  .recent-order-card {
+    grid-template-columns: minmax(110px, 1fr) minmax(105px, 1fr) 65px 82px minmax(135px, 1.15fr) auto;
+    gap: 8px;
+    padding: 8px 9px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .recent-order-card {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .recent-order-actions {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 560px) {
+  .recent-order-card {
+    grid-template-columns: 1fr;
+  }
+}
