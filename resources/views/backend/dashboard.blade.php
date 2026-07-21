@@ -50,31 +50,37 @@
                     <h2>Recent Orders</h2>
                     <a href="{{ route('backend.page', 'orders') }}">View all</a>
                 </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Royal Mail ID</th><th></th></tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($recentOrders as $order)
-                                <tr>
-                                    <td>{{ $order->order_number }}</td>
-                                    <td>{{ $order->customer_name }}</td>
-                                    <td>&pound;{{ number_format((float) $order->total, 2) }}</td>
-                                    <td><span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
-                                    <td>{{ $order->tracking_number ?: 'Pending label' }}</td>
-                                    <td>
-                                        <div class="action-group">
-                                            <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
-                                            @include('backend.partials.payment-proof-button', ['order' => $order])
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="6" class="empty-cell">No orders found.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                <div class="recent-order-list">
+                    @forelse ($recentOrders as $order)
+                        <article class="recent-order-card">
+                            <div class="recent-order-primary">
+                                <span>Order</span>
+                                <strong>{{ $order->order_number }}</strong>
+                            </div>
+                            <div>
+                                <span>Customer</span>
+                                <strong>{{ $order->customer_name }}</strong>
+                            </div>
+                            <div>
+                                <span>Total</span>
+                                <strong>&pound;{{ number_format((float) $order->total, 2) }}</strong>
+                            </div>
+                            <div>
+                                <span>Payment</span>
+                                <strong><span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></strong>
+                            </div>
+                            <div class="recent-order-tracking">
+                                <span>Royal Mail ID</span>
+                                <strong>{{ $order->tracking_number ?: 'Pending label' }}</strong>
+                            </div>
+                            <div class="action-group recent-order-actions">
+                                <a href="{{ route('backend.orders.show', $order) }}" title="View order" aria-label="View order {{ $order->order_number }}"><i class="fa-regular fa-eye"></i></a>
+                                @include('backend.partials.payment-proof-button', ['order' => $order])
+                            </div>
+                        </article>
+                    @empty
+                        <div class="empty-cell">No orders found.</div>
+                    @endforelse
                 </div>
             </article>
 
