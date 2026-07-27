@@ -1369,7 +1369,6 @@ button.is-loading .fa-spinner {
   display: block;
   width: 145px;
   height: 180px;
-  margin: 0 auto;
   object-fit: contain;
 }
 
@@ -2844,7 +2843,8 @@ button.is-loading .fa-spinner {
 .shop-hero-features {
   display: grid;
   max-width: 650px;
-  grid-template-columns: repeat(4, 1fr);
+  /* grid-template-columns: repeat(4, 1fr); */
+  grid-template-columns: repeat(3, 1fr);
   border-top: 1px solid rgba(255, 255, 255, .18);
 }
 

@@ -496,7 +496,8 @@ class BackendController extends Controller
             'remove_test_report_image' => ['nullable', 'boolean'],
             'price' => ['required', 'numeric', 'min:0'],
             'sale_price' => ['nullable', 'numeric', 'min:0'],
-            'stock' => ['required', 'integer', 'min:0'],
+            'stock' => ['required', Rule::in(['0', '1', 0, 1])],
+            'reviews_count' => ['required', 'integer', 'min:0'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'is_featured' => ['nullable', 'boolean'],
             'is_bestseller' => ['nullable', 'boolean'],
@@ -505,6 +506,7 @@ class BackendController extends Controller
         $data['slug'] = $this->uniqueSlug(Product::class, $data['slug'] ?: Str::slug($data['name']), $ignoreId);
         $data['is_featured'] = $request->boolean('is_featured');
         $data['is_bestseller'] = $request->boolean('is_bestseller');
+        $data['stock'] = (int) $data['stock'];
         $data['image'] = $this->imageValue($request, 'image_file', 'remove_image', $currentImage);
         $data['test_report_image'] = $this->imageValue($request, 'test_report_image_file', 'remove_test_report_image', $currentTestReportImage);
 

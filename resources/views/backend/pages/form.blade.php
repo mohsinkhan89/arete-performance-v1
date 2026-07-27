@@ -62,7 +62,15 @@
                                 <input type="number" step="0.01" min="0" name="sale_price" value="{{ old('sale_price', $record->sale_price ?? '') }}">
                             </label>
                             <label>Stock
-                                <input type="number" min="0" name="stock" value="{{ old('stock', $record->stock ?? 0) }}" required>
+                                <select name="stock" required>
+                                    <option value="1" @selected((string) old('stock', $record->stock ?? 1) === '1')>Active</option>
+                                    <option value="0" @selected((string) old('stock', $record->stock ?? 1) === '0')>Inactive</option>
+                                </select>
+                                @error('stock')<span>{{ $message }}</span>@enderror
+                            </label>
+                            <label>Reviews
+                                <input type="number" min="0" name="reviews_count" value="{{ old('reviews_count', $record->reviews_count ?? 0) }}" required>
+                                @error('reviews_count')<span>{{ $message }}</span>@enderror
                             </label>
                             <label>Status
                                 <select name="status" required>

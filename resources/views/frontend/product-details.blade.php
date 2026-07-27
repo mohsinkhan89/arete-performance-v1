@@ -49,7 +49,7 @@
         <aside class="product-purchase">
           <span class="product-category-pill">{{ $product->category?->name ?? 'Product' }}</span>
           <h1>{{ $product->name }}</h1>
-          <div class="product-rating"><span>&#9733;&#9733;&#9733;&#9733;&#9733;</span><small>({{ $product->stock }} in stock)</small></div>
+          <div class="product-rating"><span>&#9733;&#9733;&#9733;&#9733;&#9733;</span><small>({{ number_format($product->reviews_count) }} reviews)</small></div>
           <strong class="product-price">&pound;{{ number_format($price, 2) }}</strong>
           <p class="product-detail-summary">{{ $product->short_description }}</p>
           <div class="product-assurance">
