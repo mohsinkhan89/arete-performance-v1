@@ -228,6 +228,7 @@ class FrontendController extends Controller
                 'meta' => $product->category?->name ?? 'Product',
                 'price' => (float) ($product->sale_price ?: $product->price),
                 'stock' => $product->stock,
+                'reviews_count' => $product->reviews_count,
                 'in_stock' => $product->stock > 0,
                 'image' => url($product->image ?: 'frontend/assets/images/product-bottle.png'),
             ])
@@ -395,7 +396,6 @@ class FrontendController extends Controller
                     'line_total' => $item['line_total'],
                 ]);
 
-                $product->decrement('stock', min($product->stock, $item['quantity']));
             }
 
             return $order;

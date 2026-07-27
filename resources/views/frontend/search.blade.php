@@ -84,7 +84,7 @@
                   <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
                   <small>{{ $product->category?->name }}</small>
                   <h3>{{ $product->name }}</h3>
-                  <div class="rating">★★★★★ <span>({{ $product->stock }})</span></div>
+                  <div class="rating">★★★★★ <span>({{ number_format($product->reviews_count) }} reviews)</span></div>
                   <div class="product-card-tools">
                     @if ($product->stock > 0)
                       <div class="product-card-qty" aria-label="{{ $product->name }} quantity"><button type="button" data-card-qty-dec>-</button><span data-card-qty>1</span><button type="button" data-card-qty-inc>+</button></div>

@@ -95,7 +95,7 @@
                 @if ($page === 'products')
                     <table>
                         <thead>
-                            <tr><th>Product</th><th>Category</th><th>SKU</th><th>Price</th><th>Stock</th><th>Bestseller</th><th>Status</th><th>Action</th></tr>
+                            <tr><th>Product</th><th>Category</th><th>SKU</th><th>Price</th><th>Stock</th><th>Reviews</th><th>Bestseller</th><th>Status</th><th>Action</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $product)
@@ -109,7 +109,8 @@
                                     <td>{{ $product->category?->name ?? '-' }}</td>
                                     <td>{{ $product->sku }}</td>
                                     <td>£{{ number_format((float) $product->price, 2) }}</td>
-                                    <td>{{ $product->stock }}</td>
+                                    <td><span class="badge {{ $product->stock > 0 ? 'green' : 'muted' }}">{{ $product->stock > 0 ? 'Active' : 'Inactive' }}</span></td>
+                                    <td>{{ number_format($product->reviews_count) }}</td>
                                     <td>
                                         <span class="badge {{ $product->is_bestseller ? 'green' : 'muted' }}">{{ $product->is_bestseller ? 'Yes' : 'No' }}</span>
                                     </td>
@@ -135,7 +136,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="8" class="empty-cell">No products found.</td></tr>
+                                <tr><td colspan="9" class="empty-cell">No products found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

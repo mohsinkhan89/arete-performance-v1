@@ -23,6 +23,7 @@ class Product extends Model
         'price',
         'sale_price',
         'stock',
+        'reviews_count',
         'status',
         'is_featured',
         'is_bestseller',
@@ -34,6 +35,7 @@ class Product extends Model
             'price' => 'decimal:2',
             'sale_price' => 'decimal:2',
             'stock' => 'integer',
+            'reviews_count' => 'integer',
             'is_featured' => 'boolean',
             'is_bestseller' => 'boolean',
         ];
