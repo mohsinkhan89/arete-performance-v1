@@ -53,6 +53,7 @@ Route::prefix('admin')->name('backend.')->middleware('auth')->group(function () 
     Route::get('{resource}/{id}/edit', [BackendController::class, 'edit'])->name('resource.edit');
     Route::put('{resource}/{id}', [BackendController::class, 'update'])->name('resource.update');
     Route::delete('{resource}/{id}', [BackendController::class, 'destroy'])->name('resource.destroy');
+    Route::patch('products/{product}/toggle/{field}', [BackendController::class, 'toggleProductField'])->name('products.toggle-field');
     Route::patch('{resource}/{id}/status', [BackendController::class, 'toggleStatus'])->name('resource.status');
     Route::get('{page}', [BackendController::class, 'page'])->name('page');
 });

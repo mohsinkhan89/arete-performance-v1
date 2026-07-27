@@ -67,7 +67,7 @@
           <button class="slider-arrow slider-prev" type="button" aria-label="Previous product"><i class="fa-solid fa-chevron-left"></i></button>
           <div class="row g-3 mt-3 reveal-group product-track">
             @foreach ($featuredProducts as $product)
-              <div class="col-6 col-md-4 col-lg">
+              <div class="col-6 col-md-4 col-lg bestseller-product-column">
                 <article class="product-card {{ $product->stock <= 0 ? 'is-out-of-stock' : '' }}" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-url="{{ route('frontend.product-details', $product->slug) }}">
                   @if ($product->stock <= 0)<span class="tag stock-tag">Out of Stock</span>@elseif ($product->is_bestseller)<span class="tag">Bestseller</span>@endif
                   <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">

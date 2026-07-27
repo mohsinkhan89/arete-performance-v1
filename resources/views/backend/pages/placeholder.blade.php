@@ -95,7 +95,7 @@
                 @if ($page === 'products')
                     <table>
                         <thead>
-                            <tr><th>Product</th><th>Category</th><th>SKU</th><th>Price</th><th>Stock</th><th>Reviews</th><th>Bestseller</th><th>Status</th><th>Action</th></tr>
+                            <tr><th>Product</th><th>Category</th><th>SKU</th><th>Price</th><th>Reviews</th><th>Status</th><th>Bestseller</th><th>Stock</th><th>Action</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $product)
@@ -109,11 +109,7 @@
                                     <td>{{ $product->category?->name ?? '-' }}</td>
                                     <td>{{ $product->sku }}</td>
                                     <td>£{{ number_format((float) $product->price, 2) }}</td>
-                                    <td><span class="badge {{ $product->stock > 0 ? 'green' : 'muted' }}">{{ $product->stock > 0 ? 'Active' : 'Inactive' }}</span></td>
                                     <td>{{ number_format($product->reviews_count) }}</td>
-                                    <td>
-                                        <span class="badge {{ $product->is_bestseller ? 'green' : 'muted' }}">{{ $product->is_bestseller ? 'Yes' : 'No' }}</span>
-                                    </td>
                                     <td>
                                         <form action="{{ route('backend.resource.status', ['resource' => 'products', 'id' => $product->id]) }}" method="POST">
                                             @csrf
@@ -121,6 +117,26 @@
                                             <button class="status-toggle {{ $product->status === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status">
                                                 <i class="fa-solid {{ $product->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
                                                 {{ ucfirst($product->status) }}
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('backend.products.toggle-field', ['product' => $product->id, 'field' => 'is_bestseller']) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button class="status-toggle {{ $product->is_bestseller ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle bestseller">
+                                                <i class="fa-solid {{ $product->is_bestseller ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
+                                                {{ $product->is_bestseller ? 'Active' : 'Inactive' }}
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('backend.products.toggle-field', ['product' => $product->id, 'field' => 'stock']) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button class="status-toggle {{ $product->stock > 0 ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle stock">
+                                                <i class="fa-solid {{ $product->stock > 0 ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
+                                                {{ $product->stock > 0 ? 'Active' : 'Inactive' }}
                                             </button>
                                         </form>
                                     </td>
