@@ -1603,8 +1603,78 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelector(".cart-btn").addEventListener("click", openCart);
   document.querySelector(".cart-close").addEventListener("click", closeCart);
   cartOverlay.addEventListener("click", closeCart);
-  document.querySelector(".slider-prev")?.addEventListener("click", () => productTrack.scrollBy({ left: -260, behavior: "smooth" }));
-  document.querySelector(".slider-next")?.addEventListener("click", () => productTrack.scrollBy({ left: 260, behavior: "smooth" }));
+  if (productTrack) {
+    const productSlider = productTrack.closest(".product-slider");
+    const productSlides = [...productTrack.querySelectorAll(".bestseller-product-column")];
+    const productPrev = productSlider?.querySelector(".slider-prev");
+    const productNext = productSlider?.querySelector(".slider-next");
+    let productAutoSlide = null;
+
+    const productSlideStep = () => productSlides[0]?.getBoundingClientRect().width || 260;
+    const productSliderHasOverflow = () => productTrack.scrollWidth - productTrack.clientWidth > 8;
+
+    const updateProductSlider = () => {
+      const hasOverflow = productSliderHasOverflow();
+      if (productPrev) productPrev.hidden = !hasOverflow;
+      if (productNext) productNext.hidden = !hasOverflow;
+
+      if (!hasOverflow && productAutoSlide) {
+        window.clearInterval(productAutoSlide);
+        productAutoSlide = null;
+      }
+
+      return hasOverflow;
+    };
+
+    const moveProductSlider = (direction = 1) => {
+      const maxScroll = productTrack.scrollWidth - productTrack.clientWidth;
+      const reachedEnd = productTrack.scrollLeft >= maxScroll - 8;
+      const reachedStart = productTrack.scrollLeft <= 8;
+      const left = direction > 0 && reachedEnd
+        ? 0
+        : direction < 0 && reachedStart
+          ? maxScroll
+          : productTrack.scrollLeft + (productSlideStep() * direction);
+
+      productTrack.scrollTo({ left, behavior: "smooth" });
+    };
+
+    const startProductAutoSlide = () => {
+      if (productAutoSlide || !updateProductSlider()) return;
+      productAutoSlide = window.setInterval(() => {
+        if (!document.hidden) moveProductSlider(1);
+      }, 4000);
+    };
+
+    const stopProductAutoSlide = () => {
+      if (!productAutoSlide) return;
+      window.clearInterval(productAutoSlide);
+      productAutoSlide = null;
+    };
+
+    productPrev?.addEventListener("click", () => {
+      moveProductSlider(-1);
+      stopProductAutoSlide();
+      startProductAutoSlide();
+    });
+    productNext?.addEventListener("click", () => {
+      moveProductSlider(1);
+      stopProductAutoSlide();
+      startProductAutoSlide();
+    });
+    productSlider?.addEventListener("mouseenter", stopProductAutoSlide);
+    productSlider?.addEventListener("mouseleave", startProductAutoSlide);
+    productSlider?.addEventListener("focusin", stopProductAutoSlide);
+    productSlider?.addEventListener("focusout", startProductAutoSlide);
+    window.addEventListener("resize", () => {
+      stopProductAutoSlide();
+      updateProductSlider();
+      startProductAutoSlide();
+    });
+
+    updateProductSlider();
+    startProductAutoSlide();
+  }
 
   document.querySelectorAll("[data-testimonial-slider]").forEach((slider) => {
     const track = slider.querySelector(".testimonial-track");

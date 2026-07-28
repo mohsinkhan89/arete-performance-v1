@@ -464,6 +464,19 @@ class BackendController extends Controller
         return back()->with('success', 'Status updated successfully.');
     }
 
+    public function toggleProductField(Product $product, string $field): RedirectResponse
+    {
+        abort_unless(in_array($field, ['stock', 'is_bestseller'], true), 404);
+
+        $product->update([
+            $field => $field === 'stock'
+                ? ($product->stock > 0 ? 0 : 1)
+                : ! $product->is_bestseller,
+        ]);
+
+        return back()->with('success', Str::headline($field) . ' updated successfully.');
+    }
+
     private function authorizeResource(string $resource): void
     {
         abort_unless(in_array($resource, ['products', 'categories', 'users', 'reviews'], true), 404);
