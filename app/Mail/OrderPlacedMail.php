@@ -14,14 +14,16 @@ class OrderPlacedMail extends Mailable
     use Queueable;
     use SerializesModels;
 
-    public function __construct(public Order $order)
+    public function __construct(public Order $order, public bool $adminNotification = false)
     {
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Arete Performance order #' . $this->order->order_number,
+            subject: $this->adminNotification
+                ? 'New order received #' . $this->order->order_number
+                : 'Your Arete Performance order #' . $this->order->order_number,
         );
     }
 

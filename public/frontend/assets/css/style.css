@@ -3135,8 +3135,10 @@ button.is-loading .fa-spinner {
 }
 
 .shop-product-card.product-card img {
-  width: 150px;
-  height: 152px;
+  width: 100%;
+  height: auto;
+  /* height: 152px;
+  object-fit: cover; */
   margin-bottom: 10px;
 }
 

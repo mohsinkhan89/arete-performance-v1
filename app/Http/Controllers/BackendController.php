@@ -225,28 +225,57 @@ class BackendController extends Controller
 
     public function updateSiteSettings(Request $request): RedirectResponse
     {
-        $request->validate([
-            'header_logo_file' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
-            'footer_logo_file' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
-            'company_whatsapp_number' => ['nullable', 'string', 'max:40', 'regex:/^[0-9+\s().-]+$/'],
-        ]);
+        $setting = $request->validate([
+            'setting' => ['required', Rule::in(['header_logo', 'footer_logo', 'company_whatsapp_number', 'admin_order_emails'])],
+        ])['setting'];
 
-        $settings = $this->siteSettings();
-        SiteSetting::setValue('company_whatsapp_number', trim((string) $request->input('company_whatsapp_number')));
+        if (in_array($setting, ['header_logo', 'footer_logo'], true)) {
+            $fileKey = $setting . '_file';
+            $request->validate([
+                $fileKey => ['required', 'file', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
+            ]);
 
-        foreach (['header_logo' => 'header_logo_file', 'footer_logo' => 'footer_logo_file'] as $settingKey => $fileKey) {
-            if (! $request->hasFile($fileKey)) {
-                continue;
-            }
-
-            $this->deleteUploadedImage($settings[$settingKey] ?? null);
+            $settings = $this->siteSettings();
+            $this->deleteUploadedImage($settings[$setting] ?? null);
             $file = $request->file($fileKey);
-            $filename = 'site-' . $settingKey . '-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $filename = 'site-' . $setting . '-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('backend/assets/imgs/uploads'), $filename);
-            SiteSetting::setValue($settingKey, 'backend/assets/imgs/uploads/' . $filename);
+            SiteSetting::setValue($setting, 'backend/assets/imgs/uploads/' . $filename);
         }
 
-        return back()->with('success', 'Site settings updated successfully.');
+        if ($setting === 'company_whatsapp_number') {
+            $data = $request->validate([
+                'company_whatsapp_number' => ['nullable', 'string', 'max:40', 'regex:/^[0-9+\s().-]+$/'],
+            ]);
+            SiteSetting::setValue($setting, trim((string) ($data[$setting] ?? '')));
+        }
+
+        if ($setting === 'admin_order_emails') {
+            $data = $request->validate([
+                'admin_order_emails' => [
+                    'nullable',
+                    'string',
+                    'max:2000',
+                    function (string $attribute, mixed $value, \Closure $fail): void {
+                        foreach (array_filter(array_map('trim', explode(',', (string) $value))) as $email) {
+                            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                                $fail("The email address {$email} is invalid.");
+                            }
+                        }
+                    },
+                ],
+            ]);
+            SiteSetting::setValue(
+                $setting,
+                collect(explode(',', (string) ($data[$setting] ?? '')))
+                    ->map(fn (string $email) => strtolower(trim($email)))
+                    ->filter()
+                    ->unique()
+                    ->implode(',')
+            );
+        }
+
+        return back()->with('success', Str::headline($setting) . ' updated successfully.');
     }
 
     public function showOrder(Order $order): View
@@ -651,6 +680,7 @@ class BackendController extends Controller
             'header_logo' => 'frontend/assets/images/logo/logo-transperent.png',
             'footer_logo' => 'frontend/assets/images/logo/logo.png',
             'company_whatsapp_number' => '',
+            'admin_order_emails' => '',
         ], SiteSetting::allKeyed());
     }
 }
