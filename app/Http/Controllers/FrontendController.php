@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\SiteSetting;
 use App\Models\StockNotification;
 use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
@@ -402,7 +403,14 @@ class FrontendController extends Controller
 
         $cart->clear();
         session(['latest_order_id' => $order->id]);
-        Mail::to($order->email)->send(new OrderPlacedMail($order->load('items')));
+        $order->load('items');
+        Mail::to($order->email)->send(new OrderPlacedMail($order));
+
+        collect(explode(',', SiteSetting::getValue('admin_order_emails', '') ?? ''))
+            ->map(fn (string $email) => strtolower(trim($email)))
+            ->filter(fn (string $email) => filter_var($email, FILTER_VALIDATE_EMAIL))
+            ->unique()
+            ->each(fn (string $email) => Mail::to($email)->send(new OrderPlacedMail($order, true)));
 
         return redirect()->route('frontend.order-success');
     }

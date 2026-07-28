@@ -17,8 +17,24 @@
                     </tr>
                     <tr>
                         <td style="padding:28px 30px;">
-                            <h2 style="margin:0 0 10px;font-size:22px;">Thanks, {{ $order->customer_name }}.</h2>
-                            <p style="margin:0 0 22px;color:#5f5f5f;line-height:1.6;">Your order has been received. Here are your order details.</p>
+                            @if ($adminNotification)
+                                <h2 style="margin:0 0 10px;font-size:22px;">New order from {{ $order->customer_name }}.</h2>
+                                <p style="margin:0 0 22px;color:#5f5f5f;line-height:1.6;">A new customer order has been received. Here are the order details.</p>
+                            @else
+                                <h2 style="margin:0 0 10px;font-size:22px;">Thanks, {{ $order->customer_name }}.</h2>
+                                <p style="margin:0 0 22px;color:#5f5f5f;line-height:1.6;">Your order has been received. Here are your order details.</p>
+                            @endif
+
+                            @if ($adminNotification)
+                                <div style="margin:0 0 22px;padding:16px;background:#fafafa;border:1px solid #eeeeee;border-radius:8px;">
+                                    <strong style="display:block;margin-bottom:8px;">Customer Contact</strong>
+                                    <p style="margin:0;color:#5f5f5f;line-height:1.55;">
+                                        Email: {{ $order->email }}<br>
+                                        Phone: {{ $order->phone ?: 'Not provided' }}<br>
+                                        Payment: {{ ucfirst($order->payment_method) }}
+                                    </p>
+                                </div>
+                            @endif
 
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
                                 @foreach ($order->items as $item)
