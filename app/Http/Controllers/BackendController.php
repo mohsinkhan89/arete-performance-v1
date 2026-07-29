@@ -226,7 +226,7 @@ class BackendController extends Controller
     public function updateSiteSettings(Request $request): RedirectResponse
     {
         $setting = $request->validate([
-            'setting' => ['required', Rule::in(['header_logo', 'footer_logo', 'company_whatsapp_number', 'admin_order_emails'])],
+            'setting' => ['required', Rule::in(['header_logo', 'footer_logo', 'company_whatsapp_number', 'admin_order_emails', 'asset_versions'])],
         ])['setting'];
 
         if (in_array($setting, ['header_logo', 'footer_logo'], true)) {
@@ -273,6 +273,19 @@ class BackendController extends Controller
                     ->unique()
                     ->implode(',')
             );
+        }
+
+        if ($setting === 'asset_versions') {
+            $data = $request->validate([
+                'css_version' => ['required', 'string', 'max:50', 'regex:/^[A-Za-z0-9._-]+$/'],
+                'js_version' => ['required', 'string', 'max:50', 'regex:/^[A-Za-z0-9._-]+$/'],
+            ], [
+                'css_version.regex' => 'The CSS version may only contain letters, numbers, dots, dashes and underscores.',
+                'js_version.regex' => 'The JS version may only contain letters, numbers, dots, dashes and underscores.',
+            ]);
+
+            SiteSetting::setValue('css_version', $data['css_version']);
+            SiteSetting::setValue('js_version', $data['js_version']);
         }
 
         return back()->with('success', Str::headline($setting) . ' updated successfully.');
@@ -681,6 +694,8 @@ class BackendController extends Controller
             'footer_logo' => 'frontend/assets/images/logo/logo.png',
             'company_whatsapp_number' => '',
             'admin_order_emails' => '',
+            'css_version' => '1.0.0',
+            'js_version' => '1.0.0',
         ], SiteSetting::allKeyed());
     }
 }

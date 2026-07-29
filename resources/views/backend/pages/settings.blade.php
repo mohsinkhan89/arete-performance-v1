@@ -8,6 +8,8 @@
         $footerLogo = $settings['footer_logo'] ?? 'frontend/assets/images/logo/logo.png';
         $whatsappNumber = old('company_whatsapp_number', $settings['company_whatsapp_number'] ?? '');
         $adminOrderEmails = old('admin_order_emails', $settings['admin_order_emails'] ?? '');
+        $cssVersion = old('css_version', $settings['css_version'] ?? '1.0.0');
+        $jsVersion = old('js_version', $settings['js_version'] ?? '1.0.0');
     @endphp
 
     <div class="page-heading">
@@ -65,6 +67,23 @@
                     @error('admin_order_emails') <span>{{ $message }}</span> @enderror
                 </label>
                 <div class="form-actions"><button type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Admin Emails</button></div>
+            </form>
+
+            <form class="admin-form form-section" action="{{ route('backend.settings.site.update') }}" method="POST">
+                @csrf
+                <input type="hidden" name="setting" value="asset_versions">
+                <div class="form-section-head"><span>05</span><h2>CSS &amp; JS Versions</h2></div>
+                <label>CSS Version
+                    <input type="text" name="css_version" value="{{ $cssVersion }}" placeholder="1.0.0">
+                    <small>Change this after updating the frontend stylesheet to force browsers to load the latest CSS.</small>
+                    @error('css_version') <span>{{ $message }}</span> @enderror
+                </label>
+                <label>JS Version
+                    <input type="text" name="js_version" value="{{ $jsVersion }}" placeholder="1.0.0">
+                    <small>Change this after updating frontend JavaScript to force browsers to load the latest JS.</small>
+                    @error('js_version') <span>{{ $message }}</span> @enderror
+                </label>
+                <div class="form-actions"><button type="submit"><i class="fa-solid fa-rotate"></i> Update Asset Versions</button></div>
             </form>
         </div>
     </article>
