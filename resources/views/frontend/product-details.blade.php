@@ -109,6 +109,12 @@
             </aside>
           @endif
         </div>
+        <div class="description-assurance">
+          <div><i class="fa-solid fa-shield-halved"></i><strong>{{ $product->stock > 0 ? 'In Stock' : 'Out of Stock' }}</strong><span>{{ $product->stock > 0 ? 'Order now and get fast delivery' : 'Contact us for availability' }}</span></div>
+          <div><i class="fa-solid fa-flask-vial"></i><strong>Lab Tested</strong><span>Every batch is lab verified</span></div>
+          <div><i class="fa-solid fa-truck-fast"></i><strong>Discreet Shipping</strong><span>Private &amp; secure UK delivery</span></div>
+          <div><i class="fa-solid fa-globe"></i><strong>Worldwide Delivery</strong><span>We ship to 100+ countries</span></div>
+        </div>
       </article>
 
       <article class="product-info-card tab-content-card" id="benefits" data-tab-card="benefits">

@@ -1009,7 +1009,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const productDescription = source.querySelector(".product-description");
       if (productDescription && targets.description) {
         targets.description.innerHTML = "";
-        [...productDescription.children].forEach((child) => targets.description.appendChild(stripInlineFormatting(child.cloneNode(true))));
+        [...productDescription.children]
+          .filter((child) => !(child.matches?.("h1, h2, h3, h4") && cleanText(child.textContent).toLowerCase() === "description"))
+          .forEach((child) => targets.description.appendChild(stripInlineFormatting(child.cloneNode(true))));
       }
 
       const specs = source.querySelector(".product-specs, dl");
