@@ -16,14 +16,17 @@
   $reviewCount = $reviews->count();
   $reviewAverage = $reviewCount ? round((float) $reviews->avg('rating'), 1) : 0;
   $reviewCounts = collect(range(5, 1))->mapWithKeys(fn ($rating) => [$rating => $reviews->where('rating', $rating)->count()]);
+  $categoryIdentity = strtolower(($product->category?->slug ?? '') . ' ' . ($product->category?->name ?? ''));
+  $isPeptide = str_contains($categoryIdentity, 'peptide');
+  $calculatorUrl = $isPeptide ? route('frontend.peptide-calculator', $product->slug) : null;
 @endphp
 
 <div class="product-detail-main">
   <section class="product-detail-top">
     <div class="container">
       <nav class="product-breadcrumb" aria-label="Breadcrumb">
-        <a href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i>
-        <a href="{{ route('frontend.shop', array_filter(['category' => $product->category?->slug])) }}">{{ $product->category?->name ?? 'Shop' }}</a><i class="fa-solid fa-chevron-right"></i>
+        <a class="back-link" href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i>
+        <a class="back-link" href="{{ route('frontend.shop', array_filter(['category' => $product->category?->slug])) }}">{{ $product->category?->name ?? 'Shop' }}</a><i class="fa-solid fa-chevron-right"></i>
         <span>{{ $product->name }}</span>
       </nav>
 
@@ -94,7 +97,7 @@
 
       <article class="product-info-card tab-content-card" id="description" data-tab-card="description">
         <nav class="product-tabs" aria-label="Description tab">
-          <a class="active" href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
+          <a class="active" href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>@if($isPeptide)<a href="{{ $calculatorUrl }}" data-external-tab>Calculator</a>@endif
         </nav>
         <div class="product-info-grid {{ $descriptionGridClass }}">
           <div class="product-description" data-description-section="description">
@@ -119,7 +122,7 @@
 
       <article class="product-info-card tab-content-card" id="benefits" data-tab-card="benefits">
         <nav class="product-tabs" aria-label="Benefits tab">
-          <a href="#description">Description</a><a class="active" href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
+          <a href="#description">Description</a><a class="active" href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>@if($isPeptide)<a href="{{ $calculatorUrl }}" data-external-tab>Calculator</a>@endif
         </nav>
         <div class="benefits-tab-grid">
           <div><h2 data-section-title="benefits"></h2><div class="benefit-list dynamic-rich-content" data-description-section="benefits"></div></div>
@@ -131,7 +134,7 @@
 
       <article class="product-info-card tab-content-card" id="dosage" data-tab-card="dosage">
         <nav class="product-tabs" aria-label="Dosage tab">
-          <a href="#description">Description</a><a href="#benefits">Benefits</a><a class="active" href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
+          <a href="#description">Description</a><a href="#benefits">Benefits</a><a class="active" href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>@if($isPeptide)<a href="{{ $calculatorUrl }}" data-external-tab>Calculator</a>@endif
         </nav>
         <div class="dosage-tab-grid">
           <div class="dosage-copy"><h2 data-section-title="dosage"></h2><div class="dynamic-rich-content" data-description-section="dosage"></div></div>
@@ -142,7 +145,7 @@
 
       <article class="product-info-card tab-content-card" id="ingredients" data-tab-card="ingredients">
         <nav class="product-tabs" aria-label="Ingredients tab">
-          <a href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a class="active" href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
+          <a href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a class="active" href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>@if($isPeptide)<a href="{{ $calculatorUrl }}" data-external-tab>Calculator</a>@endif
         </nav>
         <div class="ingredients-tab-grid">
           <div><h2 data-section-title="ingredients"></h2><div class="dynamic-rich-content" data-description-section="ingredients"></div></div>
@@ -152,7 +155,7 @@
 
       <article class="product-info-card tab-content-card" id="reviews" data-tab-card="reviews" data-server-content="{{ $reviews->isNotEmpty() ? '1' : '0' }}">
         <nav class="product-tabs" aria-label="Reviews tab">
-          <a href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a class="active" href="#reviews">Reviews</a><a href="#faq">FAQ</a>
+          <a href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a class="active" href="#reviews">Reviews</a><a href="#faq">FAQ</a>@if($isPeptide)<a href="{{ $calculatorUrl }}" data-external-tab>Calculator</a>@endif
         </nav>
         <div class="reviews-tab-content">
           <h2>Customer Reviews</h2>
@@ -173,7 +176,7 @@
 
       <article class="product-info-card tab-content-card" id="faq" data-tab-card="faq">
         <nav class="product-tabs" aria-label="FAQ tab">
-          <a href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a class="active" href="#faq">FAQ</a>
+          <a href="#description">Description</a><a href="#benefits">Benefits</a><a href="#dosage">Dosage</a><a href="#ingredients">Ingredients</a><a href="#reviews">Reviews</a><a class="active" href="#faq">FAQ</a>@if($isPeptide)<a href="{{ $calculatorUrl }}" data-external-tab>Calculator</a>@endif
         </nav>
         <div class="faq-tab-grid">
           <div><h2 data-section-title="faq"></h2><div class="faq-list" data-description-section="faq"></div></div>

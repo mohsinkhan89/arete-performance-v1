@@ -200,6 +200,26 @@ class FrontendController extends Controller
         ]);
     }
 
+    public function peptideCalculator(string $product): View
+    {
+        $product = Product::with('category')
+            ->where('status', 'active')
+            ->where(fn ($query) => $query->where('slug', $product)->orWhere('id', $product))
+            ->firstOrFail();
+
+        $categoryIdentity = Str::lower(($product->category?->slug ?? '') . ' ' . ($product->category?->name ?? ''));
+        abort_unless(Str::contains($categoryIdentity, 'peptide'), 404);
+
+        preg_match('/(\d+(?:\.\d+)?)\s*mg/i', $product->name, $strengthMatch);
+        $vialAmount = (float) ($strengthMatch[1] ?? 10);
+
+        return view('frontend.peptide-calculator', [
+            'product' => $product,
+            'productImage' => url($product->image ?: 'frontend/assets/images/product-bottle.png'),
+            'vialAmount' => $vialAmount > 0 ? $vialAmount : 10,
+        ]);
+    }
+
     public function search(Request $request)
     {
         $filters = $this->filters($request);
