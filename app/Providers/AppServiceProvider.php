@@ -56,6 +56,9 @@ class AppServiceProvider extends ServiceProvider
             'header_logo' => 'frontend/assets/images/logo/logo-transperent.png',
             'footer_logo' => 'frontend/assets/images/logo/logo.png',
             'company_whatsapp_number' => '',
+            'admin_order_emails' => '',
+            'css_version' => '1.0.0',
+            'js_version' => '1.0.0',
         ], SiteSetting::allKeyed());
     }
 }

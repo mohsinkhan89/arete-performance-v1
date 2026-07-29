@@ -22,7 +22,7 @@
         }
       } catch (error) {}
     </script>
-    <link href="{{ url('frontend/assets/css/style.css') }}" rel="stylesheet">
+    <link href="{{ url('frontend/assets/css/style.css') }}?v={{ urlencode($siteSettings['css_version'] ?? '1.0.0') }}" rel="stylesheet">
 </head>
 <body class="@yield('body_class', (Request::path() === '/' ? 'home-page' : str_replace('/', '-', Request::path()) . '-page'))">
   <div class="site-loader" data-site-loader aria-live="polite" aria-label="Loading Arete Performance">
@@ -127,6 +127,6 @@
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{{ url('frontend/assets/js/main.js') }}"></script>
+  <script src="{{ url('frontend/assets/js/main.js') }}?v={{ urlencode($siteSettings['js_version'] ?? '1.0.0') }}"></script>
 </body>
 </html>
