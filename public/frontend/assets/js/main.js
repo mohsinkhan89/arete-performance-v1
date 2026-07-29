@@ -1774,6 +1774,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cardQtyDec = event.target.closest("[data-card-qty-dec]");
     const testReport = event.target.closest("[data-test-report]");
     const productZoom = event.target.closest("[data-product-zoom]");
+    const productExpand = event.target.closest("[data-product-expand]");
     const labReport = event.target.closest("[data-lab-report]");
     const detailTapCard = event.target.closest(".product-benefit-strip > div > div, .benefit-list > div, .dosage-steps > div, .ingredient-certifications > div, .review-card, .shop-trust-grid > div");
     const inc = event.target.closest("[data-cart-inc]");
@@ -1816,6 +1817,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (testReport) {
       openReportLightbox(testReport.dataset.testReport, testReport.dataset.testReportTitle || "Test Report");
+      return;
+    }
+
+    if (productExpand) {
+      const detailImage = document.querySelector("[data-product-main-image]");
+      if (detailImage) openReportLightbox(detailImage.currentSrc || detailImage.src, detailImage.alt || "Product image");
       return;
     }
 
@@ -1880,11 +1887,6 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => detailTapCard.classList.remove("is-tapped"), 520);
     }
 
-    if (productZoom && !event.target.closest("[data-product-image]")) {
-      const isZoomed = productZoom.classList.toggle("is-zoomed");
-      productZoom.setAttribute("aria-pressed", String(isZoomed));
-    }
-
     if (addFromSearch) {
       const added = await addToCart(addFromSearch.dataset.searchAdd);
       if (added) closeSearch();
@@ -1895,11 +1897,48 @@ document.addEventListener("DOMContentLoaded", () => {
     if (clearCart) clearServerCart();
   });
 
-  document.querySelector("[data-product-zoom]")?.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    event.currentTarget.click();
-  });
+  const productZoomArea = document.querySelector("[data-product-zoom]");
+
+  if (productZoomArea && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    const zoomImage = productZoomArea.querySelector("[data-product-main-image]");
+    const zoomLens = productZoomArea.querySelector("[data-product-zoom-lens]");
+    const zoomLevel = 2.35;
+
+    productZoomArea.addEventListener("mousemove", (event) => {
+      if (!zoomImage || !zoomLens) return;
+
+      const bounds = productZoomArea.getBoundingClientRect();
+      const x = event.clientX - bounds.left;
+      const y = event.clientY - bounds.top;
+
+      if (x < 0 || y < 0 || x > bounds.width || y > bounds.height) {
+        zoomLens.style.display = "none";
+        return;
+      }
+
+      const lensWidth = Math.min(230, bounds.width * 0.58);
+      const lensHeight = Math.min(230, bounds.height * 0.58);
+      const left = Math.max(0, Math.min(x - lensWidth / 2, bounds.width - lensWidth));
+      const top = Math.max(0, Math.min(y - lensHeight / 2, bounds.height - lensHeight));
+      const backgroundWidth = bounds.width * zoomLevel;
+      const backgroundHeight = bounds.height * zoomLevel;
+      const backgroundX = Math.max(0, Math.min(x * zoomLevel - lensWidth / 2, backgroundWidth - lensWidth));
+      const backgroundY = Math.max(0, Math.min(y * zoomLevel - lensHeight / 2, backgroundHeight - lensHeight));
+
+      zoomLens.style.display = "block";
+      zoomLens.style.width = `${lensWidth}px`;
+      zoomLens.style.height = `${lensHeight}px`;
+      zoomLens.style.left = `${left}px`;
+      zoomLens.style.top = `${top}px`;
+      zoomLens.style.backgroundImage = `url("${zoomImage.currentSrc || zoomImage.src}")`;
+      zoomLens.style.backgroundSize = `${backgroundWidth}px ${backgroundHeight}px`;
+      zoomLens.style.backgroundPosition = `-${backgroundX}px -${backgroundY}px`;
+    });
+
+    productZoomArea.addEventListener("mouseleave", () => {
+      if (zoomLens) zoomLens.style.display = "none";
+    });
+  }
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {

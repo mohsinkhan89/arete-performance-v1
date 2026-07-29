@@ -39,10 +39,13 @@
               </button>
             @endif
           </div>
-          <figure class="product-main-image" data-product-zoom role="button" tabindex="0" aria-label="Zoom product image" aria-pressed="false">
+          <figure class="product-main-image" data-product-zoom aria-label="Product image">
             @if ($product->is_featured)<span class="tag">Popular</span>@endif
             <img src="{{ $productImage }}" alt="{{ $product->name }}" data-product-main-image>
-            <figcaption><span><i class="fa-solid fa-magnifying-glass-plus"></i> Click to zoom</span><span>{{ $reportImage ? '2 images' : '1 image' }}</span></figcaption>
+            <span class="product-zoom-lens" data-product-zoom-lens aria-hidden="true"></span>
+            <button class="product-image-expand" type="button" data-product-expand aria-label="Open product image">
+              <i class="fa-solid fa-plus"></i>
+            </button>
           </figure>
         </div>
 
