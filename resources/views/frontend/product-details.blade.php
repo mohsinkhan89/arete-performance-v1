@@ -123,7 +123,9 @@
         </nav>
         <div class="benefits-tab-grid">
           <div><h2 data-section-title="benefits"></h2><div class="benefit-list dynamic-rich-content" data-description-section="benefits"></div></div>
-          <figure class="benefits-product-shot"><img src="{{ $productImage }}" alt="{{ $product->name }}"></figure>
+          <figure class="benefits-product-shot">
+            <img src="{{ $productImage }}" alt="{{ $product->name }}" data-benefits-product-image>
+          </figure>
         </div>
       </article>
 
