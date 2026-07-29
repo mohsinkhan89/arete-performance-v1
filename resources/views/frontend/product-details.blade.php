@@ -171,8 +171,13 @@
           <div><h2 data-section-title="faq"></h2><div class="faq-list" data-description-section="faq"></div></div>
         </div>
       </article>
+    </div>
+  </section>
+  @endif
 
-      @if ($relatedProducts->isNotEmpty())
+  @if ($relatedProducts->isNotEmpty())
+    <section class="related-products-section">
+      <div class="container">
         <section class="related-products">
           <h2>You May Also Like</h2>
           <div class="product-slider">
@@ -201,9 +206,8 @@
             <button class="slider-arrow slider-next" type="button" aria-label="Next related product"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
         </section>
-      @endif
-    </div>
-  </section>
+      </div>
+    </section>
   @endif
 
   @include('frontend.inc.delivery-trusted')
