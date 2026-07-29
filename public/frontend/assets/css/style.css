@@ -1512,10 +1512,6 @@ button.is-loading .fa-spinner {
   font-size: 1rem;
 }
 
-.error-home-btn {
-  min-width: 190px;
-}
-
 @media (max-width: 575px) {
   .error-screen {
     padding: 105px 16px 32px;
