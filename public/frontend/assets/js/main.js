@@ -1009,13 +1009,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const productDescription = source.querySelector(".product-description");
       if (productDescription && targets.description) {
         targets.description.innerHTML = "";
-        [...productDescription.children].forEach((child) => targets.description.appendChild(stripInlineFormatting(child.cloneNode(true))));
+        [...productDescription.children]
+          .filter((child) => !(child.matches?.("h1, h2, h3, h4") && cleanText(child.textContent).toLowerCase() === "description"))
+          .forEach((child) => targets.description.appendChild(stripInlineFormatting(child.cloneNode(true))));
       }
 
       const specs = source.querySelector(".product-specs, dl");
       if (specs) updateSpecs(specs);
 
-      const benefitsTokens = sliceBetween(/^key benefits$/i, /^recommended dosage$/i);
+      const dosageHeadingPattern = /^(?:recommended\s+)?dosage(?:\s*&\s*safety)?$/i;
+      const benefitsTokens = sliceBetween(/^key benefits$/i, dosageHeadingPattern);
       const benefitItems = pairSequentialItems(benefitsTokens).slice(0, 6);
       if (benefitItems.length && targets.benefits) {
         sectionTitles.benefits = "Key Benefits";
@@ -1023,13 +1026,14 @@ document.addEventListener("DOMContentLoaded", () => {
         buildIconCards(benefitItems, "fa-dumbbell").forEach((node) => targets.benefits.appendChild(node));
       }
 
-      const dosageTokens = sliceBetween(/^recommended dosage$/i, /^ingredients$/i);
+      const dosageTokens = sliceBetween(dosageHeadingPattern, /^ingredients$/i);
       if (dosageTokens.length && targets.dosage) {
         sectionTitles.dosage = "Recommended Dosage";
         const noteIndex = dosageTokens.findIndex((token) => /^note\b/i.test(token));
         const cleanDosageTokens = noteIndex >= 0 ? dosageTokens.slice(0, noteIndex) : dosageTokens;
         const noteText = noteIndex >= 0 ? dosageTokens.slice(noteIndex).join(" ").replace(/^note\s*:?\s*/i, "") : "";
-        const firstStep = cleanDosageTokens.findIndex((token) => /^(week\s*\d+|post\s*cycle)$/i.test(token));
+        const dosageStepPattern = /^(?:week\s*\d+|post\s*cycle|phase\s*\d+|follow-up\s*phase)$/i;
+        const firstStep = cleanDosageTokens.findIndex((token) => dosageStepPattern.test(token));
         const intro = firstStep > 0 ? cleanDosageTokens.slice(0, firstStep).join(" ") : cleanDosageTokens[0] || "";
         const stepTokens = firstStep >= 0 ? cleanDosageTokens.slice(firstStep) : [];
 
@@ -1045,7 +1049,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const steps = [];
           for (let index = 0; index < stepTokens.length; index += 3) {
             const title = cleanText(stepTokens[index]);
-            if (!/^(week\s*\d+|post\s*cycle)$/i.test(title)) {
+            if (!dosageStepPattern.test(title)) {
               index -= 2;
               continue;
             }
@@ -1096,7 +1100,7 @@ document.addEventListener("DOMContentLoaded", () => {
         targets.ingredients.innerHTML = "";
         appendTitle(targets.ingredients, "ingredients", "Ingredients");
 
-        const ingredientIntro = ingredientsTokens.find((token) => /^each\b/i.test(token));
+        const ingredientIntro = ingredientsTokens.find((token) => /^(?:each\b|the\s+declared\b|this\s+product\b)/i.test(token));
         if (ingredientIntro) {
           const paragraph = document.createElement("p");
           paragraph.textContent = ingredientIntro;
