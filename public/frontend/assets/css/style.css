@@ -5875,7 +5875,7 @@ button.is-loading .fa-spinner {
 
 .ingredients-tab-grid {
   grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
-  align-items: center;
+  align-items: start;
 }
 
 .dosage-tab-grid.is-single-column,
@@ -5927,6 +5927,20 @@ button.is-loading .fa-spinner {
   color: #333;
   font-size: .78rem;
   line-height: 1.45;
+}
+
+.ingredient-certifications i {
+  color: #18ad55;
+  background: #effcf4;
+  border-color: #bcebc9;
+}
+
+.ingredients-tab-grid .dynamic-rich-content > p {
+  margin-bottom: 18px;
+}
+
+.ingredients-tab-grid .ingredient-table {
+  width: 100%;
 }
 
 .benefits-product-shot {

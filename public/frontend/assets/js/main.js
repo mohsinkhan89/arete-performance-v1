@@ -1100,7 +1100,7 @@ document.addEventListener("DOMContentLoaded", () => {
         targets.ingredients.innerHTML = "";
         appendTitle(targets.ingredients, "ingredients", "Ingredients");
 
-        const ingredientIntro = ingredientsTokens.find((token) => /^each\b/i.test(token));
+        const ingredientIntro = ingredientsTokens.find((token) => /^(?:each\b|the\s+declared\b|this\s+product\b)/i.test(token));
         if (ingredientIntro) {
           const paragraph = document.createElement("p");
           paragraph.textContent = ingredientIntro;
