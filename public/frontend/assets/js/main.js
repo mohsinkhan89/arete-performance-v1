@@ -1887,11 +1887,6 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => detailTapCard.classList.remove("is-tapped"), 520);
     }
 
-    if (productZoom && !event.target.closest("[data-product-image], [data-product-expand]") && !window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-      const isZoomed = productZoom.classList.toggle("is-zoomed");
-      productZoom.setAttribute("aria-pressed", String(isZoomed));
-    }
-
     if (addFromSearch) {
       const added = await addToCart(addFromSearch.dataset.searchAdd);
       if (added) closeSearch();
@@ -1944,13 +1939,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (zoomLens) zoomLens.style.display = "none";
     });
   }
-
-  productZoomArea?.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    const isZoomed = event.currentTarget.classList.toggle("is-zoomed");
-    event.currentTarget.setAttribute("aria-pressed", String(isZoomed));
-  });
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
