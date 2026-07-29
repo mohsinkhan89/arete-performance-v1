@@ -1512,6 +1512,18 @@ button.is-loading .fa-spinner {
   font-size: 1rem;
 }
 
+.error-page .btn-gold,
+.error-page .btn-gold:hover,
+.error-page .btn-gold:active {
+  transform: none;
+  transition: none;
+  filter: none;
+}
+
+.error-page .btn-gold::after {
+  display: none;
+}
+
 @media (max-width: 575px) {
   .error-screen {
     padding: 105px 16px 32px;
