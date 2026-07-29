@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartEmpty = document.querySelector(".cart-empty");
   const cartCount = document.querySelector(".cart-count");
   const cartSubtotal = document.querySelector(".cart-subtotal");
-  const productTrack = document.querySelector(".product-track");
+  const productTracks = document.querySelectorAll(".product-track");
   const reportLightbox = document.querySelector(".report-lightbox");
   const reportLightboxImage = document.querySelector("[data-report-lightbox-image]");
   const reportLightboxTitle = document.querySelector("[data-report-lightbox-title]");
@@ -1603,7 +1603,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelector(".cart-btn").addEventListener("click", openCart);
   document.querySelector(".cart-close").addEventListener("click", closeCart);
   cartOverlay.addEventListener("click", closeCart);
-  if (productTrack) {
+  productTracks.forEach((productTrack) => {
     const productSlider = productTrack.closest(".product-slider");
     const productSlides = [...productTrack.querySelectorAll(".bestseller-product-column")];
     const productPrev = productSlider?.querySelector(".slider-prev");
@@ -1674,7 +1674,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateProductSlider();
     startProductAutoSlide();
-  }
+  });
 
   document.querySelectorAll("[data-testimonial-slider]").forEach((slider) => {
     const track = slider.querySelector(".testimonial-track");

@@ -1401,7 +1401,8 @@ button.is-loading .fa-spinner {
   object-fit: contain;
 }
 
-.bestsellers .product-card img {
+.bestsellers .product-card img,
+.related-products .product-card img {
   width: 100%;
   height: auto;
   margin-bottom: 10px;
@@ -5639,7 +5640,7 @@ button.is-loading .fa-spinner {
 
 .related-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -5657,8 +5658,10 @@ button.is-loading .fa-spinner {
 }
 
 .related-card img {
-  width: 105px;
-  height: 125px;
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
   object-fit: contain;
 }
 

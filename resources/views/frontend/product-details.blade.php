@@ -175,16 +175,30 @@
       @if ($relatedProducts->isNotEmpty())
         <section class="related-products">
           <h2>You May Also Like</h2>
-          <div class="related-grid">
-            @foreach ($relatedProducts as $related)
-              <article class="related-card {{ $related->stock <= 0 ? 'is-out-of-stock' : '' }}" data-product-id="{{ $related->id }}" data-product-name="{{ $related->name }}" data-product-url="{{ route('frontend.product-details', $related->slug) }}">
-                @if ($related->stock <= 0)<span class="tag stock-tag">Out of Stock</span>@endif
-                <img src="{{ url($related->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $related->name }}">
-                <h3>{{ $related->name }}<br><span>{{ $related->category?->name }}</span></h3>
-                <strong>&pound;{{ number_format((float) ($related->sale_price ?: $related->price), 2) }}</strong>
-                @if ($related->stock > 0)<button type="button" aria-label="Add {{ $related->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button>@else<button class="notify-stock-btn" type="button" data-stock-notify="{{ $related->id }}" data-product-name="{{ $related->name }}">Inform Me</button>@endif
-              </article>
-            @endforeach
+          <div class="product-slider">
+            <button class="slider-arrow slider-prev" type="button" aria-label="Previous related product"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="row g-3 mt-3 product-track">
+              @foreach ($relatedProducts as $related)
+                <div class="col-6 col-md-4 col-lg bestseller-product-column">
+                  <article class="product-card {{ $related->stock <= 0 ? 'is-out-of-stock' : '' }}" data-product-id="{{ $related->id }}" data-product-name="{{ $related->name }}" data-product-url="{{ route('frontend.product-details', $related->slug) }}">
+                    @if ($related->stock <= 0)<span class="tag stock-tag">Out of Stock</span>@elseif ($related->is_bestseller)<span class="tag">Bestseller</span>@endif
+                    <img src="{{ url($related->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $related->name }}">
+                    <h3>{{ $related->name }}</h3>
+                    <small>{{ $related->category?->name }}</small>
+                    <div class="product-card-tools">
+                      @if ($related->stock > 0)
+                        <div class="product-card-qty" aria-label="{{ $related->name }} quantity"><button type="button" data-card-qty-dec>-</button><span data-card-qty>1</span><button type="button" data-card-qty-inc>+</button></div>
+                      @endif
+                      @if ($related->test_report_image)
+                        <button class="test-report-icon" type="button" data-test-report="{{ url($related->test_report_image) }}" data-test-report-title="{{ $related->name }} test report" aria-label="View {{ $related->name }} test report"><i class="fa-solid fa-flask-vial"></i></button>
+                      @endif
+                    </div>
+                    <div><strong>&pound;{{ number_format((float) ($related->sale_price ?: $related->price), 2) }}</strong>@if ($related->stock > 0)<button type="button" data-cart-add="{{ $related->id }}" aria-label="Add {{ $related->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button>@else<button class="notify-stock-btn" type="button" data-stock-notify="{{ $related->id }}" data-product-name="{{ $related->name }}">Inform Me</button>@endif</div>
+                  </article>
+                </div>
+              @endforeach
+            </div>
+            <button class="slider-arrow slider-next" type="button" aria-label="Next related product"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
         </section>
       @endif

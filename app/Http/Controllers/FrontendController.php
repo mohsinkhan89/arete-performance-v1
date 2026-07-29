@@ -190,7 +190,7 @@ class FrontendController extends Controller
                 ->when($product->category_id, fn ($query) => $query->where('category_id', $product->category_id))
                 ->orderByRaw('stock > 0 desc')
                 ->latest()
-                ->take(5)
+                ->take(10)
                 ->get(),
             'reviews' => Review::where('status', 'active')
                 ->where(fn ($query) => $query->where('product_id', $product->id)->orWhereNull('product_id'))
