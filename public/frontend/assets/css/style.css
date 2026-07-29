@@ -1512,8 +1512,16 @@ button.is-loading .fa-spinner {
   font-size: 1rem;
 }
 
-.error-home-btn {
-  min-width: 190px;
+.error-page .btn-gold,
+.error-page .btn-gold:hover,
+.error-page .btn-gold:active {
+  transform: none;
+  transition: none;
+  filter: none;
+}
+
+.error-page .btn-gold::after {
+  display: none;
 }
 
 @media (max-width: 575px) {

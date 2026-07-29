@@ -3841,6 +3841,16 @@ body.admin-dark-page {
   min-height: 210px;
 }
 
+.settings-native-grid .form-section:nth-child(5) {
+  grid-column: 1 / -1;
+}
+
+.asset-version-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
 .settings-native-grid .form-actions {
   align-self: end;
   margin-top: auto;
@@ -3882,6 +3892,10 @@ body.admin-dark-page {
   .settings-native-grid .form-section:nth-child(3),
   .settings-native-grid .form-section:nth-child(4) {
     min-height: 0;
+  }
+
+  .asset-version-fields {
+    grid-template-columns: 1fr;
   }
 }
 

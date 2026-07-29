@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
   <link href="{{ url('frontend/assets/css/style.css') }}" rel="stylesheet">
 </head>
 <body class="error-page">
@@ -26,8 +27,8 @@
         Redirecting to home in <strong data-error-countdown>10</strong> seconds
       </div>
 
-      <a class="btn btn-gold error-home-btn" href="{{ route('frontend.index') }}">
-        Back to Home <span aria-hidden="true">&rarr;</span>
+      <a class="btn btn-gold" href="{{ route('frontend.index') }}">
+        Back to Home <i class="fa-solid fa-arrow-right"></i>
       </a>
     </section>
   </main>

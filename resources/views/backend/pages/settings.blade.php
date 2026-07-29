@@ -73,16 +73,18 @@
                 @csrf
                 <input type="hidden" name="setting" value="asset_versions">
                 <div class="form-section-head"><span>05</span><h2>CSS &amp; JS Versions</h2></div>
-                <label>CSS Version
-                    <input type="text" name="css_version" value="{{ $cssVersion }}" placeholder="1.0.0">
-                    <small>Change this after updating the frontend stylesheet to force browsers to load the latest CSS.</small>
-                    @error('css_version') <span>{{ $message }}</span> @enderror
-                </label>
-                <label>JS Version
-                    <input type="text" name="js_version" value="{{ $jsVersion }}" placeholder="1.0.0">
-                    <small>Change this after updating frontend JavaScript to force browsers to load the latest JS.</small>
-                    @error('js_version') <span>{{ $message }}</span> @enderror
-                </label>
+                <div class="asset-version-fields">
+                    <label>CSS Version
+                        <input type="text" name="css_version" value="{{ $cssVersion }}" placeholder="1.0.0">
+                        <small>Change this after updating the frontend stylesheet to force browsers to load the latest CSS.</small>
+                        @error('css_version') <span>{{ $message }}</span> @enderror
+                    </label>
+                    <label>JS Version
+                        <input type="text" name="js_version" value="{{ $jsVersion }}" placeholder="1.0.0">
+                        <small>Change this after updating frontend JavaScript to force browsers to load the latest JS.</small>
+                        @error('js_version') <span>{{ $message }}</span> @enderror
+                    </label>
+                </div>
                 <div class="form-actions"><button type="submit"><i class="fa-solid fa-rotate"></i> Update Asset Versions</button></div>
             </form>
         </div>
