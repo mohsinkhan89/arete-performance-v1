@@ -291,6 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     themeToggle?.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    document.dispatchEvent(new CustomEvent('admin-theme-change', { detail: { theme } }));
   };
 
   applyTheme(savedTheme);
@@ -361,6 +362,117 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   document.addEventListener('fullscreenchange', syncFullscreen);
+
+  const dashboardCanvas = document.querySelector('[data-dashboard-chart]');
+  const dashboardChartData = document.querySelector('[data-dashboard-chart-data]');
+  if (dashboardCanvas && dashboardChartData) {
+    const chartData = JSON.parse(dashboardChartData.textContent || '{}');
+    const drawDashboardChart = () => {
+      const context = dashboardCanvas.getContext('2d');
+      const bounds = dashboardCanvas.parentElement.getBoundingClientRect();
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      const width = Math.max(320, bounds.width);
+      const height = Math.max(260, bounds.height);
+      dashboardCanvas.width = width * ratio;
+      dashboardCanvas.height = height * ratio;
+      dashboardCanvas.style.width = `${width}px`;
+      dashboardCanvas.style.height = `${height}px`;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      context.clearRect(0, 0, width, height);
+
+      const labels = chartData.labels || [];
+      const revenue = chartData.revenue || [];
+      const orders = chartData.orders || [];
+      const padding = { top: 20, right: 18, bottom: 34, left: 48 };
+      const chartWidth = width - padding.left - padding.right;
+      const chartHeight = height - padding.top - padding.bottom;
+      const maxRevenue = Math.max(...revenue, 1);
+      const maxOrders = Math.max(...orders, 1);
+      const dark = document.body.classList.contains('admin-dark-page');
+      const gridColor = dark ? 'rgba(255,255,255,.09)' : 'rgba(47,43,61,.09)';
+      const textColor = dark ? '#8f91a5' : '#a5a3ae';
+      const xAt = (index) => padding.left + (labels.length <= 1 ? chartWidth / 2 : (index / (labels.length - 1)) * chartWidth);
+      const revenueY = (value) => padding.top + chartHeight - (value / maxRevenue) * chartHeight;
+
+      context.font = '11px Public Sans';
+      context.fillStyle = textColor;
+      context.textAlign = 'right';
+      context.textBaseline = 'middle';
+      for (let index = 0; index <= 4; index += 1) {
+        const y = padding.top + (chartHeight / 4) * index;
+        context.strokeStyle = gridColor;
+        context.lineWidth = 1;
+        context.beginPath();
+        context.moveTo(padding.left, y);
+        context.lineTo(width - padding.right, y);
+        context.stroke();
+        const value = maxRevenue * (1 - index / 4);
+        context.fillText(`£${Math.round(value)}`, padding.left - 8, y);
+      }
+
+      const ordersY = (value) => padding.top + chartHeight - (value / maxOrders) * chartHeight;
+
+      if (revenue.length) {
+        const gradient = context.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
+        gradient.addColorStop(0, 'rgba(115, 103, 240, .28)');
+        gradient.addColorStop(1, 'rgba(115, 103, 240, 0)');
+        context.beginPath();
+        revenue.forEach((value, index) => {
+          const x = xAt(index);
+          const y = revenueY(value);
+          if (index === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        });
+        context.lineTo(xAt(revenue.length - 1), padding.top + chartHeight);
+        context.lineTo(xAt(0), padding.top + chartHeight);
+        context.closePath();
+        context.fillStyle = gradient;
+        context.fill();
+
+        context.beginPath();
+        revenue.forEach((value, index) => {
+          const x = xAt(index);
+          const y = revenueY(value);
+          if (index === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        });
+        context.strokeStyle = '#7367f0';
+        context.lineWidth = 2.5;
+        context.lineJoin = 'round';
+        context.lineCap = 'round';
+        context.stroke();
+      }
+
+      if (orders.length) {
+        context.beginPath();
+        orders.forEach((value, index) => {
+          const x = xAt(index);
+          const y = ordersY(value);
+          if (index === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        });
+        context.strokeStyle = '#28c76f';
+        context.lineWidth = 2.5;
+        context.lineJoin = 'round';
+        context.lineCap = 'round';
+        context.stroke();
+      }
+
+      const labelStep = Math.max(1, Math.ceil(labels.length / 6));
+      context.fillStyle = textColor;
+      context.textAlign = 'center';
+      context.textBaseline = 'top';
+      labels.forEach((label, index) => {
+        if (index % labelStep !== 0 && index !== labels.length - 1) return;
+        context.fillText(label, xAt(index), padding.top + chartHeight + 10);
+      });
+    };
+
+    const chartResizeObserver = new ResizeObserver(drawDashboardChart);
+    chartResizeObserver.observe(dashboardCanvas.parentElement);
+    document.addEventListener('admin-theme-change', drawDashboardChart);
+    drawDashboardChart();
+  }
 
   const commandPalette = document.querySelector('.command-palette');
   const commandToggle = document.querySelector('.command-toggle');

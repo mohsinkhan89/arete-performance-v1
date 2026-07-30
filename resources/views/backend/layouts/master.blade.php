@@ -11,7 +11,7 @@
     <link href="{{ url('backend/assets/css/style.css') }}?v={{ urlencode($siteSettings['css_version'] ?? '1.0.0') }}" rel="stylesheet">
     @yield('css')
 </head>
-<body class="admin-light-page">
+<body class="admin-light-page {{ request()->routeIs('backend.dashboard') ? 'backend-dashboard-page' : 'backend-inner-page' }}">
     <div class="admin-shell">
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="sidebar-brand-row">
