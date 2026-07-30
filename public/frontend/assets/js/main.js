@@ -2335,6 +2335,83 @@ document.addEventListener("DOMContentLoaded", () => {
     calculate();
   });
 
+  document.querySelectorAll("[data-hero-feature-slider]").forEach((slider) => {
+    const track = slider.querySelector(".hero-features");
+    const slides = [...slider.querySelectorAll(".hero-feature-slide")];
+    const pagination = slider.querySelector(".hero-feature-pagination");
+    const responsiveQuery = window.matchMedia("(max-width: 991.98px)");
+    const mobileQuery = window.matchMedia("(max-width: 767.98px)");
+    let activePage = 0;
+    let autoSlide = null;
+    let scrollFrame = null;
+
+    const visibleSlides = () => 2;
+    const pageCount = () => Math.ceil(slides.length / visibleSlides());
+    const pageWidth = () => track.clientWidth;
+
+    const updateDots = () => {
+      pagination?.querySelectorAll("button").forEach((dot, index) => {
+        dot.classList.toggle("is-active", index === activePage);
+        dot.setAttribute("aria-current", index === activePage ? "true" : "false");
+      });
+    };
+
+    const goToPage = (page, behavior = "smooth") => {
+      const total = pageCount();
+      activePage = (page + total) % total;
+      track.scrollTo({ left: activePage * pageWidth(), behavior });
+      updateDots();
+    };
+
+    const stopAutoSlide = () => {
+      if (autoSlide) window.clearInterval(autoSlide);
+      autoSlide = null;
+    };
+
+    const startAutoSlide = () => {
+      stopAutoSlide();
+      if (!responsiveQuery.matches || pageCount() < 2) return;
+      autoSlide = window.setInterval(() => goToPage(activePage + 1), 3800);
+    };
+
+    const buildPagination = () => {
+      stopAutoSlide();
+      activePage = 0;
+      track.scrollTo({ left: 0, behavior: "auto" });
+      if (!pagination) return;
+      pagination.innerHTML = responsiveQuery.matches
+        ? Array.from({ length: pageCount() }, (_, index) =>
+          `<button type="button" aria-label="Show delivery benefits ${index + 1}"></button>`
+        ).join("")
+        : "";
+      pagination.querySelectorAll("button").forEach((dot, index) => {
+        dot.addEventListener("click", () => {
+          goToPage(index);
+          startAutoSlide();
+        });
+      });
+      updateDots();
+      startAutoSlide();
+    };
+
+    track.addEventListener("scroll", () => {
+      if (!responsiveQuery.matches || scrollFrame) return;
+      scrollFrame = window.requestAnimationFrame(() => {
+        activePage = Math.max(0, Math.min(pageCount() - 1, Math.round(track.scrollLeft / pageWidth())));
+        updateDots();
+        scrollFrame = null;
+      });
+    }, { passive: true });
+
+    slider.addEventListener("pointerenter", stopAutoSlide);
+    slider.addEventListener("pointerleave", startAutoSlide);
+    slider.addEventListener("touchstart", stopAutoSlide, { passive: true });
+    slider.addEventListener("touchend", startAutoSlide, { passive: true });
+    responsiveQuery.addEventListener("change", buildPagination);
+    mobileQuery.addEventListener("change", buildPagination);
+    buildPagination();
+  });
+
   prepareAnimatedHeadings();
   preparePageAnimations();
 

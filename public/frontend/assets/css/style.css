@@ -1069,9 +1069,14 @@ button.is-loading .fa-spinner {
   transform: translateY(-2px);
 }
 
-.hero-features {
+.hero-feature-slider {
   max-width: 650px;
   border-top: 1px solid rgba(255, 255, 255, .24);
+}
+
+.hero-features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .hero-feature {
@@ -1084,20 +1089,20 @@ button.is-loading .fa-spinner {
   animation: heroFeatureIn .75s cubic-bezier(.2, .82, .24, 1) both;
 }
 
-.hero-features .col-6:nth-child(1) .hero-feature {
+.hero-feature-slide:nth-child(1) .hero-feature {
   animation-delay: .58s;
 }
 
-.hero-features .col-6:nth-child(2) .hero-feature {
+.hero-feature-slide:nth-child(2) .hero-feature {
   animation-delay: .68s;
 }
 
-.hero-features .col-6:nth-child(3) .hero-feature {
+.hero-feature-slide:nth-child(3) .hero-feature {
   animation-delay: .78s;
 }
 
-.hero-features .col-6:nth-child(4) .hero-feature {
-  animation-delay: .88s;
+.hero-feature-pagination {
+  display: none;
 }
 
 .hero-feature i {
@@ -8322,6 +8327,7 @@ button.is-loading .fa-spinner {
     gap: 0px;
     flex-wrap: wrap;
     width: 100%;
+    justify-content: center;
   }
   .description-assurance>div,
   .shop-trust-grid>div,
@@ -10022,6 +10028,65 @@ button {
 }
 
 @media (max-width: 991.98px) {
+  .hero-feature-slider {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .hero-features {
+    display: flex;
+    max-width: none;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    touch-action: pan-y;
+  }
+
+  .hero-features::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hero-feature-slide {
+    flex: 0 0 50%;
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .hero-feature {
+    min-height: 74px;
+    margin: 18px 0 10px;
+  }
+
+  .hero-feature-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    min-height: 18px;
+    padding-bottom: 7px;
+  }
+
+  .hero-feature-pagination button {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    background: rgba(255, 255, 255, .38);
+    border: 0;
+    border-radius: 50%;
+    box-shadow: none;
+  }
+
+  .hero-feature-pagination button:hover {
+    transform: none;
+  }
+
+  .hero-feature-pagination button.is-active {
+    width: 20px;
+    background: var(--color-primary);
+    border-radius: 999px;
+  }
+
   .peptide-calculator-hero {
     grid-template-columns: minmax(0, 1fr) 220px;
     gap: 28px;
@@ -10060,6 +10125,18 @@ button {
 }
 
 @media (max-width: 767.98px) {
+  .hero-feature-slide {
+    flex-basis: 50%;
+  }
+
+  .hero-feature {
+    justify-content: center;
+    margin-right: 0;
+    margin-left: 0;
+    padding: 0 14px;
+    border-right: 0;
+  }
+
   body {
     overflow-x: hidden;
   }
