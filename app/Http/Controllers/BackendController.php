@@ -259,6 +259,16 @@ class BackendController extends Controller
             'paid' => Order::query()->distinct('email')->count('email'),
             'roles' => User::query()->whereNotNull('role')->distinct()->orderBy('role')->pluck('role'),
         ] : null;
+        $orderStats = $page === 'orders' ? [
+            'total' => Order::count(),
+            'revenue' => (float) Order::sum('total'),
+            'paid' => Order::where('payment_status', 'paid')->count(),
+            'paidRevenue' => (float) Order::where('payment_status', 'paid')->sum('total'),
+            'unpaid' => Order::where('payment_status', 'unpaid')->count(),
+            'pending' => Order::whereNotIn('tracking_status', ['delivered', 'cancelled'])->count(),
+            'delivered' => Order::where('tracking_status', 'delivered')->count(),
+            'proofs' => Order::whereNotNull('payment_proof')->where('payment_proof', '!=', '')->count(),
+        ] : null;
 
         if ($page === 'settings') {
             return view('backend.pages.settings', [
@@ -279,6 +289,7 @@ class BackendController extends Controller
             'canManageUsers' => $this->isSuperAdmin(),
             'reportStats' => $reportStats,
             'userStats' => $userStats,
+            'orderStats' => $orderStats,
             'categories' => Category::where('status', 'active')->orderBy('name')->get(),
             'products' => Product::orderBy('name')->get(),
         ]);

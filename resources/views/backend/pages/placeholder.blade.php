@@ -79,9 +79,9 @@
         @php
             $canManage = $page !== 'users' || $canManageUsers;
         @endphp
-        <article class="panel resource-panel resource-panel-polished resource-{{ $page }} {{ in_array($page, ['products', 'categories', 'reviews'], true) ? 'crud-vx-list' : '' }} {{ $page === 'orders' ? 'compact-orders-resource' : '' }}">
+        <article class="panel resource-panel resource-panel-polished resource-{{ $page }} {{ in_array($page, ['products', 'categories', 'reviews', 'orders'], true) ? 'crud-vx-list' : '' }}">
             <div class="panel-head">
-                @if (in_array($page, ['products', 'categories', 'reviews'], true))
+                @if (in_array($page, ['products', 'categories', 'reviews', 'orders'], true))
                     <form class="vx-users-toolbar crud-vx-toolbar" method="GET" action="{{ route('backend.page', $page) }}">
                         <input type="hidden" name="status" value="{{ $status ?? '' }}">
                         @if ($page === 'products')
@@ -91,7 +91,7 @@
                             <option>10</option>
                         </select>
                         <div>
-                            @if ($canManage)
+                            @if ($canManage && in_array($page, ['products', 'categories', 'reviews'], true))
                                 <button class="vx-add-record" type="button"
                                     data-resource-modal-open
                                     data-resource="{{ $page }}"
@@ -465,34 +465,63 @@
                     </div>
                 @elseif ($page === 'orders')
                     @php
-                        $orderRows = collect($records->items());
-                        $paidCount = $orderRows->where('payment_status', 'paid')->count();
-                        $proofCount = $orderRows->filter(fn ($order) => ! empty($order->payment_proof))->count();
-                        $unpaidCount = $orderRows->where('payment_status', 'unpaid')->count();
-                        $pageTotal = $orderRows->sum(fn ($order) => (float) $order->total);
+                        $orderNarrowLinks = [
+                            '' => ['All orders', $orderStats['total'] ?? 0],
+                            'paid' => ['Paid', $orderStats['paid'] ?? 0],
+                            'unpaid' => ['Unpaid', $orderStats['unpaid'] ?? 0],
+                            'processing' => ['Processing', null],
+                            'delivered' => ['Delivered', $orderStats['delivered'] ?? 0],
+                            'cancelled' => ['Cancelled', null],
+                        ];
                     @endphp
 
-                    <div class="orders-command-bar">
-                        <div>
-                            <span class="dashboard-kicker">Orders</span>
-                            <strong>{{ number_format($records->total()) }} total orders</strong>
-                            <small>{{ $records->count() }} showing on this page</small>
+                    <section class="order-vx-insights">
+                        <div class="order-vx-stats">
+                            <article>
+                                <i class="fa-solid fa-cart-shopping purple"></i>
+                                <span>Total Orders</span>
+                                <strong>{{ number_format($orderStats['total'] ?? 0) }}</strong>
+                                <small>£{{ number_format((float) ($orderStats['revenue'] ?? 0), 2) }} total value</small>
+                            </article>
+                            <article>
+                                <i class="fa-solid fa-wallet green"></i>
+                                <span>Paid Revenue</span>
+                                <strong>£{{ number_format((float) ($orderStats['paidRevenue'] ?? 0), 2) }}</strong>
+                                <small>{{ number_format($orderStats['paid'] ?? 0) }} paid orders</small>
+                            </article>
+                            <article>
+                                <i class="fa-solid fa-clock orange"></i>
+                                <span>Pending Flow</span>
+                                <strong>{{ number_format($orderStats['pending'] ?? 0) }}</strong>
+                                <small>{{ number_format($orderStats['unpaid'] ?? 0) }} unpaid</small>
+                            </article>
+                            <article>
+                                <i class="fa-solid fa-truck-fast cyan"></i>
+                                <span>Delivered</span>
+                                <strong>{{ number_format($orderStats['delivered'] ?? 0) }}</strong>
+                                <small>{{ number_format($orderStats['proofs'] ?? 0) }} proofs uploaded</small>
+                            </article>
                         </div>
-                        <div class="orders-mini-stats">
-                            <span><i class="fa-solid fa-sterling-sign"></i> £{{ number_format($pageTotal, 2) }}</span>
-                            <span><i class="fa-solid fa-circle-check"></i> {{ $paidCount }} paid</span>
-                            <span><i class="fa-solid fa-receipt"></i> {{ $proofCount }} proof</span>
-                            <span><i class="fa-solid fa-clock"></i> {{ $unpaidCount }} unpaid</span>
-                        </div>
-                    </div>
+                        <nav class="order-vx-narrow" aria-label="Narrow orders">
+                            @foreach ($orderNarrowLinks as $value => [$label, $count])
+                                <a class="{{ ($status ?? '') === $value ? 'active' : '' }}" href="{{ route('backend.page', array_filter(['page' => 'orders', 'status' => $value], fn ($item) => $item !== '' && $item !== null)) }}">
+                                    <span>{{ $label }}</span>
+                                    @if (! is_null($count))
+                                        <b>{{ number_format($count) }}</b>
+                                    @endif
+                                </a>
+                            @endforeach
+                        </nav>
+                    </section>
 
-                    <table class="orders-table-compact orders-table-modern">
+                    <table>
                         <thead>
-                            <tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Action</th></tr>
+                            <tr><th><input type="checkbox" aria-label="Select all orders"></th><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Actions</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $order)
                                 <tr>
+                                    <td><input type="checkbox" aria-label="Select {{ $order->order_number }}"></td>
                                     <td class="order-code-cell">
                                         <strong>{{ $order->order_number }}</strong>
                                         <small class="table-subtext">{{ $order->created_at?->format('M d, Y') }}</small>
@@ -511,14 +540,24 @@
                                         <small class="table-subtext">{{ $order->tracking_number ?: 'Label pending' }}</small>
                                     </td>
                                     <td>
-                                        <div class="action-group order-row-actions">
+                                        <div class="vx-row-actions order-row-actions">
                                             <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
                                             @include('backend.partials.payment-proof-button', ['order' => $order])
                                         </div>
                                     </td>
                                 </tr>
+                                <tr id="order-detail-{{ $order->id }}" class="vx-user-detail-row" hidden>
+                                    <td colspan="8">
+                                        <div class="vx-user-detail-card">
+                                            <span><b>Email</b>{{ $order->email }}</span>
+                                            <span><b>Phone</b>{{ $order->phone ?: '-' }}</span>
+                                            <span><b>Payment</b>{{ Str::headline($order->payment_status ?? 'unpaid') }}</span>
+                                            <span><b>Tracking</b>{{ Str::headline($order->tracking_status ?? 'placed') }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
                             @empty
-                                <tr><td colspan="7" class="empty-cell">No orders found.</td></tr>
+                                <tr><td colspan="8" class="empty-cell">No orders found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -643,7 +682,7 @@
                 @endif
             </div>
 
-            @if (in_array($page, ['products', 'categories', 'reviews'], true))
+            @if (in_array($page, ['products', 'categories', 'reviews', 'orders'], true))
                 <footer class="vx-users-pagination crud-vx-pagination">
                     <span>Showing {{ $records->firstItem() ?? 0 }} to {{ $records->lastItem() ?? 0 }} of {{ $records->total() }} entries</span>
                     {{ $records->links() }}
