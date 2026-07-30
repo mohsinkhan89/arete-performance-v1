@@ -10674,4 +10674,41 @@ button {
   .home-page .hero-content .d-flex {
     justify-content: center;
   }
+
+  .section-heading,
+  .why-intro,
+  .testimonial-heading,
+  .recommend-head,
+  .shop-newsletter-copy {
+    width: 100%;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .section-heading > div,
+  .section-heading .eyebrow,
+  .section-heading h2,
+  .section-heading p,
+  .why-intro .eyebrow,
+  .why-intro h2,
+  .why-intro p,
+  .testimonial-heading .eyebrow,
+  .testimonial-heading h2,
+  .testimonial-heading p,
+  .recommend-head .eyebrow,
+  .recommend-head h2,
+  .shop-newsletter-copy .eyebrow,
+  .shop-newsletter-copy h2,
+  .shop-newsletter-copy p {
+    margin-right: auto;
+    margin-left: auto;
+    text-align: center !important;
+  }
+
+  .section-heading .btn,
+  .section-heading > a,
+  .recommend-head > a {
+    align-self: center;
+  }
 }
