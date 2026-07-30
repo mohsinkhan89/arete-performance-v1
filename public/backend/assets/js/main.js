@@ -277,65 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
     (label || textarea).after(editorShell);
   });
 
-  document.querySelectorAll('.product-form-layout').forEach((layout) => {
-    const panels = [...layout.querySelectorAll(':scope > .form-section')];
-    if (panels.length < 2) return;
-
-    const icons = ['fa-rectangle-list', 'fa-sliders', 'fa-image', 'fa-align-left', 'fa-shield-halved'];
-    const tabs = document.createElement('nav');
-    tabs.className = 'vx-form-tabs';
-    tabs.setAttribute('aria-label', 'Form sections');
-    tabs.innerHTML = panels.map((panel, index) => {
-      const title = panel.querySelector('.form-section-head h2')?.textContent.trim() || `Step ${index + 1}`;
-      return `<button type="button" data-vx-form-tab="${index}" aria-selected="${index === 0}">
-        <i class="fa-solid ${icons[index] || 'fa-circle'}"></i>
-        <span>${title}</span>
-      </button>`;
-    }).join('');
-
-    const pager = document.createElement('div');
-    pager.className = 'vx-form-pager';
-    pager.innerHTML = `
-      <button type="button" data-vx-form-prev><i class="fa-solid fa-arrow-left"></i> Previous</button>
-      <span data-vx-form-progress></span>
-      <button type="button" data-vx-form-next>Next <i class="fa-solid fa-arrow-right"></i></button>
-    `;
-
-    layout.before(tabs);
-    layout.after(pager);
-    layout.classList.add('vx-tabbed-form');
-    panels.forEach((panel, index) => {
-      panel.classList.add('vx-form-panel');
-      panel.setAttribute('role', 'tabpanel');
-      panel.hidden = index !== 0;
-    });
-
-    const tabButtons = [...tabs.querySelectorAll('[data-vx-form-tab]')];
-    const previous = pager.querySelector('[data-vx-form-prev]');
-    const next = pager.querySelector('[data-vx-form-next]');
-    const progress = pager.querySelector('[data-vx-form-progress]');
-    let activeIndex = 0;
-
-    const showPanel = (index) => {
-      activeIndex = Math.max(0, Math.min(panels.length - 1, index));
-      panels.forEach((panel, panelIndex) => { panel.hidden = panelIndex !== activeIndex; });
-      tabButtons.forEach((button, buttonIndex) => {
-        const isActive = buttonIndex === activeIndex;
-        button.classList.toggle('active', isActive);
-        button.setAttribute('aria-selected', String(isActive));
-      });
-      previous.disabled = activeIndex === 0;
-      next.disabled = activeIndex === panels.length - 1;
-      progress.textContent = `Step ${activeIndex + 1} of ${panels.length}`;
-      layout.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-
-    tabButtons.forEach((button, index) => button.addEventListener('click', () => showPanel(index)));
-    previous.addEventListener('click', () => showPanel(activeIndex - 1));
-    next.addEventListener('click', () => showPanel(activeIndex + 1));
-    showPanel(0);
-  });
-
   const themeToggle = document.querySelector('.theme-toggle');
   const themeIcon = themeToggle?.querySelector('i');
   const savedTheme = localStorage.getItem('adminTheme') || 'light';

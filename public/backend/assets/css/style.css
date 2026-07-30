@@ -9574,6 +9574,245 @@ body.admin-dark-page .snapshot-links a {
 .vx-table span small { display: block; margin-top: 2px; color: var(--vx-muted); font-size: .58rem; }
 .vx-table em { width: fit-content; padding: 4px 7px; color: #ff9f43; background: rgba(255, 159, 67, .12); border-radius: 99px; font-size: .58rem; font-style: normal; }
 
+/* Add/Edit pages: screenshot-style flat form, no wizard tabs */
+.vx-flat-form-panel {
+  width: 100%;
+  max-width: none !important;
+  margin: 0;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.vx-flat-form-panel .admin-form {
+  display: block;
+}
+
+.vx-flat-form-panel .product-form-layout {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem 1.6rem;
+  padding: 1.5rem 1.5rem 1.65rem;
+  align-items: start;
+  background: #fff;
+  border-radius: 6px 6px 0 0;
+  box-shadow: 0 .25rem 1.125rem rgba(47, 43, 61, .10);
+}
+
+.vx-flat-form-panel .form-section,
+.vx-flat-form-panel .form-grid {
+  display: contents !important;
+}
+
+.vx-flat-form-panel .form-section-head {
+  display: none !important;
+}
+
+.vx-flat-form-panel .admin-form label {
+  display: grid;
+  align-self: start;
+  gap: .4rem;
+  color: #6d6b77 !important;
+  font-size: .8125rem;
+  font-weight: 400;
+  line-height: 1.35;
+  overflow: visible;
+}
+
+.vx-flat-form-panel .admin-form .field-medium {
+  grid-column: span 2;
+}
+
+.vx-flat-form-panel .admin-form label.wide,
+.vx-flat-form-panel .admin-form .rich-field,
+.vx-flat-form-panel .rich-editor,
+.vx-flat-form-panel .image-preview-grid,
+.vx-flat-form-panel .image-preview-card.wide {
+  grid-column: 1 / -1;
+}
+
+.vx-flat-form-panel .admin-form input:not([type="checkbox"]),
+.vx-flat-form-panel .admin-form select,
+.vx-flat-form-panel .admin-form textarea {
+  min-height: 40px;
+  padding: 0 .875rem;
+  color: #6d6b77 !important;
+  background: #fff !important;
+  border: 1px solid #d8d6de !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  font-size: .9375rem;
+}
+
+.vx-flat-form-panel .admin-form input,
+.vx-flat-form-panel .admin-form select {
+  height: 40px;
+}
+
+.vx-flat-form-panel .admin-form textarea {
+  min-height: 110px;
+  padding-top: .75rem;
+}
+
+.vx-flat-form-panel .admin-form input::placeholder,
+.vx-flat-form-panel .admin-form textarea::placeholder {
+  color: #b9b6c3;
+}
+
+.vx-flat-form-panel .admin-form input:focus,
+.vx-flat-form-panel .admin-form select:focus,
+.vx-flat-form-panel .admin-form textarea:focus {
+  border-color: #f7ae1a !important;
+  box-shadow: 0 0 0 2px rgba(247, 174, 26, .12) !important;
+}
+
+.vx-flat-form-panel .product-form-layout input[type="file"] {
+  padding: .45rem .875rem;
+}
+
+.vx-flat-form-panel .switch-row {
+  min-height: 40px;
+  align-items: center;
+  padding: 0 .875rem;
+  background: #fff !important;
+  border: 1px solid #d8d6de !important;
+  border-radius: 6px !important;
+}
+
+.vx-flat-form-panel .image-preview-grid {
+  display: flex;
+  min-height: 82px;
+  align-items: center;
+  gap: 1rem;
+  padding: .85rem 1rem;
+  background: #fff;
+  border: 1px solid #d8d6de;
+  border-radius: 6px;
+}
+
+.vx-flat-form-panel .image-preview-card {
+  display: inline-flex;
+  width: auto;
+  min-width: 0;
+  align-items: center;
+  gap: 1rem;
+  padding: 0;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.vx-flat-form-panel .image-preview-card img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  background: #f8f7fa;
+  border-radius: 6px;
+}
+
+.vx-flat-form-panel .image-preview-card .switch-row {
+  grid-column: auto;
+  min-height: 38px;
+  margin: 0;
+}
+
+.vx-flat-form-panel .switch-row input {
+  accent-color: #f7ae1a;
+}
+
+.vx-flat-form-panel .switch-row span {
+  color: #6d6b77 !important;
+  font-size: .9375rem;
+  font-weight: 400;
+}
+
+.vx-flat-form-panel .rich-field {
+  margin-top: .65rem;
+  padding: 1.15rem 1.35rem .25rem;
+  color: #444050 !important;
+  background: #fff;
+  border-radius: 6px 6px 0 0;
+  box-shadow: 0 .25rem 1.125rem rgba(47, 43, 61, .10);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.vx-flat-form-panel .rich-editor {
+  margin-top: -1px;
+  padding: 0 1.35rem 1.35rem;
+  overflow: hidden;
+  background: #fff;
+  border: 0;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 .25rem 1.125rem rgba(47, 43, 61, .10);
+}
+
+.vx-flat-form-panel .rich-toolbar {
+  padding: .65rem .85rem;
+  background: #fff;
+  border: 1px solid #d8d6de;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+}
+
+.vx-flat-form-panel .rich-toolbar button,
+.vx-flat-form-panel .rich-toolbar select {
+  color: #5d596c;
+  background: #fff;
+  border: 0;
+}
+
+.vx-flat-form-panel .rich-editor-box {
+  min-height: 86px;
+  color: #6d6b77;
+  background: #fff;
+  border: 1px solid #d8d6de;
+  border-radius: 0 0 6px 6px;
+}
+
+.vx-flat-form-panel .form-actions {
+  position: static !important;
+  justify-content: flex-end;
+  margin-top: 0;
+  padding: 1rem 1.35rem;
+  background: #fff;
+  border-top: 1px solid #d8d6de;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 .25rem 1.125rem rgba(47, 43, 61, .10);
+  backdrop-filter: none;
+}
+
+.vx-flat-form-panel .form-actions a,
+.vx-flat-form-panel .form-actions button {
+  min-height: 40px;
+  border-radius: 6px;
+}
+
+.vx-flat-form-panel .form-actions button {
+  color: #111;
+  background: #f7ae1a;
+  border: 1px solid #f7ae1a;
+  box-shadow: 0 8px 18px rgba(247, 174, 26, .24);
+}
+
+@media (max-width: 1199.98px) {
+  .vx-flat-form-panel .product-form-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767.98px) {
+  .vx-flat-form-panel .product-form-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .vx-flat-form-panel .rich-field {
+    padding: 1rem 1rem 0;
+  }
+}
+
 /* Arete theme overrides: replace Vuexy purple accents with brand gold */
 body.admin-light-page {
   --vx-primary: #f7ae1a;

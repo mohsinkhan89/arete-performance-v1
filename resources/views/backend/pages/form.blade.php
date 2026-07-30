@@ -13,7 +13,7 @@
         <p>{{ $isEdit ? 'Update' : 'Create' }} {{ strtolower($singular) }} details for your Arete admin panel.</p>
     </div>
 
-    <article class="panel form-panel {{ in_array($resource, ['products', 'categories'], true) ? 'form-panel-full' : '' }}">
+    <article class="panel form-panel vx-flat-form-panel {{ in_array($resource, ['products', 'categories'], true) ? 'form-panel-full' : '' }}">
         <form action="{{ $isEdit ? route('backend.resource.update', ['resource' => $resource, 'id' => $record->id]) : route('backend.resource.store', ['resource' => $resource]) }}" method="POST" class="admin-form" enctype="multipart/form-data">
             @csrf
             @if ($isEdit)
