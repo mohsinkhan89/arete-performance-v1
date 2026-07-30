@@ -536,6 +536,23 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   userEditorModal?.querySelectorAll('[data-user-modal-close]').forEach((button) => button.addEventListener('click', closeUserEditor));
 
+  document.querySelectorAll('[data-user-view-toggle]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const target = document.getElementById(button.dataset.userViewToggle || '');
+      if (!target) return;
+
+      const isHidden = target.hasAttribute('hidden');
+      document.querySelectorAll('.vx-user-detail-row').forEach((row) => {
+        if (row !== target) row.setAttribute('hidden', '');
+      });
+      document.querySelectorAll('[data-user-view-toggle]').forEach((toggleButton) => {
+        if (toggleButton !== button) toggleButton.classList.remove('is-active');
+      });
+      target.toggleAttribute('hidden', !isHidden);
+      button.classList.toggle('is-active', isHidden);
+    });
+  });
+
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       closeResourcePreview();

@@ -42,7 +42,7 @@
                 @endphp
                 @foreach ($menuItems as $item)
                     @if ($lastMenuGroup !== $item['group'])
-                        <span class="admin-nav-label">{{ $item['group'] }}</span>
+                        {{-- <span class="admin-nav-label">{{ $item['group'] }}</span> --}}
                         @php
                             $lastMenuGroup = $item['group'];
                         @endphp

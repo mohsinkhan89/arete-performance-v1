@@ -257,33 +257,6 @@
                     @endphp
 
                     <div class="vx-users-view">
-                        <section class="vx-user-stats">
-                            <article>
-                                <span>Session</span>
-                                <strong>{{ number_format($userStats['total'] ?? 0) }} <em>(+29%)</em></strong>
-                                <small>Total Users</small>
-                                <i class="fa-solid fa-users purple"></i>
-                            </article>
-                            <article>
-                                <span>Paid Users</span>
-                                <strong>{{ number_format($userStats['paid'] ?? 0) }} <em>(+18%)</em></strong>
-                                <small>Last week analytics</small>
-                                <i class="fa-solid fa-user-plus red"></i>
-                            </article>
-                            <article>
-                                <span>Active Users</span>
-                                <strong>{{ number_format($userStats['active'] ?? 0) }} <em class="down">(-14%)</em></strong>
-                                <small>Last week analytics</small>
-                                <i class="fa-solid fa-user-check green"></i>
-                            </article>
-                            <article>
-                                <span>Pending Users</span>
-                                <strong>{{ number_format($userStats['pending'] ?? 0) }} <em>(+42%)</em></strong>
-                                <small>Last week analytics</small>
-                                <i class="fa-solid fa-user-clock orange"></i>
-                            </article>
-                        </section>
-
                         <section class="vx-users-card">
                             <form class="vx-users-filters" method="GET" action="{{ route('backend.page', 'users') }}">
                                 <h2>Filters</h2>
@@ -381,6 +354,7 @@
                                                             @else
                                                                 <button type="button" disabled title="Current user"><i class="fa-regular fa-trash-can"></i></button>
                                                             @endif
+                                                            <button type="button" data-user-view-toggle="user-detail-{{ $user->id }}" title="View"><i class="fa-regular fa-eye"></i></button>
                                                             <button type="button"
                                                                 data-user-modal-open
                                                                 data-mode="edit"
@@ -390,21 +364,21 @@
                                                                 data-phone="{{ $user->phone }}"
                                                                 data-role="{{ str_contains(strtolower($user->role ?? ''), 'super') ? 'superadmin' : 'admin' }}"
                                                                 data-status="{{ $user->status ?? 'active' }}"
-                                                                title="View"><i class="fa-regular fa-eye"></i></button>
-                                                            <button type="button"
-                                                                data-user-modal-open
-                                                                data-mode="edit"
-                                                                data-action="{{ route('backend.resource.update', ['resource' => 'users', 'id' => $user->id]) }}"
-                                                                data-name="{{ $user->name }}"
-                                                                data-email="{{ $user->email }}"
-                                                                data-phone="{{ $user->phone }}"
-                                                                data-role="{{ str_contains(strtolower($user->role ?? ''), 'super') ? 'superadmin' : 'admin' }}"
-                                                                data-status="{{ $user->status ?? 'active' }}"
-                                                                title="Edit"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                                                title="Edit"><i class="fa-regular fa-pen-to-square"></i></button>
                                                         </div>
                                                     @else
                                                         <span class="view-only"><i class="fa-regular fa-eye"></i> View only</span>
                                                     @endif
+                                                </td>
+                                            </tr>
+                                            <tr id="user-detail-{{ $user->id }}" class="vx-user-detail-row" hidden>
+                                                <td colspan="7">
+                                                    <div class="vx-user-detail-card">
+                                                        <span><b>Email</b>{{ $user->email }}</span>
+                                                        <span><b>Phone</b>{{ $user->phone ?: '-' }}</span>
+                                                        <span><b>Joined</b>{{ $user->created_at?->format('M d, Y') }}</span>
+                                                        <span><b>Role</b>{{ Str::headline($user->role ?? 'user') }}</span>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @empty
