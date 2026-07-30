@@ -7153,6 +7153,573 @@ body.admin-dark-page .rich-toolbar {
   }
 }
 
+/* Vuexy vertical-menu visual system — shared by every backend module */
+:root {
+  --vuexy-canvas: #f8f7fa;
+  --vuexy-card: #fff;
+  --vuexy-heading: #444050;
+  --vuexy-body: #6d6b77;
+  --vuexy-muted: #acaab1;
+  --vuexy-border: #e6e6e8;
+  --vuexy-primary: #7367f0;
+  --vuexy-primary-rgb: 115, 103, 240;
+  --vuexy-success: #28c76f;
+  --vuexy-warning: #ff9f43;
+  --vuexy-danger: #ff4c51;
+  --vuexy-radius: 6px;
+  --vuexy-shadow: 0 .125rem .375rem rgba(47, 43, 61, .10);
+}
+
+body.admin-light-page {
+  color: var(--vuexy-body);
+  background: var(--vuexy-canvas);
+  font-family: "Public Sans", sans-serif;
+  font-size: .9375rem;
+}
+
+.admin-shell {
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  position: fixed;
+  z-index: 1100;
+  width: 260px;
+  height: 100vh;
+  padding: 0 14px 18px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  color: var(--vuexy-body);
+  background: var(--vuexy-card);
+  border: 0;
+  box-shadow: 0 0 15px rgba(47, 43, 61, .06);
+}
+
+.sidebar-brand-row {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  min-height: 68px;
+  padding: 0 8px;
+  background: var(--vuexy-card);
+}
+
+.admin-sidebar .brand {
+  min-width: 0;
+  gap: 10px;
+  padding: 0;
+  color: var(--vuexy-heading);
+}
+
+.admin-sidebar .brand img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.admin-sidebar .brand span strong {
+  color: var(--vuexy-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -.025em;
+}
+
+.admin-sidebar .brand span small {
+  display: none;
+}
+
+.admin-nav {
+  gap: 3px;
+}
+
+.admin-nav-label {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  margin-top: 8px;
+  padding: 0 14px;
+  color: var(--vuexy-muted);
+  font-size: .6875rem;
+  font-weight: 500;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.admin-nav-label:not(:first-child)::before {
+  content: "";
+  width: 14px;
+  margin-right: 9px;
+  border-top: 1px solid var(--vuexy-border);
+}
+
+.admin-nav a {
+  min-height: 40px;
+  gap: 11px;
+  padding: 0 14px;
+  color: var(--vuexy-body);
+  border-radius: var(--vuexy-radius);
+  font-size: .9375rem;
+  font-weight: 400;
+  transition: background .15s ease, color .15s ease, transform .15s ease;
+}
+
+.admin-nav a i {
+  width: 20px;
+  color: inherit;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.admin-nav a:hover {
+  color: var(--vuexy-heading);
+  background: rgba(47, 43, 61, .06);
+  transform: translateX(3px);
+}
+
+.admin-nav a.active {
+  color: #fff;
+  background: linear-gradient(72.47deg, var(--vuexy-primary) 22.16%, rgba(var(--vuexy-primary-rgb), .7) 76.47%);
+  box-shadow: 0 2px 6px rgba(var(--vuexy-primary-rgb), .48);
+}
+
+.sidebar-foot {
+  display: none;
+}
+
+.admin-main {
+  grid-column: 2;
+  min-width: 0;
+  background: var(--vuexy-canvas);
+}
+
+.topbar {
+  position: sticky;
+  top: 12px;
+  z-index: 1050;
+  width: auto;
+  min-height: 64px;
+  margin: 12px 24px 0;
+  padding: 0 16px;
+  color: var(--vuexy-body);
+  background: rgba(255, 255, 255, .96);
+  border: 0;
+  border-radius: var(--vuexy-radius);
+  box-shadow: var(--vuexy-shadow);
+  backdrop-filter: saturate(200%) blur(10px);
+}
+
+.topbar button,
+.topbar a {
+  color: var(--vuexy-body);
+}
+
+.topbar .admin-search {
+  width: min(360px, 36vw);
+  height: 42px;
+  background: transparent;
+  border: 0;
+}
+
+.topbar .admin-search input {
+  font-size: .9375rem;
+}
+
+.topbar .admin-search:focus-within {
+  box-shadow: none;
+}
+
+.topbar .icon-btn:hover,
+.topbar .storefront-link:hover,
+.topbar .profile-menu:hover,
+.topbar .sidebar-toggle:hover {
+  color: var(--vuexy-primary);
+  background: rgba(var(--vuexy-primary-rgb), .08);
+}
+
+.content-wrap {
+  width: 100%;
+  max-width: 1440px;
+  min-height: calc(100vh - 150px);
+  margin: 0 auto;
+  padding: 28px 24px 24px;
+}
+
+.page-heading {
+  margin: 0 0 20px;
+}
+
+.page-heading h1 {
+  margin: 0 0 3px;
+  color: var(--vuexy-heading);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -.02em;
+}
+
+.page-heading p {
+  margin: 0;
+  color: var(--vuexy-muted);
+  font-size: .8125rem;
+}
+
+.panel,
+.stat-card,
+.module-filter-bar,
+.vx-dashboard > article,
+.vx-dashboard > section {
+  background: var(--vuexy-card);
+  border: 0;
+  border-radius: var(--vuexy-radius);
+  box-shadow: var(--vuexy-shadow);
+}
+
+.module-filter-bar {
+  margin-bottom: 24px;
+  padding: 18px 20px 0;
+  overflow: hidden;
+}
+
+.module-filter-bar form {
+  gap: 12px;
+}
+
+.module-filter-search,
+.module-filter-bar select,
+.module-filter-bar form > button,
+.module-filter-bar form > a {
+  min-height: 38px;
+  border-radius: var(--vuexy-radius);
+}
+
+.module-filter-search,
+.module-filter-bar select {
+  color: var(--vuexy-body);
+  background: #fff;
+  border: 1px solid #dbdade;
+}
+
+.module-filter-bar form > button,
+.panel-head > a,
+.form-actions button {
+  color: #fff;
+  background: var(--vuexy-primary);
+  border: 1px solid var(--vuexy-primary);
+  border-radius: var(--vuexy-radius);
+  box-shadow: 0 2px 4px rgba(var(--vuexy-primary-rgb), .25);
+}
+
+.module-filter-bar nav {
+  gap: 4px;
+  margin: 16px -20px 0;
+  padding: 0 20px;
+  border-top: 1px solid var(--vuexy-border);
+}
+
+.module-filter-bar nav a {
+  padding: 13px 12px 11px;
+  color: var(--vuexy-body);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+}
+
+.module-filter-bar nav a.active {
+  color: var(--vuexy-primary);
+  background: transparent;
+  border-bottom-color: var(--vuexy-primary);
+}
+
+.resource-panel {
+  overflow: hidden;
+}
+
+.panel-head {
+  min-height: 74px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--vuexy-border);
+}
+
+.panel-head h2 {
+  color: var(--vuexy-heading);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.panel-head .eyebrow {
+  color: var(--vuexy-muted);
+  font-size: .6875rem;
+  font-weight: 500;
+}
+
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-wrap thead th {
+  height: 45px;
+  padding: 0 14px;
+  color: #6d6b77;
+  background: #f6f6f7;
+  border-bottom: 1px solid #dbdade;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+  text-transform: uppercase;
+}
+
+.table-wrap tbody td {
+  height: 58px;
+  padding: 10px 14px;
+  color: var(--vuexy-body);
+  border-bottom: 1px solid var(--vuexy-border);
+  font-size: .875rem;
+}
+
+.table-wrap tbody tr:hover {
+  background: rgba(47, 43, 61, .025);
+}
+
+.table-media img {
+  width: 38px;
+  height: 38px;
+  padding: 2px;
+  object-fit: contain;
+  background: #f6f6f7;
+  border-radius: 5px;
+}
+
+.badge,
+.status-toggle {
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 4px;
+  font-size: .75rem;
+  font-weight: 500;
+}
+
+.status-toggle.is-active,
+.payment-status-paid {
+  color: #28c76f;
+  background: rgba(40, 199, 111, .16);
+}
+
+.status-toggle.is-inactive,
+.payment-status-unpaid {
+  color: #ff9f43;
+  background: rgba(255, 159, 67, .16);
+}
+
+.action-group a,
+.action-group button {
+  color: var(--vuexy-body);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.action-group a:hover,
+.action-group button:hover {
+  color: var(--vuexy-primary);
+  background: rgba(var(--vuexy-primary-rgb), .08);
+}
+
+.form-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.form-panel .admin-form {
+  padding: 0;
+}
+
+.vx-tabbed-form {
+  padding: 20px 24px;
+}
+
+.vx-form-tabs {
+  margin: -20px -24px 22px;
+  padding: 0 24px;
+  background: #fff;
+  border-bottom: 1px solid var(--vuexy-border);
+}
+
+.vx-form-tabs button {
+  min-height: 50px;
+  color: var(--vuexy-body);
+  border-bottom: 2px solid transparent;
+}
+
+.vx-form-tabs button.is-active {
+  color: var(--vuexy-primary);
+  background: transparent;
+  border-bottom-color: var(--vuexy-primary);
+}
+
+.form-section {
+  background: #fff;
+  border: 1px solid var(--vuexy-border);
+  border-radius: var(--vuexy-radius);
+  box-shadow: none;
+}
+
+.form-section-head span {
+  color: var(--vuexy-primary);
+  background: rgba(var(--vuexy-primary-rgb), .12);
+}
+
+.form-section-head h2 {
+  color: var(--vuexy-heading);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.admin-form label {
+  color: var(--vuexy-heading);
+  font-size: .8125rem;
+  font-weight: 500;
+}
+
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+  min-height: 38px;
+  color: var(--vuexy-body);
+  background: #fff;
+  border: 1px solid #dbdade;
+  border-radius: var(--vuexy-radius);
+  font-family: inherit;
+}
+
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus {
+  border-color: var(--vuexy-primary);
+  box-shadow: 0 0 0 2px rgba(var(--vuexy-primary-rgb), .12);
+}
+
+.form-panel .form-actions {
+  margin: 0;
+  padding: 16px 24px;
+  background: #fff;
+  border-top: 1px solid var(--vuexy-border);
+}
+
+.admin-modal-dialog,
+.profile-panel,
+.notification-panel {
+  background: #fff;
+  border: 0;
+  border-radius: var(--vuexy-radius);
+  box-shadow: 0 .25rem 1.125rem rgba(47, 43, 61, .16);
+}
+
+.admin-modal-backdrop,
+.command-backdrop {
+  background: rgba(47, 43, 61, .65);
+  backdrop-filter: blur(2px);
+}
+
+.admin-footer {
+  display: flex;
+  width: 100%;
+  max-width: 1440px;
+  min-height: 54px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 auto;
+  padding: 0 24px 18px;
+  color: var(--vuexy-muted);
+  font-size: .8125rem;
+}
+
+.admin-footer i {
+  color: var(--vuexy-danger);
+}
+
+.admin-footer nav {
+  display: flex;
+  gap: 20px;
+}
+
+.admin-footer a {
+  color: var(--vuexy-primary);
+}
+
+@media (max-width: 1199.98px) {
+  .admin-shell {
+    display: block;
+  }
+
+  .admin-main {
+    width: 100%;
+  }
+
+  .admin-sidebar {
+    left: -280px;
+    transition: left .25s ease;
+  }
+
+  body.sidebar-open .admin-sidebar {
+    left: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .topbar {
+    top: 8px;
+    min-height: 58px;
+    margin: 8px 12px 0;
+    padding: 0 10px;
+  }
+
+  .topbar .admin-search {
+    width: auto;
+    flex: 1 1 auto;
+  }
+
+  .topbar .admin-search input {
+    width: 100%;
+  }
+
+  .content-wrap {
+    padding: 22px 12px 18px !important;
+  }
+
+  .module-filter-bar {
+    padding: 14px 14px 0;
+  }
+
+  .module-filter-bar form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .module-filter-search {
+    grid-column: 1 / -1;
+  }
+
+  .module-filter-bar nav {
+    margin-right: -14px;
+    margin-left: -14px;
+    padding: 0 14px;
+    overflow-x: auto;
+  }
+
+  .admin-footer {
+    display: block;
+    padding: 0 14px 20px;
+    text-align: center;
+  }
+
+  .admin-footer nav {
+    justify-content: center;
+    margin-top: 8px;
+  }
+}
+
 .resource-preview-modal {
   padding: 20px;
 }
@@ -9722,5 +10289,568 @@ body.command-open {
   .topbar .profile-menu {
     margin-left: 0;
     padding: 2px;
+  }
+}
+
+/* Final Vuexy header + vertical navigation alignment */
+body.admin-light-page {
+  --vx-sidebar-width: 260px;
+  color: #6d6b77;
+  background: #f8f7fa;
+}
+
+body.admin-light-page .admin-shell {
+  display: grid;
+  grid-template-columns: var(--vx-sidebar-width) minmax(0, 1fr);
+}
+
+body.admin-light-page .admin-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 1100;
+  display: flex;
+  width: var(--vx-sidebar-width);
+  height: 100vh;
+  flex-direction: column;
+  padding: 0 10px 16px;
+  overflow: hidden auto;
+  background: #fff;
+  border: 0;
+  box-shadow: 0 0 0 1px rgba(47, 43, 61, .04);
+}
+
+body.admin-light-page .sidebar-brand-row {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  background: #fff;
+}
+
+body.admin-light-page .admin-sidebar .brand {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+}
+
+.vuexy-brand-mark {
+  position: relative;
+  display: block;
+  width: 35px;
+  height: 28px;
+  flex: 0 0 35px;
+}
+
+.vuexy-brand-mark i {
+  position: absolute;
+  top: 2px;
+  width: 20px;
+  height: 25px;
+  background: linear-gradient(145deg, #7367f0, #8f85f5);
+}
+
+.vuexy-brand-mark i:first-child {
+  left: 1px;
+  border-radius: 4px 3px 8px 10px;
+  clip-path: polygon(0 0, 100% 0, 100% 42%, 52% 100%, 0 48%);
+}
+
+.vuexy-brand-mark i:last-child {
+  right: 1px;
+  border-radius: 3px 4px 10px 8px;
+  clip-path: polygon(0 0, 100% 0, 100% 48%, 48% 100%, 0 42%);
+}
+
+body.admin-light-page .admin-sidebar .brand > span:last-child strong {
+  color: #444050;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+
+body.admin-light-page .admin-sidebar .brand > span:last-child small {
+  display: none;
+}
+
+body.admin-light-page .sidebar-close {
+  position: static;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: #444050;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  font-size: .95rem;
+}
+
+body.admin-light-page .admin-nav {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  gap: 3px;
+}
+
+body.admin-light-page .admin-nav-label {
+  min-height: 34px;
+  margin: 10px 0 0;
+  padding: 0 13px;
+  color: #a8a6ae;
+  font-size: .6875rem;
+  font-weight: 400;
+  letter-spacing: .4px;
+}
+
+body.admin-light-page .admin-nav-label:first-child {
+  display: none;
+}
+
+body.admin-light-page .admin-nav a {
+  position: relative;
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  color: #5d596c;
+  background: transparent;
+  border-radius: 6px;
+  box-shadow: none;
+  font-size: .9375rem;
+  font-weight: 400;
+}
+
+body.admin-light-page .admin-nav a i {
+  width: 18px;
+  font-size: 1rem;
+}
+
+body.admin-light-page .admin-nav a:hover {
+  color: #5d596c;
+  background: rgba(47, 43, 61, .06);
+  transform: none;
+}
+
+body.admin-light-page .admin-nav a.active {
+  color: #fff;
+  background: linear-gradient(72deg, #7367f0 22%, #9a91f7 100%);
+  box-shadow: 0 2px 6px rgba(115, 103, 240, .48);
+}
+
+body.admin-light-page .admin-main {
+  grid-column: 2;
+  width: 100%;
+  min-width: 0;
+}
+
+body.admin-light-page .topbar {
+  position: sticky;
+  top: 12px;
+  z-index: 1050;
+  display: flex;
+  width: auto;
+  min-height: 58px;
+  align-items: center;
+  margin: 12px 24px 0;
+  padding: 0 12px 0 18px;
+  background: rgba(255, 255, 255, .98);
+  border: 0;
+  border-radius: 6px;
+  box-shadow: 0 .125rem .375rem rgba(47, 43, 61, .12);
+}
+
+body.admin-light-page .topbar .sidebar-toggle {
+  display: none;
+}
+
+body.admin-light-page .topbar-actions {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 3px;
+}
+
+body.admin-light-page .topbar .admin-search {
+  display: flex;
+  width: auto;
+  height: 48px;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 14px;
+  margin: 0 auto 0 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+body.admin-light-page .topbar .admin-search > i {
+  color: #5d596c;
+  font-size: 1.15rem;
+}
+
+body.admin-light-page .topbar .admin-search input {
+  width: 100%;
+  color: #5d596c;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font-size: .9375rem;
+}
+
+body.admin-light-page .topbar .admin-search input::placeholder {
+  color: #b2b0b6;
+  opacity: 1;
+}
+
+body.admin-light-page .topbar .admin-search button {
+  display: none;
+}
+
+body.admin-light-page .topbar .icon-btn,
+body.admin-light-page .topbar .storefront-link {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  color: #5d596c;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  font-size: 1rem;
+}
+
+body.admin-light-page .topbar .icon-btn:hover {
+  color: #7367f0;
+  background: rgba(115, 103, 240, .08);
+}
+
+body.admin-light-page .topbar .notification-dropdown {
+  height: 38px;
+}
+
+body.admin-light-page .topbar .has-badge span {
+  top: -1px;
+  right: -2px;
+  display: grid;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 3px;
+  place-items: center;
+  color: #fff;
+  background: #ff4c51;
+  border: 2px solid #fff;
+  border-radius: 20px;
+  font-size: .55rem;
+}
+
+body.admin-light-page .topbar .profile-menu {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  margin-left: 5px;
+  padding: 2px;
+  background: transparent;
+  border: 0;
+}
+
+body.admin-light-page .topbar .profile-copy {
+  display: none;
+}
+
+body.admin-light-page .topbar .avatar.small {
+  position: relative;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(145deg, #9b92f6, #6156d8);
+  border-radius: 50%;
+  font-size: .9rem;
+}
+
+body.admin-light-page .topbar .avatar.small b {
+  position: absolute;
+  right: -1px;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  background: #28c76f;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+body.admin-light-page .content-wrap {
+  padding-top: 24px;
+}
+
+@media (min-width: 1200px) {
+  body.sidebar-collapsed.admin-light-page {
+    --vx-sidebar-width: 78px;
+  }
+
+  body.sidebar-collapsed.admin-light-page .admin-sidebar {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  body.sidebar-collapsed.admin-light-page .vuexy-brand-mark {
+    display: block !important;
+    transform: scale(.85);
+  }
+
+  body.sidebar-collapsed.admin-light-page .admin-sidebar .brand > span:last-child,
+  body.sidebar-collapsed.admin-light-page .admin-nav a span,
+  body.sidebar-collapsed.admin-light-page .admin-nav-label {
+    display: none;
+  }
+
+  body.sidebar-collapsed.admin-light-page .sidebar-brand-row {
+    justify-content: center;
+    padding: 0;
+  }
+
+  body.sidebar-collapsed.admin-light-page .sidebar-close {
+    display: none;
+  }
+
+  body.sidebar-collapsed.admin-light-page .admin-nav a {
+    justify-content: center;
+    padding: 0;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  body.admin-light-page .admin-shell {
+    display: block;
+  }
+
+  body.admin-light-page .admin-sidebar {
+    left: -280px;
+    transition: left .25s ease;
+  }
+
+  body.admin-light-page.sidebar-open .admin-sidebar {
+    left: 0;
+  }
+
+  body.admin-light-page .admin-main {
+    width: 100%;
+  }
+
+  body.admin-light-page .topbar .sidebar-toggle {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    place-items: center;
+  }
+}
+
+@media (max-width: 767.98px) {
+  body.admin-light-page .topbar {
+    top: 8px;
+    min-height: 56px;
+    margin: 8px 12px 0;
+    padding: 0 8px;
+  }
+
+  body.admin-light-page .topbar .admin-search {
+    min-width: 0;
+    gap: 8px;
+  }
+
+  body.admin-light-page .topbar .admin-search input::placeholder {
+    color: transparent;
+  }
+
+  body.admin-light-page .topbar .language-toggle {
+    display: none;
+  }
+
+  body.admin-light-page .topbar .icon-btn {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+}
+
+/* Sidebar collapse/open behavior + dashboard navbar width fix */
+body.admin-light-page {
+  --vx-page-gutter: 24px;
+  --vx-content-max: 1392px;
+}
+
+body.admin-light-page .admin-main {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+body.admin-light-page .topbar,
+body.admin-light-page .content-wrap,
+body.admin-light-page .admin-footer {
+  width: calc(100% - (var(--vx-page-gutter) * 2));
+  max-width: var(--vx-content-max);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+body.admin-light-page .topbar {
+  margin-top: 12px;
+}
+
+body.admin-light-page .content-wrap {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+body.admin-light-page .sidebar-close {
+  pointer-events: none;
+  cursor: default;
+}
+
+body.admin-light-page .admin-sidebar .brand {
+  cursor: pointer;
+}
+
+body.admin-light-page .admin-sidebar .brand:focus-visible {
+  outline: 2px solid rgba(115, 103, 240, .45);
+  outline-offset: 4px;
+}
+
+@media (min-width: 1200px) {
+  body.backend-dashboard-page.admin-light-page .admin-shell,
+  body.admin-light-page .admin-shell {
+    grid-template-columns: var(--vx-sidebar-width) minmax(0, 1fr);
+  }
+
+  body.backend-dashboard-page.admin-light-page .admin-sidebar,
+  body.admin-light-page .admin-sidebar {
+    width: var(--vx-sidebar-width);
+  }
+
+  body.sidebar-collapsed.admin-light-page .admin-sidebar .brand {
+    justify-content: center;
+    width: 100%;
+    min-height: 56px;
+  }
+
+  body.sidebar-collapsed.admin-light-page .admin-sidebar .brand:hover .vuexy-brand-mark {
+    transform: scale(.92);
+  }
+}
+
+@media (max-width: 1199.98px) {
+  body.admin-light-page {
+    --vx-page-gutter: 18px;
+  }
+
+  body.admin-light-page .topbar,
+  body.admin-light-page .content-wrap,
+  body.admin-light-page .admin-footer {
+    width: calc(100% - (var(--vx-page-gutter) * 2));
+  }
+
+  body.admin-light-page .sidebar-close {
+    pointer-events: auto;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 767.98px) {
+  body.admin-light-page {
+    --vx-page-gutter: 12px;
+  }
+
+  body.admin-light-page .topbar {
+    margin-top: 8px;
+  }
+}
+
+/* Vuexy mini-sidebar interaction: click to collapse, hover to preview-open */
+@media (min-width: 1200px) {
+  body.admin-light-page .admin-sidebar {
+    transition: width .25s ease, box-shadow .25s ease;
+  }
+
+  body.admin-light-page .sidebar-close {
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  body.sidebar-collapsed.admin-light-page .admin-shell {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+
+  body.sidebar-collapsed.admin-light-page .admin-sidebar {
+    width: 78px;
+  }
+
+  body.sidebar-collapsed.sidebar-hovered.admin-light-page .admin-sidebar {
+    width: 260px;
+    box-shadow: 0 .25rem 1.125rem rgba(47, 43, 61, .16);
+  }
+
+  body.sidebar-collapsed.sidebar-hovered.admin-light-page .sidebar-brand-row {
+    justify-content: space-between;
+    padding: 0 10px;
+  }
+
+  body.sidebar-collapsed.sidebar-hovered.admin-light-page .admin-sidebar .brand {
+    justify-content: flex-start;
+    width: auto;
+    min-height: 0;
+  }
+
+  body.sidebar-collapsed.sidebar-hovered.admin-light-page .vuexy-brand-mark {
+    transform: scale(1);
+  }
+
+  body.sidebar-collapsed.sidebar-hovered.admin-light-page .admin-sidebar .brand > span:last-child,
+  body.sidebar-collapsed.sidebar-hovered.admin-light-page .admin-nav a span {
+    display: block;
+  }
+
+  body.sidebar-collapsed.sidebar-hovered.admin-light-page .admin-nav-label {
+    display: flex;
+  }
+
+  body.sidebar-collapsed.sidebar-hovered.admin-light-page .admin-nav-label:first-child {
+    display: none;
+  }
+
+  body.sidebar-collapsed.sidebar-hovered.admin-light-page .sidebar-close {
+    display: grid;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  body.sidebar-collapsed.sidebar-hovered.admin-light-page .admin-nav a {
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 0 14px;
+  }
+
+  body.admin-light-page .sidebar-close i {
+    font-weight: 900;
+  }
+
+  body.sidebar-collapsed.admin-light-page .sidebar-close i {
+    color: transparent;
+  }
+
+  body.sidebar-collapsed.sidebar-hovered.admin-light-page .sidebar-close i {
+    color: #444050;
   }
 }

@@ -366,6 +366,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const sidebarClose = document.querySelector('.sidebar-close');
   const sidebarBackdrop = document.querySelector('.sidebar-backdrop');
   const desktopSidebar = window.matchMedia('(min-width: 1200px)');
+  const setSidebarCollapsed = (isCollapsed) => {
+    document.body.classList.toggle('sidebar-collapsed', isCollapsed);
+    document.body.classList.remove('sidebar-hovered');
+    localStorage.setItem('adminSidebarCollapsed', String(isCollapsed));
+    toggle?.setAttribute('aria-expanded', String(!isCollapsed));
+  };
   const closeSidebar = () => {
     sidebar?.classList.remove('is-open');
     document.body.classList.remove('sidebar-open');
@@ -376,9 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toggle.setAttribute('aria-expanded', 'false');
     toggle.addEventListener('click', () => {
       if (desktopSidebar.matches) {
-        const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
-        localStorage.setItem('adminSidebarCollapsed', String(isCollapsed));
-        toggle.setAttribute('aria-expanded', String(!isCollapsed));
+        setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed'));
         return;
       }
       const isOpen = sidebar.classList.toggle('is-open');
@@ -389,15 +393,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (desktopSidebar.matches && localStorage.getItem('adminSidebarCollapsed') === 'true') {
     document.body.classList.add('sidebar-collapsed');
+    toggle?.setAttribute('aria-expanded', 'false');
   }
 
   desktopSidebar.addEventListener('change', () => {
     closeSidebar();
+    document.body.classList.remove('sidebar-hovered');
     if (!desktopSidebar.matches) document.body.classList.remove('sidebar-collapsed');
-    else if (localStorage.getItem('adminSidebarCollapsed') === 'true') document.body.classList.add('sidebar-collapsed');
+    else if (localStorage.getItem('adminSidebarCollapsed') === 'true') setSidebarCollapsed(true);
   });
 
-  sidebarClose?.addEventListener('click', closeSidebar);
+  sidebarClose?.addEventListener('click', () => {
+    if (desktopSidebar.matches) {
+      if (document.body.classList.contains('sidebar-hovered')) {
+        setSidebarCollapsed(false);
+        return;
+      }
+
+      setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed'));
+      return;
+    }
+
+    closeSidebar();
+  });
+  sidebar?.addEventListener('mouseenter', () => {
+    if (!desktopSidebar.matches || !document.body.classList.contains('sidebar-collapsed')) return;
+    document.body.classList.add('sidebar-hovered');
+  });
+  sidebar?.addEventListener('mouseleave', () => {
+    document.body.classList.remove('sidebar-hovered');
+  });
   sidebarBackdrop?.addEventListener('click', closeSidebar);
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') closeSidebar();

@@ -16,29 +16,37 @@
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="sidebar-brand-row">
                 <a class="brand" href="{{ route('backend.dashboard') }}" aria-label="Arete Performance Admin">
-                    <img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
+                    <span class="vuexy-brand-mark" aria-hidden="true"><i></i><i></i></span>
                     <span><strong>Arete</strong><small>Admin Console</small></span>
                 </a>
-                <button class="sidebar-close" type="button" aria-label="Close sidebar"><i class="fa-solid fa-xmark"></i></button>
+                <button class="sidebar-close" type="button" aria-label="Collapse sidebar"><i class="fa-regular fa-circle-dot"></i></button>
             </div>
 
             @php
                 $menuItems = [
-                    ['label' => 'Dashboard', 'icon' => 'fa-house', 'url' => route('backend.dashboard'), 'active' => request()->routeIs('backend.dashboard')],
-                    ['label' => 'Products', 'icon' => 'fa-cube', 'url' => route('backend.page', 'products')],
-                    ['label' => 'Categories', 'icon' => 'fa-table-cells', 'url' => route('backend.page', 'categories')],
-                    ['label' => 'Orders', 'icon' => 'fa-clipboard-list', 'url' => route('backend.page', 'orders')],
-                    ['label' => 'Stock Requests', 'icon' => 'fa-bell', 'url' => route('backend.page', 'stock-notifications'), 'active' => request()->is('admin/stock-notifications')],
-                    ['label' => 'Users', 'icon' => 'fa-users', 'url' => route('backend.page', 'users')],
-                    ['label' => 'Reviews', 'icon' => 'fa-star', 'url' => route('backend.page', 'reviews')],
-                    ['label' => 'Reports', 'icon' => 'fa-chart-column', 'url' => route('backend.page', 'reports')],
-                    ['label' => 'Settings', 'icon' => 'fa-gear', 'url' => route('backend.page', 'settings')],
+                    ['group' => 'Dashboards', 'label' => 'Analytics', 'icon' => 'fa-chart-pie', 'url' => route('backend.dashboard'), 'active' => request()->routeIs('backend.dashboard')],
+                    ['group' => 'Store Management', 'label' => 'Products', 'icon' => 'fa-box', 'url' => route('backend.page', 'products')],
+                    ['group' => 'Store Management', 'label' => 'Categories', 'icon' => 'fa-layer-group', 'url' => route('backend.page', 'categories')],
+                    ['group' => 'Store Management', 'label' => 'Orders', 'icon' => 'fa-cart-shopping', 'url' => route('backend.page', 'orders')],
+                    ['group' => 'Store Management', 'label' => 'Stock Requests', 'icon' => 'fa-bell', 'url' => route('backend.page', 'stock-notifications'), 'active' => request()->is('admin/stock-notifications')],
+                    ['group' => 'Customers & Content', 'label' => 'Users', 'icon' => 'fa-users', 'url' => route('backend.page', 'users')],
+                    ['group' => 'Customers & Content', 'label' => 'Reviews', 'icon' => 'fa-star', 'url' => route('backend.page', 'reviews')],
+                    ['group' => 'Reports & Settings', 'label' => 'Reports', 'icon' => 'fa-chart-column', 'url' => route('backend.page', 'reports')],
+                    ['group' => 'Reports & Settings', 'label' => 'Settings', 'icon' => 'fa-gear', 'url' => route('backend.page', 'settings')],
                 ];
             @endphp
 
             <nav class="admin-nav" aria-label="Admin navigation">
-                <span class="admin-nav-label">Apps &amp; Pages</span>
+                @php
+                    $lastMenuGroup = null;
+                @endphp
                 @foreach ($menuItems as $item)
+                    @if ($lastMenuGroup !== $item['group'])
+                        <span class="admin-nav-label">{{ $item['group'] }}</span>
+                        @php
+                            $lastMenuGroup = $item['group'];
+                        @endphp
+                    @endif
                     <a class="{{ ($item['active'] ?? false) || request()->is('admin/' . strtolower($item['label'])) ? 'active' : '' }}" href="{{ $item['url'] }}">
                         <i class="fa-solid {{ $item['icon'] }}"></i>
                         <span>{{ $item['label'] }}</span>
@@ -83,22 +91,19 @@
                     @endphp
                     <form class="admin-search" method="GET" action="{{ route('backend.page', $activeSearchPage) }}">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="search" name="q" value="{{ request('q') }}" placeholder="{{ $searchablePages[$activeSearchPage] }}" aria-label="{{ $searchablePages[$activeSearchPage] }}">
+                        <input type="search" name="q" value="{{ request('q') }}" placeholder="Search [CTRL + K]" aria-label="{{ $searchablePages[$activeSearchPage] }}">
                         <button type="submit" aria-label="Search">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </form>
-                    <button class="icon-btn command-toggle" type="button" aria-label="Open quick navigation" title="Quick navigation (Ctrl+K)">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    </button>
-                    <a class="icon-btn storefront-link" href="{{ route('frontend.index') }}" target="_blank" rel="noopener" aria-label="Open storefront" title="Open storefront">
-                        <i class="fa-solid fa-store"></i>
-                    </a>
-                    <button class="icon-btn fullscreen-toggle" type="button" aria-label="Enter fullscreen" title="Fullscreen">
-                        <i class="fa-solid fa-expand"></i>
+                    <button class="icon-btn language-toggle" type="button" aria-label="Language" title="Language">
+                        <i class="fa-solid fa-language"></i>
                     </button>
                     <button class="icon-btn theme-toggle" type="button" aria-label="Toggle dark mode">
-                        <i class="fa-regular fa-moon"></i>
+                        <i class="fa-regular fa-sun"></i>
+                    </button>
+                    <button class="icon-btn command-toggle" type="button" aria-label="Open quick navigation" title="Quick navigation (Ctrl+K)">
+                        <i class="fa-solid fa-grip"></i>
                     </button>
                     <div class="notification-dropdown">
                         <button class="icon-btn has-badge notification-toggle" type="button" aria-label="Notifications" aria-expanded="false">
@@ -132,8 +137,7 @@
                                 <strong>{{ auth()->user()->name ?? 'Admin' }}</strong>
                                 <small>Administrator</small>
                             </span>
-                            <span class="avatar small"><i class="fa-solid fa-user"></i></span>
-                            <i class="fa-solid fa-chevron-down"></i>
+                            <span class="avatar small"><i class="fa-solid fa-user"></i><b></b></span>
                         </button>
                         <div class="profile-panel" aria-hidden="true">
                             <div class="profile-panel-head">
@@ -167,6 +171,15 @@
 
                 @yield('body')
             </section>
+
+            <footer class="admin-footer">
+                <span>&copy; {{ date('Y') }}, made with <i class="fa-solid fa-heart"></i> for Arete Performance</span>
+                <nav>
+                    <a href="{{ route('backend.page', 'settings') }}">Settings</a>
+                    <a href="{{ route('backend.page', 'reports') }}">Reports</a>
+                    <a href="{{ route('frontend.index') }}" target="_blank" rel="noopener">Storefront</a>
+                </nav>
+            </footer>
         </main>
     </div>
     <button class="sidebar-backdrop" type="button" aria-label="Close sidebar"></button>
