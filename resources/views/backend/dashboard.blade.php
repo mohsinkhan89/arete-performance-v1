@@ -1,157 +1,133 @@
 @extends('backend.layouts.master')
 
-@section('title', 'Dashboard')
+@section('title', 'Analytics')
 
 @section('body')
-<div class="business-dashboard">
-    <header class="analytics-heading">
-        <div>
-            <h1>Business Analytics</h1>
-            <p>Sales, customers, products and operations in one place</p>
-        </div>
-        <div>
-            <a class="outline-action" href="{{ route('backend.page', 'orders') }}"><i class="fa-regular fa-rectangle-list"></i> All Orders</a>
-            <a class="primary-action" href="{{ route('backend.resource.create', ['resource' => 'products']) }}"><i class="fa-solid fa-plus"></i> Product</a>
-        </div>
-    </header>
-
-    <section class="analytics-filter-card">
+<div class="vx-dashboard">
+    <div class="vx-page-head">
+        <div><h1>Analytics Dashboard</h1><p>Welcome back, {{ auth()->user()->name ?? 'Admin' }}. Here is what is happening with your store.</p></div>
         <form method="GET" action="{{ route('backend.dashboard') }}">
-            <label>Date range
-                <select name="range">
-                    @foreach ([7 => 'Last 7 days', 30 => 'Last 30 days', 90 => 'Last 90 days', 365 => 'Last 12 months'] as $days => $label)
-                        <option value="{{ $days }}" @selected($range === $days)>{{ $label }}</option>
-                    @endforeach
-                </select>
-            </label>
-            <label>Order status
-                <select name="order_status">
-                    <option value="">All statuses</option>
-                    @foreach (['paid', 'unpaid', 'processing', 'dispatched', 'delivered', 'cancelled'] as $value)
-                        <option value="{{ $value }}" @selected($orderStatusFilter === $value)>{{ Str::headline($value) }}</option>
-                    @endforeach
-                </select>
-            </label>
-            <label>Category
-                <select name="category">
-                    <option value="">All categories</option>
-                    @foreach ($filterCategories as $category)
-                        <option value="{{ $category->id }}" @selected($categoryFilter === $category->id)>{{ $category->name }}</option>
-                    @endforeach
-                </select>
-            </label>
-            <label>Channel
-                <select name="channel">
-                    <option value="">All channels</option>
-                    @foreach ($filterChannels as $channel)
-                        <option value="{{ $channel }}" @selected($channelFilter === $channel)>{{ Str::headline($channel) }}</option>
-                    @endforeach
-                </select>
-            </label>
-            <div class="filter-actions">
-                <a href="{{ route('backend.dashboard') }}">Reset</a>
-                <button type="submit"><i class="fa-solid fa-filter"></i> Apply filters</button>
-            </div>
+            <select name="range" onchange="this.form.submit()">
+                @foreach ([7 => 'Last 7 days', 30 => 'Last 30 days', 90 => 'Last 90 days', 365 => 'Last year'] as $days => $label)
+                    <option value="{{ $days }}" @selected($range === $days)>{{ $label }}</option>
+                @endforeach
+            </select>
         </form>
-    </section>
+    </div>
 
-    <section class="analytics-kpis">
-        <article class="primary-kpi">
-            <span>Revenue in selected period</span>
-            <strong>&pound;{{ number_format($rangeRevenue, 2) }}</strong>
-            <div><small>Orders <b>{{ number_format($rangeOrders) }}</b></small><small>Items sold <b>{{ number_format($itemsSold) }}</b></small></div>
+    <section class="vx-grid vx-grid-top">
+        <article class="vx-card vx-analytics-hero">
+            <div>
+                <h2>Store Analytics</h2>
+                <p>Total {{ number_format($rangeOrders) }} orders in the selected period</p>
+                <div class="vx-hero-metrics">
+                    <span><b>{{ number_format($rangeOrders) }}</b>Orders</span>
+                    <span><b>&pound;{{ number_format($rangeRevenue, 0) }}</b>Revenue</span>
+                    <span><b>{{ number_format($itemsSold) }}</b>Items</span>
+                    <span><b>{{ number_format($deliveredOrders) }}</b>Delivered</span>
+                </div>
+                <a href="{{ route('backend.page', 'reports') }}">View Reports</a>
+            </div>
+            <i class="fa-solid fa-chart-pie"></i>
         </article>
-        <article><i class="fa-solid fa-chart-line purple"></i><strong>&pound;{{ number_format($rangeOrders ? $rangeRevenue / $rangeOrders : 0, 2) }}</strong><span>Average order</span></article>
-        <article><i class="fa-solid fa-circle-check green"></i><strong>{{ number_format($deliveredOrders) }}</strong><span>Delivered</span></article>
-        <article><i class="fa-solid fa-clock orange"></i><strong>{{ number_format($pendingOrders) }}</strong><span>Pending</span></article>
+
+        <article class="vx-card vx-daily-sales">
+            <span>Average Daily Sales</span>
+            <p>Total sales in this period</p>
+            <strong>&pound;{{ number_format($rangeRevenue / max($range, 1), 2) }}</strong>
+            <div class="vx-mini-bars">
+                @foreach ($revenueSeries->take(-12) as $value)
+                    <i style="height: {{ max(8, ($value / max((float) $revenueSeries->max(), 1)) * 60) }}px"></i>
+                @endforeach
+            </div>
+        </article>
+
+        <article class="vx-card vx-sales-overview">
+            <div class="vx-card-head"><div><span>Sales Overview</span><strong>&pound;{{ number_format($rangeRevenue, 1) }}</strong></div><em>+{{ number_format($rangeOrders ? ($deliveredOrders / $rangeOrders) * 100 : 0, 1) }}%</em></div>
+            <div class="vx-overview-pair">
+                <span><i class="fa-solid fa-cart-shopping"></i><b>{{ number_format($rangeOrders) }}</b><small>Orders</small></span>
+                <strong>VS</strong>
+                <span><i class="fa-solid fa-eye"></i><b>{{ number_format($totalUsers) }}</b><small>Customers</small></span>
+            </div>
+            <div class="vx-progress"><i style="width: {{ $rangeOrders ? ($deliveredOrders / $rangeOrders) * 100 : 0 }}%"></i></div>
+        </article>
     </section>
 
-    <section class="performance-grid">
-        <article class="analytics-card sales-performance-card">
-            <div class="analytics-card-head"><div><h2>Sales performance</h2><p>Revenue and order volume over time</p></div></div>
-            <div class="business-chart-wrap"><canvas data-dashboard-chart aria-label="Sales performance chart"></canvas></div>
+    <section class="vx-grid vx-grid-middle">
+        <article class="vx-card vx-earning-report">
+            <div class="vx-card-head"><div><span>Earning Reports</span><p>Selected period overview</p></div><button type="button"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div class="vx-earning-total"><strong>&pound;{{ number_format($rangeRevenue, 2) }}</strong><em>{{ number_format($rangeOrders) }} orders</em></div>
+            <div class="vx-report-chart"><canvas data-dashboard-chart aria-label="Earning report chart"></canvas></div>
             <script type="application/json" data-dashboard-chart-data>{!! json_encode(['labels' => $chartLabels, 'revenue' => $revenueSeries, 'orders' => $ordersSeries]) !!}</script>
-            <div class="chart-legend"><span><i class="purple-dot"></i>Revenue (&pound;)</span><span><i class="green-dot"></i>Orders</span></div>
-        </article>
-        <article class="analytics-card fulfillment-card">
-            <div class="analytics-card-head"><div><h2>Order fulfilment</h2><p>Current filtered split</p></div><a href="{{ route('backend.page', 'orders') }}">View orders</a></div>
-            @php $fulfilledTotal = max($deliveredOrders + $pendingOrders, 1); $deliveredPercent = round(($deliveredOrders / $fulfilledTotal) * 100, 1); @endphp
-            <div class="fulfillment-donut" style="--delivered: {{ $deliveredPercent }}%">
-                <div><span>Orders</span><strong>{{ number_format($rangeOrders) }}</strong></div>
-            </div>
-            <div class="donut-legend"><span><i></i>Delivered</span><span><i></i>Pending</span></div>
-        </article>
-    </section>
-
-    <section class="ranking-grid">
-        <article class="analytics-card ranking-card">
-            <div class="analytics-card-head"><div><h2>Top selling products</h2><p>Ranked by units sold</p></div><a href="{{ route('backend.page', 'products') }}">All products <i class="fa-solid fa-arrow-right"></i></a></div>
-            <div class="analytics-table">
-                <div class="analytics-table-head"><span>#</span><span>Product</span><span>Units</span><span>Revenue</span><span></span></div>
-                @forelse ($topProducts as $index => $product)
-                    <a href="{{ $product->product_id ? route('backend.resource.edit', ['resource' => 'products', 'id' => $product->product_id]) : route('backend.page', ['page' => 'products', 'q' => $product->product_name]) }}">
-                        <b>{{ $index + 1 }}</b><strong>{{ $product->product_name }}</strong><span>{{ number_format($product->sold_quantity) }}</span><span>&pound;{{ number_format($product->sold_total, 2) }}</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    </a>
-                @empty <div class="empty-cell">No product sales in this period.</div> @endforelse
+            <div class="vx-report-stats">
+                <span><i class="fa-solid fa-pound-sign"></i><small>Revenue</small><b>&pound;{{ number_format($rangeRevenue, 0) }}</b></span>
+                <span><i class="fa-solid fa-chart-line"></i><small>Average</small><b>&pound;{{ number_format($rangeOrders ? $rangeRevenue / $rangeOrders : 0, 0) }}</b></span>
+                <span><i class="fa-solid fa-receipt"></i><small>Pending</small><b>&pound;{{ number_format($pendingRevenue, 0) }}</b></span>
             </div>
         </article>
 
-        <article class="analytics-card ranking-card customer-ranking">
-            <div class="analytics-card-head"><div><h2>Top customers</h2><p>Ranked by total spend</p></div><a href="{{ route('backend.page', 'orders') }}">Customer orders <i class="fa-solid fa-arrow-right"></i></a></div>
-            <div class="analytics-table">
-                <div class="analytics-table-head"><span>#</span><span>Customer</span><span>Orders</span><span>Spent</span><span></span></div>
-                @forelse ($topCustomers as $index => $customer)
-                    <a href="{{ route('backend.page', ['page' => 'orders', 'q' => $customer['email']]) }}">
-                        <b>{{ $index + 1 }}</b><strong>{{ $customer['name'] }}<small>{{ $customer['email'] }}</small></strong><span>{{ number_format($customer['orders']) }}</span><span>&pound;{{ number_format($customer['spent'], 2) }}</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    </a>
-                @empty <div class="empty-cell">No customer sales in this period.</div> @endforelse
+        <article class="vx-card vx-support-tracker">
+            <div class="vx-card-head"><div><span>Order Tracker</span><p>Last {{ $range }} days</p></div><button type="button"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div class="vx-tracker-body">
+                <div><strong>{{ number_format($rangeOrders) }}</strong><span>Total Orders</span>
+                    <p><i class="green"></i>Delivered <b>{{ number_format($deliveredOrders) }}</b></p>
+                    <p><i class="orange"></i>Pending <b>{{ number_format($pendingOrders) }}</b></p>
+                    <p><i class="purple"></i>Paid <b>{{ number_format($paidOrders) }}</b></p>
+                </div>
+                @php $completePercent = $rangeOrders ? round(($deliveredOrders / $rangeOrders) * 100) : 0; @endphp
+                <div class="vx-radial" style="--percent: {{ $completePercent }}%"><span><b>{{ $completePercent }}%</b>Completed</span></div>
             </div>
         </article>
     </section>
 
-    <section class="insight-grid">
-        <article class="analytics-card">
-            <div class="analytics-card-head"><div><h2>Category performance</h2><p>Revenue contribution by category</p></div><a href="{{ route('backend.page', 'categories') }}">Manage categories</a></div>
-            @php $maxCategoryRevenue = max((float) ($categoryPerformance->max('revenue') ?? 0), 1); @endphp
-            <div class="bar-performance-list">
-                @forelse ($categoryPerformance as $category)
-                    <div><span>{{ $category['name'] }}</span><b><i style="width: {{ ($category['revenue'] / $maxCategoryRevenue) * 100 }}%"></i></b><em>&pound;{{ number_format($category['revenue'], 0) }}</em></div>
-                @empty <div class="empty-cell">No category performance data.</div> @endforelse
+    <section class="vx-grid vx-grid-lists">
+        <article class="vx-card vx-country-sales">
+            <div class="vx-card-head"><div><span>Top Customers</span><p>Highest spend in selected period</p></div><a href="{{ route('backend.page', 'orders') }}">View all</a></div>
+            <div class="vx-list">
+                @forelse ($topCustomers->take(6) as $customer)
+                    <a href="{{ route('backend.page', ['page' => 'orders', 'q' => $customer['email']]) }}"><i>{{ strtoupper(substr($customer['name'], 0, 2)) }}</i><span><b>{{ $customer['name'] }}</b><small>{{ $customer['orders'] }} orders</small></span><strong>&pound;{{ number_format($customer['spent'], 0) }}</strong></a>
+                @empty <div class="empty-cell">No customer data.</div> @endforelse
             </div>
         </article>
-        <article class="analytics-card">
-            <div class="analytics-card-head"><div><h2>Top acquisition channels</h2><p>Channel order and revenue</p></div><a href="{{ route('backend.page', 'reports') }}">View reports</a></div>
-            @php $maxChannelRevenue = max((float) ($channelPerformance->max('revenue') ?? 0), 1); @endphp
-            <div class="channel-list">
-                @forelse ($channelPerformance as $channel)
-                    <div><p><strong>{{ $channel['name'] }}</strong><span>{{ number_format($channel['orders']) }} orders &middot; &pound;{{ number_format($channel['revenue'], 2) }}</span></p><b><i style="width: {{ ($channel['revenue'] / $maxChannelRevenue) * 100 }}%"></i></b></div>
-                @empty <div class="empty-cell">No channel data in this period.</div> @endforelse
+
+        <article class="vx-card vx-total-earning">
+            <div class="vx-card-head"><div><span>Total Earning</span><p>Paid and pending revenue</p></div><button type="button"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div class="vx-earning-ring" style="--percent: {{ $totalRevenue ? ($paidRevenue / $totalRevenue) * 100 : 0 }}%"><div><strong>{{ number_format($totalRevenue ? ($paidRevenue / $totalRevenue) * 100 : 0, 0) }}%</strong><span>Paid</span></div></div>
+            <div class="vx-earning-lines">
+                <p><i class="fa-solid fa-wallet"></i><span><b>Total Revenue</b><small>Client payments</small></span><strong>&pound;{{ number_format($paidRevenue, 0) }}</strong></p>
+                <p><i class="fa-solid fa-arrow-rotate-left"></i><span><b>Pending</b><small>Unpaid orders</small></span><strong>&pound;{{ number_format($pendingRevenue, 0) }}</strong></p>
+            </div>
+        </article>
+
+        <article class="vx-card vx-campaign-state">
+            <div class="vx-card-head"><div><span>Inventory State</span><p>{{ number_format($totalInventory) }} available units</p></div><a href="{{ route('backend.page', 'products') }}">Products</a></div>
+            <div class="vx-list compact">
+                @forelse ($lowStockProducts as $product)
+                    <a href="{{ route('backend.resource.edit', ['resource' => 'products', 'id' => $product->id]) }}"><i class="fa-solid fa-box"></i><span><b>{{ $product->name }}</b><small>{{ $product->category?->name ?? 'Product' }}</small></span><strong>{{ $product->stock }} left</strong></a>
+                @empty <div class="empty-cell">No low-stock products.</div> @endforelse
             </div>
         </article>
     </section>
 
-    <section class="analytics-card module-snapshot-card">
-        <div class="analytics-card-head"><div><h2>Module snapshot</h2><p>Quick links to operational areas</p></div></div>
-        <div class="snapshot-links">
-            <a href="{{ route('backend.page', 'products') }}"><i class="fa-solid fa-box"></i><strong>{{ number_format($totalProducts) }}</strong><span>Products</span><small>{{ number_format($activeProducts) }} active</small></a>
-            <a href="{{ route('backend.page', 'categories') }}"><i class="fa-solid fa-layer-group"></i><strong>{{ number_format($totalCategories) }}</strong><span>Categories</span><small>Product catalogue</small></a>
-            <a href="{{ route('backend.page', 'users') }}"><i class="fa-solid fa-users"></i><strong>{{ number_format($totalUsers) }}</strong><span>Customers</span><small>Unique buyers</small></a>
-            <a href="{{ route('backend.page', 'stock-notifications') }}"><i class="fa-solid fa-bell"></i><strong>{{ number_format($unpaidOrders) }}</strong><span>Stock requests</span><small>Pending actions</small></a>
-            <a href="{{ route('backend.page', 'reviews') }}"><i class="fa-solid fa-star"></i><strong>{{ number_format($reviewsCount) }}</strong><span>Reviews</span><small>Customer feedback</small></a>
-            <a href="{{ route('backend.page', 'reports') }}"><i class="fa-solid fa-chart-column"></i><strong>{{ number_format($totalOrders) }}</strong><span>Reports</span><small>Sales reporting</small></a>
-        </div>
-    </section>
+    <section class="vx-grid vx-grid-bottom">
+        <article class="vx-card vx-source-visits">
+            <div class="vx-card-head"><div><span>Top Selling Products</span><p>Products ranked by units sold</p></div><a href="{{ route('backend.page', 'products') }}">View all</a></div>
+            <div class="vx-source-grid">
+                @forelse ($topProducts as $product)
+                    <a href="{{ $product->product_id ? route('backend.resource.edit', ['resource' => 'products', 'id' => $product->product_id]) : '#' }}"><i class="fa-solid fa-cube"></i><span><b>{{ $product->product_name }}</b><small>{{ $product->sold_quantity }} units sold</small></span><strong>&pound;{{ number_format($product->sold_total, 0) }}</strong></a>
+                @empty <div class="empty-cell">No product sales.</div> @endforelse
+            </div>
+        </article>
 
-    <section class="analytics-card recent-orders-card">
-        <div class="analytics-card-head"><div><h2>Recent orders</h2><p>Latest activity matching the filters</p></div><a href="{{ route('backend.page', 'orders') }}">View full order report</a></div>
-        <div class="recent-business-orders">
-            <div class="recent-business-head"><span>Order</span><span>Customer</span><span>Channel</span><span>Date</span><span>Status</span><span>Total</span></div>
-            @forelse ($recentOrders as $order)
-                <a href="{{ route('backend.orders.show', $order) }}"><strong>#{{ $order->order_number }}</strong><span>{{ $order->customer_name }}<small>{{ $order->email }}</small></span><span>{{ Str::headline($order->payment_method) }}</span><span>{{ $order->created_at?->format('d M Y, H:i') }}</span><span><b class="order-status-{{ $order->tracking_status }}">{{ Str::headline($order->tracking_status) }}</b></span><strong>&pound;{{ number_format($order->total, 2) }}</strong></a>
-            @empty <div class="empty-cell">No recent orders match these filters.</div> @endforelse
-        </div>
+        <article class="vx-card vx-recent-orders">
+            <div class="vx-card-head"><div><span>Recent Orders</span><p>Latest store transactions</p></div><a href="{{ route('backend.page', 'orders') }}">All orders</a></div>
+            <div class="vx-table">
+                <div><b>Order</b><b>Customer</b><b>Status</b><b>Total</b></div>
+                @forelse ($recentOrders as $order)
+                    <a href="{{ route('backend.orders.show', $order) }}"><strong>#{{ $order->order_number }}</strong><span>{{ $order->customer_name }}<small>{{ $order->email }}</small></span><em>{{ Str::headline($order->tracking_status) }}</em><strong>&pound;{{ number_format($order->total, 2) }}</strong></a>
+                @empty <div class="empty-cell">No recent orders.</div> @endforelse
+            </div>
+        </article>
     </section>
-
-    <footer class="dashboard-footer"><span>Copyright &copy; {{ date('Y') }} Arete Performance. All rights reserved.</span><span>Operations dashboard</span></footer>
 </div>
 @endsection

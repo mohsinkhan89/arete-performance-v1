@@ -176,6 +176,14 @@
                                     </td>
                                     <td>
                                         <div class="action-group">
+                                            <button type="button"
+                                                data-resource-preview
+                                                data-preview-title="{{ $product->name }}"
+                                                data-preview-image="{{ url($product->image ?: 'backend/assets/imgs/product-bottle.png') }}"
+                                                data-preview-subtitle="{{ $product->category?->name ?? 'Uncategorised' }}"
+                                                data-preview-meta="{{ $product->sku }}|£{{ number_format((float) $product->price, 2) }}|{{ ucfirst($product->status) }}|{{ number_format($product->stock) }} stock"
+                                                data-preview-edit="{{ route('backend.resource.edit', ['resource' => 'products', 'id' => $product->id]) }}"
+                                                title="View"><i class="fa-regular fa-eye"></i></button>
                                             <a href="{{ route('backend.resource.edit', ['resource' => 'products', 'id' => $product->id]) }}" title="Edit"><i class="fa-solid fa-pen"></i></a>
                                             <form action="{{ route('backend.resource.destroy', ['resource' => 'products', 'id' => $product->id]) }}" method="POST" onsubmit="return confirm('Delete this product?')">
                                                 @csrf

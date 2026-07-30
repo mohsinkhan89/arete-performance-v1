@@ -248,6 +248,20 @@
         </section>
     </div>
 
+    <div class="admin-modal resource-preview-modal" data-resource-preview-modal aria-hidden="true">
+        <div class="admin-modal-backdrop" data-resource-preview-close></div>
+        <section class="admin-modal-dialog vx-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="resourcePreviewTitle">
+            <button class="admin-modal-close" type="button" data-resource-preview-close aria-label="Close preview"><i class="fa-solid fa-xmark"></i></button>
+            <div class="vx-preview-media"><img src="" alt="" data-resource-preview-image></div>
+            <div class="vx-preview-content">
+                <span data-resource-preview-subtitle></span>
+                <h2 id="resourcePreviewTitle" data-resource-preview-title></h2>
+                <div class="vx-preview-meta" data-resource-preview-meta></div>
+                <a href="#" data-resource-preview-edit><i class="fa-solid fa-pen"></i> Edit Product</a>
+            </div>
+        </section>
+    </div>
+
     <script>
         window.adminRoutes = {
             orderNotifications: "{{ route('backend.notifications.orders') }}"

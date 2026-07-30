@@ -277,6 +277,65 @@ document.addEventListener('DOMContentLoaded', () => {
     (label || textarea).after(editorShell);
   });
 
+  document.querySelectorAll('.product-form-layout').forEach((layout) => {
+    const panels = [...layout.querySelectorAll(':scope > .form-section')];
+    if (panels.length < 2) return;
+
+    const icons = ['fa-rectangle-list', 'fa-sliders', 'fa-image', 'fa-align-left', 'fa-shield-halved'];
+    const tabs = document.createElement('nav');
+    tabs.className = 'vx-form-tabs';
+    tabs.setAttribute('aria-label', 'Form sections');
+    tabs.innerHTML = panels.map((panel, index) => {
+      const title = panel.querySelector('.form-section-head h2')?.textContent.trim() || `Step ${index + 1}`;
+      return `<button type="button" data-vx-form-tab="${index}" aria-selected="${index === 0}">
+        <i class="fa-solid ${icons[index] || 'fa-circle'}"></i>
+        <span>${title}</span>
+      </button>`;
+    }).join('');
+
+    const pager = document.createElement('div');
+    pager.className = 'vx-form-pager';
+    pager.innerHTML = `
+      <button type="button" data-vx-form-prev><i class="fa-solid fa-arrow-left"></i> Previous</button>
+      <span data-vx-form-progress></span>
+      <button type="button" data-vx-form-next>Next <i class="fa-solid fa-arrow-right"></i></button>
+    `;
+
+    layout.before(tabs);
+    layout.after(pager);
+    layout.classList.add('vx-tabbed-form');
+    panels.forEach((panel, index) => {
+      panel.classList.add('vx-form-panel');
+      panel.setAttribute('role', 'tabpanel');
+      panel.hidden = index !== 0;
+    });
+
+    const tabButtons = [...tabs.querySelectorAll('[data-vx-form-tab]')];
+    const previous = pager.querySelector('[data-vx-form-prev]');
+    const next = pager.querySelector('[data-vx-form-next]');
+    const progress = pager.querySelector('[data-vx-form-progress]');
+    let activeIndex = 0;
+
+    const showPanel = (index) => {
+      activeIndex = Math.max(0, Math.min(panels.length - 1, index));
+      panels.forEach((panel, panelIndex) => { panel.hidden = panelIndex !== activeIndex; });
+      tabButtons.forEach((button, buttonIndex) => {
+        const isActive = buttonIndex === activeIndex;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-selected', String(isActive));
+      });
+      previous.disabled = activeIndex === 0;
+      next.disabled = activeIndex === panels.length - 1;
+      progress.textContent = `Step ${activeIndex + 1} of ${panels.length}`;
+      layout.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    tabButtons.forEach((button, index) => button.addEventListener('click', () => showPanel(index)));
+    previous.addEventListener('click', () => showPanel(activeIndex - 1));
+    next.addEventListener('click', () => showPanel(activeIndex + 1));
+    showPanel(0);
+  });
+
   const themeToggle = document.querySelector('.theme-toggle');
   const themeIcon = themeToggle?.querySelector('i');
   const savedTheme = localStorage.getItem('adminTheme') || 'light';
@@ -360,6 +419,44 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       // Fullscreen can be blocked by browser policy; leave the interface unchanged.
     }
+  });
+
+  const resourcePreviewModal = document.querySelector('[data-resource-preview-modal]');
+  const resourcePreviewImage = resourcePreviewModal?.querySelector('[data-resource-preview-image]');
+  const resourcePreviewTitle = resourcePreviewModal?.querySelector('[data-resource-preview-title]');
+  const resourcePreviewSubtitle = resourcePreviewModal?.querySelector('[data-resource-preview-subtitle]');
+  const resourcePreviewMeta = resourcePreviewModal?.querySelector('[data-resource-preview-meta]');
+  const resourcePreviewEdit = resourcePreviewModal?.querySelector('[data-resource-preview-edit]');
+  const closeResourcePreview = () => {
+    resourcePreviewModal?.classList.remove('is-open');
+    resourcePreviewModal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  };
+
+  document.querySelectorAll('[data-resource-preview]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!resourcePreviewModal) return;
+      if (resourcePreviewImage) {
+        resourcePreviewImage.src = button.dataset.previewImage || '';
+        resourcePreviewImage.alt = button.dataset.previewTitle || 'Product preview';
+      }
+      if (resourcePreviewTitle) resourcePreviewTitle.textContent = button.dataset.previewTitle || '';
+      if (resourcePreviewSubtitle) resourcePreviewSubtitle.textContent = button.dataset.previewSubtitle || '';
+      if (resourcePreviewEdit) resourcePreviewEdit.href = button.dataset.previewEdit || '#';
+      if (resourcePreviewMeta) {
+        resourcePreviewMeta.innerHTML = (button.dataset.previewMeta || '').split('|')
+          .filter(Boolean)
+          .map((value) => `<span>${value}</span>`)
+          .join('');
+      }
+      resourcePreviewModal.classList.add('is-open');
+      resourcePreviewModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+    });
+  });
+  resourcePreviewModal?.querySelectorAll('[data-resource-preview-close]').forEach((button) => button.addEventListener('click', closeResourcePreview));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeResourcePreview();
   });
   document.addEventListener('fullscreenchange', syncFullscreen);
 
