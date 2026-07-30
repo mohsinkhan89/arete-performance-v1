@@ -10,40 +10,6 @@
         </div>
     @endif
 
-    @if (in_array($page, ['orders', 'stock-notifications'], true))
-        @php
-            $moduleStatuses = match ($page) {
-                'orders' => ['paid' => 'Paid', 'unpaid' => 'Unpaid', 'processing' => 'Processing', 'dispatched' => 'Dispatched', 'delivered' => 'Delivered', 'cancelled' => 'Cancelled'],
-                'stock-notifications' => ['pending' => 'Pending', 'notified' => 'Notified'],
-                default => ['active' => 'Active', 'inactive' => 'Inactive'],
-            };
-        @endphp
-        <section class="module-filter-bar">
-            <form method="GET" action="{{ route('backend.page', $page) }}">
-                <div class="module-filter-search">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="search" name="q" value="{{ $search }}" placeholder="Search {{ strtolower($pageTitle) }}...">
-                </div>
-                <select name="status" aria-label="Filter by status">
-                    <option value="">All statuses</option>
-                    @foreach ($moduleStatuses as $value => $label)
-                        <option value="{{ $value }}" @selected($status === $value)>{{ $label }}</option>
-                    @endforeach
-                </select>
-                <button type="submit"><i class="fa-solid fa-filter"></i> Apply</button>
-                @if ($search !== '' || $status !== '')
-                    <a href="{{ route('backend.page', $page) }}"><i class="fa-solid fa-xmark"></i> Clear</a>
-                @endif
-            </form>
-            <nav aria-label="{{ $pageTitle }} quick filters">
-                <a class="{{ $status === '' ? 'active' : '' }}" href="{{ route('backend.page', $page) }}">All</a>
-                @foreach ($moduleStatuses as $value => $label)
-                    <a class="{{ $status === $value ? 'active' : '' }}" href="{{ route('backend.page', ['page' => $page, 'status' => $value]) }}">{{ $label }}</a>
-                @endforeach
-            </nav>
-        </section>
-    @endif
-
     @if ($page === 'reports')
         <div class="stats-grid">
             <article class="stat-card">
@@ -116,32 +82,6 @@
         <article class="panel resource-panel resource-panel-polished resource-{{ $page }} {{ in_array($page, ['products', 'categories', 'reviews'], true) ? 'crud-vx-list' : '' }} {{ $page === 'orders' ? 'compact-orders-resource' : '' }}">
             <div class="panel-head">
                 @if (in_array($page, ['products', 'categories', 'reviews'], true))
-                    <form class="vx-users-filters crud-vx-filters" method="GET" action="{{ route('backend.page', $page) }}">
-                        <h2>Filters</h2>
-                        <div>
-                            <select name="status" aria-label="Select status" onchange="this.form.submit()">
-                                <option value="">Select Status</option>
-                                <option value="active" @selected($status === 'active')>Active</option>
-                                <option value="inactive" @selected($status === 'inactive')>Inactive</option>
-                            </select>
-                            @if ($page === 'products')
-                                <select name="category" aria-label="Select category" onchange="this.form.submit()">
-                                    <option value="">Select Category</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}" @selected(request('category') == $category->id)>{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-                            @else
-                                <select aria-label="Select type" disabled>
-                                    <option>{{ $page === 'categories' ? 'All Categories' : 'All Reviews' }}</option>
-                                </select>
-                            @endif
-                            <select aria-label="Select visibility" disabled>
-                                <option>{{ $page === 'products' ? 'All Products' : 'All Records' }}</option>
-                            </select>
-                        </div>
-                    </form>
-
                     <form class="vx-users-toolbar crud-vx-toolbar" method="GET" action="{{ route('backend.page', $page) }}">
                         <input type="hidden" name="status" value="{{ $status ?? '' }}">
                         @if ($page === 'products')
@@ -151,8 +91,6 @@
                             <option>10</option>
                         </select>
                         <div>
-                            <input type="search" name="q" value="{{ $search }}" placeholder="Search {{ Str::headline(Str::singular($page)) }}">
-                            <button class="vx-export-btn" type="button"><i class="fa-solid fa-arrow-up-from-bracket"></i> Export <i class="fa-solid fa-chevron-down"></i></button>
                             @if ($canManage)
                                 <button class="vx-add-record" type="button"
                                     data-resource-modal-open
@@ -188,11 +126,12 @@
                 @if ($page === 'products')
                     <table>
                         <thead>
-                            <tr><th>Product</th><th>Category</th><th>SKU</th><th>Price</th><th>Reviews</th><th>Status</th><th>Bestseller</th><th>Stock</th><th>Action</th></tr>
+                            <tr><th><input type="checkbox" aria-label="Select all products"></th><th>Product</th><th>Category</th><th>SKU</th><th>Price</th><th>Reviews</th><th>Status</th><th>Bestseller</th><th>Stock</th><th>Actions</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $product)
                                 <tr>
+                                    <td><input type="checkbox" aria-label="Select {{ $product->name }}"></td>
                                     <td>
                                         <span class="table-media">
                                             <img src="{{ url($product->image ?: 'backend/assets/imgs/product-bottle.png') }}" alt="{{ $product->name }}">
@@ -266,7 +205,7 @@
                                     </td>
                                 </tr>
                                 <tr id="product-detail-{{ $product->id }}" class="vx-user-detail-row" hidden>
-                                    <td colspan="9">
+                                    <td colspan="10">
                                         <div class="vx-user-detail-card">
                                             <span><b>SKU</b>{{ $product->sku }}</span>
                                             <span><b>Category</b>{{ $product->category?->name ?? '-' }}</span>
@@ -276,18 +215,19 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="9" class="empty-cell">No products found.</td></tr>
+                                <tr><td colspan="10" class="empty-cell">No products found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
                 @elseif ($page === 'categories')
                     <table>
                         <thead>
-                            <tr><th>Image</th><th>Name</th><th>Slug</th><th>Products</th><th>Sort</th><th>Status</th><th>Created</th><th>Action</th></tr>
+                            <tr><th><input type="checkbox" aria-label="Select all categories"></th><th>Image</th><th>Name</th><th>Slug</th><th>Products</th><th>Sort</th><th>Status</th><th>Created</th><th>Actions</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $category)
                                 <tr>
+                                    <td><input type="checkbox" aria-label="Select {{ $category->name }}"></td>
                                     <td><img class="category-thumb" src="{{ url($category->image ?: 'backend/assets/imgs/product-bottle.png') }}" alt="{{ $category->name }}"></td>
                                     <td>{{ $category->name }}</td>
                                     <td>{{ $category->slug }}</td>
@@ -328,7 +268,7 @@
                                     </td>
                                 </tr>
                                 <tr id="category-detail-{{ $category->id }}" class="vx-user-detail-row" hidden>
-                                    <td colspan="8">
+                                    <td colspan="9">
                                         <div class="vx-user-detail-card">
                                             <span><b>Slug</b>{{ $category->slug }}</span>
                                             <span><b>Products</b>{{ number_format($category->products_count) }}</span>
@@ -338,7 +278,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="8" class="empty-cell">No categories found.</td></tr>
+                                <tr><td colspan="9" class="empty-cell">No categories found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -360,29 +300,6 @@
 
                     <div class="vx-users-view">
                         <section class="vx-users-card">
-                            <form class="vx-users-filters" method="GET" action="{{ route('backend.page', 'users') }}">
-                                <h2>Filters</h2>
-                                <div>
-                                    <select name="role" aria-label="Select role" onchange="this.form.submit()">
-                                        <option value="">Select Role</option>
-                                        @foreach (($userStats['roles'] ?? collect()) as $filterRole)
-                                            <option value="{{ $filterRole }}" @selected(($role ?? '') === $filterRole)>{{ Str::headline($filterRole) }}</option>
-                                        @endforeach
-                                    </select>
-                                    <select name="plan" aria-label="Select plan" onchange="this.form.submit()">
-                                        <option value="">Select Plan</option>
-                                        @foreach ($plans as $plan)
-                                            <option value="{{ strtolower($plan) }}" @selected(request('plan') === strtolower($plan))>{{ $plan }}</option>
-                                        @endforeach
-                                    </select>
-                                    <select name="status" aria-label="Select status" onchange="this.form.submit()">
-                                        <option value="">Select Status</option>
-                                        <option value="active" @selected($status === 'active')>Active</option>
-                                        <option value="inactive" @selected($status === 'inactive')>Inactive</option>
-                                    </select>
-                                </div>
-                            </form>
-
                             <form class="vx-users-toolbar" method="GET" action="{{ route('backend.page', 'users') }}">
                                 <input type="hidden" name="role" value="{{ $role ?? '' }}">
                                 <input type="hidden" name="status" value="{{ $status ?? '' }}">
@@ -391,7 +308,6 @@
                                 </select>
                                 <div>
                                     <input type="search" name="q" value="{{ $search }}" placeholder="Search User">
-                                    <button class="vx-export-btn" type="button"><i class="fa-solid fa-arrow-up-from-bracket"></i> Export <i class="fa-solid fa-chevron-down"></i></button>
                                     @if ($canManage)
                                         <button class="vx-add-record" type="button"
                                             data-user-modal-open
@@ -658,11 +574,12 @@
                 @else
                     <table>
                         <thead>
-                            <tr><th>Customer</th><th>Product</th><th>Rating</th><th>Review</th><th>Status</th><th>Created</th><th>Action</th></tr>
+                            <tr><th><input type="checkbox" aria-label="Select all reviews"></th><th>Customer</th><th>Product</th><th>Rating</th><th>Review</th><th>Status</th><th>Created</th><th>Actions</th></tr>
                         </thead>
                         <tbody>
                             @forelse ($records as $review)
                                 <tr>
+                                    <td><input type="checkbox" aria-label="Select {{ $review->customer_name }}"></td>
                                     <td>
                                         <span class="table-media">
                                             <img src="{{ url($review->avatar ?: 'frontend/assets/images/testimonials/miker.png') }}" alt="{{ $review->customer_name }}">
@@ -709,7 +626,7 @@
                                     </td>
                                 </tr>
                                 <tr id="review-detail-{{ $review->id }}" class="vx-user-detail-row" hidden>
-                                    <td colspan="7">
+                                    <td colspan="8">
                                         <div class="vx-user-detail-card">
                                             <span><b>Customer</b>{{ $review->customer_name }}</span>
                                             <span><b>Product</b>{{ $review->product?->name ?? '-' }}</span>
@@ -719,7 +636,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="7" class="empty-cell">No reviews found.</td></tr>
+                                <tr><td colspan="8" class="empty-cell">No reviews found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
