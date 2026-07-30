@@ -5021,8 +5021,9 @@ button.is-loading .fa-spinner {
 /* Peptide calculator */
 .peptide-calculator-page {
   padding: 42px 0 80px;
-  color: #181818;
-  background: linear-gradient(180deg, #fff 0%, #f4f4f4 100%);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  background: linear-gradient(180deg, var(--color-white) 0%, var(--color-surface) 100%);
 }
 
 .peptide-calculator-hero {
@@ -5035,7 +5036,7 @@ button.is-loading .fa-spinner {
   color: #fff;
   background: radial-gradient(circle at 80% 20%, #292929, #050505 54%);
   border: 1px solid #2f2f2f;
-  border-radius: 12px;
+  border-radius: var(--radius);
 }
 
 .peptide-back-link {
@@ -5044,18 +5045,18 @@ button.is-loading .fa-spinner {
   align-items: center;
   margin-bottom: 20px;
   color: #d6d6d6;
-  font-size: .76rem;
+  font-size: .78rem;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .peptide-calculator-hero h1 {
-  margin: 5px 0 12px;
+  margin: 4px 0 10px;
   color: #fff;
   font-family: var(--font-display);
-  font-size: clamp(2.8rem, 6vw, 4.7rem);
+  font-size: clamp(2rem, 3.6vw, 3.15rem);
   font-weight: 800;
-  line-height: .95;
+  line-height: 1;
   text-transform: uppercase;
 }
 
@@ -5063,18 +5064,19 @@ button.is-loading .fa-spinner {
   max-width: 690px;
   margin: 0;
   color: #cfcfcf;
+  font-size: .95rem;
+  font-weight: 500;
   line-height: 1.7;
 }
 
 .peptide-calculator-product {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  gap: 18px;
+  display: flex;
+  justify-self: end;
   align-items: center;
   padding: 14px;
   background: rgba(255, 255, 255, .07);
   border: 1px solid rgba(255, 255, 255, .14);
-  border-radius: 10px;
+  border-radius: var(--radius);
 }
 
 .peptide-calculator-product img {
@@ -5085,24 +5087,6 @@ button.is-loading .fa-spinner {
   border-radius: 8px;
 }
 
-.peptide-calculator-product span,
-.peptide-calculator-product strong {
-  display: block;
-}
-
-.peptide-calculator-product span {
-  margin-bottom: 6px;
-  color: var(--color-primary);
-  font-size: .68rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.peptide-calculator-product strong {
-  color: #fff;
-  line-height: 1.4;
-}
-
 .peptide-calculator-shell {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
@@ -5111,10 +5095,10 @@ button.is-loading .fa-spinner {
 
 .peptide-calculator-main,
 .peptide-calculator-result {
-  background: #fff;
-  border: 1px solid #dedede;
-  border-radius: 12px;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, .07);
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 .peptide-calculator-main {
@@ -5125,14 +5109,15 @@ button.is-loading .fa-spinner {
   padding: 22px;
   background: #fafafa;
   border: 1px solid #e3e3e3;
-  border-radius: 9px;
+  border-radius: var(--radius);
 }
 
 .peptide-field h2 {
   margin: 0 0 17px;
   color: #171717;
-  font-size: .9rem;
+  font-size: 1rem;
   font-weight: 900;
+  line-height: 1.35;
 }
 
 .peptide-syringe-options {
@@ -5142,11 +5127,17 @@ button.is-loading .fa-spinner {
 }
 
 .peptide-syringe-option,
+.peptide-choice,
+.peptide-custom-input {
+  font-family: var(--font-body);
+}
+
+.peptide-syringe-option,
 .peptide-choice {
   color: #222;
-  background: #fff;
+  background: var(--color-white);
   border: 1px solid #d9d9d9;
-  border-radius: 8px;
+  border-radius: var(--radius);
 }
 
 .peptide-syringe-option {
@@ -5169,6 +5160,11 @@ button.is-loading .fa-spinner {
 
 .peptide-syringe-option small {
   color: #777;
+  font-size: .78rem;
+}
+
+.peptide-syringe-option strong {
+  font-size: .9rem;
 }
 
 .peptide-syringe-option.active,
@@ -5205,13 +5201,14 @@ button.is-loading .fa-spinner {
 .peptide-syringe-meta span {
   margin-bottom: 5px;
   color: #777;
-  font-size: .62rem;
+  font-size: .7rem;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .peptide-syringe-meta strong {
-  font-size: .72rem;
+  font-size: .8rem;
+  line-height: 1.4;
 }
 
 .peptide-fields-grid {
@@ -5230,7 +5227,7 @@ button.is-loading .fa-spinner {
 .peptide-choice {
   min-height: 38px;
   padding: 8px 13px;
-  font-size: .7rem;
+  font-size: .78rem;
   font-weight: 800;
 }
 
@@ -5240,8 +5237,11 @@ button.is-loading .fa-spinner {
   min-height: 42px;
   margin-top: 12px;
   padding: 10px 12px;
+  color: var(--color-text);
+  background: var(--color-white);
   border: 1px solid #d5d5d5;
-  border-radius: 7px;
+  border-radius: var(--radius);
+  font-size: .88rem;
 }
 
 .peptide-custom-input.active {
@@ -5259,7 +5259,7 @@ button.is-loading .fa-spinner {
 
 .peptide-field-summary span {
   color: var(--color-primary);
-  font-size: .7rem;
+  font-size: .75rem;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -5267,13 +5267,15 @@ button.is-loading .fa-spinner {
 .peptide-field-summary strong {
   margin: 7px 0;
   color: #fff;
+  font-family: var(--font-display);
   font-size: 2rem;
 }
 
 .peptide-field-summary p {
   margin: 0;
   color: #aaa;
-  font-size: .72rem;
+  font-size: .78rem;
+  line-height: 1.5;
 }
 
 .peptide-calculator-result {
@@ -5296,14 +5298,14 @@ button.is-loading .fa-spinner {
 
 .peptide-result-card span {
   color: var(--color-primary);
-  font-size: .7rem;
+  font-size: .75rem;
   font-weight: 900;
   text-transform: uppercase;
 }
 
 .peptide-result-card strong {
   margin-top: 6px;
-  font-size: 1rem;
+  font-size: 1.05rem;
 }
 
 .peptide-result-card b {
@@ -5337,12 +5339,12 @@ button.is-loading .fa-spinner {
   inset: 0;
   display: grid;
   place-items: center;
-  font-size: .72rem;
+  font-size: .78rem;
 }
 
 .peptide-calculator-result > p {
   color: #444;
-  font-size: .8rem;
+  font-size: .88rem;
   line-height: 1.6;
   text-align: center;
 }
@@ -5377,7 +5379,7 @@ button.is-loading .fa-spinner {
   top: 14px;
   left: 0;
   color: #777;
-  font-size: .58rem;
+  font-size: .65rem;
   font-style: normal;
   transform: translateX(-50%);
 }
@@ -5402,8 +5404,12 @@ button.is-loading .fa-spinner {
 .peptide-result-meta span {
   margin-bottom: 5px;
   color: #777;
-  font-size: .62rem;
+  font-size: .7rem;
   text-transform: uppercase;
+}
+
+.peptide-result-meta strong {
+  font-size: .85rem;
 }
 
 .peptide-warning {
@@ -5411,7 +5417,7 @@ button.is-loading .fa-spinner {
   margin-top: 14px;
   padding: 12px;
   color: #9d1c1c;
-  font-size: .72rem;
+  font-size: .78rem;
   background: #fff0f0;
   border: 1px solid #ffcaca;
   border-radius: 7px;
@@ -5425,7 +5431,7 @@ button.is-loading .fa-spinner {
   display: block;
   margin-top: 16px;
   color: #707070;
-  font-size: .66rem;
+  font-size: .72rem;
   line-height: 1.55;
 }
 
@@ -5436,6 +5442,7 @@ button.is-loading .fa-spinner {
   }
 
   .peptide-calculator-product {
+    justify-self: start;
     max-width: 420px;
   }
 }

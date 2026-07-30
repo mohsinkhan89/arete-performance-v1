@@ -208,7 +208,7 @@ class FrontendController extends Controller
             ->firstOrFail();
 
         $categoryIdentity = Str::lower(($product->category?->slug ?? '') . ' ' . ($product->category?->name ?? ''));
-        abort_unless(Str::contains($categoryIdentity, 'peptide'), 404);
+        abort_unless(Str::contains($categoryIdentity, ['peptide', 'injectable']), 404);
 
         preg_match('/(\d+(?:\.\d+)?)\s*mg/i', $product->name, $strengthMatch);
         $vialAmount = (float) ($strengthMatch[1] ?? 10);

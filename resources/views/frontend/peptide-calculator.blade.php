@@ -12,7 +12,6 @@
       </div>
       <div class="peptide-calculator-product">
         <img src="{{ $productImage }}" alt="{{ $product->name }}">
-        <div><span>{{ $product->category?->name ?? 'Peptides' }}</span><strong>{{ $product->name }}</strong></div>
       </div>
     </header>
 
