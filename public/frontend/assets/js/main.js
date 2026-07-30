@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartDrawer = document.querySelector(".cart-drawer");
   const cartItems = document.querySelector(".cart-items");
   const cartEmpty = document.querySelector(".cart-empty");
-  const cartCount = document.querySelector(".cart-count");
+  const cartCounts = document.querySelectorAll(".cart-count");
   const cartSubtotal = document.querySelector(".cart-subtotal");
   const productTracks = document.querySelectorAll(".product-track");
   const reportLightbox = document.querySelector(".report-lightbox");
@@ -1524,7 +1524,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </article>`;
     }).join("");
 
-    cartCount.textContent = data.item_count;
+    cartCounts.forEach((cartCount) => { cartCount.textContent = data.item_count; });
     cartSubtotal.textContent = money(data.subtotal);
     cartEmpty.classList.toggle("is-visible", data.is_empty);
   }
@@ -1601,7 +1601,7 @@ document.addEventListener("DOMContentLoaded", () => {
   navbarCollapse.addEventListener("hidden.bs.collapse", () => siteHeader.classList.remove("menu-open"));
   window.addEventListener("scroll", updateHeaderState, { passive: true });
 
-  document.querySelector(".search-toggle").addEventListener("click", openSearch);
+  document.querySelectorAll(".search-toggle").forEach((button) => button.addEventListener("click", openSearch));
   document.querySelector(".search-close").addEventListener("click", closeSearch);
   searchPanel.addEventListener("click", (event) => {
     if (event.target === searchPanel) closeSearch();
@@ -1616,7 +1616,7 @@ document.addEventListener("DOMContentLoaded", () => {
     goToPage(`${route("search", "/search")}${query ? `?q=${encodeURIComponent(query)}` : ""}`);
   });
 
-  document.querySelector(".cart-btn").addEventListener("click", openCart);
+  document.querySelectorAll(".cart-btn").forEach((button) => button.addEventListener("click", openCart));
   document.querySelector(".cart-close").addEventListener("click", closeCart);
   cartOverlay.addEventListener("click", closeCart);
   productTracks.forEach((productTrack) => {
