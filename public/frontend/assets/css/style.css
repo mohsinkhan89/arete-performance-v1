@@ -9988,3 +9988,361 @@ body:not(.home-page) .site-header {
     justify-content: center;
   }
 }
+
+/* Final responsive safeguards */
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+main,
+main section,
+main .container,
+main [class*="-grid"],
+main [class*="-layout"],
+main [class*="-panel"],
+main [class*="-copy"] {
+  min-width: 0;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+}
+
+.ingredient-table,
+.cart-items-panel,
+.checkout-summary,
+.order-detail-card {
+  max-width: 100%;
+}
+
+@media (max-width: 991.98px) {
+  .peptide-calculator-hero {
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 28px;
+    padding: 30px;
+  }
+
+  .peptide-calculator-product {
+    justify-self: end;
+    width: 220px;
+    height: 190px;
+  }
+
+  .peptide-calculator-shell,
+  .product-detail-layout,
+  .cart-layout,
+  .checkout-layout,
+  .success-grid,
+  .track-empty-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .product-main-image {
+    width: 100%;
+    max-width: none;
+  }
+
+  .order-summary,
+  .checkout-summary {
+    width: 100%;
+    max-width: none;
+  }
+
+  .success-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767.98px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: 100%;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .section-space,
+  .shop-main,
+  .cart-main,
+  .checkout-main,
+  .success-main,
+  .track-order-main {
+    padding-top: 42px;
+    padding-bottom: 42px;
+  }
+
+  .peptide-calculator-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding: 22px;
+  }
+
+  .peptide-calculator-hero::after {
+    top: auto;
+    right: -100px;
+    bottom: -150px;
+  }
+
+  .peptide-calculator-hero h1 {
+    font-size: clamp(1.9rem, 10vw, 2.7rem);
+    overflow-wrap: anywhere;
+  }
+
+  .peptide-calculator-product {
+    justify-self: center;
+    width: min(100%, 280px);
+    height: 210px;
+  }
+
+  .peptide-calculator-main,
+  .peptide-calculator-result,
+  .peptide-field {
+    padding: 18px;
+  }
+
+  .peptide-syringe-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .peptide-syringe-option {
+    min-width: 0;
+    min-height: 94px;
+    padding: 10px 6px;
+  }
+
+  .peptide-syringe-meta,
+  .peptide-fields-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .peptide-syringe-meta div {
+    border-right: 0;
+    border-bottom: 1px solid #e1e1e1;
+  }
+
+  .peptide-syringe-meta div:last-child {
+    border-bottom: 0;
+  }
+
+  .shop-grid,
+  .recommended-grid,
+  .related-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shop-product-card,
+  .related-card,
+  .recommended-grid .shop-product-card {
+    min-width: 0;
+  }
+
+  .shop-product-card h3,
+  .related-card h3,
+  .recommended-grid h3 {
+    overflow-wrap: anywhere;
+  }
+
+  .cart-row,
+  .checkout-summary-items article,
+  .search-result {
+    min-width: 0;
+  }
+
+  .cart-product-cell,
+  .checkout-summary-items article > div,
+  .search-result > div {
+    min-width: 0;
+  }
+
+  .cart-product-cell strong,
+  .checkout-summary-items strong,
+  .search-result strong {
+    overflow-wrap: anywhere;
+  }
+
+  .checkout-option,
+  .payment-option,
+  .mini-payments,
+  .crypto-marks {
+    flex-wrap: wrap;
+  }
+
+  .success-side,
+  .success-actions,
+  .track-empty-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .success-hero h1,
+  .checkout-hero h1,
+  .cart-hero h1,
+  .search-hero h1 {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  .product-gallery {
+    min-width: 0;
+  }
+
+  .product-main-image {
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+  }
+
+  .product-main-image > img {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+  }
+
+  .product-thumbs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .product-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ingredient-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .track-order-form {
+    gap: 10px;
+  }
+
+  .track-order-form .btn,
+  .track-empty-actions .btn,
+  .success-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .site-header .navbar {
+    min-height: 76px;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+  }
+
+  .site-header .brand {
+    width: 118px;
+    height: 64px;
+  }
+
+  .site-header .brand img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .site-header .navbar-toggler {
+    flex: 0 0 auto;
+  }
+
+  .site-header .navbar-collapse {
+    width: 100%;
+    max-height: calc(100dvh - 76px);
+    padding: 12px 0 16px;
+    overflow-y: auto;
+  }
+
+  .site-header .nav-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .hero,
+  .shop-hero,
+  .cart-hero,
+  .checkout-hero,
+  .search-hero,
+  .success-hero {
+    min-height: auto;
+  }
+
+  .shop-hero-inner,
+  .hero-content {
+    min-height: 520px;
+  }
+
+  .cart-hero,
+  .checkout-hero,
+  .search-hero,
+  .success-hero {
+    padding-top: 38px;
+    padding-bottom: 38px;
+  }
+
+  .checkout-hero-copy,
+  .cart-hero-copy,
+  .search-hero-copy {
+    padding-bottom: 34px !important;
+  }
+
+  .success-card,
+  .cart-items-panel,
+  .order-summary,
+  .checkout-step,
+  .checkout-summary,
+  .track-empty-panel {
+    padding: 18px;
+  }
+
+  .peptide-choice-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .peptide-choice {
+    width: 100%;
+  }
+}
+
+@media (max-width: 374.98px) {
+  .container {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .shop-grid,
+  .recommended-grid,
+  .related-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .peptide-syringe-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .product-thumbs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-category-links,
+  .product-tabs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cart-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cart-stepper {
+    justify-self: start;
+  }
+}
