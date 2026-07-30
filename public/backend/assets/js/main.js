@@ -303,6 +303,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const toggle = document.querySelector('.sidebar-toggle');
   const sidebar = document.querySelector('#adminSidebar');
+  const sidebarClose = document.querySelector('.sidebar-close');
+  const sidebarBackdrop = document.querySelector('.sidebar-backdrop');
+  const desktopSidebar = window.matchMedia('(min-width: 1200px)');
   const closeSidebar = () => {
     sidebar?.classList.remove('is-open');
     document.body.classList.remove('sidebar-open');
@@ -312,11 +315,130 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toggle && sidebar) {
     toggle.setAttribute('aria-expanded', 'false');
     toggle.addEventListener('click', () => {
+      if (desktopSidebar.matches) {
+        const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('adminSidebarCollapsed', String(isCollapsed));
+        toggle.setAttribute('aria-expanded', String(!isCollapsed));
+        return;
+      }
       const isOpen = sidebar.classList.toggle('is-open');
       document.body.classList.toggle('sidebar-open', isOpen);
       toggle.setAttribute('aria-expanded', String(isOpen));
     });
   }
+
+  if (desktopSidebar.matches && localStorage.getItem('adminSidebarCollapsed') === 'true') {
+    document.body.classList.add('sidebar-collapsed');
+  }
+
+  desktopSidebar.addEventListener('change', () => {
+    closeSidebar();
+    if (!desktopSidebar.matches) document.body.classList.remove('sidebar-collapsed');
+    else if (localStorage.getItem('adminSidebarCollapsed') === 'true') document.body.classList.add('sidebar-collapsed');
+  });
+
+  sidebarClose?.addEventListener('click', closeSidebar);
+  sidebarBackdrop?.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeSidebar();
+  });
+
+  const fullscreenToggle = document.querySelector('.fullscreen-toggle');
+  const fullscreenIcon = fullscreenToggle?.querySelector('i');
+  const syncFullscreen = () => {
+    const isFullscreen = Boolean(document.fullscreenElement);
+    fullscreenIcon?.classList.toggle('fa-expand', !isFullscreen);
+    fullscreenIcon?.classList.toggle('fa-compress', isFullscreen);
+    fullscreenToggle?.setAttribute('aria-label', isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen');
+  };
+
+  fullscreenToggle?.addEventListener('click', async () => {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await document.documentElement.requestFullscreen();
+    } catch (error) {
+      // Fullscreen can be blocked by browser policy; leave the interface unchanged.
+    }
+  });
+  document.addEventListener('fullscreenchange', syncFullscreen);
+
+  const commandPalette = document.querySelector('.command-palette');
+  const commandToggle = document.querySelector('.command-toggle');
+  const commandBackdrop = document.querySelector('.command-backdrop');
+  const commandInput = commandPalette?.querySelector('.command-search input');
+  const commandLinks = [...(commandPalette?.querySelectorAll('.command-results a') || [])];
+  const commandEmpty = commandPalette?.querySelector('.command-empty');
+  let commandIndex = 0;
+
+  const visibleCommandLinks = () => commandLinks.filter((link) => !link.hidden);
+  const focusCommand = (index) => {
+    const links = visibleCommandLinks();
+    if (!links.length) return;
+    commandIndex = (index + links.length) % links.length;
+    links.forEach((link, linkIndex) => link.classList.toggle('is-selected', linkIndex === commandIndex));
+    links[commandIndex].scrollIntoView({ block: 'nearest' });
+  };
+  const filterCommands = () => {
+    const query = commandInput?.value.trim().toLowerCase() || '';
+    commandLinks.forEach((link) => {
+      link.hidden = query !== '' && !link.dataset.commandLabel.includes(query);
+    });
+    const links = visibleCommandLinks();
+    if (commandEmpty) commandEmpty.hidden = links.length > 0;
+    commandIndex = 0;
+    focusCommand(0);
+  };
+  const openCommands = () => {
+    if (!commandPalette) return;
+    commandPalette.classList.add('is-open');
+    commandPalette.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('command-open');
+    if (commandInput) {
+      commandInput.value = '';
+      filterCommands();
+      window.setTimeout(() => commandInput.focus(), 30);
+    }
+  };
+  const closeCommands = () => {
+    commandPalette?.classList.remove('is-open');
+    commandPalette?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('command-open');
+  };
+
+  commandToggle?.addEventListener('click', openCommands);
+  commandBackdrop?.addEventListener('click', closeCommands);
+  commandInput?.addEventListener('input', filterCommands);
+  commandLinks.forEach((link) => {
+    link.addEventListener('mouseenter', () => {
+      const links = visibleCommandLinks();
+      focusCommand(links.indexOf(link));
+    });
+  });
+  document.addEventListener('keydown', (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      commandPalette?.classList.contains('is-open') ? closeCommands() : openCommands();
+      return;
+    }
+    if (!commandPalette?.classList.contains('is-open')) return;
+    if (event.key === 'Escape') {
+      closeCommands();
+      return;
+    }
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      focusCommand(commandIndex + 1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      focusCommand(commandIndex - 1);
+    } else if (event.key === 'Enter') {
+      const link = visibleCommandLinks()[commandIndex];
+      if (link) {
+        event.preventDefault();
+        link.click();
+      }
+    }
+  });
 
   const profileDropdown = document.querySelector('.profile-dropdown');
   const profileButton = document.querySelector('.profile-menu');

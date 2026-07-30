@@ -6,7 +6,7 @@
     <title>@yield('title', 'Admin Dashboard') - Arete Performance</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <link href="{{ url('backend/assets/css/style.css') }}?v={{ urlencode($siteSettings['css_version'] ?? '1.0.0') }}" rel="stylesheet">
     @yield('css')
@@ -14,9 +14,13 @@
 <body class="admin-light-page">
     <div class="admin-shell">
         <aside class="admin-sidebar" id="adminSidebar">
-            <a class="brand" href="{{ route('backend.dashboard') }}" aria-label="Arete Performance Admin">
-                <img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
-            </a>
+            <div class="sidebar-brand-row">
+                <a class="brand" href="{{ route('backend.dashboard') }}" aria-label="Arete Performance Admin">
+                    <img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
+                    <span><strong>Arete</strong><small>Admin Console</small></span>
+                </a>
+                <button class="sidebar-close" type="button" aria-label="Close sidebar"><i class="fa-solid fa-xmark"></i></button>
+            </div>
 
             @php
                 $menuItems = [
@@ -33,6 +37,7 @@
             @endphp
 
             <nav class="admin-nav" aria-label="Admin navigation">
+                <span class="admin-nav-label">Apps &amp; Pages</span>
                 @foreach ($menuItems as $item)
                     <a class="{{ ($item['active'] ?? false) || request()->is('admin/' . strtolower($item['label'])) ? 'active' : '' }}" href="{{ $item['url'] }}">
                         <i class="fa-solid {{ $item['icon'] }}"></i>
@@ -83,6 +88,15 @@
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </form>
+                    <button class="icon-btn command-toggle" type="button" aria-label="Open quick navigation" title="Quick navigation (Ctrl+K)">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </button>
+                    <a class="icon-btn storefront-link" href="{{ route('frontend.index') }}" target="_blank" rel="noopener" aria-label="Open storefront" title="Open storefront">
+                        <i class="fa-solid fa-store"></i>
+                    </a>
+                    <button class="icon-btn fullscreen-toggle" type="button" aria-label="Enter fullscreen" title="Fullscreen">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
                     <button class="icon-btn theme-toggle" type="button" aria-label="Toggle dark mode">
                         <i class="fa-regular fa-moon"></i>
                     </button>
@@ -114,6 +128,10 @@
                     </div>
                     <div class="profile-dropdown">
                         <button class="profile-menu" type="button" aria-expanded="false" aria-haspopup="true">
+                            <span class="profile-copy">
+                                <strong>{{ auth()->user()->name ?? 'Admin' }}</strong>
+                                <small>Administrator</small>
+                            </span>
                             <span class="avatar small"><i class="fa-solid fa-user"></i></span>
                             <i class="fa-solid fa-chevron-down"></i>
                         </button>
@@ -150,6 +168,42 @@
                 @yield('body')
             </section>
         </main>
+    </div>
+    <button class="sidebar-backdrop" type="button" aria-label="Close sidebar"></button>
+
+    <div class="command-palette" aria-hidden="true">
+        <button class="command-backdrop" type="button" aria-label="Close quick navigation"></button>
+        <section class="command-dialog" role="dialog" aria-modal="true" aria-labelledby="commandTitle">
+            <div class="command-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" placeholder="Search pages and actions..." aria-label="Search quick navigation" autocomplete="off">
+                <kbd>ESC</kbd>
+            </div>
+            <div class="command-body">
+                <span id="commandTitle">Quick navigation</span>
+                <div class="command-results">
+                    @foreach ($menuItems as $item)
+                        <a href="{{ $item['url'] }}" data-command-label="{{ strtolower($item['label']) }}">
+                            <i class="fa-solid {{ $item['icon'] }}"></i>
+                            <div><strong>{{ $item['label'] }}</strong><small>Open {{ strtolower($item['label']) }}</small></div>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    @endforeach
+                    <a href="{{ route('backend.profile') }}" data-command-label="profile account">
+                        <i class="fa-regular fa-user"></i>
+                        <div><strong>Profile</strong><small>View administrator profile</small></div>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <a href="{{ route('frontend.index') }}" target="_blank" data-command-label="store frontend website">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        <div><strong>View Store</strong><small>Open storefront in a new tab</small></div>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="command-empty" hidden>No matching page or action found.</div>
+            </div>
+            <footer><span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span><span><kbd>Enter</kbd> Open</span></footer>
+        </section>
     </div>
 
     <div class="admin-modal payment-proof-modal" data-payment-proof-modal aria-hidden="true">
@@ -199,7 +253,7 @@
             orderNotifications: "{{ route('backend.notifications.orders') }}"
         };
     </script>
-    <script src="{{ url('backend/assets/js/main.js') }}"></script>
+    <script src="{{ url('backend/assets/js/main.js') }}?v={{ urlencode($siteSettings['js_version'] ?? '1.0.0') }}"></script>
     @yield('js')
 </body>
 </html>
