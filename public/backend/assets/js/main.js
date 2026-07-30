@@ -616,6 +616,41 @@ document.addEventListener('DOMContentLoaded', () => {
     button.addEventListener('click', closeResourceEditor);
   });
 
+  const orderEditorModal = document.querySelector('[data-order-editor-modal]');
+  const orderEditorForm = orderEditorModal?.querySelector('[data-order-modal-form]');
+  if (orderEditorModal && orderEditorModal.parentElement !== document.body) {
+    document.body.appendChild(orderEditorModal);
+  }
+  const setOrderField = (field, value) => {
+    const input = orderEditorModal?.querySelector(`[data-order-field="${field}"]`);
+    if (input) input.value = value || '';
+  };
+  const closeOrderEditor = () => {
+    orderEditorModal?.classList.remove('is-open');
+    orderEditorModal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  };
+
+  document.querySelectorAll('[data-order-modal-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!orderEditorModal || !orderEditorForm) return;
+
+      orderEditorForm.action = button.dataset.action || '';
+      [
+        'customerName', 'email', 'phone', 'zip', 'address', 'address2', 'city', 'state',
+        'status', 'paymentStatus', 'trackingStatus', 'trackingNumber', 'trackingNote', 'adminNote',
+      ].forEach((field) => setOrderField(field, button.dataset[field]));
+
+      orderEditorModal.classList.add('is-open');
+      orderEditorModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      window.setTimeout(() => orderEditorModal.querySelector('input, select, textarea')?.focus(), 60);
+    });
+  });
+  orderEditorModal?.querySelectorAll('[data-order-modal-close]').forEach((button) => {
+    button.addEventListener('click', closeOrderEditor);
+  });
+
   document.querySelectorAll('[data-resource-view-toggle]').forEach((button) => {
     button.addEventListener('click', () => {
       const target = document.getElementById(button.dataset.resourceViewToggle || '');
@@ -638,6 +673,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeResourcePreview();
       closeUserEditor();
       closeResourceEditor();
+      closeOrderEditor();
     }
   });
   document.addEventListener('fullscreenchange', syncFullscreen);

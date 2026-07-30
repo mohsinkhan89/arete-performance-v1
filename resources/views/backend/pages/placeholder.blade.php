@@ -79,9 +79,62 @@
         @php
             $canManage = $page !== 'users' || $canManageUsers;
         @endphp
-        <article class="panel resource-panel resource-panel-polished resource-{{ $page }} {{ in_array($page, ['products', 'categories', 'reviews', 'orders'], true) ? 'crud-vx-list' : '' }}">
+
+        @if ($page === 'orders')
+            @php
+                $orderNarrowLinks = [
+                    '' => ['All orders', $orderStats['total'] ?? 0],
+                    'paid' => ['Paid', $orderStats['paid'] ?? 0],
+                    'unpaid' => ['Unpaid', $orderStats['unpaid'] ?? 0],
+                    'processing' => ['Processing', null],
+                    'delivered' => ['Delivered', $orderStats['delivered'] ?? 0],
+                    'cancelled' => ['Cancelled', null],
+                ];
+            @endphp
+
+            <section class="order-vx-insights order-vx-insights-standalone">
+                <div class="order-vx-stats">
+                    <article>
+                        <i class="fa-solid fa-cart-shopping purple"></i>
+                        <span>Total Orders</span>
+                        <strong>{{ number_format($orderStats['total'] ?? 0) }}</strong>
+                        <small>£{{ number_format((float) ($orderStats['revenue'] ?? 0), 2) }} total value</small>
+                    </article>
+                    <article>
+                        <i class="fa-solid fa-wallet green"></i>
+                        <span>Paid Revenue</span>
+                        <strong>£{{ number_format((float) ($orderStats['paidRevenue'] ?? 0), 2) }}</strong>
+                        <small>{{ number_format($orderStats['paid'] ?? 0) }} paid orders</small>
+                    </article>
+                    <article>
+                        <i class="fa-solid fa-clock orange"></i>
+                        <span>Pending Flow</span>
+                        <strong>{{ number_format($orderStats['pending'] ?? 0) }}</strong>
+                        <small>{{ number_format($orderStats['unpaid'] ?? 0) }} unpaid</small>
+                    </article>
+                    <article>
+                        <i class="fa-solid fa-truck-fast cyan"></i>
+                        <span>Delivered</span>
+                        <strong>{{ number_format($orderStats['delivered'] ?? 0) }}</strong>
+                        <small>{{ number_format($orderStats['proofs'] ?? 0) }} proofs uploaded</small>
+                    </article>
+                </div>
+                <nav class="order-vx-narrow" aria-label="Narrow orders">
+                    @foreach ($orderNarrowLinks as $value => [$label, $count])
+                        <a class="{{ ($status ?? '') === $value ? 'active' : '' }}" href="{{ route('backend.page', array_filter(['page' => 'orders', 'status' => $value], fn ($item) => $item !== '' && $item !== null)) }}">
+                            <span>{{ $label }}</span>
+                            @if (! is_null($count))
+                                <b>{{ number_format($count) }}</b>
+                            @endif
+                        </a>
+                    @endforeach
+                </nav>
+            </section>
+        @endif
+
+        <article class="panel resource-panel resource-panel-polished resource-{{ $page }} {{ in_array($page, ['products', 'categories', 'reviews', 'orders'], true) ? 'crud-vx-list' : '' }} {{ $page === 'orders' ? 'order-vx-list' : '' }}">
             <div class="panel-head">
-                @if (in_array($page, ['products', 'categories', 'reviews', 'orders'], true))
+                @if (in_array($page, ['products', 'categories', 'reviews'], true))
                     <form class="vx-users-toolbar crud-vx-toolbar" method="GET" action="{{ route('backend.page', $page) }}">
                         <input type="hidden" name="status" value="{{ $status ?? '' }}">
                         @if ($page === 'products')
@@ -408,7 +461,7 @@
 
                             <footer class="vx-users-pagination">
                                 <span>Showing {{ $records->firstItem() ?? 0 }} to {{ $records->lastItem() ?? 0 }} of {{ $records->total() }} entries</span>
-                                {{ $records->links() }}
+                                {{ $records->links('backend.partials.vuexy-pagination') }}
                             </footer>
                         </section>
 
@@ -464,56 +517,6 @@
                         @endif
                     </div>
                 @elseif ($page === 'orders')
-                    @php
-                        $orderNarrowLinks = [
-                            '' => ['All orders', $orderStats['total'] ?? 0],
-                            'paid' => ['Paid', $orderStats['paid'] ?? 0],
-                            'unpaid' => ['Unpaid', $orderStats['unpaid'] ?? 0],
-                            'processing' => ['Processing', null],
-                            'delivered' => ['Delivered', $orderStats['delivered'] ?? 0],
-                            'cancelled' => ['Cancelled', null],
-                        ];
-                    @endphp
-
-                    <section class="order-vx-insights">
-                        <div class="order-vx-stats">
-                            <article>
-                                <i class="fa-solid fa-cart-shopping purple"></i>
-                                <span>Total Orders</span>
-                                <strong>{{ number_format($orderStats['total'] ?? 0) }}</strong>
-                                <small>£{{ number_format((float) ($orderStats['revenue'] ?? 0), 2) }} total value</small>
-                            </article>
-                            <article>
-                                <i class="fa-solid fa-wallet green"></i>
-                                <span>Paid Revenue</span>
-                                <strong>£{{ number_format((float) ($orderStats['paidRevenue'] ?? 0), 2) }}</strong>
-                                <small>{{ number_format($orderStats['paid'] ?? 0) }} paid orders</small>
-                            </article>
-                            <article>
-                                <i class="fa-solid fa-clock orange"></i>
-                                <span>Pending Flow</span>
-                                <strong>{{ number_format($orderStats['pending'] ?? 0) }}</strong>
-                                <small>{{ number_format($orderStats['unpaid'] ?? 0) }} unpaid</small>
-                            </article>
-                            <article>
-                                <i class="fa-solid fa-truck-fast cyan"></i>
-                                <span>Delivered</span>
-                                <strong>{{ number_format($orderStats['delivered'] ?? 0) }}</strong>
-                                <small>{{ number_format($orderStats['proofs'] ?? 0) }} proofs uploaded</small>
-                            </article>
-                        </div>
-                        <nav class="order-vx-narrow" aria-label="Narrow orders">
-                            @foreach ($orderNarrowLinks as $value => [$label, $count])
-                                <a class="{{ ($status ?? '') === $value ? 'active' : '' }}" href="{{ route('backend.page', array_filter(['page' => 'orders', 'status' => $value], fn ($item) => $item !== '' && $item !== null)) }}">
-                                    <span>{{ $label }}</span>
-                                    @if (! is_null($count))
-                                        <b>{{ number_format($count) }}</b>
-                                    @endif
-                                </a>
-                            @endforeach
-                        </nav>
-                    </section>
-
                     <table>
                         <thead>
                             <tr><th><input type="checkbox" aria-label="Select all orders"></th><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Actions</th></tr>
@@ -541,7 +544,25 @@
                                     </td>
                                     <td>
                                         <div class="vx-row-actions order-row-actions">
-                                            <a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a>
+                                            <button type="button" data-resource-view-toggle="order-detail-{{ $order->id }}" title="View"><i class="fa-regular fa-eye"></i></button>
+                                            <button type="button"
+                                                data-order-modal-open
+                                                data-action="{{ route('backend.orders.update', $order) }}"
+                                                data-customer-name="{{ $order->customer_name }}"
+                                                data-email="{{ $order->email }}"
+                                                data-phone="{{ $order->phone }}"
+                                                data-zip="{{ $order->zip }}"
+                                                data-address="{{ $order->address }}"
+                                                data-address-2="{{ $order->address_2 }}"
+                                                data-city="{{ $order->city }}"
+                                                data-state="{{ $order->state }}"
+                                                data-status="{{ $order->status }}"
+                                                data-payment-status="{{ $order->payment_status ?? 'unpaid' }}"
+                                                data-tracking-status="{{ $order->tracking_status ?? 'placed' }}"
+                                                data-tracking-number="{{ $order->tracking_number }}"
+                                                data-tracking-note="{{ $order->tracking_note }}"
+                                                data-admin-note="{{ $order->admin_note }}"
+                                                title="Edit"><i class="fa-regular fa-pen-to-square"></i></button>
                                             @include('backend.partials.payment-proof-button', ['order' => $order])
                                         </div>
                                     </td>
@@ -685,11 +706,11 @@
             @if (in_array($page, ['products', 'categories', 'reviews', 'orders'], true))
                 <footer class="vx-users-pagination crud-vx-pagination">
                     <span>Showing {{ $records->firstItem() ?? 0 }} to {{ $records->lastItem() ?? 0 }} of {{ $records->total() }} entries</span>
-                    {{ $records->links() }}
+                    {{ $records->links('backend.partials.vuexy-pagination') }}
                 </footer>
             @else
                 <div class="pagination-row">
-                    {{ $records->links() }}
+                    {{ $records->links('backend.partials.vuexy-pagination') }}
                 </div>
             @endif
 
@@ -839,6 +860,93 @@
                             <div class="vx-user-modal-actions">
                                 <button type="button" data-resource-modal-close>Cancel</button>
                                 <button type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-resource-submit-label>Save</span></button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            @endif
+
+            @if ($page === 'orders')
+                <div class="admin-modal user-editor-modal resource-editor-modal" data-order-editor-modal aria-hidden="true">
+                    <div class="admin-modal-backdrop" data-order-modal-close></div>
+                    <section class="admin-modal-dialog vx-user-modal-dialog vx-resource-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="orderModalTitle">
+                        <button class="admin-modal-close" type="button" data-order-modal-close aria-label="Close order modal"><i class="fa-solid fa-xmark"></i></button>
+                        <div class="admin-modal-head">
+                            <span><i class="fa-solid fa-truck-fast"></i></span>
+                            <div>
+                                <h2 id="orderModalTitle">Edit Order</h2>
+                                <p>Update customer, payment and tracking details without leaving this list.</p>
+                            </div>
+                        </div>
+                        <form class="vx-user-modal-form" data-order-modal-form method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <div class="vx-user-modal-grid">
+                                <label>Customer Name
+                                    <input name="customer_name" data-order-field="customerName">
+                                </label>
+                                <label>Email
+                                    <input type="email" name="email" data-order-field="email">
+                                </label>
+                                <label>Phone
+                                    <input name="phone" data-order-field="phone">
+                                </label>
+                                <label>Post Code
+                                    <input name="zip" data-order-field="zip">
+                                </label>
+                                <label class="wide">Address
+                                    <input name="address" data-order-field="address">
+                                </label>
+                                <label>Address 2
+                                    <input name="address_2" data-order-field="address2">
+                                </label>
+                                <label>City
+                                    <input name="city" data-order-field="city">
+                                </label>
+                                <label>County/State
+                                    <input name="state" data-order-field="state">
+                                </label>
+                                <label>Order Status
+                                    <select name="status" data-order-field="status" required>
+                                        <option value="pending">Pending</option>
+                                        <option value="processing">Processing</option>
+                                        <option value="shipped">Shipped</option>
+                                        <option value="delivered">Delivered</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </label>
+                                <label>Payment Status
+                                    <select name="payment_status" data-order-field="paymentStatus" required>
+                                        <option value="unpaid">Unpaid</option>
+                                        <option value="paid">Paid</option>
+                                        <option value="failed">Failed</option>
+                                        <option value="refunded">Refunded</option>
+                                    </select>
+                                </label>
+                                <label>Tracking Status
+                                    <select name="tracking_status" data-order-field="trackingStatus" required>
+                                        <option value="placed">Placed</option>
+                                        <option value="processing">Processing</option>
+                                        <option value="packed">Packed</option>
+                                        <option value="dispatched">Dispatched</option>
+                                        <option value="out_for_delivery">Out for delivery</option>
+                                        <option value="delivered">Delivered</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </label>
+                                <label>Royal Mail ID
+                                    <input name="tracking_number" data-order-field="trackingNumber">
+                                </label>
+                                <label class="wide">Customer Tracking Note
+                                    <textarea name="tracking_note" rows="3" data-order-field="trackingNote"></textarea>
+                                </label>
+                                <label class="wide">Admin Note
+                                    <textarea name="admin_note" rows="3" data-order-field="adminNote"></textarea>
+                                </label>
+                            </div>
+                            <div class="vx-user-modal-actions">
+                                <button type="button" data-order-modal-close>Cancel</button>
+                                <button type="submit"><i class="fa-solid fa-floppy-disk"></i><span>Update Order</span></button>
                             </div>
                         </form>
                     </section>

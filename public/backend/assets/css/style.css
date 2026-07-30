@@ -11370,17 +11370,23 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
 
 .user-editor-modal {
   z-index: 2600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 1.75rem;
 }
 
 .user-editor-modal .admin-modal-backdrop {
-  background: rgba(47, 43, 61, .68);
-  backdrop-filter: none;
+  background: rgba(47, 43, 61, .62);
+  backdrop-filter: blur(6px);
 }
 
 .user-editor-modal .vx-user-modal-dialog {
+  display: flex;
   width: min(568px, calc(100vw - 2rem));
-  max-height: calc(100dvh - 3.5rem);
+  max-height: min(760px, calc(100dvh - 3.5rem));
+  flex-direction: column;
+  overflow: hidden;
   color: #6d6b77;
   background: #fff !important;
   border: 0 !important;
@@ -11406,6 +11412,7 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
 }
 
 .user-editor-modal .admin-modal-head {
+  flex: 0 0 auto;
   display: block;
   padding: 1.5rem 3.75rem 1rem 1.5rem;
   background: #fff !important;
@@ -11435,7 +11442,9 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
 }
 
 .user-editor-modal .vx-user-modal-form {
+  min-height: 0;
   padding: 0 1.5rem 1.5rem;
+  overflow-y: auto;
 }
 
 .user-editor-modal .vx-user-modal-grid {
@@ -11454,8 +11463,11 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
 }
 
 .user-editor-modal .vx-user-modal-actions {
+  position: sticky;
+  bottom: 0;
   margin: 1.5rem 0 0;
-  padding: 0;
+  padding: 1rem 0 0;
+  background: #fff;
   border-top: 0;
 }
 
@@ -11470,13 +11482,15 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
   font-size: .9375rem;
 }
 
-.vx-users-pagination nav {
+.vx-users-pagination nav,
+.vx-pagination {
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 
-.vx-users-pagination .pagination {
+.vx-users-pagination .pagination,
+.vx-pagination ul {
   display: flex;
   gap: 6px;
   margin: 0;
@@ -11485,7 +11499,9 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
 }
 
 .vx-users-pagination .page-link,
-.vx-users-pagination .page-item span {
+.vx-users-pagination .page-item span,
+.vx-pagination a,
+.vx-pagination span {
   display: grid;
   min-width: 38px;
   height: 38px;
@@ -11498,16 +11514,23 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
 }
 
 .vx-users-pagination .page-item.active .page-link,
-.vx-users-pagination .page-item.active span {
+.vx-users-pagination .page-item.active span,
+.vx-pagination li.active span {
   color: #fff;
   background: #7367f0;
   box-shadow: none;
 }
 
 .vx-users-pagination .page-item.disabled .page-link,
-.vx-users-pagination .page-item.disabled span {
+.vx-users-pagination .page-item.disabled span,
+.vx-pagination li.disabled span {
   color: #c9c7ce;
   background: #f6f6f7;
+}
+
+.vx-pagination a:hover {
+  color: #7367f0;
+  background: rgba(115, 103, 240, .12);
 }
 
 .resource-panel .panel-head > button.vx-add-record {
@@ -11521,10 +11544,11 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
 
 .resource-editor-modal .vx-resource-modal-dialog {
   width: min(760px, calc(100vw - 2rem));
+  max-height: min(760px, calc(100dvh - 3.5rem));
 }
 
 .resource-editor-modal .vx-user-modal-form {
-  max-height: calc(100dvh - 180px);
+  max-height: none;
   overflow-y: auto;
 }
 
@@ -11757,6 +11781,17 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
   border-bottom: 1px solid #eeeeef;
 }
 
+.order-vx-insights-standalone {
+  margin-bottom: 18px;
+  padding: 18px 24px;
+  border: 0;
+  border-radius: 6px;
+}
+
+.order-vx-list > .panel-head {
+  display: none;
+}
+
 .order-vx-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -11856,6 +11891,21 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
   font-size: .75rem;
 }
 
+body > .admin-modal.user-editor-modal,
+body > .admin-modal.resource-editor-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 5000 !important;
+}
+
+body > .admin-modal.user-editor-modal .admin-modal-backdrop,
+body > .admin-modal.resource-editor-modal .admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(47, 43, 61, .56);
+  backdrop-filter: blur(7px);
+}
+
 .crud-vx-list > .crud-vx-pagination {
   display: flex;
   min-height: 70px;
@@ -11869,7 +11919,8 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
   box-shadow: none;
 }
 
-.crud-vx-list > .crud-vx-pagination .pagination {
+.crud-vx-list > .crud-vx-pagination .pagination,
+.crud-vx-list > .crud-vx-pagination .vx-pagination ul {
   display: flex;
   gap: 6px;
   margin: 0;
@@ -11878,7 +11929,9 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
 }
 
 .crud-vx-list > .crud-vx-pagination .page-link,
-.crud-vx-list > .crud-vx-pagination .page-item span {
+.crud-vx-list > .crud-vx-pagination .page-item span,
+.crud-vx-list > .crud-vx-pagination .vx-pagination a,
+.crud-vx-list > .crud-vx-pagination .vx-pagination span {
   display: grid;
   min-width: 38px;
   height: 38px;
@@ -11891,13 +11944,15 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
 }
 
 .crud-vx-list > .crud-vx-pagination .page-item.active .page-link,
-.crud-vx-list > .crud-vx-pagination .page-item.active span {
+.crud-vx-list > .crud-vx-pagination .page-item.active span,
+.crud-vx-list > .crud-vx-pagination .vx-pagination li.active span {
   color: #fff;
   background: #7367f0;
 }
 
 .crud-vx-list > .crud-vx-pagination .page-item.disabled .page-link,
-.crud-vx-list > .crud-vx-pagination .page-item.disabled span {
+.crud-vx-list > .crud-vx-pagination .page-item.disabled span,
+.crud-vx-list > .crud-vx-pagination .vx-pagination li.disabled span {
   color: #c9c7ce;
   background: #f6f6f7;
 }
