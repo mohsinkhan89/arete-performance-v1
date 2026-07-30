@@ -9,10 +9,13 @@
             <h1>Shop</h1>
             <p>Explore premium, science-backed supplements designed to help you perform, recover and grow.</p>
           </div>
-          <div class="shop-hero-features reveal-up delay-2">
-            <div><i class="fa-solid fa-truck-fast"></i><span>Fast &amp; Secure<br>Delivery</span></div>
-            <div><i class="fa-solid fa-globe"></i><span>Delivery All<br>Over UK</span></div>
-            <div><i class="fa-solid fa-sterling-sign"></i><span>Flat Delivery<br>&pound;4.99</span></div>
+          <div class="hero-feature-slider reveal-up delay-2" data-hero-feature-slider>
+            <div class="hero-features">
+              <div class="hero-feature-slide"><div class="hero-feature"><i class="fa-solid fa-truck-fast"></i><span>Fast &amp; Secure Delivery</span></div></div>
+              <div class="hero-feature-slide"><div class="hero-feature"><i class="fa-solid fa-globe"></i><span>Delivery All Over UK</span></div></div>
+              <div class="hero-feature-slide"><div class="hero-feature border-0"><i class="fa-solid fa-sterling-sign"></i><span>Flat Delivery &pound;4.99</span></div></div>
+            </div>
+            <div class="hero-feature-pagination" aria-label="Delivery benefits pagination"></div>
           </div>
         </div>
       </div>
