@@ -568,6 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     input.value = value || '';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
   };
   const closeResourceEditor = () => {
     resourceEditorModal?.classList.remove('is-open');

@@ -182,13 +182,9 @@
                         </select>
                         <div>
                             @if ($canManage && in_array($page, ['products', 'categories', 'reviews'], true))
-                                <button class="vx-add-record" type="button"
-                                    data-resource-modal-open
-                                    data-resource="{{ $page }}"
-                                    data-mode="create"
-                                    data-action="{{ route('backend.resource.store', ['resource' => $page]) }}">
+                                <a class="vx-add-record" href="{{ route('backend.resource.create', ['resource' => $page]) }}">
                                     <i class="fa-solid fa-plus"></i> Add New Record
-                                </button>
+                                </a>
                             @endif
                         </div>
                     </form>
@@ -201,13 +197,9 @@
                         @endif
                     </div>
                     @if ($canManage && in_array($page, ['products', 'categories', 'reviews'], true))
-                        <button class="vx-add-record" type="button"
-                            data-resource-modal-open
-                            data-resource="{{ $page }}"
-                            data-mode="create"
-                            data-action="{{ route('backend.resource.store', ['resource' => $page]) }}">
+                        <a class="vx-add-record" href="{{ route('backend.resource.create', ['resource' => $page]) }}">
                             <i class="fa-solid fa-plus"></i> Add New
-                        </button>
+                        </a>
                     @endif
                 @endif
             </div>
@@ -267,25 +259,7 @@
                                             <button type="button"
                                                 data-resource-view-toggle="product-detail-{{ $product->id }}"
                                                 title="View"><i class="fa-regular fa-eye"></i></button>
-                                            <button type="button"
-                                                data-resource-modal-open
-                                                data-resource="products"
-                                                data-mode="edit"
-                                                data-action="{{ route('backend.resource.update', ['resource' => 'products', 'id' => $product->id]) }}"
-                                                data-name="{{ $product->name }}"
-                                                data-sku="{{ $product->sku }}"
-                                                data-slug="{{ $product->slug }}"
-                                                data-category-id="{{ $product->category_id }}"
-                                                data-short-description="{{ $product->short_description }}"
-                                                data-description="{{ $product->description }}"
-                                                data-price="{{ $product->price }}"
-                                                data-sale-price="{{ $product->sale_price }}"
-                                                data-stock="{{ $product->stock }}"
-                                                data-reviews-count="{{ $product->reviews_count }}"
-                                                data-status="{{ $product->status }}"
-                                                data-is-featured="{{ $product->is_featured ? '1' : '0' }}"
-                                                data-is-bestseller="{{ $product->is_bestseller ? '1' : '0' }}"
-                                                title="Edit"><i class="fa-regular fa-pen-to-square"></i></button>
+                                            <a href="{{ route('backend.resource.edit', ['resource' => 'products', 'id' => $product->id]) }}" title="Edit"><i class="fa-regular fa-pen-to-square"></i></a>
                                             <form action="{{ route('backend.resource.destroy', ['resource' => 'products', 'id' => $product->id]) }}" method="POST" onsubmit="return confirm('Delete this product?')">
                                                 @csrf
                                                 @method('DELETE')
@@ -337,18 +311,7 @@
                                     <td>
                                         <div class="vx-row-actions">
                                             <button type="button" data-resource-view-toggle="category-detail-{{ $category->id }}" title="View"><i class="fa-regular fa-eye"></i></button>
-                                            <button type="button"
-                                                data-resource-modal-open
-                                                data-resource="categories"
-                                                data-mode="edit"
-                                                data-action="{{ route('backend.resource.update', ['resource' => 'categories', 'id' => $category->id]) }}"
-                                                data-name="{{ $category->name }}"
-                                                data-slug="{{ $category->slug }}"
-                                                data-sort-order="{{ $category->sort_order }}"
-                                                data-status="{{ $category->status }}"
-                                                data-image="{{ $category->image }}"
-                                                data-description="{{ $category->description }}"
-                                                title="Edit"><i class="fa-regular fa-pen-to-square"></i></button>
+                                            <a href="{{ route('backend.resource.edit', ['resource' => 'categories', 'id' => $category->id]) }}" title="Edit"><i class="fa-regular fa-pen-to-square"></i></a>
                                             <form action="{{ route('backend.resource.destroy', ['resource' => 'categories', 'id' => $category->id]) }}" method="POST" onsubmit="return confirm('Delete this category?')">
                                                 @csrf
                                                 @method('DELETE')
@@ -700,20 +663,7 @@
                                     <td>
                                         <div class="vx-row-actions">
                                             <button type="button" data-resource-view-toggle="review-detail-{{ $review->id }}" title="View"><i class="fa-regular fa-eye"></i></button>
-                                            <button type="button"
-                                                data-resource-modal-open
-                                                data-resource="reviews"
-                                                data-mode="edit"
-                                                data-action="{{ route('backend.resource.update', ['resource' => 'reviews', 'id' => $review->id]) }}"
-                                                data-customer-name="{{ $review->customer_name }}"
-                                                data-customer-title="{{ $review->customer_title }}"
-                                                data-product-id="{{ $review->product_id }}"
-                                                data-rating="{{ $review->rating }}"
-                                                data-avatar="{{ $review->avatar }}"
-                                                data-comment="{{ $review->comment }}"
-                                                data-status="{{ $review->status }}"
-                                                data-is-featured="{{ $review->is_featured ? '1' : '0' }}"
-                                                title="Edit"><i class="fa-regular fa-pen-to-square"></i></button>
+                                            <a href="{{ route('backend.resource.edit', ['resource' => 'reviews', 'id' => $review->id]) }}" title="Edit"><i class="fa-regular fa-pen-to-square"></i></a>
                                             <form action="{{ route('backend.resource.destroy', ['resource' => 'reviews', 'id' => $review->id]) }}" method="POST" onsubmit="return confirm('Delete this review?')">
                                                 @csrf
                                                 @method('DELETE')
@@ -822,7 +772,7 @@
                                         <input name="short_description" data-resource-field="shortDescription">
                                     </label>
                                     <label class="wide">Description
-                                        <textarea name="description" rows="4" data-resource-field="description"></textarea>
+                                        <textarea name="description" rows="4" data-resource-field="description" data-rich-text></textarea>
                                     </label>
                                 </div>
                             @elseif ($page === 'categories')
@@ -849,7 +799,7 @@
                                         <input name="image" data-resource-field="image">
                                     </label>
                                     <label class="wide">Description
-                                        <textarea name="description" rows="4" data-resource-field="description"></textarea>
+                                        <textarea name="description" rows="4" data-resource-field="description" data-rich-text></textarea>
                                     </label>
                                 </div>
                             @else
@@ -889,7 +839,7 @@
                                         <span>Featured review</span>
                                     </label>
                                     <label class="wide">Review
-                                        <textarea name="comment" rows="5" data-resource-field="comment" required></textarea>
+                                        <textarea name="comment" rows="5" data-resource-field="comment" data-rich-text required></textarea>
                                     </label>
                                 </div>
                             @endif

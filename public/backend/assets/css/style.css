@@ -11726,13 +11726,99 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
 }
 
 .resource-editor-modal .vx-resource-modal-dialog {
-  width: min(760px, calc(100vw - 2rem));
-  max-height: min(760px, calc(100dvh - 3.5rem));
+  width: min(1440px, calc(100vw - 64px));
+  max-height: min(820px, calc(100dvh - 32px));
+  background: #f8f7fa !important;
 }
 
 .resource-editor-modal .vx-user-modal-form {
   max-height: none;
   overflow-y: auto;
+}
+
+.resource-editor-modal .admin-modal-head {
+  min-height: 62px;
+  margin: 14px 18px 8px;
+  padding: 0 3.5rem 0 1.25rem;
+  background: #fff !important;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: 0 .125rem .375rem rgba(47, 43, 61, .12);
+}
+
+.resource-editor-modal .admin-modal-head h2 {
+  text-align: left;
+}
+
+.resource-editor-modal .admin-modal-head p {
+  margin-left: 0;
+  text-align: left;
+}
+
+.resource-editor-modal .admin-modal-close {
+  top: 1.75rem;
+  right: 2rem;
+}
+
+.resource-editor-modal .vx-user-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.6rem 1.75rem;
+  padding-top: 12px;
+}
+
+.resource-editor-modal .vx-user-modal-grid label.wide {
+  grid-column: 1 / -1;
+}
+
+.resource-editor-modal .vx-user-modal-grid label {
+  gap: 7px;
+  color: #6d6b77;
+  letter-spacing: .01em;
+}
+
+.resource-editor-modal .vx-user-modal-grid input:not([type="checkbox"]),
+.resource-editor-modal .vx-user-modal-grid select,
+.resource-editor-modal .vx-user-modal-grid textarea {
+  min-height: 40px;
+  color: #6d6b77;
+  background: #fff;
+  border: 1px solid #d8d6de;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+.resource-editor-modal .vx-user-modal-grid input::placeholder,
+.resource-editor-modal .vx-user-modal-grid textarea::placeholder {
+  color: #b9b6c3;
+}
+
+.resource-editor-modal .rich-editor {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #d8d6de;
+  border-radius: 6px;
+}
+
+.resource-editor-modal .rich-toolbar {
+  background: #fff;
+  border-bottom: 1px solid #d8d6de;
+}
+
+.resource-editor-modal .rich-editor-box {
+  min-height: 92px;
+  background: #fff;
+  border: 0;
+  box-shadow: none;
+}
+
+.resource-editor-modal .vx-user-modal-actions {
+  position: sticky;
+  bottom: 0;
+  margin: 1.75rem -1.5rem -1.5rem;
+  background: rgba(248, 247, 250, .96);
+  backdrop-filter: blur(10px);
 }
 
 .resource-editor-modal textarea {
@@ -11757,6 +11843,37 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
 .resource-editor-modal .switch-row span {
   color: #6d6b77;
   font-size: .9375rem;
+}
+
+@media (max-width: 1199.98px) {
+  .resource-editor-modal .vx-resource-modal-dialog {
+    width: min(960px, calc(100vw - 32px));
+  }
+
+  .resource-editor-modal .vx-user-modal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767.98px) {
+  .resource-editor-modal {
+    padding: .75rem;
+  }
+
+  .resource-editor-modal .vx-resource-modal-dialog {
+    width: calc(100vw - 1.5rem);
+    max-height: calc(100dvh - 1.5rem);
+  }
+
+  .resource-editor-modal .admin-modal-head {
+    margin: .75rem .75rem .25rem;
+    padding: 1rem 3rem 1rem 1rem;
+  }
+
+  .resource-editor-modal .vx-user-modal-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 /* Apply the Users-tab Vuexy list shell to CRUD modules */
