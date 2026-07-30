@@ -3,14 +3,14 @@
 @section('title', $pageTitle)
 
 @section('body')
-    @if ($page !== 'users')
+    @if (! in_array($page, ['users', 'products', 'categories', 'reviews'], true))
         <div class="page-heading">
             <h1>{{ $pageTitle }}</h1>
             <p>Manage {{ strtolower($pageTitle) }} from your Arete Performance admin panel.</p>
         </div>
     @endif
 
-    @if (in_array($page, ['products', 'categories', 'reviews', 'orders', 'stock-notifications'], true))
+    @if (in_array($page, ['orders', 'stock-notifications'], true))
         @php
             $moduleStatuses = match ($page) {
                 'orders' => ['paid' => 'Paid', 'unpaid' => 'Unpaid', 'processing' => 'Processing', 'dispatched' => 'Dispatched', 'delivered' => 'Delivered', 'cancelled' => 'Cancelled'],
@@ -113,17 +113,74 @@
         @php
             $canManage = $page !== 'users' || $canManageUsers;
         @endphp
-        <article class="panel resource-panel resource-panel-polished resource-{{ $page }} {{ $page === 'orders' ? 'compact-orders-resource' : '' }}">
+        <article class="panel resource-panel resource-panel-polished resource-{{ $page }} {{ in_array($page, ['products', 'categories', 'reviews'], true) ? 'crud-vx-list' : '' }} {{ $page === 'orders' ? 'compact-orders-resource' : '' }}">
             <div class="panel-head">
-                <div>
-                    <span class="eyebrow">{{ $records->total() ?? 0 }} records</span>
-                    <h2>{{ $pageTitle }} Table</h2>
-                    @if (! empty($search))
-                        <small>Filtered by "{{ $search }}"</small>
+                @if (in_array($page, ['products', 'categories', 'reviews'], true))
+                    <form class="vx-users-filters crud-vx-filters" method="GET" action="{{ route('backend.page', $page) }}">
+                        <h2>Filters</h2>
+                        <div>
+                            <select name="status" aria-label="Select status" onchange="this.form.submit()">
+                                <option value="">Select Status</option>
+                                <option value="active" @selected($status === 'active')>Active</option>
+                                <option value="inactive" @selected($status === 'inactive')>Inactive</option>
+                            </select>
+                            @if ($page === 'products')
+                                <select name="category" aria-label="Select category" onchange="this.form.submit()">
+                                    <option value="">Select Category</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}" @selected(request('category') == $category->id)>{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            @else
+                                <select aria-label="Select type" disabled>
+                                    <option>{{ $page === 'categories' ? 'All Categories' : 'All Reviews' }}</option>
+                                </select>
+                            @endif
+                            <select aria-label="Select visibility" disabled>
+                                <option>{{ $page === 'products' ? 'All Products' : 'All Records' }}</option>
+                            </select>
+                        </div>
+                    </form>
+
+                    <form class="vx-users-toolbar crud-vx-toolbar" method="GET" action="{{ route('backend.page', $page) }}">
+                        <input type="hidden" name="status" value="{{ $status ?? '' }}">
+                        @if ($page === 'products')
+                            <input type="hidden" name="category" value="{{ $categoryFilter ?? '' }}">
+                        @endif
+                        <select name="per_page" aria-label="Rows per page">
+                            <option>10</option>
+                        </select>
+                        <div>
+                            <input type="search" name="q" value="{{ $search }}" placeholder="Search {{ Str::headline(Str::singular($page)) }}">
+                            <button class="vx-export-btn" type="button"><i class="fa-solid fa-arrow-up-from-bracket"></i> Export <i class="fa-solid fa-chevron-down"></i></button>
+                            @if ($canManage)
+                                <button class="vx-add-record" type="button"
+                                    data-resource-modal-open
+                                    data-resource="{{ $page }}"
+                                    data-mode="create"
+                                    data-action="{{ route('backend.resource.store', ['resource' => $page]) }}">
+                                    <i class="fa-solid fa-plus"></i> Add New Record
+                                </button>
+                            @endif
+                        </div>
+                    </form>
+                @else
+                    <div>
+                        <span class="eyebrow">{{ $records->total() ?? 0 }} records</span>
+                        <h2>{{ $pageTitle }} Table</h2>
+                        @if (! empty($search))
+                            <small>Filtered by "{{ $search }}"</small>
+                        @endif
+                    </div>
+                    @if ($canManage && in_array($page, ['products', 'categories', 'reviews'], true))
+                        <button class="vx-add-record" type="button"
+                            data-resource-modal-open
+                            data-resource="{{ $page }}"
+                            data-mode="create"
+                            data-action="{{ route('backend.resource.store', ['resource' => $page]) }}">
+                            <i class="fa-solid fa-plus"></i> Add New
+                        </button>
                     @endif
-                </div>
-                @if ($canManage && in_array($page, ['products', 'categories', 'users', 'reviews'], true))
-                    <a href="{{ route('backend.resource.create', ['resource' => $page]) }}"><i class="fa-solid fa-plus"></i> Add New</a>
                 @endif
             </div>
 
@@ -177,21 +234,44 @@
                                         </form>
                                     </td>
                                     <td>
-                                        <div class="action-group">
+                                        <div class="vx-row-actions">
                                             <button type="button"
-                                                data-resource-preview
-                                                data-preview-title="{{ $product->name }}"
-                                                data-preview-image="{{ url($product->image ?: 'backend/assets/imgs/product-bottle.png') }}"
-                                                data-preview-subtitle="{{ $product->category?->name ?? 'Uncategorised' }}"
-                                                data-preview-meta="{{ $product->sku }}|£{{ number_format((float) $product->price, 2) }}|{{ ucfirst($product->status) }}|{{ number_format($product->stock) }} stock"
-                                                data-preview-edit="{{ route('backend.resource.edit', ['resource' => 'products', 'id' => $product->id]) }}"
+                                                data-resource-view-toggle="product-detail-{{ $product->id }}"
                                                 title="View"><i class="fa-regular fa-eye"></i></button>
-                                            <a href="{{ route('backend.resource.edit', ['resource' => 'products', 'id' => $product->id]) }}" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                                            <button type="button"
+                                                data-resource-modal-open
+                                                data-resource="products"
+                                                data-mode="edit"
+                                                data-action="{{ route('backend.resource.update', ['resource' => 'products', 'id' => $product->id]) }}"
+                                                data-name="{{ $product->name }}"
+                                                data-sku="{{ $product->sku }}"
+                                                data-slug="{{ $product->slug }}"
+                                                data-category-id="{{ $product->category_id }}"
+                                                data-short-description="{{ $product->short_description }}"
+                                                data-description="{{ $product->description }}"
+                                                data-price="{{ $product->price }}"
+                                                data-sale-price="{{ $product->sale_price }}"
+                                                data-stock="{{ $product->stock }}"
+                                                data-reviews-count="{{ $product->reviews_count }}"
+                                                data-status="{{ $product->status }}"
+                                                data-is-featured="{{ $product->is_featured ? '1' : '0' }}"
+                                                data-is-bestseller="{{ $product->is_bestseller ? '1' : '0' }}"
+                                                title="Edit"><i class="fa-regular fa-pen-to-square"></i></button>
                                             <form action="{{ route('backend.resource.destroy', ['resource' => 'products', 'id' => $product->id]) }}" method="POST" onsubmit="return confirm('Delete this product?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                                <button type="submit" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
                                             </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr id="product-detail-{{ $product->id }}" class="vx-user-detail-row" hidden>
+                                    <td colspan="9">
+                                        <div class="vx-user-detail-card">
+                                            <span><b>SKU</b>{{ $product->sku }}</span>
+                                            <span><b>Category</b>{{ $product->category?->name ?? '-' }}</span>
+                                            <span><b>Price</b>£{{ number_format((float) $product->price, 2) }}</span>
+                                            <span><b>Status</b>{{ Str::headline($product->status) }}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -225,13 +305,35 @@
                                     </td>
                                     <td>{{ $category->created_at?->format('M d, Y') }}</td>
                                     <td>
-                                        <div class="action-group">
-                                            <a href="{{ route('backend.resource.edit', ['resource' => 'categories', 'id' => $category->id]) }}" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                                        <div class="vx-row-actions">
+                                            <button type="button" data-resource-view-toggle="category-detail-{{ $category->id }}" title="View"><i class="fa-regular fa-eye"></i></button>
+                                            <button type="button"
+                                                data-resource-modal-open
+                                                data-resource="categories"
+                                                data-mode="edit"
+                                                data-action="{{ route('backend.resource.update', ['resource' => 'categories', 'id' => $category->id]) }}"
+                                                data-name="{{ $category->name }}"
+                                                data-slug="{{ $category->slug }}"
+                                                data-sort-order="{{ $category->sort_order }}"
+                                                data-status="{{ $category->status }}"
+                                                data-image="{{ $category->image }}"
+                                                data-description="{{ $category->description }}"
+                                                title="Edit"><i class="fa-regular fa-pen-to-square"></i></button>
                                             <form action="{{ route('backend.resource.destroy', ['resource' => 'categories', 'id' => $category->id]) }}" method="POST" onsubmit="return confirm('Delete this category?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                                <button type="submit" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
                                             </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr id="category-detail-{{ $category->id }}" class="vx-user-detail-row" hidden>
+                                    <td colspan="8">
+                                        <div class="vx-user-detail-card">
+                                            <span><b>Slug</b>{{ $category->slug }}</span>
+                                            <span><b>Products</b>{{ number_format($category->products_count) }}</span>
+                                            <span><b>Sort</b>{{ $category->sort_order }}</span>
+                                            <span><b>Status</b>{{ Str::headline($category->status) }}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -582,13 +684,37 @@
                                     </td>
                                     <td>{{ $review->created_at?->format('M d, Y') }}</td>
                                     <td>
-                                        <div class="action-group">
-                                            <a href="{{ route('backend.resource.edit', ['resource' => 'reviews', 'id' => $review->id]) }}" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                                        <div class="vx-row-actions">
+                                            <button type="button" data-resource-view-toggle="review-detail-{{ $review->id }}" title="View"><i class="fa-regular fa-eye"></i></button>
+                                            <button type="button"
+                                                data-resource-modal-open
+                                                data-resource="reviews"
+                                                data-mode="edit"
+                                                data-action="{{ route('backend.resource.update', ['resource' => 'reviews', 'id' => $review->id]) }}"
+                                                data-customer-name="{{ $review->customer_name }}"
+                                                data-customer-title="{{ $review->customer_title }}"
+                                                data-product-id="{{ $review->product_id }}"
+                                                data-rating="{{ $review->rating }}"
+                                                data-avatar="{{ $review->avatar }}"
+                                                data-comment="{{ $review->comment }}"
+                                                data-status="{{ $review->status }}"
+                                                data-is-featured="{{ $review->is_featured ? '1' : '0' }}"
+                                                title="Edit"><i class="fa-regular fa-pen-to-square"></i></button>
                                             <form action="{{ route('backend.resource.destroy', ['resource' => 'reviews', 'id' => $review->id]) }}" method="POST" onsubmit="return confirm('Delete this review?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                                <button type="submit" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
                                             </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr id="review-detail-{{ $review->id }}" class="vx-user-detail-row" hidden>
+                                    <td colspan="7">
+                                        <div class="vx-user-detail-card">
+                                            <span><b>Customer</b>{{ $review->customer_name }}</span>
+                                            <span><b>Product</b>{{ $review->product?->name ?? '-' }}</span>
+                                            <span><b>Rating</b>{{ $review->rating }} star</span>
+                                            <span><b>Status</b>{{ Str::headline($review->status) }}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -600,9 +726,168 @@
                 @endif
             </div>
 
-            <div class="pagination-row">
-                {{ $records->links() }}
-            </div>
+            @if (in_array($page, ['products', 'categories', 'reviews'], true))
+                <footer class="vx-users-pagination crud-vx-pagination">
+                    <span>Showing {{ $records->firstItem() ?? 0 }} to {{ $records->lastItem() ?? 0 }} of {{ $records->total() }} entries</span>
+                    {{ $records->links() }}
+                </footer>
+            @else
+                <div class="pagination-row">
+                    {{ $records->links() }}
+                </div>
+            @endif
+
+            @if ($canManage && in_array($page, ['products', 'categories', 'reviews'], true))
+                <div class="admin-modal user-editor-modal resource-editor-modal" data-resource-editor-modal aria-hidden="true">
+                    <div class="admin-modal-backdrop" data-resource-modal-close></div>
+                    <section class="admin-modal-dialog vx-user-modal-dialog vx-resource-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="resourceModalTitle">
+                        <button class="admin-modal-close" type="button" data-resource-modal-close aria-label="Close modal"><i class="fa-solid fa-xmark"></i></button>
+                        <div class="admin-modal-head">
+                            <span><i class="fa-solid fa-pen-to-square"></i></span>
+                            <div>
+                                <h2 id="resourceModalTitle">Add {{ Str::headline(Str::singular($page)) }}</h2>
+                                <p>Manage {{ strtolower($pageTitle) }} without leaving this list.</p>
+                            </div>
+                        </div>
+                        <form class="vx-user-modal-form" data-resource-modal-form method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="_method" value="" data-resource-modal-method disabled>
+
+                            @if ($page === 'products')
+                                <div class="vx-user-modal-grid">
+                                    <label class="wide">Product Name
+                                        <input name="name" data-resource-field="name" required>
+                                    </label>
+                                    <label>SKU
+                                        <input name="sku" data-resource-field="sku" required>
+                                    </label>
+                                    <label>Slug
+                                        <input name="slug" data-resource-field="slug" placeholder="Auto generated if empty">
+                                    </label>
+                                    <label>Category
+                                        <select name="category_id" data-resource-field="categoryId">
+                                            <option value="">No category</option>
+                                            @foreach ($categories as $category)
+                                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </label>
+                                    <label>Price
+                                        <input type="number" step="0.01" min="0" name="price" data-resource-field="price" required>
+                                    </label>
+                                    <label>Sale Price
+                                        <input type="number" step="0.01" min="0" name="sale_price" data-resource-field="salePrice">
+                                    </label>
+                                    <label>Stock
+                                        <select name="stock" data-resource-field="stock" required>
+                                            <option value="1">Active</option>
+                                            <option value="0">Inactive</option>
+                                        </select>
+                                    </label>
+                                    <label>Reviews
+                                        <input type="number" min="0" name="reviews_count" data-resource-field="reviewsCount" required>
+                                    </label>
+                                    <label>Status
+                                        <select name="status" data-resource-field="status" required>
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </select>
+                                    </label>
+                                    <label>Product Image
+                                        <input type="file" name="image_file" accept="image/png,image/jpeg,image/webp">
+                                    </label>
+                                    <label class="switch-row">
+                                        <input type="checkbox" name="is_featured" value="1" data-resource-field="isFeatured">
+                                        <span>Featured product</span>
+                                    </label>
+                                    <label class="switch-row">
+                                        <input type="checkbox" name="is_bestseller" value="1" data-resource-field="isBestseller">
+                                        <span>Bestseller product</span>
+                                    </label>
+                                    <label class="wide">Short Description
+                                        <input name="short_description" data-resource-field="shortDescription">
+                                    </label>
+                                    <label class="wide">Description
+                                        <textarea name="description" rows="4" data-resource-field="description"></textarea>
+                                    </label>
+                                </div>
+                            @elseif ($page === 'categories')
+                                <div class="vx-user-modal-grid">
+                                    <label class="wide">Name
+                                        <input name="name" data-resource-field="name" required>
+                                    </label>
+                                    <label>Slug
+                                        <input name="slug" data-resource-field="slug" placeholder="Auto generated if empty">
+                                    </label>
+                                    <label>Sort Order
+                                        <input type="number" min="0" name="sort_order" data-resource-field="sortOrder" required>
+                                    </label>
+                                    <label>Status
+                                        <select name="status" data-resource-field="status" required>
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </select>
+                                    </label>
+                                    <label>Upload Image
+                                        <input type="file" name="image_file" accept="image/png,image/jpeg,image/webp">
+                                    </label>
+                                    <label>Image Path
+                                        <input name="image" data-resource-field="image">
+                                    </label>
+                                    <label class="wide">Description
+                                        <textarea name="description" rows="4" data-resource-field="description"></textarea>
+                                    </label>
+                                </div>
+                            @else
+                                <div class="vx-user-modal-grid">
+                                    <label class="wide">Customer Name
+                                        <input name="customer_name" data-resource-field="customerName" required>
+                                    </label>
+                                    <label>Rating
+                                        <select name="rating" data-resource-field="rating" required>
+                                            @for ($rating = 5; $rating >= 1; $rating--)
+                                                <option value="{{ $rating }}">{{ $rating }} Star{{ $rating > 1 ? 's' : '' }}</option>
+                                            @endfor
+                                        </select>
+                                    </label>
+                                    <label>Status
+                                        <select name="status" data-resource-field="status" required>
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </select>
+                                    </label>
+                                    <label class="wide">Customer Title
+                                        <input name="customer_title" data-resource-field="customerTitle">
+                                    </label>
+                                    <label class="wide">Product
+                                        <select name="product_id" data-resource-field="productId">
+                                            <option value="">No product</option>
+                                            @foreach ($products as $product)
+                                                <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </label>
+                                    <label class="wide">Avatar Path
+                                        <input name="avatar" data-resource-field="avatar">
+                                    </label>
+                                    <label class="switch-row wide">
+                                        <input type="checkbox" name="is_featured" value="1" data-resource-field="isFeatured">
+                                        <span>Featured review</span>
+                                    </label>
+                                    <label class="wide">Review
+                                        <textarea name="comment" rows="5" data-resource-field="comment" required></textarea>
+                                    </label>
+                                </div>
+                            @endif
+
+                            <div class="vx-user-modal-actions">
+                                <button type="button" data-resource-modal-close>Cancel</button>
+                                <button type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-resource-submit-label>Save</span></button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            @endif
         </article>
     @endif
 @endsection

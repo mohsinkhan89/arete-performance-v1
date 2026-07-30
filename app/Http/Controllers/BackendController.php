@@ -175,12 +175,14 @@ class BackendController extends Controller
         $search = trim((string) $request->query('q', ''));
         $status = trim((string) $request->query('status', ''));
         $role = trim((string) $request->query('role', ''));
+        $category = (int) $request->query('category', 0);
         $records = match ($page) {
             'products' => Product::with('category')
                 ->when($search, fn ($query) => $query->where(fn ($query) => $query
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('sku', 'like', "%{$search}%")
                     ->orWhereHas('category', fn ($query) => $query->where('name', 'like', "%{$search}%"))))
+                ->when($category, fn ($query) => $query->where('category_id', $category))
                 ->when($status, fn ($query) => $query->where('status', $status))
                 ->latest()
                 ->paginate(10)
@@ -273,9 +275,12 @@ class BackendController extends Controller
             'search' => $search,
             'status' => $status,
             'role' => $role,
+            'categoryFilter' => $category,
             'canManageUsers' => $this->isSuperAdmin(),
             'reportStats' => $reportStats,
             'userStats' => $userStats,
+            'categories' => Category::where('status', 'active')->orderBy('name')->get(),
+            'products' => Product::orderBy('name')->get(),
         ]);
     }
 

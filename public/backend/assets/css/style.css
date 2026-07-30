@@ -11510,6 +11510,240 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
   background: #f6f6f7;
 }
 
+.resource-panel .panel-head > button.vx-add-record {
+  min-height: 38px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 6px;
+  font-size: .9375rem;
+  font-weight: 500;
+}
+
+.resource-editor-modal .vx-resource-modal-dialog {
+  width: min(760px, calc(100vw - 2rem));
+}
+
+.resource-editor-modal .vx-user-modal-form {
+  max-height: calc(100dvh - 180px);
+  overflow-y: auto;
+}
+
+.resource-editor-modal textarea {
+  min-height: 96px;
+  padding-top: 10px;
+  resize: vertical;
+}
+
+.resource-editor-modal .switch-row {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 10px;
+}
+
+.resource-editor-modal .switch-row input {
+  width: 18px;
+  min-height: 18px;
+  accent-color: #7367f0;
+}
+
+.resource-editor-modal .switch-row span {
+  color: #6d6b77;
+  font-size: .9375rem;
+}
+
+/* Apply the Users-tab Vuexy list shell to CRUD modules */
+.crud-vx-list {
+  padding: 0;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  overflow: visible;
+}
+
+.crud-vx-list > .panel-head {
+  display: block;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  background: #fff !important;
+  border: 0;
+  border-radius: 6px 6px 0 0;
+  box-shadow: none;
+}
+
+.crud-vx-list .crud-vx-filters {
+  margin: 0;
+  border-bottom: 1px solid #dbdade;
+}
+
+.crud-vx-list .crud-vx-toolbar {
+  margin: 0;
+}
+
+.crud-vx-list > .table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.crud-vx-list > .table-wrap table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+.crud-vx-list > .table-wrap th {
+  height: 48px;
+  padding: 0 18px;
+  color: #6d6b77;
+  background: #f6f6f7;
+  border-bottom: 1px solid #dbdade;
+  font-size: .8125rem;
+  font-weight: 600;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.crud-vx-list > .table-wrap td {
+  height: 62px;
+  padding: 10px 18px;
+  color: #6d6b77;
+  border-bottom: 1px solid #eeeeef;
+  font-size: .9375rem;
+  vertical-align: middle;
+}
+
+.crud-vx-list > .table-wrap tbody tr:hover {
+  background: rgba(47, 43, 61, .025);
+}
+
+.crud-vx-list .table-media {
+  gap: 14px;
+}
+
+.crud-vx-list .table-media img,
+.crud-vx-list .category-thumb {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  padding: 0;
+  object-fit: cover;
+  background: #f6f6f7;
+  border-radius: 50%;
+}
+
+.crud-vx-list .status-toggle {
+  display: inline-grid;
+  min-height: 26px;
+  place-items: center;
+  padding: 0 10px;
+  color: #28c76f;
+  background: rgba(40, 199, 111, .16);
+  border: 0;
+  border-radius: 4px;
+  box-shadow: none;
+  font-size: .8125rem;
+  font-weight: 500;
+}
+
+.crud-vx-list .status-toggle i {
+  display: none;
+}
+
+.crud-vx-list .status-toggle.is-inactive {
+  color: #a8aaae;
+  background: rgba(168, 170, 174, .16);
+}
+
+.crud-vx-list .status-toggle:hover {
+  color: #7367f0;
+  background: rgba(115, 103, 240, .12);
+  transform: none;
+}
+
+.crud-vx-list .vx-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.crud-vx-list .vx-row-actions form {
+  display: contents;
+}
+
+.crud-vx-list .vx-row-actions button,
+.crud-vx-list .vx-row-actions a {
+  display: inline-flex;
+  min-width: 24px;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #6d6b77;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.crud-vx-list .vx-row-actions button:hover,
+.crud-vx-list .vx-row-actions a:hover,
+.crud-vx-list .vx-row-actions button.is-active {
+  color: #7367f0;
+  background: transparent;
+}
+
+.crud-vx-list > .crud-vx-pagination {
+  display: flex;
+  min-height: 70px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0;
+  padding: 14px 24px;
+  background: #fff;
+  border-radius: 0 0 6px 6px;
+  box-shadow: none;
+}
+
+.crud-vx-list > .crud-vx-pagination .pagination {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.crud-vx-list > .crud-vx-pagination .page-link,
+.crud-vx-list > .crud-vx-pagination .page-item span {
+  display: grid;
+  min-width: 38px;
+  height: 38px;
+  place-items: center;
+  color: #6d6b77;
+  background: #f1f1f2;
+  border: 0;
+  border-radius: 6px;
+  font-size: .9375rem;
+}
+
+.crud-vx-list > .crud-vx-pagination .page-item.active .page-link,
+.crud-vx-list > .crud-vx-pagination .page-item.active span {
+  color: #fff;
+  background: #7367f0;
+}
+
+.crud-vx-list > .crud-vx-pagination .page-item.disabled .page-link,
+.crud-vx-list > .crud-vx-pagination .page-item.disabled span {
+  color: #c9c7ce;
+  background: #f6f6f7;
+}
+
 @media (max-width: 1199.98px) {
   .vx-user-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -553,10 +553,91 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  const resourceEditorModal = document.querySelector('[data-resource-editor-modal]');
+  const resourceEditorForm = resourceEditorModal?.querySelector('[data-resource-modal-form]');
+  const resourceEditorTitle = resourceEditorModal?.querySelector('#resourceModalTitle');
+  const resourceEditorMethod = resourceEditorModal?.querySelector('[data-resource-modal-method]');
+  const resourceSubmitLabel = resourceEditorModal?.querySelector('[data-resource-submit-label]');
+  const setResourceField = (field, value) => {
+    const input = resourceEditorModal?.querySelector(`[data-resource-field="${field}"]`);
+    if (!input) return;
+
+    if (input.type === 'checkbox') {
+      input.checked = value === '1' || value === 'true' || value === true;
+      return;
+    }
+
+    input.value = value || '';
+  };
+  const closeResourceEditor = () => {
+    resourceEditorModal?.classList.remove('is-open');
+    resourceEditorModal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  };
+
+  document.querySelectorAll('[data-resource-modal-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!resourceEditorModal || !resourceEditorForm) return;
+
+      const isEdit = button.dataset.mode === 'edit';
+      const resource = button.dataset.resource || 'resource';
+      const singular = resource.replace(/s$/, '').replace(/-/g, ' ');
+      resourceEditorForm.reset();
+      resourceEditorForm.action = button.dataset.action || '';
+      if (resourceEditorTitle) resourceEditorTitle.textContent = `${isEdit ? 'Edit' : 'Add'} ${singular.charAt(0).toUpperCase()}${singular.slice(1)}`;
+      if (resourceSubmitLabel) resourceSubmitLabel.textContent = `${isEdit ? 'Update' : 'Save'} ${singular.charAt(0).toUpperCase()}${singular.slice(1)}`;
+
+      if (resourceEditorMethod) {
+        resourceEditorMethod.disabled = !isEdit;
+        resourceEditorMethod.value = isEdit ? 'PUT' : '';
+      }
+
+      [
+        'name', 'sku', 'slug', 'categoryId', 'shortDescription', 'description', 'price', 'salePrice',
+        'stock', 'reviewsCount', 'status', 'isFeatured', 'isBestseller', 'sortOrder', 'image',
+        'customerName', 'customerTitle', 'productId', 'rating', 'avatar', 'comment',
+      ].forEach((field) => setResourceField(field, isEdit ? button.dataset[field] : ''));
+
+      if (!isEdit) {
+        setResourceField('stock', '1');
+        setResourceField('reviewsCount', '0');
+        setResourceField('sortOrder', '0');
+        setResourceField('rating', '5');
+        setResourceField('status', 'active');
+      }
+
+      resourceEditorModal.classList.add('is-open');
+      resourceEditorModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      window.setTimeout(() => resourceEditorModal.querySelector('input, select, textarea')?.focus(), 60);
+    });
+  });
+  resourceEditorModal?.querySelectorAll('[data-resource-modal-close]').forEach((button) => {
+    button.addEventListener('click', closeResourceEditor);
+  });
+
+  document.querySelectorAll('[data-resource-view-toggle]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const target = document.getElementById(button.dataset.resourceViewToggle || '');
+      if (!target) return;
+
+      const isHidden = target.hasAttribute('hidden');
+      document.querySelectorAll('.vx-user-detail-row').forEach((row) => {
+        if (row !== target) row.setAttribute('hidden', '');
+      });
+      document.querySelectorAll('[data-resource-view-toggle], [data-user-view-toggle]').forEach((toggleButton) => {
+        if (toggleButton !== button) toggleButton.classList.remove('is-active');
+      });
+      target.toggleAttribute('hidden', !isHidden);
+      button.classList.toggle('is-active', isHidden);
+    });
+  });
+
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       closeResourcePreview();
       closeUserEditor();
+      closeResourceEditor();
     }
   });
   document.addEventListener('fullscreenchange', syncFullscreen);
