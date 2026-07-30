@@ -9574,6 +9574,107 @@ body.admin-dark-page .snapshot-links a {
 .vx-table span small { display: block; margin-top: 2px; color: var(--vx-muted); font-size: .58rem; }
 .vx-table em { width: fit-content; padding: 4px 7px; color: #ff9f43; background: rgba(255, 159, 67, .12); border-radius: 99px; font-size: .58rem; font-style: normal; }
 
+/* Arete theme overrides: replace Vuexy purple accents with brand gold */
+body.admin-light-page {
+  --vx-primary: #f7ae1a;
+}
+
+body.backend-dashboard-page.admin-light-page .vx-analytics-hero {
+  background: #050505;
+  box-shadow: inset 0 0 0 1px rgba(247, 174, 26, .18), 0 .25rem 1.125rem rgba(0, 0, 0, .14);
+}
+
+body.backend-dashboard-page.admin-light-page .vx-analytics-hero::after {
+  border-color: rgba(247, 174, 26, .16);
+}
+
+body.backend-dashboard-page.admin-light-page .vx-analytics-hero a,
+body.admin-light-page .vx-card-head a,
+body.admin-light-page .vx-table > a > strong:first-child,
+body.admin-light-page .recent-business-orders > a > strong:first-child {
+  color: #f7ae1a;
+}
+
+body.admin-light-page .topbar .icon-btn:hover,
+body.admin-light-page .vx-row-actions button:hover,
+body.admin-light-page .vx-row-actions button.is-active,
+body.admin-light-page .crud-vx-list .status-toggle:hover,
+body.admin-light-page .crud-vx-list .vx-row-actions button.is-active,
+body.admin-light-page .crud-vx-list .payment-proof-icon:hover,
+body.admin-light-page .vx-pagination a:hover,
+body.admin-light-page .user-editor-modal .admin-modal-close:hover {
+  color: #f7ae1a;
+}
+
+body.admin-light-page .topbar .icon-btn:hover,
+body.admin-light-page .crud-vx-list .status-toggle:hover,
+body.admin-light-page .vx-pagination a:hover,
+body.admin-light-page .user-editor-modal .admin-modal-close:hover {
+  background: rgba(247, 174, 26, .12);
+}
+
+body.admin-light-page .topbar .avatar.small,
+body.admin-light-page .vx-add-record,
+body.admin-light-page .vx-users-pagination .active span,
+body.admin-light-page .vx-pagination .active span,
+body.admin-light-page .crud-vx-list .crud-vx-toolbar .vx-add-record,
+body.admin-light-page .crud-vx-list > .crud-vx-pagination .page-item.active .page-link,
+body.admin-light-page .crud-vx-list > .crud-vx-pagination .page-item.active span,
+body.admin-light-page .crud-vx-list > .crud-vx-pagination .vx-pagination li.active span,
+body.admin-light-page .order-vx-narrow a.active,
+body.admin-light-page .order-vx-narrow a:hover,
+body.admin-light-page .vx-user-modal-actions button[type="submit"] {
+  color: #111;
+  background: #f7ae1a;
+  box-shadow: 0 8px 18px rgba(247, 174, 26, .24);
+}
+
+body.admin-light-page .vx-mini-bars i {
+  background: rgba(247, 174, 26, .22);
+}
+
+body.admin-light-page .vx-mini-bars i:nth-last-child(-n + 4),
+body.admin-light-page .vx-progress i,
+body.admin-light-page .vx-tracker-body p i.purple {
+  background: #f7ae1a;
+}
+
+body.admin-light-page .vx-overview-pair i,
+body.admin-light-page .vx-report-stats i,
+body.admin-light-page .vx-list a > i,
+body.admin-light-page .vx-source-grid a > i,
+body.admin-light-page .vx-earning-lines p > i,
+body.admin-light-page .vx-user-stats i.purple,
+body.admin-light-page .order-vx-stats article > i.purple,
+body.admin-light-page .vx-role.purple i {
+  color: #f7ae1a;
+  background: rgba(247, 174, 26, .14);
+}
+
+body.admin-light-page .vx-report-stats span,
+body.admin-light-page .vx-table > div,
+body.admin-light-page .vx-list a:hover,
+body.admin-light-page .vx-source-grid a:hover {
+  background: rgba(247, 174, 26, .06);
+}
+
+body.admin-light-page .vx-radial,
+body.admin-light-page .vx-earning-ring {
+  background: conic-gradient(#f7ae1a 0 var(--percent), rgba(247, 174, 26, .14) var(--percent) 100%);
+}
+
+body.admin-light-page .vx-users-toolbar input:focus,
+body.admin-light-page .vx-user-modal-grid input:focus,
+body.admin-light-page .vx-user-modal-grid select:focus {
+  border-color: #f7ae1a;
+  box-shadow: 0 0 0 2px rgba(247, 174, 26, .14);
+}
+
+body.admin-light-page .vx-users-table input[type="checkbox"],
+body.admin-light-page .crud-vx-list > .table-wrap input[type="checkbox"] {
+  accent-color: #f7ae1a;
+}
+
 @media (max-width: 1199.98px) {
   .vx-grid-top { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .vx-analytics-hero { grid-column: 1 / -1; }
@@ -10314,9 +10415,9 @@ body.admin-light-page .admin-sidebar {
   flex-direction: column;
   padding: 0 10px 16px;
   overflow: hidden auto;
-  background: #fff;
+  background: #050505;
   border: 0;
-  box-shadow: 0 0 0 1px rgba(47, 43, 61, .04);
+  box-shadow: 0 0 0 1px rgba(247, 174, 26, .16), 0 18px 42px rgba(0, 0, 0, .26);
 }
 
 body.admin-light-page .sidebar-brand-row {
@@ -10328,23 +10429,47 @@ body.admin-light-page .sidebar-brand-row {
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
-  background: #fff;
+  background: #050505;
+  backdrop-filter: blur(10px);
 }
 
 body.admin-light-page .admin-sidebar .brand {
   display: flex;
   min-width: 0;
+  max-width: calc(100% - 44px);
   align-items: center;
   gap: 12px;
   padding: 0;
+  overflow: hidden;
 }
 
 .vuexy-brand-mark {
   position: relative;
   display: block;
-  width: 35px;
-  height: 28px;
-  flex: 0 0 35px;
+  width: 162px;
+  height: 54px;
+  flex: 0 0 162px;
+}
+
+.vuexy-brand-mark.arete-sidebar-logo {
+  display: grid;
+  overflow: hidden;
+  place-items: center;
+}
+
+.vuexy-brand-mark.arete-sidebar-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  /* object-fit: contain; */
+  object-fit: cover;
+  object-position: center;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, .38));
+}
+
+.vuexy-brand-mark.arete-sidebar-logo i {
+  display: none;
 }
 
 .vuexy-brand-mark i {
@@ -10368,14 +10493,15 @@ body.admin-light-page .admin-sidebar .brand {
 }
 
 body.admin-light-page .admin-sidebar .brand > span:last-child strong {
-  color: #444050;
+  color: #fff;
   font-size: 1.375rem;
   font-weight: 600;
   letter-spacing: -.02em;
 }
 
-body.admin-light-page .admin-sidebar .brand > span:last-child small {
-  display: none;
+body.admin-light-page .admin-sidebar .brand > span:last-child small,
+body.admin-light-page .admin-sidebar .brand > .arete-brand-copy {
+  display: none !important;
 }
 
 body.admin-light-page .sidebar-close {
@@ -10384,9 +10510,9 @@ body.admin-light-page .sidebar-close {
   width: 34px;
   height: 34px;
   place-items: center;
-  color: #444050;
-  background: transparent;
-  border: 0;
+  color: #f7ae1a;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(247, 174, 26, .28);
   border-radius: 50%;
   font-size: .95rem;
 }
@@ -10402,7 +10528,7 @@ body.admin-light-page .admin-nav-label {
   min-height: 34px;
   margin: 10px 0 0;
   padding: 0 13px;
-  color: #a8a6ae;
+  color: rgba(255, 255, 255, .48);
   font-size: .6875rem;
   font-weight: 400;
   letter-spacing: .4px;
@@ -10419,7 +10545,7 @@ body.admin-light-page .admin-nav a {
   align-items: center;
   gap: 12px;
   padding: 0 14px;
-  color: #5d596c;
+  color: rgba(255, 255, 255, .78);
   background: transparent;
   border-radius: 6px;
   box-shadow: none;
@@ -10433,15 +10559,31 @@ body.admin-light-page .admin-nav a i {
 }
 
 body.admin-light-page .admin-nav a:hover {
-  color: #5d596c;
-  background: rgba(47, 43, 61, .06);
+  color: #fff;
+  background: rgba(247, 174, 26, .12);
   transform: none;
 }
 
 body.admin-light-page .admin-nav a.active {
+  color: #111;
+  background: #f7ae1a;
+  box-shadow: 0 8px 18px rgba(247, 174, 26, .32);
+}
+
+body.admin-light-page .admin-nav a.active i {
+  color: #111;
+}
+
+body.admin-light-page .sidebar-foot {
+  border-top-color: rgba(247, 174, 26, .18);
+}
+
+body.admin-light-page .sidebar-foot span {
   color: #fff;
-  background: linear-gradient(72deg, #7367f0 22%, #9a91f7 100%);
-  box-shadow: 0 2px 6px rgba(115, 103, 240, .48);
+}
+
+body.admin-light-page .sidebar-foot small {
+  color: rgba(255, 255, 255, .58);
 }
 
 body.admin-light-page .admin-main {
@@ -10574,7 +10716,8 @@ body.admin-light-page .topbar .avatar.small {
   height: 38px;
   place-items: center;
   color: #fff;
-  background: linear-gradient(145deg, #9b92f6, #6156d8);
+  background: #050505;
+  box-shadow: inset 0 0 0 1px rgba(247, 174, 26, .26);
   border-radius: 50%;
   font-size: .9rem;
 }
@@ -10588,6 +10731,26 @@ body.admin-light-page .topbar .avatar.small b {
   background: #28c76f;
   border: 2px solid #fff;
   border-radius: 50%;
+}
+
+body.admin-light-page .profile-panel .avatar.small,
+body.admin-light-page .profile-avatar {
+  color: #fff;
+  background: #050505;
+  box-shadow: inset 0 0 0 1px rgba(247, 174, 26, .26);
+}
+
+body.admin-light-page .profile-panel a:hover,
+body.admin-light-page .profile-panel button:hover {
+  color: #111;
+  background: #f7ae1a;
+}
+
+body.admin-light-page .profile-hero > a,
+body.admin-light-page .profile-tags span.active {
+  color: #111;
+  background: #f7ae1a;
+  border-color: #f7ae1a;
 }
 
 body.admin-light-page .content-wrap {
@@ -10606,7 +10769,17 @@ body.admin-light-page .content-wrap {
 
   body.sidebar-collapsed.admin-light-page .vuexy-brand-mark {
     display: block !important;
-    transform: scale(.85);
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+    transform: none;
+  }
+
+  body.sidebar-collapsed.admin-light-page .vuexy-brand-mark.arete-sidebar-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left center;
   }
 
   body.sidebar-collapsed.admin-light-page .admin-sidebar .brand > span:last-child,
@@ -10814,10 +10987,20 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
   }
 
   body.sidebar-collapsed.sidebar-hovered.admin-light-page .vuexy-brand-mark {
-    transform: scale(1);
+    width: 162px;
+    height: 54px;
+    flex-basis: 162px;
+    transform: none;
   }
 
-  body.sidebar-collapsed.sidebar-hovered.admin-light-page .admin-sidebar .brand > span:last-child,
+  body.sidebar-collapsed.sidebar-hovered.admin-light-page .vuexy-brand-mark.arete-sidebar-logo img {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: contain;
+    object-position: center;
+  }
+
   body.sidebar-collapsed.sidebar-hovered.admin-light-page .admin-nav a span {
     display: block;
   }
@@ -10851,7 +11034,7 @@ body.admin-light-page .admin-sidebar .brand:focus-visible {
   }
 
   body.sidebar-collapsed.sidebar-hovered.admin-light-page .sidebar-close i {
-    color: #444050;
+    color: #f7ae1a;
   }
 }
 

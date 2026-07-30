@@ -767,8 +767,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (revenue.length) {
         const gradient = context.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
-        gradient.addColorStop(0, 'rgba(115, 103, 240, .28)');
-        gradient.addColorStop(1, 'rgba(115, 103, 240, 0)');
+        gradient.addColorStop(0, 'rgba(247, 174, 26, .28)');
+        gradient.addColorStop(1, 'rgba(247, 174, 26, 0)');
         context.beginPath();
         revenue.forEach((value, index) => {
           const x = xAt(index);
@@ -789,7 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (index === 0) context.moveTo(x, y);
           else context.lineTo(x, y);
         });
-        context.strokeStyle = '#7367f0';
+        context.strokeStyle = '#f7ae1a';
         context.lineWidth = 2.5;
         context.lineJoin = 'round';
         context.lineCap = 'round';

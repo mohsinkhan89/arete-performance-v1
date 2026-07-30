@@ -16,8 +16,10 @@
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="sidebar-brand-row">
                 <a class="brand" href="{{ route('backend.dashboard') }}" aria-label="Arete Performance Admin">
-                    <span class="vuexy-brand-mark" aria-hidden="true"><i></i><i></i></span>
-                    <span><strong>Arete</strong><small>Admin Console</small></span>
+                    <span class="vuexy-brand-mark arete-sidebar-logo" aria-hidden="true">
+                        <img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="">
+                    </span>
+                    <span class="arete-brand-copy"><strong>Arete</strong><small>Admin Console</small></span>
                 </a>
                 <button class="sidebar-close" type="button" aria-label="Collapse sidebar"><i class="fa-regular fa-circle-dot"></i></button>
             </div>
