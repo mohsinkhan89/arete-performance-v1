@@ -1069,9 +1069,14 @@ button.is-loading .fa-spinner {
   transform: translateY(-2px);
 }
 
-.hero-features {
+.hero-feature-slider {
   max-width: 650px;
   border-top: 1px solid rgba(255, 255, 255, .24);
+}
+
+.hero-features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .hero-feature {
@@ -1084,20 +1089,20 @@ button.is-loading .fa-spinner {
   animation: heroFeatureIn .75s cubic-bezier(.2, .82, .24, 1) both;
 }
 
-.hero-features .col-6:nth-child(1) .hero-feature {
+.hero-feature-slide:nth-child(1) .hero-feature {
   animation-delay: .58s;
 }
 
-.hero-features .col-6:nth-child(2) .hero-feature {
+.hero-feature-slide:nth-child(2) .hero-feature {
   animation-delay: .68s;
 }
 
-.hero-features .col-6:nth-child(3) .hero-feature {
+.hero-feature-slide:nth-child(3) .hero-feature {
   animation-delay: .78s;
 }
 
-.hero-features .col-6:nth-child(4) .hero-feature {
-  animation-delay: .88s;
+.hero-feature-pagination {
+  display: none;
 }
 
 .hero-feature i {
@@ -4999,6 +5004,11 @@ button.is-loading .fa-spinner {
   font-weight: 600;
 }
 
+.product-breadcrumb i,
+.product-breadcrumb .back-link {
+  color: #000!important;  
+}
+
 .product-breadcrumb a:hover {
   color: var(--color-primary);
 }
@@ -5011,6 +5021,510 @@ button.is-loading .fa-spinner {
 .product-breadcrumb span {
   color: #111;
   font-weight: 700;
+}
+
+/* Peptide calculator */
+.peptide-calculator-page {
+  padding: 42px 0 80px;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  background: linear-gradient(180deg, var(--color-white) 0%, var(--color-surface) 100%);
+}
+
+.peptide-calculator-hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 48px;
+  align-items: center;
+  margin-bottom: 28px;
+  padding: 38px 42px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 86% 48%, rgba(245, 168, 23, .18), transparent 25%),
+    linear-gradient(115deg, #050505 0%, #111 58%, #242424 100%);
+  border: 1px solid #2f2f2f;
+  border-radius: var(--radius);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .14);
+  overflow: hidden;
+}
+
+.peptide-calculator-hero::after {
+  position: absolute;
+  top: -90px;
+  right: -55px;
+  z-index: -1;
+  width: 360px;
+  height: 360px;
+  content: "";
+  border: 1px solid rgba(245, 168, 23, .12);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 48px rgba(255, 255, 255, .018),
+    0 0 0 96px rgba(245, 168, 23, .025);
+}
+
+.peptide-back-link {
+  display: inline-flex;
+  gap: 9px;
+  align-items: center;
+  margin-bottom: 20px;
+  color: #d6d6d6;
+  font-size: .78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.peptide-calculator-hero h1 {
+  margin: 4px 0 10px;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.6vw, 3.15rem);
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.peptide-calculator-hero > div:first-child > p:last-child {
+  max-width: 690px;
+  margin: 0;
+  color: #cfcfcf;
+  font-size: .95rem;
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+.peptide-calculator-product {
+  position: relative;
+  display: flex;
+  justify-self: end;
+  align-items: center;
+  justify-content: center;
+  /* width: 260px; */
+  /* padding: 18px; */
+  width: auto;
+  height: 220px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .035));
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 16px;
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, .32),
+    inset 0 1px 0 rgba(255, 255, 255, .12);
+  backdrop-filter: blur(8px);
+}
+
+.peptide-calculator-product::before {
+  position: absolute;
+  right: 20px;
+  bottom: 12px;
+  left: 20px;
+  height: 24px;
+  content: "";
+  background: rgba(245, 168, 23, .28);
+  border-radius: 50%;
+  filter: blur(18px);
+}
+
+.peptide-calculator-product img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: transparent;
+  border-radius: 10px;
+  filter: drop-shadow(0 16px 18px rgba(0, 0, 0, .35));
+}
+
+.peptide-calculator-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 22px;
+}
+
+.peptide-calculator-main,
+.peptide-calculator-result {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.peptide-calculator-main {
+  padding: 26px;
+}
+
+.peptide-field {
+  padding: 22px;
+  background: #fafafa;
+  border: 1px solid #e3e3e3;
+  border-radius: var(--radius);
+}
+
+.peptide-field h2 {
+  margin: 0 0 17px;
+  color: #171717;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.peptide-syringe-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.peptide-syringe-option,
+.peptide-choice,
+.peptide-custom-input {
+  font-family: var(--font-body);
+}
+
+.peptide-syringe-option,
+.peptide-choice {
+  color: #222;
+  background: var(--color-white);
+  border: 1px solid #d9d9d9;
+  border-radius: var(--radius);
+}
+
+.peptide-syringe-option {
+  min-height: 104px;
+  display: grid;
+  gap: 5px;
+  place-items: center;
+  padding: 14px;
+}
+
+.peptide-syringe-option i {
+  color: var(--color-primary);
+  font-size: 1.35rem;
+}
+
+.peptide-syringe-option strong,
+.peptide-syringe-option small {
+  display: block;
+}
+
+.peptide-syringe-option small {
+  color: #777;
+  font-size: .78rem;
+}
+
+.peptide-syringe-option strong {
+  font-size: .9rem;
+}
+
+.peptide-syringe-option.active,
+.peptide-choice.active {
+  color: #111;
+  background: #fff6e5;
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 20px rgba(245, 168, 23, .14);
+}
+
+.peptide-syringe-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 14px;
+  overflow: hidden;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+}
+
+.peptide-syringe-meta div {
+  padding: 14px;
+  border-right: 1px solid #e1e1e1;
+}
+
+.peptide-syringe-meta div:last-child {
+  border-right: 0;
+}
+
+.peptide-syringe-meta span,
+.peptide-syringe-meta strong {
+  display: block;
+}
+
+.peptide-syringe-meta span {
+  margin-bottom: 5px;
+  color: #777;
+  font-size: .7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.peptide-syringe-meta strong {
+  font-size: .8rem;
+  line-height: 1.4;
+}
+
+.peptide-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.peptide-choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.peptide-choice {
+  min-height: 38px;
+  padding: 8px 13px;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.peptide-custom-input {
+  display: none;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  color: var(--color-text);
+  background: var(--color-white);
+  border: 1px solid #d5d5d5;
+  border-radius: var(--radius);
+  font-size: .88rem;
+}
+
+.peptide-custom-input.active {
+  display: block;
+}
+
+.peptide-field-summary {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #fff;
+  background: #111;
+  border-color: #111;
+}
+
+.peptide-field-summary span {
+  color: var(--color-primary);
+  font-size: .75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.peptide-field-summary strong {
+  margin: 7px 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 2rem;
+}
+
+.peptide-field-summary p {
+  margin: 0;
+  color: #aaa;
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+.peptide-calculator-result {
+  align-self: start;
+  padding: 25px;
+}
+
+.peptide-result-card {
+  padding: 22px;
+  text-align: center;
+  color: #fff;
+  background: #090909;
+  border-radius: 9px;
+}
+
+.peptide-result-card span,
+.peptide-result-card strong {
+  display: block;
+}
+
+.peptide-result-card span {
+  color: var(--color-primary);
+  font-size: .75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.peptide-result-card strong {
+  margin-top: 6px;
+  font-size: 1.05rem;
+}
+
+.peptide-result-card b {
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.peptide-syringe-visual {
+  position: relative;
+  height: 48px;
+  margin: 26px 12px;
+  color: #111;
+  background: #f1f1f1;
+  border: 3px solid #222;
+  border-radius: 8px 18px 18px 8px;
+  overflow: hidden;
+}
+
+.peptide-syringe-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: linear-gradient(90deg, #ffc44f, var(--color-primary));
+  transition: width .3s ease;
+}
+
+.peptide-syringe-visual b {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: .78rem;
+}
+
+.peptide-calculator-result > p {
+  color: #444;
+  font-size: .88rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.peptide-scale {
+  position: relative;
+  height: 52px;
+  margin: 28px 5px 20px;
+  border-top: 2px solid #222;
+}
+
+.peptide-scale > span {
+  position: absolute;
+  top: -9px;
+  z-index: 2;
+  width: 3px;
+  height: 24px;
+  background: var(--color-primary);
+  transform: translateX(-50%);
+}
+
+.peptide-scale > div span {
+  position: absolute;
+  top: -2px;
+  width: 1px;
+  height: 10px;
+  background: #555;
+}
+
+.peptide-scale em {
+  position: absolute;
+  top: 14px;
+  left: 0;
+  color: #777;
+  font-size: .65rem;
+  font-style: normal;
+  transform: translateX(-50%);
+}
+
+.peptide-result-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.peptide-result-meta div {
+  padding: 13px;
+  background: #f6f6f6;
+  border-radius: 7px;
+}
+
+.peptide-result-meta span,
+.peptide-result-meta strong {
+  display: block;
+}
+
+.peptide-result-meta span {
+  margin-bottom: 5px;
+  color: #777;
+  font-size: .7rem;
+  text-transform: uppercase;
+}
+
+.peptide-result-meta strong {
+  font-size: .85rem;
+}
+
+.peptide-warning {
+  display: none;
+  margin-top: 14px;
+  padding: 12px;
+  color: #9d1c1c;
+  font-size: .78rem;
+  background: #fff0f0;
+  border: 1px solid #ffcaca;
+  border-radius: 7px;
+}
+
+.peptide-warning.active {
+  display: block;
+}
+
+.peptide-disclaimer {
+  display: block;
+  margin-top: 16px;
+  color: #707070;
+  font-size: .72rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 991px) {
+  .peptide-calculator-hero,
+  .peptide-calculator-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .peptide-calculator-product {
+    justify-self: start;
+    width: 240px;
+    height: 200px;
+  }
+}
+
+@media (max-width: 767px) {
+  .peptide-calculator-page {
+    padding: 24px 0 50px;
+  }
+
+  .peptide-calculator-hero,
+  .peptide-calculator-main,
+  .peptide-calculator-result {
+    padding: 18px;
+  }
+
+  .peptide-calculator-product {
+    justify-self: center;
+    width: min(100%, 240px);
+    height: 190px;
+  }
+
+  .peptide-fields-grid,
+  .peptide-syringe-options,
+  .peptide-syringe-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .peptide-syringe-meta div {
+    border-right: 0;
+    border-bottom: 1px solid #e1e1e1;
+  }
 }
 
 .product-detail-layout {
@@ -6667,7 +7181,7 @@ button.is-loading .fa-spinner {
   }
 
   .site-footer {
-    padding: 58px 0 36px;
+    padding: 20px 0 36px;
   }
 
   .footer-main {
@@ -7813,6 +8327,7 @@ button.is-loading .fa-spinner {
     gap: 0px;
     flex-wrap: wrap;
     width: 100%;
+    justify-content: center;
   }
   .description-assurance>div,
   .shop-trust-grid>div,
@@ -8440,6 +8955,17 @@ button.is-loading .fa-spinner {
 
 .site-header .navbar-toggler:focus {
   box-shadow: 0 0 0 3px rgba(245, 168, 23, .18);
+}
+
+.header-mobile-actions {
+  gap: 7px;
+  margin-left: auto;
+  margin-right: 9px;
+}
+
+.site-header .header-mobile-actions .icon-btn {
+  width: 40px;
+  height: 40px;
 }
 
 @media (max-width: 1199.98px) {
@@ -9272,8 +9798,7 @@ button:not(.navbar-toggler):not(.panel-close):not(.slider-arrow):not(.testimonia
 }
 
 .cart-breadcrumb i,
-.search-breadcrumb i,
-.product-breadcrumb i {
+.search-breadcrumb i {
   color: rgba(255, 255, 255, 0.4) !important;
   margin: 0 10px !important;
   font-size: 0.75rem !important;
@@ -9478,5 +10003,816 @@ body:not(.home-page) .site-header {
   .success-actions .btn {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* Final responsive safeguards */
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+main,
+main section,
+main .container,
+main [class*="-grid"],
+main [class*="-layout"],
+main [class*="-panel"],
+main [class*="-copy"] {
+  min-width: 0;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+}
+
+.ingredient-table,
+.cart-items-panel,
+.checkout-summary,
+.order-detail-card {
+  max-width: 100%;
+}
+
+@media (max-width: 991.98px) {
+  .hero-feature-slider {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .hero-features {
+    display: flex;
+    max-width: none;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    touch-action: pan-y;
+  }
+
+  .hero-features::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hero-feature-slide {
+    flex: 0 0 50%;
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .hero-feature {
+    min-height: 74px;
+    margin: 18px 0 10px;
+  }
+
+  .hero-feature-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    min-height: 18px;
+    padding-bottom: 7px;
+  }
+
+  .hero-feature-pagination button {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    background: rgba(255, 255, 255, .38);
+    border: 0;
+    border-radius: 50%;
+    box-shadow: none;
+  }
+
+  .hero-feature-pagination button:hover {
+    transform: none;
+  }
+
+  .hero-feature-pagination button.is-active {
+    width: 20px;
+    background: var(--color-primary);
+    border-radius: 999px;
+  }
+
+  .peptide-calculator-hero {
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 28px;
+    padding: 30px;
+  }
+
+  .peptide-calculator-product {
+    justify-self: end;
+    width: 220px;
+    height: 190px;
+  }
+
+  .peptide-calculator-shell,
+  .product-detail-layout,
+  .cart-layout,
+  .checkout-layout,
+  .success-grid,
+  .track-empty-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .product-main-image {
+    width: 100%;
+    max-width: none;
+  }
+
+  .order-summary,
+  .checkout-summary {
+    width: 100%;
+    max-width: none;
+  }
+
+  .success-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hero-feature-slide {
+    flex-basis: 50%;
+  }
+
+  .hero-feature {
+    justify-content: center;
+    margin-right: 0;
+    margin-left: 0;
+    padding: 0 14px;
+    border-right: 0;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: 100%;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .section-space,
+  .shop-main,
+  .cart-main,
+  .checkout-main,
+  .success-main,
+  .track-order-main {
+    padding-top: 42px;
+    padding-bottom: 42px;
+  }
+
+  .peptide-calculator-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding: 22px;
+  }
+
+  .peptide-calculator-hero::after {
+    top: auto;
+    right: -100px;
+    bottom: -150px;
+  }
+
+  .peptide-calculator-hero h1 {
+    font-size: clamp(1.9rem, 10vw, 2.7rem);
+    overflow-wrap: anywhere;
+  }
+
+  .peptide-calculator-product {
+    justify-self: center;
+    width: min(100%, 280px);
+    height: 210px;
+  }
+
+  .peptide-calculator-main,
+  .peptide-calculator-result,
+  .peptide-field {
+    padding: 18px;
+  }
+
+  .peptide-syringe-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .peptide-syringe-option {
+    min-width: 0;
+    min-height: 94px;
+    padding: 10px 6px;
+  }
+
+  .peptide-syringe-meta,
+  .peptide-fields-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .peptide-syringe-meta div {
+    border-right: 0;
+    border-bottom: 1px solid #e1e1e1;
+  }
+
+  .peptide-syringe-meta div:last-child {
+    border-bottom: 0;
+  }
+
+  .shop-grid,
+  .recommended-grid,
+  .related-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shop-product-card,
+  .related-card,
+  .recommended-grid .shop-product-card {
+    min-width: 0;
+  }
+
+  .shop-product-card h3,
+  .related-card h3,
+  .recommended-grid h3 {
+    overflow-wrap: anywhere;
+  }
+
+  .cart-row,
+  .checkout-summary-items article,
+  .search-result {
+    min-width: 0;
+  }
+
+  .cart-product-cell,
+  .checkout-summary-items article > div,
+  .search-result > div {
+    min-width: 0;
+  }
+
+  .cart-product-cell strong,
+  .checkout-summary-items strong,
+  .search-result strong {
+    overflow-wrap: anywhere;
+  }
+
+  .checkout-option,
+  .payment-option,
+  .mini-payments,
+  .crypto-marks {
+    flex-wrap: wrap;
+  }
+
+  .success-side,
+  .success-actions,
+  .track-empty-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .success-hero h1,
+  .checkout-hero h1,
+  .cart-hero h1,
+  .search-hero h1 {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  .product-gallery {
+    min-width: 0;
+  }
+
+  .product-main-image {
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+  }
+
+  .product-main-image > img {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+  }
+
+  .product-thumbs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .product-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ingredient-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .track-order-form {
+    gap: 10px;
+  }
+
+  .track-order-form .btn,
+  .track-empty-actions .btn,
+  .success-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .site-header .navbar {
+    min-height: 76px;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+  }
+
+  .site-header .brand {
+    width: 150px;
+    height: 65px;
+  }
+
+  .site-header .brand img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .site-header .navbar-toggler {
+    flex: 0 0 auto;
+  }
+
+  .header-mobile-actions {
+    gap: 5px;
+    margin-right: 7px;
+  }
+
+  .site-header .header-mobile-actions .icon-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .site-header .navbar-collapse {
+    width: 100%;
+    max-height: calc(100dvh - 76px);
+    padding: 12px 0 16px;
+    overflow-y: auto;
+  }
+
+  .site-header .nav-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .hero,
+  .shop-hero,
+  .cart-hero,
+  .checkout-hero,
+  .search-hero,
+  .success-hero {
+    min-height: auto;
+  }
+
+  .shop-hero-inner,
+  .hero-content {
+    min-height: 520px;
+  }
+
+  .cart-hero,
+  .checkout-hero,
+  .search-hero,
+  .success-hero {
+    padding-top: 38px;
+    padding-bottom: 38px;
+  }
+
+  .checkout-hero-copy,
+  .cart-hero-copy,
+  .search-hero-copy {
+    padding-bottom: 34px !important;
+  }
+
+  .success-card,
+  .cart-items-panel,
+  .order-summary,
+  .checkout-step,
+  .checkout-summary,
+  .track-empty-panel {
+    padding: 18px;
+  }
+
+  .peptide-choice-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .peptide-choice {
+    width: 100%;
+  }
+}
+
+@media (max-width: 374.98px) {
+  .container {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .shop-grid,
+  .recommended-grid,
+  .related-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .peptide-syringe-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .product-thumbs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-category-links,
+  .product-tabs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cart-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cart-stepper {
+    justify-self: start;
+  }
+}
+
+/* Keep desktop heroes unchanged; match compact home sizing on smaller screens */
+@media (max-width: 991.98px) {
+  .shop-hero,
+  .cart-hero,
+  .checkout-hero,
+  .search-hero,
+  .success-hero {
+    height: 640px;
+    min-height: 640px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .shop-hero,
+  .cart-hero,
+  .checkout-hero,
+  .search-hero,
+  .success-hero {
+    height: 520px;
+    min-height: 520px;
+  }
+
+  .shop-hero-copy,
+  .cart-hero-copy,
+  .checkout-hero-copy,
+  .search-hero-copy,
+  .success-hero-copy {
+    align-items: center !important;
+    margin-right: auto !important;
+    margin-left: auto !important;
+    text-align: center !important;
+  }
+
+  .shop-hero-copy h1,
+  .cart-hero-copy h1,
+  .checkout-hero-copy h1,
+  .search-hero-copy h1,
+  .success-hero-copy h1,
+  .shop-hero-copy p,
+  .cart-hero-copy p,
+  .checkout-hero-copy p,
+  .search-hero-copy p,
+  .success-hero-copy p {
+    text-align: center !important;
+  }
+
+  .cart-breadcrumb,
+  .checkout-breadcrumb,
+  .search-breadcrumb {
+    justify-content: center !important;
+    margin-right: auto !important;
+    margin-left: auto !important;
+  }
+
+  .search-hero-form {
+    margin-right: auto !important;
+    margin-left: auto !important;
+  }
+
+  .shop-hero {
+    height: auto;
+    min-height: 0;
+  }
+
+  .shop-hero-inner {
+    min-height: 0;
+    padding: 42px 0 16px;
+    justify-content: flex-start;
+    gap: 30px;
+  }
+
+  .shop-hero-copy {
+    width: 100%;
+    max-width: 360px;
+    padding-top: 0;
+  }
+
+  .shop-hero h1 {
+    font-size: clamp(2.5rem, 12vw, 3.2rem);
+  }
+
+  .shop-hero-copy p:last-child {
+    margin-top: 13px;
+    font-size: .9rem;
+    line-height: 1.55;
+  }
+
+  .shop-hero .hero-feature-slider {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .shop-hero .hero-feature {
+    min-height: 64px;
+    margin-top: 12px;
+    margin-bottom: 6px;
+  }
+
+  .cart-hero,
+  .checkout-hero,
+  .search-hero,
+  .success-hero {
+    height: auto;
+    min-height: 0;
+    padding-top: 38px;
+    padding-bottom: 38px;
+  }
+
+  .cart-hero .container,
+  .checkout-hero .container,
+  .search-hero .container,
+  .success-hero .container {
+    min-height: 0;
+  }
+
+  .cart-hero-copy,
+  .checkout-hero-copy,
+  .search-hero-copy,
+  .success-hero-copy {
+    width: 100%;
+    max-width: 390px !important;
+    min-height: 0;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  .cart-hero-copy h1,
+  .checkout-hero-copy h1,
+  .search-hero-copy h1,
+  .success-hero-copy h1 {
+    font-size: clamp(2.5rem, 12vw, 3.2rem) !important;
+  }
+
+  .cart-hero-copy > p,
+  .checkout-hero-copy > p,
+  .search-hero-copy > p,
+  .success-hero-copy > p {
+    margin-top: 13px;
+    font-size: .9rem;
+    line-height: 1.55;
+  }
+
+  .cart-breadcrumb,
+  .checkout-breadcrumb,
+  .search-breadcrumb {
+    margin-bottom: 16px !important;
+  }
+
+  .success-check {
+    width: 58px;
+    height: 58px;
+    margin-bottom: 14px !important;
+    font-size: 1.75rem;
+  }
+
+  .search-hero-form {
+    margin-top: 18px !important;
+  }
+
+  .track-order-page .search-hero {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding-top: 38px;
+    padding-bottom: 42px;
+  }
+
+  .track-order-page .search-hero-copy {
+    max-width: 420px !important;
+  }
+
+  .track-order-page .track-order-form {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 10px;
+    height: auto !important;
+    min-height: 0;
+    overflow: visible;
+    color: inherit;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .track-order-page .track-order-form input,
+  .track-order-page .track-order-form .btn {
+    width: 100%;
+    height: 52px;
+    min-height: 52px;
+  }
+
+  .track-order-page .track-order-form input {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 7px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
+  }
+
+  .track-order-page .track-order-form .btn {
+    display: inline-flex;
+    grid-template-columns: none;
+    justify-content: center;
+    color: var(--color-black);
+    background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
+    border-radius: 7px;
+  }
+
+  .home-page .hero-content .min-vh-hero {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .home-page .hero-content .min-vh-hero > div {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .home-page .hero .eyebrow,
+  .home-page .hero h1,
+  .home-page .hero-copy {
+    margin-right: auto;
+    margin-left: auto;
+    text-align: center;
+  }
+
+  .home-page .hero-content .d-flex {
+    justify-content: center;
+  }
+
+  .section-heading,
+  .why-intro,
+  .testimonial-heading,
+  .recommend-head,
+  .shop-newsletter-copy {
+    width: 100%;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .section-heading > div,
+  .section-heading .eyebrow,
+  .section-heading h2,
+  .section-heading p,
+  .why-intro .eyebrow,
+  .why-intro h2,
+  .why-intro p,
+  .testimonial-heading .eyebrow,
+  .testimonial-heading h2,
+  .testimonial-heading p,
+  .recommend-head .eyebrow,
+  .recommend-head h2,
+  .shop-newsletter-copy .eyebrow,
+  .shop-newsletter-copy h2,
+  .shop-newsletter-copy p {
+    margin-right: auto;
+    margin-left: auto;
+    text-align: center !important;
+  }
+
+  .section-heading .btn,
+  .section-heading > a,
+  .recommend-head > a {
+    align-self: center;
+  }
+}
+
+/* Consistent full-frame product imagery across every product card */
+.product-card > img,
+.shop-product-card.product-card > img,
+.recommended-grid .shop-product-card.product-card > img,
+.related-card > img {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  margin-right: 0;
+  margin-left: 0;
+  object-fit: cover;
+}
+
+@media (max-width: 767.98px) {
+  .product-card > img,
+  .shop-product-card.product-card > img,
+  .recommended-grid .shop-product-card.product-card > img,
+  .related-card > img {
+    width: 100%;
+    height: auto;
+  }
+
+  .shop-trust {
+    padding: 24px 0;
+  }
+
+  .shop-trust-grid {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .shop-trust-grid > div {
+    display: flex;
+    width: auto;
+    min-width: 0;
+    min-height: 150px;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 12px !important;
+    text-align: center;
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+  }
+
+  .shop-trust-grid > div:nth-child(odd) {
+    border-right: 1px solid rgba(180, 180, 180, .35) !important;
+  }
+
+  .shop-trust-grid > div:nth-child(-n + 2) {
+    border-bottom: 1px solid rgba(180, 180, 180, .35) !important;
+  }
+
+  .shop-trust-grid i {
+    flex: 0 0 auto;
+    margin-bottom: 10px;
+  }
+
+  .shop-trust-grid strong {
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.25;
+  }
+
+  .shop-trust-grid span {
+    min-height: 36px;
+    margin-top: 5px;
+    line-height: 1.4;
+  }
+
+  .cart-drawer .cart-item {
+    position: relative;
+    grid-template-columns: 58px minmax(0, 1fr);
+    padding-right: 52px;
+  }
+
+  .cart-drawer .cart-item .remove-item {
+    position: absolute;
+    top: 50%;
+    right: 13px;
+    display: grid;
+    width: 34px;
+    height: 34px;
+    grid-column: auto;
+    place-items: center;
+    justify-self: auto;
+    color: #777;
+    background: #f5f5f5;
+    border-radius: 50%;
+    transform: translateY(-50%);
+  }
+
+  .cart-drawer .cart-item .remove-item:hover,
+  .cart-drawer .cart-item .remove-item:active {
+    color: #a71919;
+    background: #fff0f0;
+    transform: translateY(-50%);
   }
 }

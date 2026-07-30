@@ -28,8 +28,44 @@ class BackendController extends Controller
         return str_contains(strtolower(auth()->user()->role ?? ''), 'super');
     }
 
-    public function dashboard(): View
+    public function dashboard(Request $request): View
     {
+        $range = (int) $request->query('range', 30);
+        $range = in_array($range, [7, 30, 90, 365], true) ? $range : 30;
+        $orderStatusFilter = trim((string) $request->query('order_status', ''));
+        $categoryFilter = (int) $request->query('category', 0);
+        $channelFilter = trim((string) $request->query('channel', ''));
+        $rangeStart = now()->startOfDay()->subDays($range - 1);
+        $rangeOrders = Order::query()
+            ->where('created_at', '>=', $rangeStart)
+            ->when($orderStatusFilter, fn ($query) => $query->where(fn ($query) => $query
+                ->where('status', $orderStatusFilter)
+                ->orWhere('payment_status', $orderStatusFilter)
+                ->orWhere('tracking_status', $orderStatusFilter)))
+            ->when($categoryFilter, fn ($query) => $query->whereHas('items.product', fn ($query) => $query->where('category_id', $categoryFilter)))
+            ->when($channelFilter, fn ($query) => $query->where('payment_method', $channelFilter))
+            ->oldest()
+            ->get();
+        $dailyOrders = $rangeOrders->groupBy(fn (Order $order) => $order->created_at->format('Y-m-d'));
+        $chartDates = collect(range(0, $range - 1))->map(fn (int $offset) => $rangeStart->copy()->addDays($offset));
+        $chartLabels = $chartDates->map(fn ($date) => $date->format('M d'));
+        $revenueSeries = $chartDates->map(fn ($date) => round((float) ($dailyOrders->get($date->format('Y-m-d'))?->sum('total') ?? 0), 2));
+        $ordersSeries = $chartDates->map(fn ($date) => (int) ($dailyOrders->get($date->format('Y-m-d'))?->count() ?? 0));
+        $topCustomers = $rangeOrders
+            ->groupBy(fn (Order $order) => strtolower($order->email))
+            ->map(function ($orders) {
+                $latest = $orders->last();
+
+                return [
+                    'name' => $latest->customer_name,
+                    'email' => $latest->email,
+                    'orders' => $orders->count(),
+                    'spent' => (float) $orders->sum('total'),
+                ];
+            })
+            ->sortByDesc('spent')
+            ->take(5)
+            ->values();
         $activeProducts = Product::where('status', 'active')->count();
         $inactiveProducts = Product::where('status', 'inactive')->count();
         $activeCategories = Category::where('status', 'active')->count();
@@ -43,10 +79,32 @@ class BackendController extends Controller
         $paymentStatuses = ['unpaid', 'paid', 'failed', 'refunded'];
         $topProducts = OrderItem::query()
             ->selectRaw('product_id, product_name, product_sku, product_image, SUM(quantity) as sold_quantity, SUM(line_total) as sold_total')
+            ->whereIn('order_id', $rangeOrders->pluck('id'))
             ->groupBy('product_id', 'product_name', 'product_sku', 'product_image')
             ->orderByDesc('sold_quantity')
-            ->take(5)
+            ->take(8)
             ->get();
+        $categoryPerformance = OrderItem::with('product.category')
+            ->whereIn('order_id', $rangeOrders->pluck('id'))
+            ->get()
+            ->groupBy(fn (OrderItem $item) => $item->product?->category?->name ?? 'Uncategorised')
+            ->map(fn ($items, string $name) => [
+                'name' => $name,
+                'revenue' => (float) $items->sum('line_total'),
+                'units' => (int) $items->sum('quantity'),
+            ])
+            ->sortByDesc('revenue')
+            ->take(6)
+            ->values();
+        $channelPerformance = $rangeOrders
+            ->groupBy(fn (Order $order) => $order->payment_method ?: 'Unknown')
+            ->map(fn ($orders, string $name) => [
+                'name' => Str::headline($name),
+                'orders' => $orders->count(),
+                'revenue' => (float) $orders->sum('total'),
+            ])
+            ->sortByDesc('revenue')
+            ->values();
 
         return view('backend.dashboard', [
             'totalProducts' => Product::count(),
@@ -73,10 +131,28 @@ class BackendController extends Controller
             'recentProducts' => Product::with('category')->latest()->take(5)->get(),
             'recentCategories' => Category::withCount('products')->latest()->take(5)->get(),
             'recentUsers' => User::latest()->take(5)->get(),
-            'recentOrders' => Order::with('items')->latest()->take(5)->get(),
+            'recentOrders' => $rangeOrders->sortByDesc('created_at')->take(8)->values(),
             'trackingBreakdown' => collect($trackingStatuses)->mapWithKeys(fn ($status) => [$status => Order::where('tracking_status', $status)->count()]),
             'paymentBreakdown' => collect($paymentStatuses)->mapWithKeys(fn ($status) => [$status => Order::where('payment_status', $status)->count()]),
             'lowStockProducts' => Product::with('category')->where('stock', '<=', 5)->orderBy('stock')->take(5)->get(),
+            'range' => $range,
+            'rangeRevenue' => (float) $rangeOrders->sum('total'),
+            'rangeOrders' => $rangeOrders->count(),
+            'chartLabels' => $chartLabels,
+            'revenueSeries' => $revenueSeries,
+            'ordersSeries' => $ordersSeries,
+            'topCustomers' => $topCustomers,
+            'categoryInsights' => Category::withCount('products')->orderByDesc('products_count')->take(5)->get(),
+            'orderStatusFilter' => $orderStatusFilter,
+            'categoryFilter' => $categoryFilter,
+            'channelFilter' => $channelFilter,
+            'filterCategories' => Category::where('status', 'active')->orderBy('name')->get(['id', 'name']),
+            'filterChannels' => Order::whereNotNull('payment_method')->distinct()->orderBy('payment_method')->pluck('payment_method'),
+            'itemsSold' => (int) OrderItem::whereIn('order_id', $rangeOrders->pluck('id'))->sum('quantity'),
+            'deliveredOrders' => $rangeOrders->where('tracking_status', 'delivered')->count(),
+            'pendingOrders' => $rangeOrders->whereNotIn('tracking_status', ['delivered', 'cancelled'])->count(),
+            'categoryPerformance' => $categoryPerformance,
+            'channelPerformance' => $channelPerformance,
         ]);
     }
 
@@ -97,12 +173,14 @@ class BackendController extends Controller
 
         $pageTitle = ucwords(str_replace('-', ' ', $page));
         $search = trim((string) $request->query('q', ''));
+        $status = trim((string) $request->query('status', ''));
         $records = match ($page) {
             'products' => Product::with('category')
                 ->when($search, fn ($query) => $query->where(fn ($query) => $query
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('sku', 'like', "%{$search}%")
                     ->orWhereHas('category', fn ($query) => $query->where('name', 'like', "%{$search}%"))))
+                ->when($status, fn ($query) => $query->where('status', $status))
                 ->latest()
                 ->paginate(10)
                 ->withQueryString(),
@@ -110,6 +188,7 @@ class BackendController extends Controller
                 ->when($search, fn ($query) => $query->where(fn ($query) => $query
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('slug', 'like', "%{$search}%")))
+                ->when($status, fn ($query) => $query->where('status', $status))
                 ->latest()
                 ->paginate(10)
                 ->withQueryString(),
@@ -118,6 +197,7 @@ class BackendController extends Controller
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")))
+                ->when($status, fn ($query) => $query->where('status', $status))
                 ->latest()
                 ->paginate(10)
                 ->withQueryString(),
@@ -126,6 +206,7 @@ class BackendController extends Controller
                     ->where('customer_name', 'like', "%{$search}%")
                     ->orWhere('comment', 'like', "%{$search}%")
                     ->orWhereHas('product', fn ($query) => $query->where('name', 'like', "%{$search}%"))))
+                ->when($status, fn ($query) => $query->where('status', $status))
                 ->latest()
                 ->paginate(10)
                 ->withQueryString(),
@@ -135,6 +216,7 @@ class BackendController extends Controller
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")
                     ->orWhereHas('product', fn ($query) => $query->where('name', 'like', "%{$search}%")->orWhere('sku', 'like', "%{$search}%"))))
+                ->when($status, fn ($query) => $query->where('status', $status))
                 ->latest()
                 ->paginate(10)
                 ->withQueryString(),
@@ -146,6 +228,10 @@ class BackendController extends Controller
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")
                     ->orWhere('tracking_number', 'like', "%{$search}%")))
+                ->when($status, fn ($query) => $query->where(fn ($query) => $query
+                    ->where('status', $status)
+                    ->orWhere('payment_status', $status)
+                    ->orWhere('tracking_status', $status)))
                 ->latest()
                 ->paginate(10)
                 ->withQueryString(),
@@ -175,6 +261,7 @@ class BackendController extends Controller
             'pageTitle' => $pageTitle,
             'records' => $records,
             'search' => $search,
+            'status' => $status,
             'canManageUsers' => $this->isSuperAdmin(),
             'reportStats' => $reportStats,
         ]);

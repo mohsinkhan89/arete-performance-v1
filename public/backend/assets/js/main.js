@@ -277,6 +277,65 @@ document.addEventListener('DOMContentLoaded', () => {
     (label || textarea).after(editorShell);
   });
 
+  document.querySelectorAll('.product-form-layout').forEach((layout) => {
+    const panels = [...layout.querySelectorAll(':scope > .form-section')];
+    if (panels.length < 2) return;
+
+    const icons = ['fa-rectangle-list', 'fa-sliders', 'fa-image', 'fa-align-left', 'fa-shield-halved'];
+    const tabs = document.createElement('nav');
+    tabs.className = 'vx-form-tabs';
+    tabs.setAttribute('aria-label', 'Form sections');
+    tabs.innerHTML = panels.map((panel, index) => {
+      const title = panel.querySelector('.form-section-head h2')?.textContent.trim() || `Step ${index + 1}`;
+      return `<button type="button" data-vx-form-tab="${index}" aria-selected="${index === 0}">
+        <i class="fa-solid ${icons[index] || 'fa-circle'}"></i>
+        <span>${title}</span>
+      </button>`;
+    }).join('');
+
+    const pager = document.createElement('div');
+    pager.className = 'vx-form-pager';
+    pager.innerHTML = `
+      <button type="button" data-vx-form-prev><i class="fa-solid fa-arrow-left"></i> Previous</button>
+      <span data-vx-form-progress></span>
+      <button type="button" data-vx-form-next>Next <i class="fa-solid fa-arrow-right"></i></button>
+    `;
+
+    layout.before(tabs);
+    layout.after(pager);
+    layout.classList.add('vx-tabbed-form');
+    panels.forEach((panel, index) => {
+      panel.classList.add('vx-form-panel');
+      panel.setAttribute('role', 'tabpanel');
+      panel.hidden = index !== 0;
+    });
+
+    const tabButtons = [...tabs.querySelectorAll('[data-vx-form-tab]')];
+    const previous = pager.querySelector('[data-vx-form-prev]');
+    const next = pager.querySelector('[data-vx-form-next]');
+    const progress = pager.querySelector('[data-vx-form-progress]');
+    let activeIndex = 0;
+
+    const showPanel = (index) => {
+      activeIndex = Math.max(0, Math.min(panels.length - 1, index));
+      panels.forEach((panel, panelIndex) => { panel.hidden = panelIndex !== activeIndex; });
+      tabButtons.forEach((button, buttonIndex) => {
+        const isActive = buttonIndex === activeIndex;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-selected', String(isActive));
+      });
+      previous.disabled = activeIndex === 0;
+      next.disabled = activeIndex === panels.length - 1;
+      progress.textContent = `Step ${activeIndex + 1} of ${panels.length}`;
+      layout.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    tabButtons.forEach((button, index) => button.addEventListener('click', () => showPanel(index)));
+    previous.addEventListener('click', () => showPanel(activeIndex - 1));
+    next.addEventListener('click', () => showPanel(activeIndex + 1));
+    showPanel(0);
+  });
+
   const themeToggle = document.querySelector('.theme-toggle');
   const themeIcon = themeToggle?.querySelector('i');
   const savedTheme = localStorage.getItem('adminTheme') || 'light';
@@ -291,6 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     themeToggle?.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    document.dispatchEvent(new CustomEvent('admin-theme-change', { detail: { theme } }));
   };
 
   applyTheme(savedTheme);
@@ -303,6 +363,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const toggle = document.querySelector('.sidebar-toggle');
   const sidebar = document.querySelector('#adminSidebar');
+  const sidebarClose = document.querySelector('.sidebar-close');
+  const sidebarBackdrop = document.querySelector('.sidebar-backdrop');
+  const desktopSidebar = window.matchMedia('(min-width: 1200px)');
+  const setSidebarCollapsed = (isCollapsed) => {
+    document.body.classList.toggle('sidebar-collapsed', isCollapsed);
+    document.body.classList.remove('sidebar-hovered');
+    localStorage.setItem('adminSidebarCollapsed', String(isCollapsed));
+    toggle?.setAttribute('aria-expanded', String(!isCollapsed));
+  };
   const closeSidebar = () => {
     sidebar?.classList.remove('is-open');
     document.body.classList.remove('sidebar-open');
@@ -312,11 +381,298 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toggle && sidebar) {
     toggle.setAttribute('aria-expanded', 'false');
     toggle.addEventListener('click', () => {
+      if (desktopSidebar.matches) {
+        setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed'));
+        return;
+      }
       const isOpen = sidebar.classList.toggle('is-open');
       document.body.classList.toggle('sidebar-open', isOpen);
       toggle.setAttribute('aria-expanded', String(isOpen));
     });
   }
+
+  if (desktopSidebar.matches && localStorage.getItem('adminSidebarCollapsed') === 'true') {
+    document.body.classList.add('sidebar-collapsed');
+    toggle?.setAttribute('aria-expanded', 'false');
+  }
+
+  desktopSidebar.addEventListener('change', () => {
+    closeSidebar();
+    document.body.classList.remove('sidebar-hovered');
+    if (!desktopSidebar.matches) document.body.classList.remove('sidebar-collapsed');
+    else if (localStorage.getItem('adminSidebarCollapsed') === 'true') setSidebarCollapsed(true);
+  });
+
+  sidebarClose?.addEventListener('click', () => {
+    if (desktopSidebar.matches) {
+      if (document.body.classList.contains('sidebar-hovered')) {
+        setSidebarCollapsed(false);
+        return;
+      }
+
+      setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed'));
+      return;
+    }
+
+    closeSidebar();
+  });
+  sidebar?.addEventListener('mouseenter', () => {
+    if (!desktopSidebar.matches || !document.body.classList.contains('sidebar-collapsed')) return;
+    document.body.classList.add('sidebar-hovered');
+  });
+  sidebar?.addEventListener('mouseleave', () => {
+    document.body.classList.remove('sidebar-hovered');
+  });
+  sidebarBackdrop?.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeSidebar();
+  });
+
+  const fullscreenToggle = document.querySelector('.fullscreen-toggle');
+  const fullscreenIcon = fullscreenToggle?.querySelector('i');
+  const syncFullscreen = () => {
+    const isFullscreen = Boolean(document.fullscreenElement);
+    fullscreenIcon?.classList.toggle('fa-expand', !isFullscreen);
+    fullscreenIcon?.classList.toggle('fa-compress', isFullscreen);
+    fullscreenToggle?.setAttribute('aria-label', isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen');
+  };
+
+  fullscreenToggle?.addEventListener('click', async () => {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await document.documentElement.requestFullscreen();
+    } catch (error) {
+      // Fullscreen can be blocked by browser policy; leave the interface unchanged.
+    }
+  });
+
+  const resourcePreviewModal = document.querySelector('[data-resource-preview-modal]');
+  const resourcePreviewImage = resourcePreviewModal?.querySelector('[data-resource-preview-image]');
+  const resourcePreviewTitle = resourcePreviewModal?.querySelector('[data-resource-preview-title]');
+  const resourcePreviewSubtitle = resourcePreviewModal?.querySelector('[data-resource-preview-subtitle]');
+  const resourcePreviewMeta = resourcePreviewModal?.querySelector('[data-resource-preview-meta]');
+  const resourcePreviewEdit = resourcePreviewModal?.querySelector('[data-resource-preview-edit]');
+  const closeResourcePreview = () => {
+    resourcePreviewModal?.classList.remove('is-open');
+    resourcePreviewModal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  };
+
+  document.querySelectorAll('[data-resource-preview]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!resourcePreviewModal) return;
+      if (resourcePreviewImage) {
+        resourcePreviewImage.src = button.dataset.previewImage || '';
+        resourcePreviewImage.alt = button.dataset.previewTitle || 'Product preview';
+      }
+      if (resourcePreviewTitle) resourcePreviewTitle.textContent = button.dataset.previewTitle || '';
+      if (resourcePreviewSubtitle) resourcePreviewSubtitle.textContent = button.dataset.previewSubtitle || '';
+      if (resourcePreviewEdit) resourcePreviewEdit.href = button.dataset.previewEdit || '#';
+      if (resourcePreviewMeta) {
+        resourcePreviewMeta.innerHTML = (button.dataset.previewMeta || '').split('|')
+          .filter(Boolean)
+          .map((value) => `<span>${value}</span>`)
+          .join('');
+      }
+      resourcePreviewModal.classList.add('is-open');
+      resourcePreviewModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+    });
+  });
+  resourcePreviewModal?.querySelectorAll('[data-resource-preview-close]').forEach((button) => button.addEventListener('click', closeResourcePreview));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeResourcePreview();
+  });
+  document.addEventListener('fullscreenchange', syncFullscreen);
+
+  const dashboardCanvas = document.querySelector('[data-dashboard-chart]');
+  const dashboardChartData = document.querySelector('[data-dashboard-chart-data]');
+  if (dashboardCanvas && dashboardChartData) {
+    const chartData = JSON.parse(dashboardChartData.textContent || '{}');
+    const drawDashboardChart = () => {
+      const context = dashboardCanvas.getContext('2d');
+      const bounds = dashboardCanvas.parentElement.getBoundingClientRect();
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      const width = Math.max(320, bounds.width);
+      const height = Math.max(260, bounds.height);
+      dashboardCanvas.width = width * ratio;
+      dashboardCanvas.height = height * ratio;
+      dashboardCanvas.style.width = `${width}px`;
+      dashboardCanvas.style.height = `${height}px`;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      context.clearRect(0, 0, width, height);
+
+      const labels = chartData.labels || [];
+      const revenue = chartData.revenue || [];
+      const orders = chartData.orders || [];
+      const padding = { top: 20, right: 18, bottom: 34, left: 48 };
+      const chartWidth = width - padding.left - padding.right;
+      const chartHeight = height - padding.top - padding.bottom;
+      const maxRevenue = Math.max(...revenue, 1);
+      const maxOrders = Math.max(...orders, 1);
+      const dark = document.body.classList.contains('admin-dark-page');
+      const gridColor = dark ? 'rgba(255,255,255,.09)' : 'rgba(47,43,61,.09)';
+      const textColor = dark ? '#8f91a5' : '#a5a3ae';
+      const xAt = (index) => padding.left + (labels.length <= 1 ? chartWidth / 2 : (index / (labels.length - 1)) * chartWidth);
+      const revenueY = (value) => padding.top + chartHeight - (value / maxRevenue) * chartHeight;
+
+      context.font = '11px Public Sans';
+      context.fillStyle = textColor;
+      context.textAlign = 'right';
+      context.textBaseline = 'middle';
+      for (let index = 0; index <= 4; index += 1) {
+        const y = padding.top + (chartHeight / 4) * index;
+        context.strokeStyle = gridColor;
+        context.lineWidth = 1;
+        context.beginPath();
+        context.moveTo(padding.left, y);
+        context.lineTo(width - padding.right, y);
+        context.stroke();
+        const value = maxRevenue * (1 - index / 4);
+        context.fillText(`£${Math.round(value)}`, padding.left - 8, y);
+      }
+
+      const ordersY = (value) => padding.top + chartHeight - (value / maxOrders) * chartHeight;
+
+      if (revenue.length) {
+        const gradient = context.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
+        gradient.addColorStop(0, 'rgba(115, 103, 240, .28)');
+        gradient.addColorStop(1, 'rgba(115, 103, 240, 0)');
+        context.beginPath();
+        revenue.forEach((value, index) => {
+          const x = xAt(index);
+          const y = revenueY(value);
+          if (index === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        });
+        context.lineTo(xAt(revenue.length - 1), padding.top + chartHeight);
+        context.lineTo(xAt(0), padding.top + chartHeight);
+        context.closePath();
+        context.fillStyle = gradient;
+        context.fill();
+
+        context.beginPath();
+        revenue.forEach((value, index) => {
+          const x = xAt(index);
+          const y = revenueY(value);
+          if (index === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        });
+        context.strokeStyle = '#7367f0';
+        context.lineWidth = 2.5;
+        context.lineJoin = 'round';
+        context.lineCap = 'round';
+        context.stroke();
+      }
+
+      if (orders.length) {
+        context.beginPath();
+        orders.forEach((value, index) => {
+          const x = xAt(index);
+          const y = ordersY(value);
+          if (index === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        });
+        context.strokeStyle = '#28c76f';
+        context.lineWidth = 2.5;
+        context.lineJoin = 'round';
+        context.lineCap = 'round';
+        context.stroke();
+      }
+
+      const labelStep = Math.max(1, Math.ceil(labels.length / 6));
+      context.fillStyle = textColor;
+      context.textAlign = 'center';
+      context.textBaseline = 'top';
+      labels.forEach((label, index) => {
+        if (index % labelStep !== 0 && index !== labels.length - 1) return;
+        context.fillText(label, xAt(index), padding.top + chartHeight + 10);
+      });
+    };
+
+    const chartResizeObserver = new ResizeObserver(drawDashboardChart);
+    chartResizeObserver.observe(dashboardCanvas.parentElement);
+    document.addEventListener('admin-theme-change', drawDashboardChart);
+    drawDashboardChart();
+  }
+
+  const commandPalette = document.querySelector('.command-palette');
+  const commandToggle = document.querySelector('.command-toggle');
+  const commandBackdrop = document.querySelector('.command-backdrop');
+  const commandInput = commandPalette?.querySelector('.command-search input');
+  const commandLinks = [...(commandPalette?.querySelectorAll('.command-results a') || [])];
+  const commandEmpty = commandPalette?.querySelector('.command-empty');
+  let commandIndex = 0;
+
+  const visibleCommandLinks = () => commandLinks.filter((link) => !link.hidden);
+  const focusCommand = (index) => {
+    const links = visibleCommandLinks();
+    if (!links.length) return;
+    commandIndex = (index + links.length) % links.length;
+    links.forEach((link, linkIndex) => link.classList.toggle('is-selected', linkIndex === commandIndex));
+    links[commandIndex].scrollIntoView({ block: 'nearest' });
+  };
+  const filterCommands = () => {
+    const query = commandInput?.value.trim().toLowerCase() || '';
+    commandLinks.forEach((link) => {
+      link.hidden = query !== '' && !link.dataset.commandLabel.includes(query);
+    });
+    const links = visibleCommandLinks();
+    if (commandEmpty) commandEmpty.hidden = links.length > 0;
+    commandIndex = 0;
+    focusCommand(0);
+  };
+  const openCommands = () => {
+    if (!commandPalette) return;
+    commandPalette.classList.add('is-open');
+    commandPalette.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('command-open');
+    if (commandInput) {
+      commandInput.value = '';
+      filterCommands();
+      window.setTimeout(() => commandInput.focus(), 30);
+    }
+  };
+  const closeCommands = () => {
+    commandPalette?.classList.remove('is-open');
+    commandPalette?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('command-open');
+  };
+
+  commandToggle?.addEventListener('click', openCommands);
+  commandBackdrop?.addEventListener('click', closeCommands);
+  commandInput?.addEventListener('input', filterCommands);
+  commandLinks.forEach((link) => {
+    link.addEventListener('mouseenter', () => {
+      const links = visibleCommandLinks();
+      focusCommand(links.indexOf(link));
+    });
+  });
+  document.addEventListener('keydown', (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      commandPalette?.classList.contains('is-open') ? closeCommands() : openCommands();
+      return;
+    }
+    if (!commandPalette?.classList.contains('is-open')) return;
+    if (event.key === 'Escape') {
+      closeCommands();
+      return;
+    }
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      focusCommand(commandIndex + 1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      focusCommand(commandIndex - 1);
+    } else if (event.key === 'Enter') {
+      const link = visibleCommandLinks()[commandIndex];
+      if (link) {
+        event.preventDefault();
+        link.click();
+      }
+    }
+  });
 
   const profileDropdown = document.querySelector('.profile-dropdown');
   const profileButton = document.querySelector('.profile-menu');

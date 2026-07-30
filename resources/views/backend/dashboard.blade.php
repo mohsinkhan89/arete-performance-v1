@@ -1,176 +1,133 @@
 @extends('backend.layouts.master')
 
-@section('title', 'Dashboard')
+@section('title', 'Analytics')
 
 @section('body')
-    <div class="dashboard-v2">
-        <section class="dashboard-hero-panel">
-            <div>
-                <span class="dashboard-kicker">Live Database</span>
-                <h1>Operations Dashboard</h1>
-                <p>Compact overview from orders, order items, products, categories, users, and reviews tables.</p>
-            </div>
-            <div class="dashboard-quick-actions">
-                <a href="{{ route('backend.page', 'orders') }}"><i class="fa-solid fa-clipboard-list"></i> Orders</a>
-                <a href="{{ route('backend.page', 'reports') }}"><i class="fa-solid fa-chart-column"></i> Reports</a>
-                <a href="{{ route('backend.resource.create', ['resource' => 'products']) }}"><i class="fa-solid fa-plus"></i> Product</a>
-            </div>
-        </section>
-
-        <section class="compact-stats">
-            <article class="compact-stat metric-revenue">
-                <span>Total Revenue</span>
-                <strong>&pound;{{ number_format((float) $totalRevenue, 2) }}</strong>
-                <small>&pound;{{ number_format((float) $averageOrderValue, 2) }} average order</small>
-                <i class="fa-solid fa-chart-line"></i>
-            </article>
-            <article class="compact-stat metric-proof">
-                <span>Unpaid Orders</span>
-                <strong>{{ number_format($unpaidOrders) }}</strong>
-                <small>&pound;{{ number_format((float) $pendingRevenue, 2) }} pending</small>
-                <i class="fa-solid fa-hourglass-half"></i>
-            </article>
-            <article class="compact-stat metric-orders">
-                <span>Today Orders</span>
-                <strong>{{ number_format($todayOrders) }}</strong>
-                <small>{{ number_format($totalOrders) }} all time orders</small>
-                <i class="fa-solid fa-calendar-day"></i>
-            </article>
-            <article class="compact-stat metric-stock">
-                <span>Stock Units</span>
-                <strong>{{ number_format($totalInventory) }}</strong>
-                <small>&pound;{{ number_format((float) $inventoryValue, 2) }} inventory</small>
-                <i class="fa-solid fa-boxes-stacked"></i>
-            </article>
-        </section>
-
-        <section class="dashboard-command-grid">
-            <article class="panel orders-panel compact-orders-panel">
-                <div class="panel-head">
-                    <h2>Recent Orders</h2>
-                    <a href="{{ route('backend.page', 'orders') }}">View all</a>
-                </div>
-                <div class="recent-order-list">
-                    @forelse ($recentOrders as $order)
-                        <article class="recent-order-card">
-                            <div class="recent-order-primary">
-                                <span>Order</span>
-                                <strong>{{ $order->order_number }}</strong>
-                            </div>
-                            <div>
-                                <span>Customer</span>
-                                <strong>{{ $order->customer_name }}</strong>
-                            </div>
-                            <div>
-                                <span>Total</span>
-                                <strong>&pound;{{ number_format((float) $order->total, 2) }}</strong>
-                            </div>
-                            <div>
-                                <span>Payment</span>
-                                <strong><span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></strong>
-                            </div>
-                            <div class="recent-order-tracking">
-                                <span>Royal Mail ID</span>
-                                <strong>{{ $order->tracking_number ?: 'Pending label' }}</strong>
-                            </div>
-                            <div class="action-group recent-order-actions">
-                                <a href="{{ route('backend.orders.show', $order) }}" title="View order" aria-label="View order {{ $order->order_number }}"><i class="fa-regular fa-eye"></i></a>
-                                @include('backend.partials.payment-proof-button', ['order' => $order])
-                            </div>
-                        </article>
-                    @empty
-                        <div class="empty-cell">No orders found.</div>
-                    @endforelse
-                </div>
-            </article>
-
-            <aside class="dashboard-side-stack">
-                <article class="panel ops-snapshot">
-                    <div class="panel-head">
-                        <h2>Order Status</h2>
-                        <a href="{{ route('backend.page', 'orders') }}">Orders</a>
-                    </div>
-                    <div class="status-breakdown status-breakdown-tight">
-                        @foreach ($trackingBreakdown as $status => $count)
-                            <div><span>{{ str_replace('_', ' ', ucfirst($status)) }}</span><strong>{{ number_format($count) }}</strong></div>
-                        @endforeach
-                    </div>
-                </article>
-
-                <article class="panel ops-snapshot">
-                    <div class="panel-head">
-                        <h2>Payment Status</h2>
-                        <a href="{{ route('backend.page', 'reports') }}">Reports</a>
-                    </div>
-                    <div class="status-breakdown status-breakdown-tight">
-                        @foreach ($paymentBreakdown as $status => $count)
-                            <div><span>{{ str_replace('_', ' ', ucfirst($status)) }}</span><strong>{{ number_format($count) }}</strong></div>
-                        @endforeach
-                    </div>
-                </article>
-
-                <article class="panel ops-snapshot">
-                    <div class="panel-head">
-                        <h2>Revenue Split</h2>
-                        <a href="{{ route('backend.page', 'reports') }}">Reports</a>
-                    </div>
-                    <div class="snapshot-grid dashboard-mini-grid">
-                        <div><span>Paid</span><strong>&pound;{{ number_format((float) $paidRevenue, 2) }}</strong><small>{{ number_format($paidOrders) }} orders</small></div>
-                        <div><span>Pending</span><strong>&pound;{{ number_format((float) $pendingRevenue, 2) }}</strong><small>{{ number_format($unpaidOrders) }} orders</small></div>
-                    </div>
-                </article>
-            </aside>
-        </section>
-
-        <section class="dashboard-dense-grid">
-            <article class="panel ops-snapshot dashboard-snapshot-panel">
-                <div class="panel-head">
-                    <h2>Database Snapshot</h2>
-                    <a href="{{ route('backend.page', 'products') }}">Manage</a>
-                </div>
-                <div class="snapshot-grid">
-                    <div><span>Products</span><strong>{{ number_format($totalProducts) }}</strong><small>{{ number_format($activeProducts) }} active / {{ number_format($inactiveProducts) }} inactive</small></div>
-                    <div><span>Categories</span><strong>{{ number_format($totalCategories) }}</strong><small>{{ number_format($activeCategories) }} active / {{ number_format($inactiveCategories) }} inactive</small></div>
-                    <div><span>Users</span><strong>{{ number_format($totalUsers) }}</strong><small>{{ number_format($activeUsers) }} active</small></div>
-                    <div><span>Order Items</span><strong>{{ number_format($orderItemsCount ?? 0) }}</strong><small>{{ number_format($reviewsCount ?? 0) }} reviews</small></div>
-                </div>
-            </article>
-
-            <article class="panel products-panel compact-products-panel">
-                <div class="panel-head">
-                    <h2>Best Sellers</h2>
-                    <a href="{{ route('backend.page', 'reports') }}">Reports</a>
-                </div>
-                <div class="product-list">
-                    @forelse ($topProducts as $product)
-                        <div class="product-row">
-                            <img src="{{ url($product->product_image ?: 'backend/assets/imgs/product-bottle.png') }}" alt="{{ $product->product_name }}">
-                            <div><strong>{{ $product->product_name }}</strong><span>{{ $product->product_sku ?: 'Order item' }}</span></div>
-                            <em>{{ number_format((int) $product->sold_quantity) }} sold</em>
-                        </div>
-                    @empty
-                        <div class="empty-cell">No sold products yet.</div>
-                    @endforelse
-                </div>
-            </article>
-
-            <article class="panel products-panel compact-products-panel">
-                <div class="panel-head">
-                    <h2>Low Stock</h2>
-                    <a href="{{ route('backend.page', 'products') }}">Products</a>
-                </div>
-                <div class="product-list">
-                    @forelse ($lowStockProducts as $product)
-                        <div class="product-row">
-                            <img src="{{ url($product->image ?: 'backend/assets/imgs/product-bottle.png') }}" alt="{{ $product->name }}">
-                            <div><strong>{{ $product->name }}</strong><span>{{ $product->category?->name ?? 'Product' }}</span></div>
-                            <em>{{ number_format($product->stock) }} left</em>
-                        </div>
-                    @empty
-                        <div class="empty-cell">No low-stock products.</div>
-                    @endforelse
-                </div>
-            </article>
-        </section>
+<div class="vx-dashboard">
+    <div class="vx-page-head">
+        <div><h1>Analytics Dashboard</h1><p>Welcome back, {{ auth()->user()->name ?? 'Admin' }}. Here is what is happening with your store.</p></div>
+        <form method="GET" action="{{ route('backend.dashboard') }}">
+            <select name="range" onchange="this.form.submit()">
+                @foreach ([7 => 'Last 7 days', 30 => 'Last 30 days', 90 => 'Last 90 days', 365 => 'Last year'] as $days => $label)
+                    <option value="{{ $days }}" @selected($range === $days)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </form>
     </div>
+
+    <section class="vx-grid vx-grid-top">
+        <article class="vx-card vx-analytics-hero">
+            <div>
+                <h2>Store Analytics</h2>
+                <p>Total {{ number_format($rangeOrders) }} orders in the selected period</p>
+                <div class="vx-hero-metrics">
+                    <span><b>{{ number_format($rangeOrders) }}</b>Orders</span>
+                    <span><b>&pound;{{ number_format($rangeRevenue, 0) }}</b>Revenue</span>
+                    <span><b>{{ number_format($itemsSold) }}</b>Items</span>
+                    <span><b>{{ number_format($deliveredOrders) }}</b>Delivered</span>
+                </div>
+                <a href="{{ route('backend.page', 'reports') }}">View Reports</a>
+            </div>
+            <i class="fa-solid fa-chart-pie"></i>
+        </article>
+
+        <article class="vx-card vx-daily-sales">
+            <span>Average Daily Sales</span>
+            <p>Total sales in this period</p>
+            <strong>&pound;{{ number_format($rangeRevenue / max($range, 1), 2) }}</strong>
+            <div class="vx-mini-bars">
+                @foreach ($revenueSeries->take(-12) as $value)
+                    <i style="height: {{ max(8, ($value / max((float) $revenueSeries->max(), 1)) * 60) }}px"></i>
+                @endforeach
+            </div>
+        </article>
+
+        <article class="vx-card vx-sales-overview">
+            <div class="vx-card-head"><div><span>Sales Overview</span><strong>&pound;{{ number_format($rangeRevenue, 1) }}</strong></div><em>+{{ number_format($rangeOrders ? ($deliveredOrders / $rangeOrders) * 100 : 0, 1) }}%</em></div>
+            <div class="vx-overview-pair">
+                <span><i class="fa-solid fa-cart-shopping"></i><b>{{ number_format($rangeOrders) }}</b><small>Orders</small></span>
+                <strong>VS</strong>
+                <span><i class="fa-solid fa-eye"></i><b>{{ number_format($totalUsers) }}</b><small>Customers</small></span>
+            </div>
+            <div class="vx-progress"><i style="width: {{ $rangeOrders ? ($deliveredOrders / $rangeOrders) * 100 : 0 }}%"></i></div>
+        </article>
+    </section>
+
+    <section class="vx-grid vx-grid-middle">
+        <article class="vx-card vx-earning-report">
+            <div class="vx-card-head"><div><span>Earning Reports</span><p>Selected period overview</p></div><button type="button"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div class="vx-earning-total"><strong>&pound;{{ number_format($rangeRevenue, 2) }}</strong><em>{{ number_format($rangeOrders) }} orders</em></div>
+            <div class="vx-report-chart"><canvas data-dashboard-chart aria-label="Earning report chart"></canvas></div>
+            <script type="application/json" data-dashboard-chart-data>{!! json_encode(['labels' => $chartLabels, 'revenue' => $revenueSeries, 'orders' => $ordersSeries]) !!}</script>
+            <div class="vx-report-stats">
+                <span><i class="fa-solid fa-pound-sign"></i><small>Revenue</small><b>&pound;{{ number_format($rangeRevenue, 0) }}</b></span>
+                <span><i class="fa-solid fa-chart-line"></i><small>Average</small><b>&pound;{{ number_format($rangeOrders ? $rangeRevenue / $rangeOrders : 0, 0) }}</b></span>
+                <span><i class="fa-solid fa-receipt"></i><small>Pending</small><b>&pound;{{ number_format($pendingRevenue, 0) }}</b></span>
+            </div>
+        </article>
+
+        <article class="vx-card vx-support-tracker">
+            <div class="vx-card-head"><div><span>Order Tracker</span><p>Last {{ $range }} days</p></div><button type="button"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div class="vx-tracker-body">
+                <div><strong>{{ number_format($rangeOrders) }}</strong><span>Total Orders</span>
+                    <p><i class="green"></i>Delivered <b>{{ number_format($deliveredOrders) }}</b></p>
+                    <p><i class="orange"></i>Pending <b>{{ number_format($pendingOrders) }}</b></p>
+                    <p><i class="purple"></i>Paid <b>{{ number_format($paidOrders) }}</b></p>
+                </div>
+                @php $completePercent = $rangeOrders ? round(($deliveredOrders / $rangeOrders) * 100) : 0; @endphp
+                <div class="vx-radial" style="--percent: {{ $completePercent }}%"><span><b>{{ $completePercent }}%</b>Completed</span></div>
+            </div>
+        </article>
+    </section>
+
+    <section class="vx-grid vx-grid-lists">
+        <article class="vx-card vx-country-sales">
+            <div class="vx-card-head"><div><span>Top Customers</span><p>Highest spend in selected period</p></div><a href="{{ route('backend.page', 'orders') }}">View all</a></div>
+            <div class="vx-list">
+                @forelse ($topCustomers->take(6) as $customer)
+                    <a href="{{ route('backend.page', ['page' => 'orders', 'q' => $customer['email']]) }}"><i>{{ strtoupper(substr($customer['name'], 0, 2)) }}</i><span><b>{{ $customer['name'] }}</b><small>{{ $customer['orders'] }} orders</small></span><strong>&pound;{{ number_format($customer['spent'], 0) }}</strong></a>
+                @empty <div class="empty-cell">No customer data.</div> @endforelse
+            </div>
+        </article>
+
+        <article class="vx-card vx-total-earning">
+            <div class="vx-card-head"><div><span>Total Earning</span><p>Paid and pending revenue</p></div><button type="button"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div class="vx-earning-ring" style="--percent: {{ $totalRevenue ? ($paidRevenue / $totalRevenue) * 100 : 0 }}%"><div><strong>{{ number_format($totalRevenue ? ($paidRevenue / $totalRevenue) * 100 : 0, 0) }}%</strong><span>Paid</span></div></div>
+            <div class="vx-earning-lines">
+                <p><i class="fa-solid fa-wallet"></i><span><b>Total Revenue</b><small>Client payments</small></span><strong>&pound;{{ number_format($paidRevenue, 0) }}</strong></p>
+                <p><i class="fa-solid fa-arrow-rotate-left"></i><span><b>Pending</b><small>Unpaid orders</small></span><strong>&pound;{{ number_format($pendingRevenue, 0) }}</strong></p>
+            </div>
+        </article>
+
+        <article class="vx-card vx-campaign-state">
+            <div class="vx-card-head"><div><span>Inventory State</span><p>{{ number_format($totalInventory) }} available units</p></div><a href="{{ route('backend.page', 'products') }}">Products</a></div>
+            <div class="vx-list compact">
+                @forelse ($lowStockProducts as $product)
+                    <a href="{{ route('backend.resource.edit', ['resource' => 'products', 'id' => $product->id]) }}"><i class="fa-solid fa-box"></i><span><b>{{ $product->name }}</b><small>{{ $product->category?->name ?? 'Product' }}</small></span><strong>{{ $product->stock }} left</strong></a>
+                @empty <div class="empty-cell">No low-stock products.</div> @endforelse
+            </div>
+        </article>
+    </section>
+
+    <section class="vx-grid vx-grid-bottom">
+        <article class="vx-card vx-source-visits">
+            <div class="vx-card-head"><div><span>Top Selling Products</span><p>Products ranked by units sold</p></div><a href="{{ route('backend.page', 'products') }}">View all</a></div>
+            <div class="vx-source-grid">
+                @forelse ($topProducts as $product)
+                    <a href="{{ $product->product_id ? route('backend.resource.edit', ['resource' => 'products', 'id' => $product->product_id]) : '#' }}"><i class="fa-solid fa-cube"></i><span><b>{{ $product->product_name }}</b><small>{{ $product->sold_quantity }} units sold</small></span><strong>&pound;{{ number_format($product->sold_total, 0) }}</strong></a>
+                @empty <div class="empty-cell">No product sales.</div> @endforelse
+            </div>
+        </article>
+
+        <article class="vx-card vx-recent-orders">
+            <div class="vx-card-head"><div><span>Recent Orders</span><p>Latest store transactions</p></div><a href="{{ route('backend.page', 'orders') }}">All orders</a></div>
+            <div class="vx-table">
+                <div><b>Order</b><b>Customer</b><b>Status</b><b>Total</b></div>
+                @forelse ($recentOrders as $order)
+                    <a href="{{ route('backend.orders.show', $order) }}"><strong>#{{ $order->order_number }}</strong><span>{{ $order->customer_name }}<small>{{ $order->email }}</small></span><em>{{ Str::headline($order->tracking_status) }}</em><strong>&pound;{{ number_format($order->total, 2) }}</strong></a>
+                @empty <div class="empty-cell">No recent orders.</div> @endforelse
+            </div>
+        </article>
+    </section>
+</div>
 @endsection

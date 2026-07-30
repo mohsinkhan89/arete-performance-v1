@@ -2,6 +2,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark py-lg-0 py-md-1 py-3">
       <div class="container">
         <a class="brand" href="{{ route('frontend.index') }}#home" aria-label="Arete Performance home"><img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance"></a>
+        <div class="header-mobile-actions d-flex d-lg-none align-items-center">
+          <button class="icon-btn search-toggle" type="button" aria-label="Search products"><i class="fa-solid fa-magnifying-glass"></i></button>
+          <button class="icon-btn cart-btn" type="button" aria-label="Cart"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">{{ $cartSummary['item_count'] ?? 0 }}</span></button>
+        </div>
         <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -13,7 +17,7 @@
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('frontend.track-order') ? 'active' : '' }}" href="{{ route('frontend.track-order') }}"><i class="fa-solid fa-truck-fast"></i><span>Track</span></a></li>
             <li class="nav-item"><a class="nav-link {{ request()->routeIs('frontend.my-cart') ? 'active' : '' }}" href="{{ route('frontend.my-cart') }}"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span></a></li>
           </ul>
-          <div class="nav-actions d-flex align-items-center gap-2">
+          <div class="nav-actions d-none d-lg-flex align-items-center gap-2">
             <button class="icon-btn search-toggle" type="button" aria-label="Search products"><i class="fa-solid fa-magnifying-glass"></i></button>
             <button class="icon-btn cart-btn" type="button" aria-label="Cart"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">{{ $cartSummary['item_count'] ?? 0 }}</span></button>
           </div>

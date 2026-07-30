@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartDrawer = document.querySelector(".cart-drawer");
   const cartItems = document.querySelector(".cart-items");
   const cartEmpty = document.querySelector(".cart-empty");
-  const cartCount = document.querySelector(".cart-count");
+  const cartCounts = document.querySelectorAll(".cart-count");
   const cartSubtotal = document.querySelector(".cart-subtotal");
   const productTracks = document.querySelectorAll(".product-track");
   const reportLightbox = document.querySelector(".report-lightbox");
@@ -444,8 +444,14 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       document.querySelectorAll(".product-tabs").forEach((nav) => {
-        nav.style.setProperty("--visible-tabs", String(availableTabs.length));
+        const externalTabs = nav.querySelectorAll("[data-external-tab]").length;
+        nav.style.setProperty("--visible-tabs", String(availableTabs.length + externalTabs));
         nav.querySelectorAll("a").forEach((link) => {
+          if (link.hasAttribute("data-external-tab")) {
+            link.hidden = false;
+            link.classList.remove("is-hidden");
+            return;
+          }
           const key = link.getAttribute("href")?.replace("#", "");
           const isVisible = availableTabs.includes(key);
           link.hidden = !isVisible;
@@ -1201,8 +1207,14 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       document.querySelectorAll(".product-tabs").forEach((nav) => {
-        nav.style.setProperty("--visible-tabs", String(availableTabs.length || 1));
+        const externalTabs = nav.querySelectorAll("[data-external-tab]").length;
+        nav.style.setProperty("--visible-tabs", String((availableTabs.length || 1) + externalTabs));
         nav.querySelectorAll("a").forEach((link) => {
+          if (link.hasAttribute("data-external-tab")) {
+            link.hidden = false;
+            link.classList.remove("is-hidden");
+            return;
+          }
           const key = link.getAttribute("href")?.replace("#", "");
           const isVisible = availableTabs.includes(key);
           link.hidden = !isVisible;
@@ -1512,7 +1524,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </article>`;
     }).join("");
 
-    cartCount.textContent = data.item_count;
+    cartCounts.forEach((cartCount) => { cartCount.textContent = data.item_count; });
     cartSubtotal.textContent = money(data.subtotal);
     cartEmpty.classList.toggle("is-visible", data.is_empty);
   }
@@ -1589,7 +1601,7 @@ document.addEventListener("DOMContentLoaded", () => {
   navbarCollapse.addEventListener("hidden.bs.collapse", () => siteHeader.classList.remove("menu-open"));
   window.addEventListener("scroll", updateHeaderState, { passive: true });
 
-  document.querySelector(".search-toggle").addEventListener("click", openSearch);
+  document.querySelectorAll(".search-toggle").forEach((button) => button.addEventListener("click", openSearch));
   document.querySelector(".search-close").addEventListener("click", closeSearch);
   searchPanel.addEventListener("click", (event) => {
     if (event.target === searchPanel) closeSearch();
@@ -1604,7 +1616,7 @@ document.addEventListener("DOMContentLoaded", () => {
     goToPage(`${route("search", "/search")}${query ? `?q=${encodeURIComponent(query)}` : ""}`);
   });
 
-  document.querySelector(".cart-btn").addEventListener("click", openCart);
+  document.querySelectorAll(".cart-btn").forEach((button) => button.addEventListener("click", openCart));
   document.querySelector(".cart-close").addEventListener("click", closeCart);
   cartOverlay.addEventListener("click", closeCart);
   productTracks.forEach((productTrack) => {
@@ -2251,6 +2263,154 @@ document.addEventListener("DOMContentLoaded", () => {
 
     showProductTab(location.hash.replace("#", ""), false);
   }
+
+  document.querySelectorAll("[data-peptide-calculator]").forEach((calculator) => {
+    const activeChoice = (group) => calculator.querySelector(`[data-peptide-group="${group}"] .active`);
+    const groupValue = (group) => {
+      const choice = activeChoice(group);
+      const custom = calculator.querySelector(`[data-peptide-custom="${group}"]`);
+      return choice?.hasAttribute(`data-peptide-other`) ? Number(custom?.value) || 0 : Number(choice?.dataset.value) || 0;
+    };
+    const setText = (selector, value) => calculator.querySelectorAll(selector).forEach((node) => { node.textContent = value; });
+
+    const syncCustomInput = (group) => {
+      const input = calculator.querySelector(`[data-peptide-custom="${group}"]`);
+      if (input) input.classList.toggle("active", activeChoice(group)?.hasAttribute("data-peptide-other"));
+    };
+
+    const buildScale = (units) => {
+      calculator.querySelectorAll("[data-syringe-scale-ticks]").forEach((scale) => {
+        const step = units <= 50 ? 5 : 10;
+        scale.innerHTML = Array.from({ length: (units / step) + 1 }, (_, index) => {
+          const value = index * step;
+          return `<span style="left:${(value / units) * 100}%"><em>${value}</em></span>`;
+        }).join("");
+      });
+    };
+
+    const calculate = () => {
+      const syringe = activeChoice("syringe");
+      const syringeMl = groupValue("syringe");
+      const syringeUnits = Number(syringe?.dataset.units) || 100;
+      const vialMg = groupValue("vial");
+      const waterMl = groupValue("water");
+      const doseMcg = groupValue("dose");
+      const concentration = waterMl > 0 ? (vialMg * 1000) / waterMl : 0;
+      const pullMl = concentration > 0 ? doseMcg / concentration : 0;
+      const pullUnits = pullMl * 100;
+      const usage = syringeMl > 0 ? (pullMl / syringeMl) * 100 : 0;
+      const displayUnits = pullUnits >= 10 ? pullUnits.toFixed(1) : pullUnits.toFixed(2);
+
+      setText("[data-peptide-result]", displayUnits);
+      setText("[data-peptide-result-inline]", displayUnits);
+      setText("[data-peptide-summary-result]", `${displayUnits} units`);
+      setText("[data-peptide-dose-inline]", `${doseMcg || 0} mcg`);
+      setText("[data-peptide-units]", `${displayUnits} units`);
+      setText("[data-peptide-ml]", `${pullMl.toFixed(3)} ml`);
+      setText("[data-peptide-percent]", `${Math.min(usage, 999).toFixed(1)}%`);
+      setText("[data-syringe-label]", syringe?.dataset.label || "");
+      setText("[data-syringe-capacity]", `${syringeMl} ml / ${syringeUnits} units`);
+      setText("[data-syringe-marking]", `${syringeUnits} unit markings`);
+
+      calculator.querySelectorAll("[data-peptide-fill]").forEach((fill) => { fill.style.width = `${Math.min(usage, 100)}%`; });
+      calculator.querySelectorAll("[data-syringe-scale-marker]").forEach((marker) => { marker.style.left = `${Math.min(Math.max(usage, 0), 100)}%`; });
+      calculator.querySelector("[data-peptide-warning]")?.classList.toggle("active", pullMl > syringeMl);
+      const note = calculator.querySelector("[data-peptide-summary-note]");
+      if (note) note.textContent = pullMl > syringeMl ? "Selected syringe is not sufficient for this amount." : "Use the selected syringe and pull to the calculated unit line.";
+      buildScale(syringeUnits);
+    };
+
+    calculator.querySelectorAll(".peptide-choice, .peptide-syringe-option").forEach((choice) => {
+      choice.addEventListener("click", () => {
+        const group = choice.closest("[data-peptide-group]");
+        if (!group) return;
+        group.querySelectorAll(".peptide-choice, .peptide-syringe-option").forEach((item) => item.classList.remove("active"));
+        choice.classList.add("active");
+        syncCustomInput(group.dataset.peptideGroup);
+        calculate();
+      });
+    });
+    calculator.querySelectorAll(".peptide-custom-input").forEach((input) => input.addEventListener("input", calculate));
+    ["vial", "water", "dose"].forEach(syncCustomInput);
+    calculate();
+  });
+
+  document.querySelectorAll("[data-hero-feature-slider]").forEach((slider) => {
+    const track = slider.querySelector(".hero-features");
+    const slides = [...slider.querySelectorAll(".hero-feature-slide")];
+    const pagination = slider.querySelector(".hero-feature-pagination");
+    const responsiveQuery = window.matchMedia("(max-width: 991.98px)");
+    const mobileQuery = window.matchMedia("(max-width: 767.98px)");
+    let activePage = 0;
+    let autoSlide = null;
+    let scrollFrame = null;
+
+    const visibleSlides = () => 2;
+    const pageCount = () => Math.ceil(slides.length / visibleSlides());
+    const pageWidth = () => track.clientWidth;
+
+    const updateDots = () => {
+      pagination?.querySelectorAll("button").forEach((dot, index) => {
+        dot.classList.toggle("is-active", index === activePage);
+        dot.setAttribute("aria-current", index === activePage ? "true" : "false");
+      });
+    };
+
+    const goToPage = (page, behavior = "smooth") => {
+      const total = pageCount();
+      activePage = (page + total) % total;
+      track.scrollTo({ left: activePage * pageWidth(), behavior });
+      updateDots();
+    };
+
+    const stopAutoSlide = () => {
+      if (autoSlide) window.clearInterval(autoSlide);
+      autoSlide = null;
+    };
+
+    const startAutoSlide = () => {
+      stopAutoSlide();
+      if (!responsiveQuery.matches || pageCount() < 2) return;
+      autoSlide = window.setInterval(() => goToPage(activePage + 1), 3800);
+    };
+
+    const buildPagination = () => {
+      stopAutoSlide();
+      activePage = 0;
+      track.scrollTo({ left: 0, behavior: "auto" });
+      if (!pagination) return;
+      pagination.innerHTML = responsiveQuery.matches
+        ? Array.from({ length: pageCount() }, (_, index) =>
+          `<button type="button" aria-label="Show delivery benefits ${index + 1}"></button>`
+        ).join("")
+        : "";
+      pagination.querySelectorAll("button").forEach((dot, index) => {
+        dot.addEventListener("click", () => {
+          goToPage(index);
+          startAutoSlide();
+        });
+      });
+      updateDots();
+      startAutoSlide();
+    };
+
+    track.addEventListener("scroll", () => {
+      if (!responsiveQuery.matches || scrollFrame) return;
+      scrollFrame = window.requestAnimationFrame(() => {
+        activePage = Math.max(0, Math.min(pageCount() - 1, Math.round(track.scrollLeft / pageWidth())));
+        updateDots();
+        scrollFrame = null;
+      });
+    }, { passive: true });
+
+    slider.addEventListener("pointerenter", stopAutoSlide);
+    slider.addEventListener("pointerleave", startAutoSlide);
+    slider.addEventListener("touchstart", stopAutoSlide, { passive: true });
+    slider.addEventListener("touchend", startAutoSlide, { passive: true });
+    responsiveQuery.addEventListener("change", buildPagination);
+    mobileQuery.addEventListener("change", buildPagination);
+    buildPagination();
+  });
 
   prepareAnimatedHeadings();
   preparePageAnimations();

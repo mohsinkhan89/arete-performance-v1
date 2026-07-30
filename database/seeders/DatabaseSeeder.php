@@ -64,5 +64,7 @@ class DatabaseSeeder extends Seeder
                 'is_featured' => true,
             ]);
         });
+
+        $this->call(DemoOrderSeeder::class);
     }
 }

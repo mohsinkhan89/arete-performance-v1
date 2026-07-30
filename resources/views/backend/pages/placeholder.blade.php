@@ -8,6 +8,40 @@
         <p>Manage {{ strtolower($pageTitle) }} from your Arete Performance admin panel.</p>
     </div>
 
+    @if (in_array($page, ['products', 'categories', 'users', 'reviews', 'orders', 'stock-notifications'], true))
+        @php
+            $moduleStatuses = match ($page) {
+                'orders' => ['paid' => 'Paid', 'unpaid' => 'Unpaid', 'processing' => 'Processing', 'dispatched' => 'Dispatched', 'delivered' => 'Delivered', 'cancelled' => 'Cancelled'],
+                'stock-notifications' => ['pending' => 'Pending', 'notified' => 'Notified'],
+                default => ['active' => 'Active', 'inactive' => 'Inactive'],
+            };
+        @endphp
+        <section class="module-filter-bar">
+            <form method="GET" action="{{ route('backend.page', $page) }}">
+                <div class="module-filter-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" name="q" value="{{ $search }}" placeholder="Search {{ strtolower($pageTitle) }}...">
+                </div>
+                <select name="status" aria-label="Filter by status">
+                    <option value="">All statuses</option>
+                    @foreach ($moduleStatuses as $value => $label)
+                        <option value="{{ $value }}" @selected($status === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+                <button type="submit"><i class="fa-solid fa-filter"></i> Apply</button>
+                @if ($search !== '' || $status !== '')
+                    <a href="{{ route('backend.page', $page) }}"><i class="fa-solid fa-xmark"></i> Clear</a>
+                @endif
+            </form>
+            <nav aria-label="{{ $pageTitle }} quick filters">
+                <a class="{{ $status === '' ? 'active' : '' }}" href="{{ route('backend.page', $page) }}">All</a>
+                @foreach ($moduleStatuses as $value => $label)
+                    <a class="{{ $status === $value ? 'active' : '' }}" href="{{ route('backend.page', ['page' => $page, 'status' => $value]) }}">{{ $label }}</a>
+                @endforeach
+            </nav>
+        </section>
+    @endif
+
     @if ($page === 'reports')
         <div class="stats-grid">
             <article class="stat-card">
@@ -142,6 +176,14 @@
                                     </td>
                                     <td>
                                         <div class="action-group">
+                                            <button type="button"
+                                                data-resource-preview
+                                                data-preview-title="{{ $product->name }}"
+                                                data-preview-image="{{ url($product->image ?: 'backend/assets/imgs/product-bottle.png') }}"
+                                                data-preview-subtitle="{{ $product->category?->name ?? 'Uncategorised' }}"
+                                                data-preview-meta="{{ $product->sku }}|£{{ number_format((float) $product->price, 2) }}|{{ ucfirst($product->status) }}|{{ number_format($product->stock) }} stock"
+                                                data-preview-edit="{{ route('backend.resource.edit', ['resource' => 'products', 'id' => $product->id]) }}"
+                                                title="View"><i class="fa-regular fa-eye"></i></button>
                                             <a href="{{ route('backend.resource.edit', ['resource' => 'products', 'id' => $product->id]) }}" title="Edit"><i class="fa-solid fa-pen"></i></a>
                                             <form action="{{ route('backend.resource.destroy', ['resource' => 'products', 'id' => $product->id]) }}" method="POST" onsubmit="return confirm('Delete this product?')">
                                                 @csrf
