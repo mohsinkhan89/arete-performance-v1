@@ -480,8 +480,67 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   resourcePreviewModal?.querySelectorAll('[data-resource-preview-close]').forEach((button) => button.addEventListener('click', closeResourcePreview));
+
+  const userEditorModal = document.querySelector('[data-user-editor-modal]');
+  const userEditorForm = userEditorModal?.querySelector('[data-user-modal-form]');
+  const userEditorTitle = userEditorModal?.querySelector('#userModalTitle');
+  const userEditorMethod = userEditorModal?.querySelector('[data-user-modal-method]');
+  const userSubmitLabel = userEditorModal?.querySelector('[data-user-submit-label]');
+  const userPassword = userEditorModal?.querySelector('[data-user-field="password"]');
+  const userPasswordNote = userEditorModal?.querySelector('[data-user-password-note]');
+  const setUserField = (field, value) => {
+    const input = userEditorModal?.querySelector(`[data-user-field="${field}"]`);
+    if (input) input.value = value || '';
+  };
+  const closeUserEditor = () => {
+    userEditorModal?.classList.remove('is-open');
+    userEditorModal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  };
+
+  document.querySelectorAll('[data-user-modal-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!userEditorModal || !userEditorForm) return;
+
+      const isEdit = button.dataset.mode === 'edit';
+      userEditorForm.action = button.dataset.action || '';
+      if (userEditorTitle) userEditorTitle.textContent = isEdit ? 'Edit User' : 'Add User';
+      if (userSubmitLabel) userSubmitLabel.textContent = isEdit ? 'Update User' : 'Save User';
+
+      if (userEditorMethod) {
+        userEditorMethod.disabled = !isEdit;
+        userEditorMethod.value = isEdit ? 'PUT' : '';
+      }
+
+      setUserField('name', isEdit ? button.dataset.name : '');
+      setUserField('email', isEdit ? button.dataset.email : '');
+      setUserField('phone', isEdit ? button.dataset.phone : '');
+      setUserField('role', isEdit ? button.dataset.role : 'admin');
+      setUserField('status', isEdit ? button.dataset.status : 'active');
+      setUserField('password', '');
+
+      if (userPassword) {
+        userPassword.required = !isEdit;
+        userPassword.placeholder = isEdit ? 'Leave blank to keep current password' : 'Minimum 6 characters';
+      }
+
+      if (userPasswordNote) {
+        userPasswordNote.textContent = isEdit ? 'Leave blank to keep the current password.' : 'Required for new users.';
+      }
+
+      userEditorModal.classList.add('is-open');
+      userEditorModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      window.setTimeout(() => userEditorModal.querySelector('[data-user-field="name"]')?.focus(), 60);
+    });
+  });
+  userEditorModal?.querySelectorAll('[data-user-modal-close]').forEach((button) => button.addEventListener('click', closeUserEditor));
+
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeResourcePreview();
+    if (event.key === 'Escape') {
+      closeResourcePreview();
+      closeUserEditor();
+    }
   });
   document.addEventListener('fullscreenchange', syncFullscreen);
 

@@ -174,6 +174,7 @@ class BackendController extends Controller
         $pageTitle = ucwords(str_replace('-', ' ', $page));
         $search = trim((string) $request->query('q', ''));
         $status = trim((string) $request->query('status', ''));
+        $role = trim((string) $request->query('role', ''));
         $records = match ($page) {
             'products' => Product::with('category')
                 ->when($search, fn ($query) => $query->where(fn ($query) => $query
@@ -197,6 +198,7 @@ class BackendController extends Controller
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")))
+                ->when($role, fn ($query) => $query->where('role', $role))
                 ->when($status, fn ($query) => $query->where('status', $status))
                 ->latest()
                 ->paginate(10)
@@ -247,6 +249,14 @@ class BackendController extends Controller
             'cancelled_count' => Order::where('status', 'cancelled')->count(),
             'recent' => Order::with('items')->latest()->take(10)->get(),
         ] : null;
+        $userStats = $page === 'users' ? [
+            'total' => User::count(),
+            'active' => User::where('status', 'active')->count(),
+            'inactive' => User::where('status', 'inactive')->count(),
+            'pending' => User::whereNotIn('status', ['active', 'inactive'])->count(),
+            'paid' => Order::query()->distinct('email')->count('email'),
+            'roles' => User::query()->whereNotNull('role')->distinct()->orderBy('role')->pluck('role'),
+        ] : null;
 
         if ($page === 'settings') {
             return view('backend.pages.settings', [
@@ -262,8 +272,10 @@ class BackendController extends Controller
             'records' => $records,
             'search' => $search,
             'status' => $status,
+            'role' => $role,
             'canManageUsers' => $this->isSuperAdmin(),
             'reportStats' => $reportStats,
+            'userStats' => $userStats,
         ]);
     }
 

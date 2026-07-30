@@ -3,12 +3,14 @@
 @section('title', $pageTitle)
 
 @section('body')
-    <div class="page-heading">
-        <h1>{{ $pageTitle }}</h1>
-        <p>Manage {{ strtolower($pageTitle) }} from your Arete Performance admin panel.</p>
-    </div>
+    @if ($page !== 'users')
+        <div class="page-heading">
+            <h1>{{ $pageTitle }}</h1>
+            <p>Manage {{ strtolower($pageTitle) }} from your Arete Performance admin panel.</p>
+        </div>
+    @endif
 
-    @if (in_array($page, ['products', 'categories', 'users', 'reviews', 'orders', 'stock-notifications'], true))
+    @if (in_array($page, ['products', 'categories', 'reviews', 'orders', 'stock-notifications'], true))
         @php
             $moduleStatuses = match ($page) {
                 'orders' => ['paid' => 'Paid', 'unpaid' => 'Unpaid', 'processing' => 'Processing', 'dispatched' => 'Dispatched', 'delivered' => 'Delivered', 'cancelled' => 'Cancelled'],
@@ -239,54 +241,236 @@
                         </tbody>
                     </table>
                 @elseif ($page === 'users')
-                    <table>
-                        <thead>
-                            <tr><th>User</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Joined</th><th>Action</th></tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($records as $user)
-                                <tr>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
-                                    <td>{{ $user->phone ?? '-' }}</td>
-                                    <td>{{ ucfirst($user->role ?? 'user') }}</td>
-                                    <td>
-                                        @if ($canManageUsers && auth()->id() !== $user->id)
-                                            <form action="{{ route('backend.resource.status', ['resource' => 'users', 'id' => $user->id]) }}" method="POST">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button class="status-toggle {{ ($user->status ?? 'active') === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status">
-                                                    <i class="fa-solid {{ ($user->status ?? 'active') === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
-                                                    {{ ucfirst($user->status ?? 'active') }}
-                                                </button>
-                                            </form>
-                                        @else
-                                            <span class="badge {{ ($user->status ?? 'active') === 'active' ? 'green' : 'red' }}">{{ ucfirst($user->status ?? 'active') }}</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $user->created_at?->format('M d, Y') }}</td>
-                                    <td>
-                                        @if ($canManageUsers)
-                                            <div class="action-group">
-                                                <a href="{{ route('backend.resource.edit', ['resource' => 'users', 'id' => $user->id]) }}" title="Edit"><i class="fa-solid fa-pen"></i></a>
-                                                @if (auth()->id() !== $user->id)
-                                                    <form action="{{ route('backend.resource.destroy', ['resource' => 'users', 'id' => $user->id]) }}" method="POST" onsubmit="return confirm('Delete this user?')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" title="Delete"><i class="fa-solid fa-trash"></i></button>
-                                                    </form>
-                                                @endif
-                                            </div>
-                                        @else
-                                            <span class="view-only"><i class="fa-regular fa-eye"></i> View only</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="7" class="empty-cell">No users found.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                    @php
+                        $plans = ['Enterprise', 'Basic', 'Team', 'Company'];
+                        $billings = ['Auto Debit', 'Manual - Paypal', 'Manual - Cash'];
+                        $roleIconMap = [
+                            'super administrator' => ['fa-user-shield', 'red'],
+                            'administrator' => ['fa-user-gear', 'purple'],
+                            'admin' => ['fa-desktop', 'red'],
+                            'maintainer' => ['fa-user-check', 'green'],
+                            'subscriber' => ['fa-crown', 'purple'],
+                            'editor' => ['fa-clock', 'cyan'],
+                            'author' => ['fa-pen-to-square', 'orange'],
+                            'user' => ['fa-user', 'green'],
+                        ];
+                    @endphp
+
+                    <div class="vx-users-view">
+                        <section class="vx-user-stats">
+                            <article>
+                                <span>Session</span>
+                                <strong>{{ number_format($userStats['total'] ?? 0) }} <em>(+29%)</em></strong>
+                                <small>Total Users</small>
+                                <i class="fa-solid fa-users purple"></i>
+                            </article>
+                            <article>
+                                <span>Paid Users</span>
+                                <strong>{{ number_format($userStats['paid'] ?? 0) }} <em>(+18%)</em></strong>
+                                <small>Last week analytics</small>
+                                <i class="fa-solid fa-user-plus red"></i>
+                            </article>
+                            <article>
+                                <span>Active Users</span>
+                                <strong>{{ number_format($userStats['active'] ?? 0) }} <em class="down">(-14%)</em></strong>
+                                <small>Last week analytics</small>
+                                <i class="fa-solid fa-user-check green"></i>
+                            </article>
+                            <article>
+                                <span>Pending Users</span>
+                                <strong>{{ number_format($userStats['pending'] ?? 0) }} <em>(+42%)</em></strong>
+                                <small>Last week analytics</small>
+                                <i class="fa-solid fa-user-clock orange"></i>
+                            </article>
+                        </section>
+
+                        <section class="vx-users-card">
+                            <form class="vx-users-filters" method="GET" action="{{ route('backend.page', 'users') }}">
+                                <h2>Filters</h2>
+                                <div>
+                                    <select name="role" aria-label="Select role" onchange="this.form.submit()">
+                                        <option value="">Select Role</option>
+                                        @foreach (($userStats['roles'] ?? collect()) as $filterRole)
+                                            <option value="{{ $filterRole }}" @selected(($role ?? '') === $filterRole)>{{ Str::headline($filterRole) }}</option>
+                                        @endforeach
+                                    </select>
+                                    <select name="plan" aria-label="Select plan" onchange="this.form.submit()">
+                                        <option value="">Select Plan</option>
+                                        @foreach ($plans as $plan)
+                                            <option value="{{ strtolower($plan) }}" @selected(request('plan') === strtolower($plan))>{{ $plan }}</option>
+                                        @endforeach
+                                    </select>
+                                    <select name="status" aria-label="Select status" onchange="this.form.submit()">
+                                        <option value="">Select Status</option>
+                                        <option value="active" @selected($status === 'active')>Active</option>
+                                        <option value="inactive" @selected($status === 'inactive')>Inactive</option>
+                                    </select>
+                                </div>
+                            </form>
+
+                            <form class="vx-users-toolbar" method="GET" action="{{ route('backend.page', 'users') }}">
+                                <input type="hidden" name="role" value="{{ $role ?? '' }}">
+                                <input type="hidden" name="status" value="{{ $status ?? '' }}">
+                                <select name="per_page" aria-label="Rows per page">
+                                    <option>10</option>
+                                </select>
+                                <div>
+                                    <input type="search" name="q" value="{{ $search }}" placeholder="Search User">
+                                    <button class="vx-export-btn" type="button"><i class="fa-solid fa-arrow-up-from-bracket"></i> Export <i class="fa-solid fa-chevron-down"></i></button>
+                                    @if ($canManage)
+                                        <button class="vx-add-record" type="button"
+                                            data-user-modal-open
+                                            data-mode="create"
+                                            data-action="{{ route('backend.resource.store', ['resource' => 'users']) }}">
+                                            <i class="fa-solid fa-plus"></i> Add New Record
+                                        </button>
+                                    @endif
+                                </div>
+                            </form>
+
+                            <div class="vx-users-table-wrap">
+                                <table class="vx-users-table">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" aria-label="Select all users"></th>
+                                            <th>User</th>
+                                            <th>Role</th>
+                                            <th>Plan</th>
+                                            <th>Billing</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($records as $user)
+                                            @php
+                                                $roleName = strtolower($user->role ?? 'user');
+                                                $roleIcon = $roleIconMap[$roleName] ?? $roleIconMap['user'];
+                                                $plan = $plans[$user->id % count($plans)];
+                                                $billing = $billings[$user->id % count($billings)];
+                                                $statusName = strtolower($user->status ?? 'active');
+                                                $initials = Str::of($user->name)->explode(' ')->filter()->map(fn ($part) => Str::substr($part, 0, 1))->take(2)->implode('');
+                                            @endphp
+                                            <tr>
+                                                <td><input type="checkbox" aria-label="Select {{ $user->name }}"></td>
+                                                <td>
+                                                    <span class="vx-user-cell">
+                                                        @if ($user->avatar)
+                                                            <img src="{{ url($user->avatar) }}" alt="{{ $user->name }}">
+                                                        @else
+                                                            <b>{{ Str::upper($initials ?: 'U') }}</b>
+                                                        @endif
+                                                        <span><strong>{{ $user->name }}</strong><small>{{ $user->email }}</small></span>
+                                                    </span>
+                                                </td>
+                                                <td><span class="vx-role {{ $roleIcon[1] }}"><i class="fa-solid {{ $roleIcon[0] }}"></i>{{ Str::headline($user->role ?? 'user') }}</span></td>
+                                                <td>{{ $plan }}</td>
+                                                <td>{{ $billing }}</td>
+                                                <td>
+                                                    <span class="vx-status {{ $statusName === 'active' ? 'active' : ($statusName === 'inactive' ? 'inactive' : 'pending') }}">{{ Str::headline($statusName) }}</span>
+                                                </td>
+                                                <td>
+                                                    @if ($canManageUsers)
+                                                        <div class="vx-row-actions">
+                                                            @if (auth()->id() !== $user->id)
+                                                                <form action="{{ route('backend.resource.destroy', ['resource' => 'users', 'id' => $user->id]) }}" method="POST" onsubmit="return confirm('Delete this user?')">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
+                                                                </form>
+                                                            @else
+                                                                <button type="button" disabled title="Current user"><i class="fa-regular fa-trash-can"></i></button>
+                                                            @endif
+                                                            <button type="button"
+                                                                data-user-modal-open
+                                                                data-mode="edit"
+                                                                data-action="{{ route('backend.resource.update', ['resource' => 'users', 'id' => $user->id]) }}"
+                                                                data-name="{{ $user->name }}"
+                                                                data-email="{{ $user->email }}"
+                                                                data-phone="{{ $user->phone }}"
+                                                                data-role="{{ str_contains(strtolower($user->role ?? ''), 'super') ? 'superadmin' : 'admin' }}"
+                                                                data-status="{{ $user->status ?? 'active' }}"
+                                                                title="View"><i class="fa-regular fa-eye"></i></button>
+                                                            <button type="button"
+                                                                data-user-modal-open
+                                                                data-mode="edit"
+                                                                data-action="{{ route('backend.resource.update', ['resource' => 'users', 'id' => $user->id]) }}"
+                                                                data-name="{{ $user->name }}"
+                                                                data-email="{{ $user->email }}"
+                                                                data-phone="{{ $user->phone }}"
+                                                                data-role="{{ str_contains(strtolower($user->role ?? ''), 'super') ? 'superadmin' : 'admin' }}"
+                                                                data-status="{{ $user->status ?? 'active' }}"
+                                                                title="Edit"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                                        </div>
+                                                    @else
+                                                        <span class="view-only"><i class="fa-regular fa-eye"></i> View only</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr><td colspan="7" class="empty-cell">No users found.</td></tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <footer class="vx-users-pagination">
+                                <span>Showing {{ $records->firstItem() ?? 0 }} to {{ $records->lastItem() ?? 0 }} of {{ $records->total() }} entries</span>
+                                {{ $records->links() }}
+                            </footer>
+                        </section>
+
+                        @if ($canManage)
+                            <div class="admin-modal user-editor-modal" data-user-editor-modal aria-hidden="true">
+                                <div class="admin-modal-backdrop" data-user-modal-close></div>
+                                <section class="admin-modal-dialog vx-user-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="userModalTitle">
+                                    <button class="admin-modal-close" type="button" data-user-modal-close aria-label="Close user modal"><i class="fa-solid fa-xmark"></i></button>
+                                    <div class="admin-modal-head">
+                                        <span><i class="fa-solid fa-user-gear"></i></span>
+                                        <div>
+                                            <h2 id="userModalTitle">Add User</h2>
+                                            <p>Create and update users without leaving this list.</p>
+                                        </div>
+                                    </div>
+                                    <form class="vx-user-modal-form" data-user-modal-form method="POST">
+                                        @csrf
+                                        <input type="hidden" name="_method" value="" data-user-modal-method disabled>
+                                        <div class="vx-user-modal-grid">
+                                            <label>Name
+                                                <input name="name" data-user-field="name" required>
+                                            </label>
+                                            <label>Phone
+                                                <input name="phone" data-user-field="phone">
+                                            </label>
+                                            <label class="wide">Email
+                                                <input type="email" name="email" data-user-field="email" required>
+                                            </label>
+                                            <label>Role
+                                                <select name="role" data-user-field="role" required>
+                                                    <option value="admin">Admin</option>
+                                                    <option value="superadmin">Super Admin</option>
+                                                </select>
+                                            </label>
+                                            <label>Status
+                                                <select name="status" data-user-field="status" required>
+                                                    <option value="active">Active</option>
+                                                    <option value="inactive">Inactive</option>
+                                                </select>
+                                            </label>
+                                            <label class="wide">Password
+                                                <input type="password" name="password" data-user-field="password" placeholder="Minimum 6 characters">
+                                                <small data-user-password-note>Required for new users.</small>
+                                            </label>
+                                        </div>
+                                        <div class="vx-user-modal-actions">
+                                            <button type="button" data-user-modal-close>Cancel</button>
+                                            <button type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-user-submit-label>Save User</span></button>
+                                        </div>
+                                    </form>
+                                </section>
+                            </div>
+                        @endif
+                    </div>
                 @elseif ($page === 'orders')
                     @php
                         $orderRows = collect($records->items());
