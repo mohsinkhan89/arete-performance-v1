@@ -11906,6 +11906,42 @@ body > .admin-modal.resource-editor-modal .admin-modal-backdrop {
   backdrop-filter: blur(7px);
 }
 
+.report-vx-list > .panel-head {
+  display: block;
+}
+
+.report-vx-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.report-view-modal .vx-user-modal-dialog {
+  width: min(620px, calc(100vw - 2rem));
+  max-height: min(640px, calc(100dvh - 3rem));
+}
+
+.report-modal-body {
+  padding: 0 1.5rem 1.5rem;
+  overflow-y: auto;
+}
+
+.report-modal-body .vx-user-detail-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+}
+
+.report-modal-body .vx-user-detail-card > span {
+  min-height: 78px;
+}
+
+.report-modal-body .vx-user-modal-actions {
+  position: static;
+  margin-top: 1.25rem;
+  padding: 0;
+  border-top: 0;
+}
+
 .crud-vx-list > .crud-vx-pagination {
   display: flex;
   min-height: 70px;
@@ -11966,6 +12002,10 @@ body > .admin-modal.resource-editor-modal .admin-modal-backdrop {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .report-vx-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .vx-users-filters > div {
     grid-template-columns: 1fr;
     gap: 14px;
@@ -11994,6 +12034,11 @@ body > .admin-modal.resource-editor-modal .admin-modal-backdrop {
   .order-vx-stats {
     grid-template-columns: 1fr;
     gap: 10px;
+  }
+
+  .report-vx-stats,
+  .report-modal-body .vx-user-detail-card {
+    grid-template-columns: 1fr;
   }
 
   .vx-users-view {

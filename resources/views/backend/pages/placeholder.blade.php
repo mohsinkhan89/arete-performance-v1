@@ -3,7 +3,7 @@
 @section('title', $pageTitle)
 
 @section('body')
-    @if (! in_array($page, ['users', 'products', 'categories', 'reviews'], true))
+    @if (! in_array($page, ['users', 'products', 'categories', 'reviews', 'reports'], true))
         <div class="page-heading">
             <h1>{{ $pageTitle }}</h1>
             <p>Manage {{ strtolower($pageTitle) }} from your Arete Performance admin panel.</p>
@@ -11,70 +11,107 @@
     @endif
 
     @if ($page === 'reports')
-        <div class="stats-grid">
-            <article class="stat-card">
-                <div>
-                    <span>Paid Orders</span>
-                    <strong>{{ number_format($reportStats['paid_count']) }}</strong>
-                    <small class="up"><i class="fa-solid fa-check-circle"></i> £{{ number_format((float) $reportStats['paid_total'], 2) }}</small>
-                    <em>payment received</em>
-                </div>
-                <i class="stat-icon fa-solid fa-wallet"></i>
-                <svg viewBox="0 0 180 42" aria-hidden="true"><path d="M2 33 C22 31 34 18 52 23 S82 34 102 20 S132 17 150 22 S171 17 178 10"/></svg>
-            </article>
-            <article class="stat-card">
-                <div>
-                    <span>Unpaid Orders</span>
-                    <strong>{{ number_format($reportStats['unpaid_count']) }}</strong>
-                    <small class="down"><i class="fa-solid fa-clock"></i> £{{ number_format((float) $reportStats['unpaid_total'], 2) }}</small>
-                    <em>payment pending</em>
-                </div>
-                <i class="stat-icon fa-solid fa-hourglass-half"></i>
-                <svg viewBox="0 0 180 42" aria-hidden="true"><path d="M2 32 C22 31 34 17 53 24 S84 34 104 18 S134 16 151 20 S171 18 178 9"/></svg>
-            </article>
-            <article class="stat-card">
-                <div>
+        <section class="order-vx-insights order-vx-insights-standalone">
+            <div class="order-vx-stats report-vx-stats">
+                <article>
+                    <i class="fa-solid fa-chart-column purple"></i>
                     <span>Total Orders</span>
                     <strong>{{ number_format($reportStats['orders']) }}</strong>
-                    <small class="down"><i class="fa-solid fa-ban"></i> {{ number_format($reportStats['cancelled_count']) }}</small>
-                    <em>cancelled orders</em>
-                </div>
-                <i class="stat-icon fa-solid fa-chart-column"></i>
-                <svg viewBox="0 0 180 42" aria-hidden="true"><path d="M2 33 C23 32 36 21 55 23 S84 36 104 23 S133 11 150 18 S170 21 178 11"/></svg>
-            </article>
-        </div>
+                    <small>{{ number_format($reportStats['cancelled_count']) }} cancelled</small>
+                </article>
+                <article>
+                    <i class="fa-solid fa-wallet green"></i>
+                    <span>Paid Orders</span>
+                    <strong>{{ number_format($reportStats['paid_count']) }}</strong>
+                    <small>£{{ number_format((float) $reportStats['paid_total'], 2) }} received</small>
+                </article>
+                <article>
+                    <i class="fa-solid fa-clock orange"></i>
+                    <span>Unpaid Orders</span>
+                    <strong>{{ number_format($reportStats['unpaid_count']) }}</strong>
+                    <small>£{{ number_format((float) $reportStats['unpaid_total'], 2) }} pending</small>
+                </article>
+            </div>
+        </section>
 
-        <article class="panel resource-panel resource-panel-polished resource-reports">
+        <article class="panel resource-panel resource-panel-polished resource-reports crud-vx-list report-vx-list">
             <div class="panel-head">
-                <div>
-                    <span class="eyebrow">{{ $reportStats['orders'] }} orders</span>
-                    <h2>Payment Report</h2>
-                </div>
-                <a href="{{ route('backend.page', 'orders') }}"><i class="fa-solid fa-clipboard-list"></i> Orders</a>
+                <form class="vx-users-toolbar crud-vx-toolbar" method="GET" action="{{ route('backend.page', 'reports') }}">
+                    <select name="per_page" aria-label="Rows per page">
+                        <option>10</option>
+                    </select>
+                    <div>
+                        <a class="vx-add-record" href="{{ route('backend.page', 'orders') }}"><i class="fa-solid fa-clipboard-list"></i> All Orders</a>
+                    </div>
+                </form>
             </div>
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Created</th><th>Action</th></tr>
+                        <tr><th><input type="checkbox" aria-label="Select all report rows"></th><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Created</th><th>Actions</th></tr>
                     </thead>
                     <tbody>
                         @forelse ($reportStats['recent'] as $order)
                             <tr>
-                                <td>{{ $order->order_number }}</td>
-                                <td>{{ $order->customer_name }}</td>
+                                <td><input type="checkbox" aria-label="Select {{ $order->order_number }}"></td>
+                                <td><strong>{{ $order->order_number }}</strong><small class="table-subtext">{{ $order->created_at?->format('M d, Y') }}</small></td>
+                                <td><strong>{{ $order->customer_name }}</strong><small class="table-subtext">{{ $order->email }}</small></td>
                                 <td>£{{ number_format((float) $order->total, 2) }}</td>
                                 <td><span class="badge payment-status-{{ $order->payment_status ?? 'unpaid' }}">{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</span></td>
                                 <td>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</td>
                                 <td>{{ $order->created_at?->format('M d, Y') }}</td>
-                                <td><div class="action-group"><a href="{{ route('backend.orders.show', $order) }}" title="View"><i class="fa-regular fa-eye"></i></a></div></td>
+                                <td>
+                                    <div class="vx-row-actions">
+                                        <button type="button"
+                                            data-report-modal-open
+                                            data-order="{{ $order->order_number }}"
+                                            data-customer="{{ $order->customer_name }}"
+                                            data-email="{{ $order->email }}"
+                                            data-total="£{{ number_format((float) $order->total, 2) }}"
+                                            data-payment="{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}"
+                                            data-tracking="{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}"
+                                            data-created="{{ $order->created_at?->format('M d, Y H:i') }}"
+                                            data-view-url="{{ route('backend.orders.show', $order) }}"
+                                            title="View"><i class="fa-regular fa-eye"></i></button>
+                                        @include('backend.partials.payment-proof-button', ['order' => $order])
+                                    </div>
+                                </td>
                             </tr>
                         @empty
-                            <tr><td colspan="7" class="empty-cell">No report data found.</td></tr>
+                            <tr><td colspan="8" class="empty-cell">No report data found.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
         </article>
+
+        <div class="admin-modal user-editor-modal report-view-modal" data-report-view-modal aria-hidden="true">
+            <div class="admin-modal-backdrop" data-report-modal-close></div>
+            <section class="admin-modal-dialog vx-user-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
+                <button class="admin-modal-close" type="button" data-report-modal-close aria-label="Close report modal"><i class="fa-solid fa-xmark"></i></button>
+                <div class="admin-modal-head">
+                    <span><i class="fa-solid fa-chart-line"></i></span>
+                    <div>
+                        <h2 id="reportModalTitle" data-report-order>Order Report</h2>
+                        <p data-report-summary>Payment and fulfilment snapshot.</p>
+                    </div>
+                </div>
+                <div class="report-modal-body">
+                    <div class="vx-user-detail-card">
+                        <span><b>Customer</b><span data-report-customer></span></span>
+                        <span><b>Email</b><span data-report-email></span></span>
+                        <span><b>Total</b><span data-report-total></span></span>
+                        <span><b>Payment</b><span data-report-payment></span></span>
+                        <span><b>Tracking</b><span data-report-tracking></span></span>
+                        <span><b>Created</b><span data-report-created></span></span>
+                    </div>
+                    <div class="vx-user-modal-actions">
+                        <button type="button" data-report-modal-close>Close</button>
+                        <a class="vx-add-record" href="#" data-report-view-url><i class="fa-regular fa-eye"></i> Open Order</a>
+                    </div>
+                </div>
+            </section>
+        </div>
     @elseif (in_array($page, ['products', 'categories', 'users', 'reviews', 'orders', 'stock-notifications'], true))
         @php
             $canManage = $page !== 'users' || $canManageUsers;

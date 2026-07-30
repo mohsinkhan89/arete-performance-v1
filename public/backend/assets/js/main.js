@@ -651,6 +651,43 @@ document.addEventListener('DOMContentLoaded', () => {
     button.addEventListener('click', closeOrderEditor);
   });
 
+  const reportViewModal = document.querySelector('[data-report-view-modal]');
+  if (reportViewModal && reportViewModal.parentElement !== document.body) {
+    document.body.appendChild(reportViewModal);
+  }
+  const reportViewUrl = reportViewModal?.querySelector('[data-report-view-url]');
+  const setReportText = (field, value) => {
+    const element = reportViewModal?.querySelector(`[data-report-${field}]`);
+    if (element) element.textContent = value || '-';
+  };
+  const closeReportView = () => {
+    reportViewModal?.classList.remove('is-open');
+    reportViewModal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  };
+
+  document.querySelectorAll('[data-report-modal-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!reportViewModal) return;
+
+      setReportText('order', button.dataset.order ? `Order ${button.dataset.order}` : 'Order Report');
+      setReportText('customer', button.dataset.customer);
+      setReportText('email', button.dataset.email);
+      setReportText('total', button.dataset.total);
+      setReportText('payment', button.dataset.payment);
+      setReportText('tracking', button.dataset.tracking);
+      setReportText('created', button.dataset.created);
+      if (reportViewUrl) reportViewUrl.href = button.dataset.viewUrl || '#';
+
+      reportViewModal.classList.add('is-open');
+      reportViewModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+    });
+  });
+  reportViewModal?.querySelectorAll('[data-report-modal-close]').forEach((button) => {
+    button.addEventListener('click', closeReportView);
+  });
+
   document.querySelectorAll('[data-resource-view-toggle]').forEach((button) => {
     button.addEventListener('click', () => {
       const target = document.getElementById(button.dataset.resourceViewToggle || '');
@@ -674,6 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeUserEditor();
       closeResourceEditor();
       closeOrderEditor();
+      closeReportView();
     }
   });
   document.addEventListener('fullscreenchange', syncFullscreen);
