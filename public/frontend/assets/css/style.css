@@ -10712,3 +10712,27 @@ button {
     align-self: center;
   }
 }
+
+/* Consistent full-frame product imagery across every product card */
+.product-card > img,
+.shop-product-card.product-card > img,
+.recommended-grid .shop-product-card.product-card > img,
+.related-card > img {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  margin-right: 0;
+  margin-left: 0;
+  object-fit: cover;
+}
+
+@media (max-width: 767.98px) {
+  .product-card > img,
+  .shop-product-card.product-card > img,
+  .recommended-grid .shop-product-card.product-card > img,
+  .related-card > img {
+    width: 100%;
+    height: auto;
+  }
+}
