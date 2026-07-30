@@ -14,57 +14,67 @@
     <main class="login-shell">
         <section class="login-visual" aria-label="Arete Performance">
             <div class="login-visual-bg"></div>
+            <div class="login-banner-orb login-banner-orb-one"></div>
+            <div class="login-banner-orb login-banner-orb-two"></div>
+
             <div class="login-visual-logo">
                 <img src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
             </div>
+
             <div class="login-visual-copy">
-                <p>Premium performance<br><strong>starts here.</strong></p>
+                <small>Admin Control Center</small>
+                <p>Manage premium performance<br><strong>with confidence.</strong></p>
                 <span></span>
+                <div class="login-banner-pills" aria-label="Platform highlights">
+                    <b><i class="fa-solid fa-chart-line"></i> Live Analytics</b>
+                    <b><i class="fa-solid fa-boxes-stacked"></i> Product Control</b>
+                    <b><i class="fa-solid fa-shield-halved"></i> Secure Access</b>
+                </div>
             </div>
         </section>
 
         <section class="login-card">
-            <div class="login-card-head">
-                <h1>Welcome back</h1>
-                <p>Sign in to continue to your dashboard</p>
-            </div>
-
-            <form action="{{ route('login.store') }}" method="POST" class="login-form">
-                @csrf
-                <label>
-                    <span>Email address</span>
-                    <i class="fa-regular fa-envelope"></i>
-                    <input type="email" name="email" value="{{ old('email') }}" placeholder="Enter your email" required autofocus>
-                </label>
-
-                <label>
-                    <span>Password</span>
-                    <i class="fa-solid fa-lock"></i>
-                    <input id="adminPassword" type="password" name="password" placeholder="Enter your password" required>
-                    <button class="password-toggle" type="button" aria-label="Show password" aria-controls="adminPassword">
-                        <i class="fa-regular fa-eye"></i>
-                    </button>
-                </label>
-
-                @error('email')
-                    <p class="login-error">{{ $message }}</p>
-                @enderror
-
-                <div class="login-options">
-                    <label class="check-row">
-                        <input type="checkbox" name="remember" value="1" checked>
-                        <span>Remember me</span>
-                    </label>
-                    <a href="#">Forgot password?</a>
+            <div class="login-card-inner">
+                <div class="login-card-head">
+                    <span class="login-kicker">Arete Admin</span>
+                    <h1>Welcome back</h1>
+                    <p>Please sign in to your account and continue managing your store.</p>
                 </div>
 
-                <button type="submit">
-                    Sign in
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
-            </form>
+                <form action="{{ route('login.store') }}" method="POST" class="login-form">
+                    @csrf
+                    <label>
+                        <span>Email address</span>
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="Enter your email" required autofocus>
+                    </label>
 
-            <p class="login-footer">&copy; 2024 Arete Performance. All rights reserved.</p>
+                    <label>
+                        <span>Password</span>
+                        <i class="fa-solid fa-lock"></i>
+                        <input id="adminPassword" type="password" name="password" placeholder="Enter your password" required>
+                        <button class="password-toggle" type="button" aria-label="Show password" aria-controls="adminPassword">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </label>
+
+                    @error('email')
+                        <p class="login-error">{{ $message }}</p>
+                    @enderror
+
+                    <div class="login-options">
+                        <label class="check-row">
+                            <input type="checkbox" name="remember" value="1" checked>
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#">Forgot password?</a>
+                    </div>
+
+                    <button type="submit">Sign in</button>
+                </form>
+
+                <p class="login-footer">&copy; {{ date('Y') }} Arete Performance. All rights reserved.</p>
+            </div>
         </section>
     </main>
 
