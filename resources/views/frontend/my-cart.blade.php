@@ -12,7 +12,6 @@
 @section('body')
     <section class="cart-hero">
       <div class="container">
-        <nav class="cart-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i><span>Cart</span></nav>
         <div class="cart-hero-copy reveal-up">
           <p class="eyebrow">Shopping cart</p>
           <h1>Your <span>Cart</span></h1>

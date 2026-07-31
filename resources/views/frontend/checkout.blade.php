@@ -13,8 +13,7 @@
     <section class="checkout-hero">
       <div class="container">
         <div class="checkout-hero-copy reveal-up">
-          <nav class="cart-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i><a href="{{ route('frontend.my-cart') }}">Cart</a><i class="fa-solid fa-chevron-right"></i><span>Checkout</span></nav>
-<p class="eyebrow">Checkout</p>
+          <p class="eyebrow">Checkout</p>
           <h1><span class="checkout-line">Secure <span>Checkout.</span></span><small>Stronger You.</small></h1>
         </div>
       </div>
