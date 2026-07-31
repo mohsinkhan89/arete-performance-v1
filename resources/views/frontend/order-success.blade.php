@@ -1,150 +1,16 @@
 @extends('frontend.layouts.master')
-
-@section('body')
-    @php($customerWhatsappUrl = $order?->customerWhatsappUrl())
-
-    <section class="success-hero">
-      <div class="container">
-        <div class="success-hero-copy reveal-up" @if($customerWhatsappUrl) data-whatsapp-redirect="{{ $customerWhatsappUrl }}" @endif>
-          <div class="success-check" aria-hidden="true"><i class="fa-solid fa-check"></i></div>
-          <h1>Order Placed <span>Successfully!</span></h1>
-          @if ($order)
-            <p>Thank you for your order. Your purchase has been confirmed and saved.</p>
-            <p class="success-order-id">Order <strong>#{{ $order->order_number }}</strong></p>
-            @if ($customerWhatsappUrl)
-              <p class="success-whatsapp-redirect" data-whatsapp-message>WhatsApp will open in <strong data-whatsapp-countdown>10</strong> seconds so you can send this order to us.</p>
-            @endif
-            <div class="success-actions">
-              <a class="btn btn-gold" href="#orderDetails">View order details <i class="fa-solid fa-arrow-right"></i></a>
-              @if ($customerWhatsappUrl)
-                <a class="btn btn-outline-light" href="{{ $customerWhatsappUrl }}" target="_blank" rel="noopener" data-whatsapp-manual>Send on WhatsApp <i class="fa-brands fa-whatsapp"></i></a>
-              @endif
-              <a class="btn btn-outline-light" href="{{ route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email]) }}">Track order <i class="fa-solid fa-truck-fast"></i></a>
-            </div>
-          @else
-            <p>No recent order found.</p>
-            <a class="btn btn-gold" href="{{ route('frontend.shop') }}">Continue shopping <i class="fa-solid fa-arrow-right"></i></a>
-          @endif
-        </div>
-      </div>
-    </section>
-
-    @if ($order)
-      <section class="success-main section-space">
-        <div class="container">
-          <div class="success-grid">
-            <aside class="success-side">
-              <article class="success-card reveal-on-scroll">
-                <h2><i class="fa-regular fa-clipboard"></i> Order Confirmation</h2>
-                <p>Confirmation is ready for <a href="mailto:{{ $order->email }}">{{ $order->email }}</a>.</p>
-              </article>
-
-              <article class="success-card reveal-on-scroll">
-                <h2>What's Next?</h2>
-                @include('frontend.partials.order-timeline', ['order' => $order])
-              </article>
-
-            </aside>
-
-            <section class="success-card order-detail-card reveal-on-scroll" id="orderDetails">
-              <h2><i class="fa-regular fa-rectangle-list"></i> Order Details</h2>
-              <dl class="order-detail-list">
-                <div><dt>Order Number</dt><dd>{{ $order->order_number }}</dd></div>
-                <div><dt>Order Date</dt><dd>{{ $order->created_at?->format('M d, Y') }}</dd></div>
-                <div><dt>Payment Method</dt><dd>{{ ucfirst($order->payment_method) }}</dd></div>
-                <div><dt>Payment Status</dt><dd>{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</dd></div>
-                <div><dt>Order Status</dt><dd>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? $order->status)) }}</dd></div>
-                <div><dt>Royal Mail Tracking ID</dt><dd>{{ $order->tracking_number ?: 'Preparing label' }}</dd></div>
-                <div><dt>Shipping Method</dt><dd>{{ ucfirst($order->shipping_method) }}</dd></div>
-                <div><dt>Shipping Address</dt><dd><strong>{{ $order->customer_name }}</strong><br>@if($order->company){{ $order->company }}<br>@endif{{ $order->address }}<br>@if($order->address_2){{ $order->address_2 }}<br>@endif{{ $order->city }}, {{ $order->state }} {{ $order->zip }}<br>{{ $order->country }}<br>{{ $order->phone }}</dd></div>
-                <div class="paid-line"><dt>Total</dt><dd>£{{ number_format((float) $order->total, 2) }}</dd></div>
-              </dl>
-            </section>
-
-            <aside class="success-card success-summary reveal-on-scroll" aria-labelledby="successSummaryTitle">
-              <h2 id="successSummaryTitle">Order Summary ({{ $order->items->sum('quantity') }} Items)</h2>
-              <div class="checkout-summary-items">
-                @foreach ($order->items as $item)
-                  <article>
-                    <img src="{{ url($item->product_image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $item->product_name }}">
-                    <div><strong>{{ $item->product_name }}</strong><span>{{ $item->product_sku }}</span><small>Qty: {{ $item->quantity }}</small></div>
-                    <b>£{{ number_format((float) $item->line_total, 2) }}</b>
-                  </article>
-                @endforeach
-              </div>
-              <div class="checkout-total-lines">
-                <div><span>Subtotal</span><strong>£{{ number_format((float) $order->subtotal, 2) }}</strong></div>
-                <div><span>Shipping</span><strong>£{{ number_format((float) $order->shipping_total, 2) }}</strong></div>
-              </div>
-              <div class="checkout-total"><span>Total</span><strong>£{{ number_format((float) $order->total, 2) }}</strong></div>
-            </aside>
-          </div>
-        </div>
-      </section>
-    @endif
-
-    @include('frontend.inc.delivery-trusted')
+@section('body_class','order-success-page')
+@section('css')
+<style>
+.order-complete{--gold:#e9a611;min-height:calc(100vh - 90px);padding:70px 0;background:radial-gradient(circle at 50% 0,rgba(233,166,17,.17),transparent 34%),#f4f5f7;position:relative;overflow:hidden}.complete-wrap{width:min(1120px,calc(100% - 30px));margin:auto;position:relative;z-index:2}.complete-hero{text-align:center;margin-bottom:28px}.complete-check{width:82px;height:82px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:#111;font-size:32px;box-shadow:0 0 0 12px rgba(233,166,17,.14);animation:checkPop .7s cubic-bezier(.2,1.5,.5,1)}.complete-hero .eyebrow{color:#9b6900;font-weight:900;letter-spacing:.12em;font-size:11px}.complete-hero h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(42px,6vw,72px);line-height:.95;text-transform:uppercase;margin:10px 0;color:#111}.complete-hero h1 span{color:var(--gold)}.complete-hero>p{color:#69717d;margin:0 auto;max-width:620px}.order-reference{display:inline-flex;gap:9px;align-items:center;margin-top:15px;padding:8px 14px;background:#111;color:#fff;border-radius:30px;font-size:12px}.order-reference strong{color:var(--gold)}.return-message{margin:14px auto 0!important;padding:9px 13px;border-radius:9px;background:#fff7e2;color:#775300!important;font-size:12px!important;width:max-content;max-width:100%}.receipt-layout{display:grid;grid-template-columns:1.35fr .65fr;gap:18px;align-items:start}.receipt-card{background:#fff;border:1px solid #e3e7ed;border-radius:18px;padding:22px;box-shadow:0 10px 34px rgba(18,25,38,.06)}.receipt-head{display:flex;justify-content:space-between;gap:15px;align-items:start;margin-bottom:18px}.receipt-head h2{font-size:19px;margin:0;color:#171717}.receipt-head p{font-size:11px;color:#78808c;margin:4px 0}.status-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:20px;background:#e4f7ec;color:#177f48;font-size:10px;font-weight:900}.status-chip:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}.purchased-items{display:grid;gap:8px}.purchased-item{display:grid;grid-template-columns:64px 1fr auto;gap:13px;align-items:center;padding:12px;border-radius:12px;background:#f8f9fb;border:1px solid #edf0f3}.purchased-item img{width:64px;height:64px;object-fit:contain;border-radius:9px;background:#fff}.purchased-item b,.purchased-item small{display:block}.purchased-item b{font-size:13px}.purchased-item small{color:#7a828e;font-size:10px;margin-top:3px}.purchased-price{text-align:right}.purchased-price strong{display:block;font-size:14px}.purchased-price small{color:#7a828e;font-size:9px}.receipt-totals{margin:18px 0 0 auto;width:min(100%,390px);display:grid;gap:8px}.receipt-line{display:flex;justify-content:space-between;color:#707884;font-size:12px}.receipt-line.final{border-top:1px solid #e4e8ed;padding-top:11px;color:#171717;font-size:19px;font-weight:900}.receipt-line.final strong{color:#ac7300}.order-facts{display:grid;gap:10px}.order-fact{display:flex;gap:11px;padding:12px;border-radius:11px;background:#f8f9fb}.order-fact i{width:35px;height:35px;flex:0 0 35px;border-radius:9px;background:#fff0ca;color:#986600;display:grid;place-items:center}.order-fact span,.order-fact strong,.order-fact small{display:block}.order-fact span{font-size:9px;text-transform:uppercase;color:#8a919c;font-weight:800}.order-fact strong{font-size:12px;margin-top:2px}.order-fact small{font-size:10px;color:#777f8b;margin-top:2px}.complete-actions{display:grid;gap:8px;margin-top:16px}.complete-actions a{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:10px;text-decoration:none;font-size:12px;font-weight:900}.action-gold{background:var(--gold);color:#111}.action-dark{background:#111;color:#fff}.action-light{border:1px solid #dfe4ea;color:#333}.confetti{position:absolute;top:-20px;width:9px;height:16px;opacity:.9;animation:confettiFall var(--duration) linear var(--delay) infinite;transform:rotate(var(--rotate));z-index:1}@keyframes checkPop{0%{transform:scale(0) rotate(-35deg)}100%{transform:scale(1) rotate(0)}}@keyframes confettiFall{0%{transform:translate3d(0,-10vh,0) rotate(0)}100%{transform:translate3d(var(--drift),115vh,0) rotate(720deg)}}@media(max-width:820px){.order-complete{padding:45px 0}.receipt-layout{grid-template-columns:1fr}}@media(max-width:540px){.complete-hero h1{font-size:43px}.receipt-card{padding:16px}.purchased-item{grid-template-columns:52px 1fr}.purchased-item img{width:52px;height:52px}.purchased-price{grid-column:2;text-align:left}.receipt-head{display:grid}}
+</style>
 @endsection
-
+@section('body')
+@php($customerWhatsappUrl=$order?->customerWhatsappUrl())
+<section class="order-complete" data-celebration>@if($order)<div class="complete-wrap"><header class="complete-hero" @if($customerWhatsappUrl)data-whatsapp-redirect="{{ $customerWhatsappUrl }}"@endif><div class="complete-check"><i class="fa-solid fa-check"></i></div><span class="eyebrow">Payment journey started</span><h1>Order placed <span>successfully</span></h1><p>Thank you, {{ $order->customer_name }}. Your exact checkout order is confirmed below and a copy has been emailed to {{ $order->email }}.</p><span class="order-reference">Order reference <strong>#{{ $order->order_number }}</strong></span>@if($customerWhatsappUrl)<p class="return-message" data-whatsapp-message>WhatsApp will open in <strong data-whatsapp-countdown>10</strong> seconds.</p>@endif</header>
+<div class="receipt-layout"><article class="receipt-card"><div class="receipt-head"><div><h2>Your purchased items</h2><p>Only the items from order #{{ $order->order_number }}</p></div><span class="status-chip">{{ Str::headline($order->tracking_status) }}</span></div><div class="purchased-items">@foreach($order->items as $item)<div class="purchased-item"><img src="{{ url($item->product_image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $item->product_name }}"><span><b>{{ $item->product_name }}</b><small>{{ $item->product_sku ?: 'Product' }} · Quantity {{ $item->quantity }}</small></span><span class="purchased-price"><strong>£{{ number_format($item->line_total,2) }}</strong><small>£{{ number_format($item->unit_price,2) }} each</small></span></div>@endforeach</div><div class="receipt-totals"><div class="receipt-line"><span>Subtotal</span><strong>£{{ number_format($order->subtotal,2) }}</strong></div><div class="receipt-line"><span>Shipping</span><strong>£{{ number_format($order->shipping_total,2) }}</strong></div><div class="receipt-line final"><span>Order total</span><strong>£{{ number_format($order->total,2) }}</strong></div></div></article>
+<aside class="receipt-card"><div class="receipt-head"><div><h2>Order details</h2><p>Confirmation and delivery information</p></div></div><div class="order-facts"><div class="order-fact"><i class="fa-solid fa-calendar-check"></i><span><span>Placed</span><strong>{{ $order->created_at->format('d M Y, h:i A') }}</strong></span></div><div class="order-fact"><i class="fa-solid fa-wallet"></i><span><span>Payment</span><strong>{{ Str::headline($order->payment_status) }}</strong><small>{{ Str::headline($order->payment_method) }}</small></span></div><div class="order-fact"><i class="fa-solid fa-truck-fast"></i><span><span>Delivery</span><strong>{{ Str::headline($order->shipping_method) }}</strong><small>{{ $order->tracking_number ?: 'Tracking label is being prepared' }}</small></span></div><div class="order-fact"><i class="fa-solid fa-location-dot"></i><span><span>Shipping to</span><strong>{{ $order->address }}, {{ $order->city }}</strong><small>{{ $order->zip }}, {{ $order->country }}</small></span></div></div><div class="complete-actions"><a class="action-gold" href="{{ route('frontend.track-order',['order_number'=>$order->order_number,'email'=>$order->email]) }}">Track this order <i class="fa-solid fa-arrow-right"></i></a>@if($customerWhatsappUrl)<a class="action-dark" href="{{ $customerWhatsappUrl }}" target="_blank" rel="noopener" data-whatsapp-manual>Send on WhatsApp <i class="fa-brands fa-whatsapp"></i></a>@endif<a class="action-light" href="{{ route('frontend.index') }}">Return home</a></div></aside></div></div>@else<div class="complete-wrap"><header class="complete-hero"><h1>No recent <span>order</span></h1><p>We could not find a newly completed checkout in this session.</p><div class="complete-actions" style="max-width:300px;margin:20px auto"><a class="action-gold" href="{{ route('frontend.shop') }}">Continue shopping</a></div></header></div>@endif</section>
+@endsection
 @section('js')
-  @if ($customerWhatsappUrl)
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const redirectTarget = document.querySelector('[data-whatsapp-redirect]');
-        const countdown = document.querySelector('[data-whatsapp-countdown]');
-        const message = document.querySelector('[data-whatsapp-message]');
-        const manualLink = document.querySelector('[data-whatsapp-manual]');
-        const whatsappUrl = redirectTarget?.dataset.whatsappRedirect;
-        const returnKey = 'arete-whatsapp-order-{{ $order->id }}';
-        const homeUrl = @json(route('frontend.index'));
-        let whatsappTimer;
-        let homeTimer;
-
-        if (!whatsappUrl) return;
-
-        const markWhatsappOpened = () => sessionStorage.setItem(returnKey, String(Date.now()));
-        const startHomeRedirect = () => {
-          if (!sessionStorage.getItem(returnKey) || homeTimer) return;
-          window.clearInterval(whatsappTimer);
-          let seconds = 5;
-          if (message) message.innerHTML = 'WhatsApp se return ho gaye. Home page <strong data-whatsapp-countdown>5</strong> seconds mein open hoga.';
-          const homeCountdown = document.querySelector('[data-whatsapp-countdown]');
-          homeTimer = window.setInterval(() => {
-            seconds -= 1;
-            if (homeCountdown) homeCountdown.textContent = String(Math.max(seconds, 0));
-            if (seconds <= 0) {
-              window.clearInterval(homeTimer);
-              sessionStorage.removeItem(returnKey);
-              window.location.replace(homeUrl);
-            }
-          }, 1000);
-        };
-
-        manualLink?.addEventListener('click', markWhatsappOpened);
-        window.addEventListener('focus', startHomeRedirect);
-        window.addEventListener('pageshow', (event) => {
-          if (event.persisted || sessionStorage.getItem(returnKey)) startHomeRedirect();
-        });
-        document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible') startHomeRedirect();
-        });
-
-        if (sessionStorage.getItem(returnKey)) {
-          startHomeRedirect();
-          return;
-        }
-
-        let seconds = 10;
-        whatsappTimer = window.setInterval(() => {
-          seconds -= 1;
-          if (countdown) countdown.textContent = String(Math.max(seconds, 0));
-          if (seconds <= 0) {
-            window.clearInterval(whatsappTimer);
-            markWhatsappOpened();
-            window.location.href = whatsappUrl;
-          }
-        }, 1000);
-      });
-    </script>
-  @endif
+<script>document.addEventListener('DOMContentLoaded',()=>{const stage=document.querySelector('[data-celebration]');if(stage){const colors=['#e9a611','#111','#fff','#c79019','#5e6673'];for(let i=0;i<42;i++){const bit=document.createElement('i');bit.className='confetti';bit.style.left=`${Math.random()*100}%`;bit.style.background=colors[i%colors.length];bit.style.setProperty('--duration',`${4+Math.random()*4}s`);bit.style.setProperty('--delay',`${Math.random()*-7}s`);bit.style.setProperty('--drift',`${-80+Math.random()*160}px`);bit.style.setProperty('--rotate',`${Math.random()*180}deg`);stage.appendChild(bit)}}const target=document.querySelector('[data-whatsapp-redirect]');const initial=document.querySelector('[data-whatsapp-countdown]');const message=document.querySelector('[data-whatsapp-message]');const manual=document.querySelector('[data-whatsapp-manual]');const url=target?.dataset.whatsappRedirect;if(!url)return;const key='arete-whatsapp-order-{{ $order?->id }}';const home=@json(route('frontend.index'));let whatsappTimer,homeTimer;const mark=()=>sessionStorage.setItem(key,String(Date.now()));const goHome=()=>{if(!sessionStorage.getItem(key)||homeTimer)return;clearInterval(whatsappTimer);let seconds=5;if(message)message.innerHTML='WhatsApp se return ho gaye. Home page <strong data-whatsapp-countdown>5</strong> seconds mein open hoga.';const counter=document.querySelector('[data-whatsapp-countdown]');homeTimer=setInterval(()=>{seconds--;if(counter)counter.textContent=String(Math.max(seconds,0));if(seconds<=0){clearInterval(homeTimer);sessionStorage.removeItem(key);location.replace(home)}},1000)};manual?.addEventListener('click',mark);addEventListener('focus',goHome);addEventListener('pageshow',event=>{if(event.persisted||sessionStorage.getItem(key))goHome()});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')goHome()});if(sessionStorage.getItem(key)){goHome();return}let seconds=10;whatsappTimer=setInterval(()=>{seconds--;if(initial)initial.textContent=String(Math.max(seconds,0));if(seconds<=0){clearInterval(whatsappTimer);mark();location.href=url}},1000)});</script>
 @endsection
