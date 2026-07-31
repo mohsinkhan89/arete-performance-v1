@@ -226,10 +226,18 @@ class FrontendController extends Controller
         $filters = $this->filters($request);
         $products = $this->filteredProducts($filters)->paginate(12)->withQueryString();
 
+        $priceBounds = Product::where('status', 'active')
+            ->selectRaw('FLOOR(MIN(COALESCE(sale_price, price))) as min_price, CEIL(MAX(COALESCE(sale_price, price))) as max_price')
+            ->first();
+
         return view('frontend.search', [
             'categories' => Category::withCount(['products' => fn ($query) => $query->where('status', 'active')])->where('status', 'active')->orderBy('sort_order')->get(),
             'products' => $products,
             'filters' => $filters,
+            'priceBounds' => [
+                'min' => (int) ($priceBounds->min_price ?? 0),
+                'max' => max(1, (int) ($priceBounds->max_price ?? 400)),
+            ],
         ]);
     }
 

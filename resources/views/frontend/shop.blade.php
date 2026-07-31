@@ -121,7 +121,7 @@
           </div>
         </div>
 
-        <section class="bundle-banner reveal-on-scroll" aria-label="Bundle offer">
+        {{-- <section class="bundle-banner reveal-on-scroll" aria-label="Bundle offer">
           <div></div>
           <div>
             <p class="eyebrow">Bundle &amp; save</p>
@@ -129,7 +129,7 @@
             <p>Stack your results with premium bundles and exclusive savings.</p>
             <a class="btn btn-gold" href="{{ route('frontend.shop') }}">View bundles <i class="fa-solid fa-arrow-right"></i></a>
           </div>
-        </section>
+        </section> --}}
       </div>
     </section>
 
