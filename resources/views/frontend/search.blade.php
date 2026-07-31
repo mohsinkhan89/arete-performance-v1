@@ -4,6 +4,9 @@
 @endsection
 
 @section('css')
+<style>
+.search-hero h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(42px,6vw,68px);font-weight:800;line-height:.95}.search-hero h1 span{display:block}.search-hero-form{grid-template-columns:auto 1fr!important}.search-hero-form button{display:none!important}
+</style>
 @endsection
 
 @section('body')
@@ -21,7 +24,7 @@
             <label class="visually-hidden" for="searchQuery">Search query</label>
             <i class="fa-solid fa-magnifying-glass"></i>
             <input id="searchQuery" name="q" type="search" value="{{ $filters['q'] }}" aria-label="Search query" placeholder="Search products or categories">
-            <button type="submit" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+
           </form>
         </div>
       </div>

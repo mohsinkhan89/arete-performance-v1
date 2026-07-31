@@ -4,6 +4,9 @@
 @endsection
 
 @section('css')
+<style>
+.cart-hero-copy .eyebrow{color:#e9a611;font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}.cart-hero h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(42px,6vw,68px);font-weight:800;line-height:.95}
+</style>
 @endsection
 
 @section('body')
@@ -11,6 +14,7 @@
       <div class="container">
         <nav class="cart-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i><span>Cart</span></nav>
         <div class="cart-hero-copy reveal-up">
+          <p class="eyebrow">Shopping cart</p>
           <h1>Your <span>Cart</span></h1>
           <p>Review your items and proceed to checkout.</p>
         </div>

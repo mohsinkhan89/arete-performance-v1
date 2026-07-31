@@ -4,6 +4,9 @@
 @endsection
 
 @section('css')
+<style>
+.checkout-hero-copy .eyebrow{color:#e9a611;font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}.checkout-hero h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(42px,6vw,68px);font-weight:800;line-height:.95}.checkout-hero h1 .checkout-line{white-space:nowrap}.checkout-hero h1 small{display:block;color:#fff;font:inherit}
+</style>
 @endsection
 
 @section('body')
@@ -11,7 +14,8 @@
       <div class="container">
         <div class="checkout-hero-copy reveal-up">
           <nav class="cart-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i><a href="{{ route('frontend.my-cart') }}">Cart</a><i class="fa-solid fa-chevron-right"></i><span>Checkout</span></nav>
-          <h1>Secure Checkout.<br><span>Stronger You.</span></h1>
+<p class="eyebrow">Checkout</p>
+          <h1><span class="checkout-line">Secure <span>Checkout.</span></span><small>Stronger You.</small></h1>
         </div>
       </div>
     </section>
