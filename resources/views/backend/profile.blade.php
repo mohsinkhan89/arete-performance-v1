@@ -1,73 +1,17 @@
 @extends('backend.layouts.master')
-
 @section('title', $pageTitle)
-
+@section('css')
+<style>
+.account-page{--ink:#172033;--muted:#718096;--line:#e5eaf1;display:grid;gap:18px}.account-head{display:flex;justify-content:space-between;align-items:end;gap:18px}.account-head h1{margin:4px 0;color:var(--ink);font-size:29px}.account-head p{margin:0;color:var(--muted)}.account-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:#a56c00;font-weight:900}.account-head a{display:inline-flex;align-items:center;gap:7px;padding:10px 14px;border-radius:10px;background:#172033;color:#fff;text-decoration:none;font-weight:800}.account-summary{display:grid;grid-template-columns:1.3fr repeat(3,.7fr);gap:12px}.identity-card,.account-stat,.account-card{background:#fff;border:1px solid var(--line);border-radius:15px}.identity-card{display:flex;align-items:center;gap:14px;padding:16px}.account-avatar{width:54px;height:54px;flex:0 0 54px;border-radius:15px;background:linear-gradient(145deg,#171717,#343434);color:#e9a611;display:grid;place-items:center;font-size:18px;font-weight:900;position:relative}.account-avatar:after{content:"";position:absolute;right:-3px;bottom:-3px;width:12px;height:12px;border:3px solid #fff;border-radius:50%;background:#24a66a}.identity-card h2{font-size:17px;color:var(--ink);margin:0}.identity-card p{font-size:11px;color:var(--muted);margin:3px 0}.identity-tags{display:flex;gap:6px;margin-top:7px}.identity-tags span{padding:4px 8px;border-radius:20px;background:#f0f2f5;color:#687180;font-size:9px;font-weight:800}.identity-tags .active{background:#e4f7ec;color:#177f48}.account-stat{padding:15px}.account-stat i{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;background:#fff1cf;color:#9b6700;margin-bottom:9px}.account-stat span,.account-stat strong,.account-stat small{display:block}.account-stat span{font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:800}.account-stat strong{font-size:14px;color:var(--ink);margin:3px 0}.account-stat small{font-size:9px;color:var(--muted)}.account-layout{display:grid;grid-template-columns:1.35fr .65fr;gap:16px;align-items:start}.account-form{display:grid;gap:16px}.account-card{padding:19px}.account-card-head{display:flex;align-items:center;gap:11px;margin-bottom:17px}.account-card-head>i{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:#fff1cf;color:#9b6700}.account-card-head h2{font-size:16px;color:var(--ink);margin:0}.account-card-head p{font-size:10px;color:var(--muted);margin:3px 0}.account-fields{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.account-field{display:grid;gap:6px;color:#596271;font-size:11px;font-weight:800}.account-field.wide{grid-column:1/-1}.field-shell{position:relative}.field-shell>i{position:absolute;left:12px;top:14px;color:#9ca3af}.field-shell input{width:100%;height:43px;border:1px solid #dfe5ec;border-radius:9px;background:#fff;color:var(--ink);padding:0 12px 0 36px;font:inherit;font-weight:500;transition:.15s}.field-shell input:focus{outline:0;border-color:#e9a611;box-shadow:0 0 0 3px rgba(233,166,17,.12)}.field-shell button{position:absolute;right:7px;top:7px;width:29px;height:29px;border:0;background:#f2f4f7;border-radius:7px;color:#737b88}.account-field>small{font-size:9px;color:var(--muted);font-weight:500}.field-error{font-size:9px;color:#c03d44}.security-note{display:flex;gap:10px;padding:12px;border-radius:10px;background:#f8f9fb;color:#69717d;font-size:10px;line-height:1.5;margin-bottom:14px}.security-note i{color:#9b6700;margin-top:2px}.account-actions{position:sticky;bottom:12px;display:flex;justify-content:flex-end;gap:9px;padding:13px;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:13px;box-shadow:0 9px 28px rgba(18,25,38,.08);backdrop-filter:blur(10px)}.account-actions a,.account-actions button{display:inline-flex;align-items:center;gap:7px;padding:10px 15px;border-radius:9px;font-weight:900;text-decoration:none}.account-actions a{border:1px solid var(--line);color:var(--ink)}.account-actions button{border:0;background:#e9a611;color:#171717}.account-sidebar{position:sticky;top:90px}.account-list{display:grid;gap:9px}.account-list div{padding:12px;background:#f8f9fb;border-radius:10px}.account-list span,.account-list strong{display:block}.account-list span{font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:800}.account-list strong{font-size:12px;color:var(--ink);margin-top:3px;word-break:break-word}.account-tip{margin-top:14px;padding:13px;border-left:3px solid #e9a611;background:#fffbf2;border-radius:0 9px 9px 0}.account-tip strong,.account-tip small{display:block}.account-tip strong{font-size:11px;color:#805800}.account-tip small{font-size:9px;color:#786e59;margin-top:4px;line-height:1.5}.profile-read-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.profile-read-grid div{padding:13px;border-radius:10px;background:#f8f9fb}.profile-read-grid span,.profile-read-grid strong{display:block}.profile-read-grid span{font-size:9px;text-transform:uppercase;color:var(--muted)}.profile-read-grid strong{font-size:12px;color:var(--ink);margin-top:4px}body.dark-mode .account-page{--ink:#f4f5f7;--muted:#a8adbb;--line:#41465d}body.dark-mode .identity-card,body.dark-mode .account-stat,body.dark-mode .account-card,body.dark-mode .account-actions,body.dark-mode .field-shell input{background:#2f3349;color:#f4f5f7}body.dark-mode .account-list div,body.dark-mode .security-note,body.dark-mode .profile-read-grid div{background:#292d42}@media(max-width:1000px){.account-summary{grid-template-columns:repeat(3,1fr)}.identity-card{grid-column:1/-1}}@media(max-width:800px){.account-layout{grid-template-columns:1fr}.account-sidebar{position:static}}@media(max-width:580px){.account-head{display:grid}.account-summary,.account-fields,.profile-read-grid{grid-template-columns:1fr}.identity-card{grid-column:auto}.account-field.wide{grid-column:auto}.account-actions{display:grid;grid-template-columns:1fr 1fr}.account-actions a,.account-actions button{justify-content:center}}
+</style>
+@endsection
 @section('body')
-    <div class="page-heading">
-        <h1>{{ $pageTitle }}</h1>
-        <p>Manage your account details and password from one place.</p>
-    </div>
-
-    <article class="panel profile-page-panel">
-        <div class="profile-hero">
-            <span class="avatar profile-avatar"><i class="fa-solid fa-user"></i><b></b></span>
-            <div>
-                <h2>{{ $admin->name }}</h2>
-                <p>{{ $admin->email }}</p>
-                <div class="profile-tags">
-                    <span><i class="fa-solid fa-shield-halved"></i>{{ ucfirst($admin->role ?? 'admin') }}</span>
-                    <span class="{{ ($admin->status ?? 'active') === 'active' ? 'active' : '' }}"><i class="fa-solid fa-circle"></i>{{ ucfirst($admin->status ?? 'active') }}</span>
-                </div>
-            </div>
-            @unless ($editMode)
-                <a href="{{ route('backend.profile.edit') }}"><i class="fa-solid fa-pen"></i>Edit Profile</a>
-            @endunless
-        </div>
-
-        @if ($editMode)
-            <form action="{{ route('backend.profile.update') }}" method="POST" class="admin-form profile-form">
-                @csrf
-                @method('PUT')
-
-                <div class="form-grid">
-                    <label>Name
-                        <input name="name" value="{{ old('name', $admin->name) }}" required>
-                        @error('name')<span>{{ $message }}</span>@enderror
-                    </label>
-                    <label>Email
-                        <input type="email" name="email" value="{{ old('email', $admin->email) }}" required>
-                        @error('email')<span>{{ $message }}</span>@enderror
-                    </label>
-                    <label>Phone
-                        <input name="phone" value="{{ old('phone', $admin->phone) }}" placeholder="Add phone number">
-                    </label>
-                    <label>Current Password
-                        <input type="password" name="current_password" placeholder="Required only to change password">
-                        @error('current_password')<span>{{ $message }}</span>@enderror
-                    </label>
-                    <label>Password
-                        <input type="password" name="password" placeholder="New password">
-                        @error('password')<span>{{ $message }}</span>@enderror
-                    </label>
-                    <label>Confirm Password
-                        <input type="password" name="password_confirmation" placeholder="Confirm new password">
-                    </label>
-                </div>
-
-                <div class="form-actions">
-                    <a href="{{ route('backend.profile') }}">Cancel</a>
-                    <button type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Profile</button>
-                </div>
-            </form>
-        @else
-            <div class="profile-info-grid">
-                <div><span>Full Name</span><strong>{{ $admin->name }}</strong></div>
-                <div><span>Email</span><strong>{{ $admin->email }}</strong></div>
-                <div><span>Phone</span><strong>{{ $admin->phone ?: 'Not added' }}</strong></div>
-                <div><span>Role</span><strong>{{ ucfirst($admin->role ?? 'admin') }}</strong></div>
-                <div><span>Status</span><strong>{{ ucfirst($admin->status ?? 'active') }}</strong></div>
-                <div><span>Joined</span><strong>{{ $admin->created_at?->format('M d, Y') }}</strong></div>
-            </div>
-        @endif
-    </article>
+@php($initials=collect(explode(' ',$admin->name))->filter()->take(2)->map(fn($part)=>Str::upper(Str::substr($part,0,1)))->implode(''))
+<div class="account-page"><header class="account-head"><div><span class="account-kicker"><i class="fa-solid fa-user-shield"></i> Account workspace</span><h1>{{ $pageTitle }}</h1><p>{{ $editMode?'Manage your personal details and account security.':'Your administrator profile and account information.' }}</p></div>@unless($editMode)<a href="{{ route('backend.profile.edit') }}"><i class="fa-solid fa-pen"></i> Edit profile</a>@endunless</header>
+<section class="account-summary"><article class="identity-card"><span class="account-avatar">{{ $initials?:'AD' }}</span><div><h2>{{ $admin->name }}</h2><p>{{ $admin->email }}</p><div class="identity-tags"><span><i class="fa-solid fa-shield-halved"></i> {{ Str::headline($admin->role??'admin') }}</span><span class="{{ ($admin->status??'active')==='active'?'active':'' }}"><i class="fa-solid fa-circle"></i> {{ Str::headline($admin->status??'active') }}</span></div></div></article><article class="account-stat"><i class="fa-solid fa-calendar-check"></i><span>Member since</span><strong>{{ $admin->created_at?->format('d M Y') }}</strong><small>Administrator account</small></article><article class="account-stat"><i class="fa-solid fa-key"></i><span>Security</span><strong>Password protected</strong><small>Change it anytime</small></article><article class="account-stat"><i class="fa-solid fa-circle-check"></i><span>Account state</span><strong>{{ Str::headline($admin->status??'active') }}</strong><small>Dashboard access</small></article></section>
+@if($editMode)<form class="account-form" action="{{ route('backend.profile.update') }}" method="POST">@csrf @method('PUT')<div class="account-layout"><main class="account-form"><article class="account-card"><div class="account-card-head"><i class="fa-solid fa-address-card"></i><div><h2>Personal information</h2><p>Details used across your admin account.</p></div></div><div class="account-fields"><label class="account-field">Full name<div class="field-shell"><i class="fa-solid fa-user"></i><input name="name" value="{{ old('name',$admin->name) }}" required></div>@error('name')<span class="field-error">{{ $message }}</span>@enderror</label><label class="account-field">Email address<div class="field-shell"><i class="fa-regular fa-envelope"></i><input type="email" name="email" value="{{ old('email',$admin->email) }}" required></div>@error('email')<span class="field-error">{{ $message }}</span>@enderror</label><label class="account-field wide">Phone number<div class="field-shell"><i class="fa-solid fa-phone"></i><input name="phone" value="{{ old('phone',$admin->phone) }}" placeholder="Add a contact number"></div><small>Optional contact number for your account.</small></label></div></article><article class="account-card"><div class="account-card-head"><i class="fa-solid fa-lock"></i><div><h2>Password & security</h2><p>Set a new password without entering the previous one.</p></div></div><div class="security-note"><i class="fa-solid fa-circle-info"></i><span>Enter and confirm a new password using at least 6 characters. Leave both fields empty to keep the current password.</span></div><div class="account-fields"><label class="account-field">New password<div class="field-shell"><i class="fa-solid fa-lock"></i><input type="password" name="password" placeholder="Minimum 6 characters" data-profile-password><button type="button" data-profile-password-toggle aria-label="Show password"><i class="fa-regular fa-eye"></i></button></div>@error('password')<span class="field-error">{{ $message }}</span>@enderror</label><label class="account-field">Confirm password<div class="field-shell"><i class="fa-solid fa-shield-halved"></i><input type="password" name="password_confirmation" placeholder="Repeat new password" data-profile-password><button type="button" data-profile-password-toggle aria-label="Show password"><i class="fa-regular fa-eye"></i></button></div></label></div></article></main><aside class="account-card account-sidebar"><div class="account-card-head"><i class="fa-solid fa-circle-info"></i><div><h2>Account overview</h2><p>Current administrator record</p></div></div><div class="account-list"><div><span>Role</span><strong>{{ Str::headline($admin->role??'admin') }}</strong></div><div><span>Status</span><strong>{{ Str::headline($admin->status??'active') }}</strong></div><div><span>Account email</span><strong>{{ $admin->email }}</strong></div><div><span>Last updated</span><strong>{{ $admin->updated_at?->format('d M Y, h:i A') }}</strong></div></div><div class="account-tip"><strong>Keep your account secure</strong><small>Use a unique password and do not share dashboard credentials.</small></div></aside></div><div class="account-actions"><a href="{{ route('backend.profile') }}"><i class="fa-solid fa-xmark"></i> Cancel</a><button type="submit"><i class="fa-solid fa-floppy-disk"></i> Save profile changes</button></div></form>
+@else<article class="account-card"><div class="account-card-head"><i class="fa-solid fa-address-card"></i><div><h2>Profile information</h2><p>Your current administrator details.</p></div></div><div class="profile-read-grid"><div><span>Full name</span><strong>{{ $admin->name }}</strong></div><div><span>Email</span><strong>{{ $admin->email }}</strong></div><div><span>Phone</span><strong>{{ $admin->phone?:'Not added' }}</strong></div><div><span>Role</span><strong>{{ Str::headline($admin->role??'admin') }}</strong></div><div><span>Status</span><strong>{{ Str::headline($admin->status??'active') }}</strong></div><div><span>Joined</span><strong>{{ $admin->created_at?->format('d M Y') }}</strong></div></div></article>@endif</div>
+@endsection
+@section('js')
+<script>document.querySelectorAll('[data-profile-password-toggle]').forEach(button=>button.addEventListener('click',()=>{const input=button.parentElement.querySelector('[data-profile-password]');const visible=input.type==='text';input.type=visible?'password':'text';button.innerHTML=`<i class="fa-regular fa-eye${visible?'':'-slash'}"></i>`;button.setAttribute('aria-label',visible?'Show password':'Hide password')}));</script>
 @endsection

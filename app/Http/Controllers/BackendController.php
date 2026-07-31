@@ -565,11 +565,10 @@ class BackendController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($admin->id)],
             'phone' => ['nullable', 'string', 'max:40'],
-            'current_password' => ['nullable', 'required_with:password', 'current_password'],
             'password' => ['nullable', 'string', 'min:6', 'confirmed'],
         ]);
 
-        unset($data['current_password'], $data['password_confirmation']);
+        unset($data['password_confirmation']);
 
         if (! empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
