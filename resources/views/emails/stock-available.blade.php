@@ -1,18 +1,11 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>{{ $stockNotification->product?->name }} is available</title>
-</head>
-<body style="font-family: Arial, sans-serif; color: #111827; line-height: 1.6;">
-    <h2 style="margin-bottom: 8px;">Good news, {{ $stockNotification->customer_name }}.</h2>
-    <p>{{ $stockNotification->product?->name }} is now available at Arete Performance.</p>
-    <p>You asked to be notified for {{ $stockNotification->quantity }} item(s).</p>
-    <p>
-        <a href="{{ route('frontend.product-details', $stockNotification->product?->slug ?? $stockNotification->product_id) }}" style="display: inline-block; background: #d6a84f; color: #111827; padding: 12px 18px; text-decoration: none; font-weight: 700;">
-            View Product
-        </a>
-    </p>
-    <p>Thank you,<br>Arete Performance</p>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ $stockNotification->product?->name }} is available</title><style>@media only screen and (max-width:620px){.email-shell{width:100%!important}.email-pad{padding:24px 18px!important}.email-title{font-size:25px!important}.product-cell{display:block!important;width:100%!important;text-align:center!important}.product-copy{padding:18px 0 0!important}.cta{display:block!important;text-align:center!important}.footer-pad{padding:22px 18px!important}}</style></head>
+<body style="margin:0;padding:0;background:#f1f3f6;font-family:Arial,Helvetica,sans-serif;color:#171717;-webkit-text-size-adjust:100%;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f1f3f6"><tr><td align="center" style="padding:28px 12px">
+<table role="presentation" class="email-shell" width="620" cellspacing="0" cellpadding="0" style="width:620px;max-width:100%;background:#fff;border:1px solid #e3e6eb;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(18,25,38,.08)">
+<tr><td align="center" style="background:#080808;padding:25px 24px;border-bottom:3px solid #e9a611"><img src="{{ $logoUrl }}" width="190" alt="Arete Performance" style="display:block;width:190px;max-width:72%;height:auto;border:0"></td></tr>
+<tr><td class="email-pad" style="padding:38px 42px 30px"><div style="display:inline-block;padding:6px 10px;border-radius:20px;background:#fff3d5;color:#8c5e00;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em">Back in stock</div><h1 class="email-title" style="margin:16px 0 10px;font-size:31px;line-height:1.18;color:#171717">Good news, {{ $stockNotification->customer_name }}.</h1><p style="margin:0 0 25px;color:#656d79;font-size:15px;line-height:1.65">The product you asked about is available again. Stock can move quickly, so secure yours while it is ready to order.</p>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8f9fb;border:1px solid #e8ebef;border-radius:13px"><tr><td class="product-cell" width="150" align="center" style="padding:20px"><img src="{{ url($stockNotification->product?->image ?: 'frontend/assets/images/product-bottle.png') }}" width="105" alt="{{ $stockNotification->product?->name }}" style="display:block;max-width:105px;max-height:135px;height:auto;margin:auto"></td><td class="product-cell product-copy" style="padding:22px 22px 22px 0"><p style="margin:0 0 6px;color:#9a6800;font-size:11px;font-weight:800;text-transform:uppercase">{{ $stockNotification->product?->sku }}</p><h2 style="margin:0 0 9px;font-size:20px;line-height:1.3">{{ $stockNotification->product?->name }}</h2><p style="margin:0;color:#69717d;font-size:13px">Requested quantity: <strong style="color:#171717">{{ $stockNotification->quantity }}</strong></p><p style="margin:7px 0 0;font-size:18px;font-weight:900;color:#171717">£{{ number_format((float) ($stockNotification->product?->sale_price ?: $stockNotification->product?->price),2) }}</p></td></tr></table>
+<p style="margin:25px 0"><a class="cta" href="{{ route('frontend.product-details',$stockNotification->product?->slug ?? $stockNotification->product_id) }}" style="display:inline-block;background:#e9a611;color:#111;padding:14px 23px;border-radius:9px;text-decoration:none;font-size:14px;font-weight:900">View product &amp; order now&nbsp; →</a></p><p style="margin:0;color:#747b86;font-size:12px;line-height:1.6">You received this email because you selected “Inform Me When Available” for this product.</p></td></tr>
+<tr><td class="footer-pad" style="padding:24px 42px;background:#0b0b0b;color:#aeb2ba;font-size:12px;line-height:1.6"><strong style="display:block;color:#fff;font-size:14px;margin-bottom:4px">Arete Performance</strong>Premium performance solutions designed to help you reach your full potential.<div style="margin-top:12px"><a href="{{ route('frontend.shop') }}" style="color:#e9a611;text-decoration:none">Shop products</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="{{ url('/') }}" style="color:#e9a611;text-decoration:none">Visit website</a></div></td></tr>
+</table></td></tr></table></body></html>

@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\SiteSetting;
+use App\Mail\StockRequestMail;
 use App\Models\StockNotification;
 use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
@@ -323,16 +324,15 @@ class FrontendController extends Controller
             ]
         );
 
-        $adminEmail = config('mail.from.address');
-        if ($adminEmail) {
-            Mail::raw(
-                "Stock notification request\n\nProduct: {$product->name}\nSKU: {$product->sku}\nRequested quantity: {$stockNotification->quantity}\n\nCustomer: {$stockNotification->customer_name}\nEmail: {$stockNotification->email}\nPhone: " . ($stockNotification->phone ?? 'N/A') . "\n\nMessage:\n" . ($stockNotification->message ?? 'N/A'),
-                fn ($message) => $message
-                    ->to($adminEmail)
-                    ->replyTo($stockNotification->email, $stockNotification->customer_name)
-                    ->subject("Stock request: {$product->name}")
-            );
-        }
+        $adminEmails = collect(explode(',', SiteSetting::getValue('admin_order_emails', '') ?? ''))
+            ->map(fn (string $email) => strtolower(trim($email)))
+            ->filter(fn (string $email) => filter_var($email, FILTER_VALIDATE_EMAIL))
+            ->whenEmpty(fn ($emails) => $emails->push(config('mail.from.address')))
+            ->filter()
+            ->unique();
+
+        $stockNotification->load('product');
+        $adminEmails->each(fn (string $email) => Mail::to($email)->send(new StockRequestMail($stockNotification)));
 
         return response()->json([
             'message' => 'Thanks. You will be notified when this product is available.',

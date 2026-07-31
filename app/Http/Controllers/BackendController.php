@@ -337,14 +337,20 @@ class BackendController extends Controller
 
         abort_unless($stockNotification->product, 404);
 
-        Mail::to($stockNotification->email)->send(new StockAvailableMail($stockNotification));
+        $product = $stockNotification->product;
+        $product->update([
+            'status' => 'active',
+            'stock' => max((int) $product->stock, (int) $stockNotification->quantity, 1),
+        ]);
+
+        Mail::to($stockNotification->email)->send(new StockAvailableMail($stockNotification->fresh('product')));
 
         $stockNotification->update([
             'status' => 'notified',
             'notified_at' => now(),
         ]);
 
-        return back()->with('success', 'Customer notified successfully.');
+        return back()->with('success', "{$product->name} is now active with stock available and the customer has been notified.");
     }
 
     public function profile(): View

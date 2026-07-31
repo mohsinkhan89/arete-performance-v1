@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class StockAvailableMail extends Mailable
+class StockRequestMail extends Mailable
 {
     use Queueable;
     use SerializesModels;
@@ -22,14 +22,15 @@ class StockAvailableMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->stockNotification->product?->name . ' is available now',
+            replyTo: [$this->stockNotification->email],
+            subject: 'Stock request: ' . $this->stockNotification->product?->name,
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'emails.stock-available',
+            view: 'emails.stock-request',
             with: [
                 'logoUrl' => url(SiteSetting::getValue('header_logo', 'frontend/assets/images/logo/logo-transperent.png')),
             ],
