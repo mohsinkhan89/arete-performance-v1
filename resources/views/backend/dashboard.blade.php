@@ -4,16 +4,88 @@
 
 @section('body')
 <div class="vx-dashboard">
-    <div class="vx-page-head">
-        <div><h1>Analytics Dashboard</h1><p>Welcome back, {{ auth()->user()->name ?? 'Admin' }}. Here is what is happening with your store.</p></div>
-        <form method="GET" action="{{ route('backend.dashboard') }}">
-            <select name="range" onchange="this.form.submit()">
+    <div class="vx-page-head ap-dashboard-head">
+        <div>
+            <span class="ap-dashboard-eyebrow"><i class="fa-solid fa-sparkles"></i> Live store intelligence</span>
+            <h1>Analytics Dashboard</h1>
+            <p>Welcome back, {{ auth()->user()->name ?? 'Admin' }}. Here is what is happening with your store.</p>
+        </div>
+        <div class="ap-dashboard-actions">
+            <a href="{{ route('backend.resource.create', ['resource' => 'products']) }}"><i class="fa-solid fa-plus"></i> Add Product</a>
+            <a class="primary" href="{{ route('backend.page', 'orders') }}"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Orders</a>
+        </div>
+    </div>
+
+    <section class="ap-dashboard-stats" aria-label="Store summary">
+        <a href="{{ route('backend.page', 'orders') }}" class="ap-stat-card amber">
+            <span class="ap-stat-icon"><i class="fa-solid fa-cart-shopping"></i></span>
+            <span class="ap-stat-copy"><small>Total orders</small><strong>{{ number_format($totalOrders) }}</strong><em><i class="fa-solid fa-arrow-trend-up"></i> {{ number_format($todayOrders) }} today</em></span>
+            <i class="fa-solid fa-arrow-right ap-stat-arrow"></i>
+        </a>
+        <a href="{{ route('backend.page', 'reports') }}" class="ap-stat-card green">
+            <span class="ap-stat-icon"><i class="fa-solid fa-sterling-sign"></i></span>
+            <span class="ap-stat-copy"><small>Total revenue</small><strong>&pound;{{ number_format($totalRevenue, 0) }}</strong><em>{{ number_format($paidOrders) }} paid orders</em></span>
+            <i class="fa-solid fa-arrow-right ap-stat-arrow"></i>
+        </a>
+        <a href="{{ route('backend.page', 'products') }}" class="ap-stat-card blue">
+            <span class="ap-stat-icon"><i class="fa-solid fa-box-open"></i></span>
+            <span class="ap-stat-copy"><small>Active products</small><strong>{{ number_format($activeProducts) }}</strong><em>{{ number_format($totalInventory) }} units available</em></span>
+            <i class="fa-solid fa-arrow-right ap-stat-arrow"></i>
+        </a>
+        <a href="{{ route('backend.page', 'users') }}" class="ap-stat-card purple">
+            <span class="ap-stat-icon"><i class="fa-solid fa-user-group"></i></span>
+            <span class="ap-stat-copy"><small>Customers</small><strong>{{ number_format($totalUsers) }}</strong><em>{{ number_format($reviewsCount) }} product reviews</em></span>
+            <i class="fa-solid fa-arrow-right ap-stat-arrow"></i>
+        </a>
+    </section>
+
+    <form class="ap-dashboard-narrow" method="GET" action="{{ route('backend.dashboard') }}">
+        <div class="ap-narrow-title">
+            <span><i class="fa-solid fa-sliders"></i></span>
+            <div><strong>Narrow analytics</strong><small>Focus every insight on the data you need</small></div>
+        </div>
+        <label>
+            <span>Period</span>
+            <select name="range">
                 @foreach ([7 => 'Last 7 days', 30 => 'Last 30 days', 90 => 'Last 90 days', 365 => 'Last year'] as $days => $label)
                     <option value="{{ $days }}" @selected($range === $days)>{{ $label }}</option>
                 @endforeach
             </select>
-        </form>
-    </div>
+        </label>
+        <label>
+            <span>Order status</span>
+            <select name="order_status">
+                <option value="">All statuses</option>
+                @foreach (['paid' => 'Paid', 'unpaid' => 'Unpaid', 'processing' => 'Processing', 'delivered' => 'Delivered', 'cancelled' => 'Cancelled'] as $value => $label)
+                    <option value="{{ $value }}" @selected($orderStatusFilter === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </label>
+        <label>
+            <span>Category</span>
+            <select name="category">
+                <option value="">All categories</option>
+                @foreach ($filterCategories as $category)
+                    <option value="{{ $category->id }}" @selected($categoryFilter === $category->id)>{{ $category->name }}</option>
+                @endforeach
+            </select>
+        </label>
+        <label>
+            <span>Payment channel</span>
+            <select name="channel">
+                <option value="">All channels</option>
+                @foreach ($filterChannels as $channel)
+                    <option value="{{ $channel }}" @selected($channelFilter === $channel)>{{ Str::headline($channel) }}</option>
+                @endforeach
+            </select>
+        </label>
+        <div class="ap-narrow-actions">
+            @if ($orderStatusFilter || $categoryFilter || $channelFilter || $range !== 30)
+                <a href="{{ route('backend.dashboard') }}" title="Reset filters"><i class="fa-solid fa-rotate-left"></i></a>
+            @endif
+            <button type="submit"><i class="fa-solid fa-filter"></i> Apply</button>
+        </div>
+    </form>
 
     <section class="vx-grid vx-grid-top">
         <article class="vx-card vx-analytics-hero">
