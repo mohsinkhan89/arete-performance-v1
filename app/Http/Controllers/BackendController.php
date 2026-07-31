@@ -45,7 +45,7 @@ class BackendController extends Controller
                 ->when($categoryFilter, fn ($query) => $query->whereHas('items.product', fn ($query) => $query->where('category_id', $categoryFilter)))
                 ->when($channelFilter, fn ($query) => $query->where('payment_method', $channelFilter));
         };
-        $rangeOrders = $applyFilters(Order::query())
+        $rangeOrders = $applyFilters(Order::query()->withCount('items'))
             ->where('created_at', '>=', $rangeStart)
             ->oldest()
             ->get();
