@@ -1,104 +1,17 @@
 @extends('frontend.layouts.master')
-
+@section('body_class','track-order-page')
+@section('css')
+<style>
+.tracking-page{--gold:#e9a611;background:linear-gradient(#0b0b0b 0 355px,#f4f5f7 355px);min-height:calc(100vh - 80px);padding:58px 0 75px}.tracking-wrap{width:min(1120px,calc(100% - 30px));margin:auto}.tracking-intro{text-align:center;max-width:720px;margin:0 auto 25px}.tracking-intro span{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#976500;font-weight:900}.tracking-intro h1{color:#fff!important;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:clamp(42px,6vw,68px);font-weight:800;line-height:1;margin:9px 0;color:#111}.tracking-intro h1 em{color:var(--gold);font-style:normal}.tracking-intro p{margin:0;color:#afb5bf}.tracking-intro span{color:#e9a611!important}.tracking-search{display:grid;position:relative;z-index:3;grid-template-columns:1fr 1fr auto;gap:9px;max-width:850px;margin:0 auto 30px;padding:12px;background:#fff;border:1px solid #e2e6eb;border-radius:15px;box-shadow:0 9px 30px rgba(18,25,38,.07)}.tracking-field{position:relative}.tracking-field i{position:absolute;left:13px;top:14px;color:#a16d00}.tracking-field input{width:100%;height:44px;border:1px solid #e0e5eb;border-radius:10px;padding:0 12px 0 38px;font-size:12px}.tracking-search button{height:44px;border:0;border-radius:10px;background:#111;color:#fff;padding:0 21px;font-weight:900;font-size:12px}.tracking-status-hero{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;margin:0 0 17px;padding:20px 22px;border-radius:17px;background:linear-gradient(125deg,#121212,#242424);color:#fff;border:1px solid #343434;box-shadow:0 14px 35px rgba(0,0,0,.14)}.status-main{display:flex;gap:15px;align-items:center}.status-main>i{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;background:#e9a611;color:#111;font-size:19px}.status-main span,.status-main b,.status-main small{display:block}.status-main span{font-size:9px;color:#e9a611;text-transform:uppercase;letter-spacing:.08em;font-weight:900}.status-main b{font-size:20px;margin:3px 0}.status-main small{font-size:10px;color:#aeb4bd}.status-progress{text-align:right;min-width:240px}.status-progress strong{font-size:22px;color:#e9a611}.status-progress small{display:block;color:#aeb4bd;font-size:9px;margin-bottom:7px}.progress-track{height:7px;background:#3a3a3a;border-radius:20px;overflow:hidden}.progress-track i{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#b87900,#f2bd3d);animation:progressGrow .9s ease-out}.tracking-grid{display:grid;grid-template-columns:.72fr 1.28fr;gap:17px;align-items:start}.tracking-grid>main{position:sticky;top:92px;align-self:start}.track-card{background:#fff;border:1px solid #e2e6eb;border-radius:17px;padding:20px;box-shadow:0 9px 30px rgba(18,25,38,.05)}.track-card+.track-card{margin-top:15px}.track-card-head{display:flex;justify-content:space-between;align-items:start;gap:12px;margin-bottom:17px}.track-card h2{font-size:17px;margin:0}.track-card-head p{font-size:10px;color:#7a828e;margin:4px 0}.live-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:20px;background:#fff2d3;color:#946400;font-size:10px;font-weight:900}.live-chip:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;animation:livePulse 1.4s infinite}.live-chip.delivered{background:#e4f7ec;color:#177f48}.track-facts{display:grid;gap:9px}.track-fact{display:flex;gap:10px;padding:11px;background:#f8f9fb;border-radius:10px}.track-fact i{width:33px;height:33px;display:grid;place-items:center;border-radius:8px;background:#fff0ca;color:#946400}.track-fact span,.track-fact b,.track-fact small{display:block}.track-fact span{font-size:9px;text-transform:uppercase;color:#89919d;font-weight:800}.track-fact b{font-size:12px;margin-top:2px}.track-fact small{font-size:9px;color:#747c88;margin-top:2px}.delivery-timeline{display:grid}.delivery-step{display:grid;grid-template-columns:38px 1fr;gap:11px;position:relative;padding-bottom:19px;color:#9ba2ae}.delivery-step:after{content:"";position:absolute;left:18px;top:36px;bottom:0;width:2px;background:#e8ebef}.delivery-step:last-child:after{display:none}.step-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:#f0f2f5;color:#9ba2ae;position:relative;z-index:2}.delivery-step.done .step-icon{background:#e4f7ec;color:#177f48}.delivery-step.current .step-icon{background:#fff0ca;color:#946400;box-shadow:0 0 0 5px rgba(233,166,17,.12)}.delivery-step.done:after{background:#86cfa7}.delivery-step b,.delivery-step small{display:block}.delivery-step b{font-size:12px;color:#646c78;margin-top:3px}.delivery-step.current b,.delivery-step.done b{color:#171717}.delivery-step small{font-size:10px;margin-top:3px;line-height:1.45}.tracking-items{display:grid;gap:8px}.tracking-item{display:grid;grid-template-columns:52px 1fr auto;gap:11px;align-items:center;padding:10px;background:#f8f9fb;border-radius:10px}.tracking-item img{width:52px;height:52px;object-fit:contain;background:#fff;border-radius:8px}.tracking-item b,.tracking-item small{display:block}.tracking-item b{font-size:12px}.tracking-item small{font-size:9px;color:#7b838f;margin-top:2px}.tracking-item>strong{font-size:12px}.track-total{display:flex;justify-content:space-between;border-top:1px solid #e3e7ec;margin-top:13px;padding-top:13px;font-size:16px}.tracking-empty{max-width:850px;margin:0 auto;background:#fff;border:1px solid #e2e6eb;border-radius:17px;padding:42px;text-align:center}.tracking-empty i{width:62px;height:62px;border-radius:50%;background:#fff0ca;color:#946400;display:grid;place-items:center;margin:0 auto 15px;font-size:22px}.tracking-empty h2{font-size:22px;margin:0 0 8px}.tracking-empty p{max-width:560px;margin:0 auto;color:#747c88;font-size:12px;line-height:1.6}.tracking-help{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}.tracking-help div{padding:13px;background:#f8f9fb;border-radius:10px}.tracking-help b,.tracking-help small{display:block}.tracking-help b{font-size:11px}.tracking-help small{font-size:9px;color:#7b838f;margin-top:3px}@keyframes progressGrow{from{width:0}}@keyframes livePulse{50%{opacity:.35;transform:scale(.75)}}@media(max-width:850px){.tracking-status-hero{grid-template-columns:1fr}.status-progress{text-align:left;min-width:0}.tracking-grid{grid-template-columns:1fr}.tracking-grid>main{position:static}.tracking-search{grid-template-columns:1fr 1fr}.tracking-search button{grid-column:1/-1}}@media(max-width:560px){.tracking-page{padding-top:38px;background:linear-gradient(#0b0b0b 0 410px,#f4f5f7 410px)}.tracking-status-hero{padding:17px}.status-main>i{width:42px;height:42px}.status-main b{font-size:17px}.tracking-search,.tracking-help{grid-template-columns:1fr}.tracking-search button{grid-column:auto}.tracking-empty{padding:28px 17px}.tracking-item{grid-template-columns:45px 1fr}.tracking-item img{width:45px;height:45px}.tracking-item>strong{grid-column:2}}
+</style>
+@endsection
 @section('body')
-  <section class="search-hero">
-    <div class="container">
-      <div class="search-hero-copy reveal-up">
-        <h1>Track <span>Order</span></h1>
-        <p>Enter your order number and email to see where your order is right now.</p>
-        <form class="search-hero-form track-order-form" action="{{ route('frontend.track-order') }}" method="GET">
-          <input type="text" name="order_number" value="{{ request('order_number') }}" placeholder="Order number" required>
-          <input type="email" name="email" value="{{ request('email') }}" placeholder="Email address" required>
-          <button class="btn btn-gold" type="submit">Track <i class="fa-solid fa-arrow-right"></i></button>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <section class="success-main section-space">
-    <div class="container">
-      @if (session('success'))
-        <div class="track-alert">{{ session('success') }}</div>
-      @endif
-
-      @if ($order)
-        <div class="success-grid">
-          <aside class="success-side">
-            <article class="success-card">
-              <h2><i class="fa-solid fa-truck-fast"></i> Current Status</h2>
-              <p><strong>{{ str_replace('_', ' ', ucfirst($order->tracking_status ?? 'placed')) }}</strong></p>
-              @if ($order->tracking_number)
-                <p>Tracking number: <strong>{{ $order->tracking_number }}</strong></p>
-              @endif
-            </article>
-            <article class="success-card">
-              <h2>Order Timeline</h2>
-              @include('frontend.partials.order-timeline', ['order' => $order])
-            </article>
-          </aside>
-
-          <section class="success-card order-detail-card">
-            <h2><i class="fa-regular fa-rectangle-list"></i> Order #{{ $order->order_number }}</h2>
-            <dl class="order-detail-list">
-              <div><dt>Customer</dt><dd>{{ $order->customer_name }}</dd></div>
-              <div><dt>Payment</dt><dd>{{ str_replace('_', ' ', ucfirst($order->payment_status ?? 'unpaid')) }}</dd></div>
-              <div><dt>Royal Mail ID</dt><dd>{{ $order->tracking_number ?: 'Preparing label' }}</dd></div>
-              <div><dt>Total</dt><dd>£{{ number_format((float) $order->total, 2) }}</dd></div>
-              <div><dt>Address</dt><dd>{{ $order->address }}, {{ $order->city }}, {{ $order->zip }}</dd></div>
-            </dl>
-
-          </section>
-
-          <aside class="success-card success-summary">
-            <h2>Items</h2>
-            <div class="checkout-summary-items">
-              @foreach ($order->items as $item)
-                <article>
-                  <img src="{{ url($item->product_image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $item->product_name }}">
-                  <div><strong>{{ $item->product_name }}</strong><span>{{ $item->product_sku }}</span><small>Qty: {{ $item->quantity }}</small></div>
-                  <b>£{{ number_format((float) $item->line_total, 2) }}</b>
-                </article>
-              @endforeach
-            </div>
-          </aside>
-        </div>
-      @else
-        <section class="track-empty-panel">
-          <div class="track-empty-copy">
-            <span class="track-empty-kicker">
-              <i class="fa-solid {{ $searched ? 'fa-magnifying-glass' : 'fa-location-crosshairs' }}"></i>
-              {{ $searched ? 'Search result' : 'Order tracking' }}
-            </span>
-            <h2>{{ $searched ? 'No order found yet' : 'Ready to track your order?' }}</h2>
-            <p>
-              {{ $searched
-                ? 'We could not match that order number with the email address. Check both details exactly as they appear on your confirmation email and search again.'
-                : 'Enter your order number and email above to see the latest status, Royal Mail ID, order timeline, payment update, and item details in one place.' }}
-            </p>
-            <div class="track-empty-actions">
-              <a class="btn btn-gold" href="{{ route('frontend.shop') }}">Continue shopping <i class="fa-solid fa-arrow-right"></i></a>
-              <a class="btn btn-outline-dark" href="mailto:support@areteperformance.co.uk">Contact support <i class="fa-regular fa-envelope"></i></a>
-            </div>
-          </div>
-          <div class="track-empty-steps" aria-label="Tracking help">
-            <div>
-              <i class="fa-regular fa-envelope-open"></i>
-              <strong>Check your email</strong>
-              <span>Use the same email address from checkout.</span>
-            </div>
-            <div>
-              <i class="fa-solid fa-hashtag"></i>
-              <strong>Enter order number</strong>
-              <span>Copy the full order number without extra spaces.</span>
-            </div>
-            <div>
-              <i class="fa-solid fa-truck-fast"></i>
-              <strong>View live details</strong>
-              <span>If the order is found, the current details show here.</span>
-            </div>
-          </div>
-        </section>
-      @endif
-    </div>
-  </section>
+@php
+$steps=['placed'=>['fa-receipt','Order placed','We received your order'],'processing'=>['fa-gears','Processing','Payment and order checks are underway'],'packed'=>['fa-box-open','Packed','Your products are prepared for dispatch'],'dispatched'=>['fa-truck-fast','Dispatched',$order?->tracking_number?'Tracking: '.$order->tracking_number:'Courier tracking will appear here'],'out_for_delivery'=>['fa-route','Out for delivery','Your parcel is on its final journey'],'delivered'=>['fa-house-circle-check','Delivered','Your order has been completed']];
+$keys=array_keys($steps);$current=$order?->tracking_status??'placed';$currentIndex=array_search($current,$keys,true);$currentIndex=$currentIndex===false?0:$currentIndex;$progressPercent=$current==='cancelled'?0:(int)round((($currentIndex+1)/count($keys))*100);
+@endphp
+<section class="tracking-page"><div class="tracking-wrap"><header class="tracking-intro"><span><i class="fa-solid fa-location-crosshairs"></i> Live delivery workspace</span><h1>Track your <em>order</em></h1><p>Use the exact order number and email from checkout to view payment, fulfilment and delivery updates.</p></header><form class="tracking-search" action="{{ route('frontend.track-order') }}" method="GET"><label class="tracking-field"><i class="fa-solid fa-hashtag"></i><input name="order_number" value="{{ request('order_number') }}" placeholder="Order number" required></label><label class="tracking-field"><i class="fa-regular fa-envelope"></i><input type="email" name="email" value="{{ request('email') }}" placeholder="Checkout email address" required></label><button type="submit">Track order <i class="fa-solid fa-arrow-right"></i></button></form>
+@if($order)<section class="tracking-status-hero"><div class="status-main"><i class="fa-solid {{ $current==='delivered'?'fa-circle-check':($current==='cancelled'?'fa-circle-xmark':'fa-truck-fast') }}"></i><span><span>Live order status</span><b>{{ Str::headline($current) }}</b><small>Order #{{ $order->order_number }} · Last checked {{ now()->format('h:i A') }}</small></span></div><div class="status-progress"><strong>{{ $progressPercent }}%</strong><small>Delivery journey complete</small><div class="progress-track"><i style="width:{{ $progressPercent }}%"></i></div></div></section><div class="tracking-grid"><aside><article class="track-card"><div class="track-card-head"><div><h2>Order #{{ $order->order_number }}</h2><p>Placed {{ $order->created_at->format('d M Y, h:i A') }}</p></div><span class="live-chip {{ $current==='delivered'?'delivered':'' }}">{{ Str::headline($current) }}</span></div><div class="track-facts"><div class="track-fact"><i class="fa-solid fa-user"></i><span><span>Customer</span><b>{{ $order->customer_name }}</b><small>{{ $order->email }}</small></span></div><div class="track-fact"><i class="fa-solid fa-wallet"></i><span><span>Payment</span><b>{{ Str::headline($order->payment_status) }}</b><small>{{ Str::headline($order->payment_method) }}</small></span></div><div class="track-fact"><i class="fa-solid fa-barcode"></i><span><span>Tracking ID</span><b>{{ $order->tracking_number ?: 'Preparing label' }}</b><small>{{ Str::headline($order->shipping_method) }}</small></span></div><div class="track-fact"><i class="fa-solid fa-location-dot"></i><span><span>Destination</span><b>{{ $order->city }}, {{ $order->zip }}</b><small>{{ $order->country }}</small></span></div></div></article><article class="track-card"><div class="track-card-head"><div><h2>Purchased items</h2><p>{{ $order->items->sum('quantity') }} units in this delivery</p></div></div><div class="tracking-items">@foreach($order->items as $item)<div class="tracking-item"><img src="{{ url($item->product_image ?: 'frontend/assets/images/product-bottle.png') }}" alt=""><span><b>{{ $item->product_name }}</b><small>{{ $item->product_sku }} · Qty {{ $item->quantity }}</small></span><strong>£{{ number_format($item->line_total,2) }}</strong></div>@endforeach</div><div class="track-total"><span>Total</span><strong>£{{ number_format($order->total,2) }}</strong></div></article></aside>
+<main><article class="track-card"><div class="track-card-head"><div><h2>Delivery journey</h2><p>Latest fulfilment progress for your parcel</p></div></div><div class="delivery-timeline">@foreach($steps as $key=>$step)@php($index=array_search($key,$keys,true))<div class="delivery-step {{ $current==='cancelled'?'':($index<$currentIndex?'done':($index===$currentIndex?'current':'')) }}"><span class="step-icon"><i class="fa-solid {{ $step[0] }}"></i></span><span><b>{{ $step[1] }}</b><small>{{ $key==='placed'?$order->created_at->format('d M Y, h:i A'):$step[2] }}</small></span></div>@endforeach @if($current==='cancelled')<div class="delivery-step current"><span class="step-icon"><i class="fa-solid fa-circle-xmark"></i></span><span><b>Order cancelled</b><small>{{ $order->tracking_note ?: 'Please contact support if you need assistance.' }}</small></span></div>@elseif($order->tracking_note)<div class="delivery-step current"><span class="step-icon"><i class="fa-solid fa-circle-info"></i></span><span><b>Latest update</b><small>{{ $order->tracking_note }}</small></span></div>@endif</div></article></main></div>
+@else<section class="tracking-empty"><i class="fa-solid {{ $searched?'fa-magnifying-glass':'fa-box' }}"></i><h2>{{ $searched?'We could not find that order':'Your delivery details will appear here' }}</h2><p>{{ $searched?'Check that the order number and email match your checkout confirmation exactly, then try again.':'Enter your order reference and checkout email above for a secure view of your delivery.' }}</p><div class="tracking-help"><div><b>1. Check confirmation</b><small>Copy the full order number.</small></div><div><b>2. Use checkout email</b><small>Email must match exactly.</small></div><div><b>3. View live journey</b><small>Status updates appear here.</small></div></div></section>@endif</div></section>
 @endsection

@@ -36,15 +36,21 @@ class BackendController extends Controller
         $categoryFilter = (int) $request->query('category', 0);
         $channelFilter = trim((string) $request->query('channel', ''));
         $rangeStart = now()->startOfDay()->subDays($range - 1);
-        $rangeOrders = Order::query()
+        $applyFilters = function ($query) use ($orderStatusFilter, $categoryFilter, $channelFilter) {
+            return $query
+                ->when($orderStatusFilter, fn ($query) => $query->where(fn ($query) => $query
+                    ->where('status', $orderStatusFilter)
+                    ->orWhere('payment_status', $orderStatusFilter)
+                    ->orWhere('tracking_status', $orderStatusFilter)))
+                ->when($categoryFilter, fn ($query) => $query->whereHas('items.product', fn ($query) => $query->where('category_id', $categoryFilter)))
+                ->when($channelFilter, fn ($query) => $query->where('payment_method', $channelFilter));
+        };
+        $rangeOrders = $applyFilters(Order::query()->withCount('items'))
             ->where('created_at', '>=', $rangeStart)
-            ->when($orderStatusFilter, fn ($query) => $query->where(fn ($query) => $query
-                ->where('status', $orderStatusFilter)
-                ->orWhere('payment_status', $orderStatusFilter)
-                ->orWhere('tracking_status', $orderStatusFilter)))
-            ->when($categoryFilter, fn ($query) => $query->whereHas('items.product', fn ($query) => $query->where('category_id', $categoryFilter)))
-            ->when($channelFilter, fn ($query) => $query->where('payment_method', $channelFilter))
             ->oldest()
+            ->get();
+        $previousOrders = $applyFilters(Order::query())
+            ->whereBetween('created_at', [$rangeStart->copy()->subDays($range), $rangeStart->copy()->subSecond()])
             ->get();
         $dailyOrders = $rangeOrders->groupBy(fn (Order $order) => $order->created_at->format('Y-m-d'));
         $chartDates = collect(range(0, $range - 1))->map(fn (int $offset) => $rangeStart->copy()->addDays($offset));
@@ -106,6 +112,17 @@ class BackendController extends Controller
             ->sortByDesc('revenue')
             ->values();
 
+        $rangeRevenue = (float) $rangeOrders->sum('total');
+        $previousRevenue = (float) $previousOrders->sum('total');
+        $percentageChange = static fn (float $current, float $previous): ?float => $previous > 0
+            ? round((($current - $previous) / $previous) * 100, 1)
+            : ($current > 0 ? 100.0 : null);
+        $currentItems = (int) OrderItem::whereIn('order_id', $rangeOrders->pluck('id'))->sum('quantity');
+        $previousItems = (int) OrderItem::whereIn('order_id', $previousOrders->pluck('id'))->sum('quantity');
+        $rangeCustomers = $rangeOrders->pluck('email')->map(fn ($email) => strtolower($email))->unique()->count();
+        $previousCustomers = $previousOrders->pluck('email')->map(fn ($email) => strtolower($email))->unique()->count();
+        $filteredPaidOrders = $rangeOrders->where('payment_status', 'paid');
+
         return view('backend.dashboard', [
             'totalProducts' => Product::count(),
             'totalCategories' => Category::count(),
@@ -136,7 +153,15 @@ class BackendController extends Controller
             'paymentBreakdown' => collect($paymentStatuses)->mapWithKeys(fn ($status) => [$status => Order::where('payment_status', $status)->count()]),
             'lowStockProducts' => Product::with('category')->where('stock', '<=', 5)->orderBy('stock')->take(5)->get(),
             'range' => $range,
-            'rangeRevenue' => (float) $rangeOrders->sum('total'),
+            'rangeRevenue' => $rangeRevenue,
+            'revenueChange' => $percentageChange($rangeRevenue, $previousRevenue),
+            'ordersChange' => $percentageChange((float) $rangeOrders->count(), (float) $previousOrders->count()),
+            'itemsChange' => $percentageChange((float) $currentItems, (float) $previousItems),
+            'customerChange' => $percentageChange((float) $rangeCustomers, (float) $previousCustomers),
+            'rangeCustomers' => $rangeCustomers,
+            'rangeAverageOrder' => $rangeOrders->count() ? $rangeRevenue / $rangeOrders->count() : 0,
+            'rangePaidRevenue' => (float) $filteredPaidOrders->sum('total'),
+            'rangePaidOrders' => $filteredPaidOrders->count(),
             'rangeOrders' => $rangeOrders->count(),
             'chartLabels' => $chartLabels,
             'revenueSeries' => $revenueSeries,
@@ -148,11 +173,13 @@ class BackendController extends Controller
             'channelFilter' => $channelFilter,
             'filterCategories' => Category::where('status', 'active')->orderBy('name')->get(['id', 'name']),
             'filterChannels' => Order::whereNotNull('payment_method')->distinct()->orderBy('payment_method')->pluck('payment_method'),
-            'itemsSold' => (int) OrderItem::whereIn('order_id', $rangeOrders->pluck('id'))->sum('quantity'),
+            'itemsSold' => $currentItems,
             'deliveredOrders' => $rangeOrders->where('tracking_status', 'delivered')->count(),
             'pendingOrders' => $rangeOrders->whereNotIn('tracking_status', ['delivered', 'cancelled'])->count(),
             'categoryPerformance' => $categoryPerformance,
             'channelPerformance' => $channelPerformance,
+            'filteredTrackingBreakdown' => collect($trackingStatuses)->mapWithKeys(fn ($status) => [$status => $rangeOrders->where('tracking_status', $status)->count()]),
+            'filteredPaymentBreakdown' => collect($paymentStatuses)->mapWithKeys(fn ($status) => [$status => $rangeOrders->where('payment_status', $status)->count()]),
         ]);
     }
 
@@ -174,12 +201,15 @@ class BackendController extends Controller
         $pageTitle = ucwords(str_replace('-', ' ', $page));
         $search = trim((string) $request->query('q', ''));
         $status = trim((string) $request->query('status', ''));
+        $role = trim((string) $request->query('role', ''));
+        $category = (int) $request->query('category', 0);
         $records = match ($page) {
             'products' => Product::with('category')
                 ->when($search, fn ($query) => $query->where(fn ($query) => $query
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('sku', 'like', "%{$search}%")
                     ->orWhereHas('category', fn ($query) => $query->where('name', 'like', "%{$search}%"))))
+                ->when($category, fn ($query) => $query->where('category_id', $category))
                 ->when($status, fn ($query) => $query->where('status', $status))
                 ->latest()
                 ->paginate(10)
@@ -197,6 +227,7 @@ class BackendController extends Controller
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")))
+                ->when($role, fn ($query) => $query->where('role', $role))
                 ->when($status, fn ($query) => $query->where('status', $status))
                 ->latest()
                 ->paginate(10)
@@ -247,7 +278,34 @@ class BackendController extends Controller
             'cancelled_count' => Order::where('status', 'cancelled')->count(),
             'recent' => Order::with('items')->latest()->take(10)->get(),
         ] : null;
+        $userStats = $page === 'users' ? [
+            'total' => User::count(),
+            'active' => User::where('status', 'active')->count(),
+            'inactive' => User::where('status', 'inactive')->count(),
+            'pending' => User::whereNotIn('status', ['active', 'inactive'])->count(),
+            'paid' => Order::query()->distinct('email')->count('email'),
+            'roles' => User::query()->whereNotNull('role')->distinct()->orderBy('role')->pluck('role'),
+        ] : null;
+        $orderStats = $page === 'orders' ? [
+            'total' => Order::count(),
+            'revenue' => (float) Order::sum('total'),
+            'paid' => Order::where('payment_status', 'paid')->count(),
+            'paidRevenue' => (float) Order::where('payment_status', 'paid')->sum('total'),
+            'unpaid' => Order::where('payment_status', 'unpaid')->count(),
+            'pending' => Order::whereNotIn('tracking_status', ['delivered', 'cancelled'])->count(),
+            'delivered' => Order::where('tracking_status', 'delivered')->count(),
+            'proofs' => Order::whereNotNull('payment_proof')->where('payment_proof', '!=', '')->count(),
+        ] : null;
 
+        if ($page === 'orders') {
+            return view('backend.pages.orders-index', [
+                'pageTitle' => 'Orders',
+                'records' => $records,
+                'search' => $search,
+                'status' => $status,
+                'orderStats' => $orderStats,
+            ]);
+        }
         if ($page === 'settings') {
             return view('backend.pages.settings', [
                 'page' => $page,
@@ -262,8 +320,14 @@ class BackendController extends Controller
             'records' => $records,
             'search' => $search,
             'status' => $status,
+            'role' => $role,
+            'categoryFilter' => $category,
             'canManageUsers' => $this->isSuperAdmin(),
             'reportStats' => $reportStats,
+            'userStats' => $userStats,
+            'orderStats' => $orderStats,
+            'categories' => Category::where('status', 'active')->orderBy('name')->get(),
+            'products' => Product::orderBy('name')->get(),
         ]);
     }
 
@@ -273,14 +337,20 @@ class BackendController extends Controller
 
         abort_unless($stockNotification->product, 404);
 
-        Mail::to($stockNotification->email)->send(new StockAvailableMail($stockNotification));
+        $product = $stockNotification->product;
+        $product->update([
+            'status' => 'active',
+            'stock' => max((int) $product->stock, (int) $stockNotification->quantity, 1),
+        ]);
+
+        Mail::to($stockNotification->email)->send(new StockAvailableMail($stockNotification->fresh('product')));
 
         $stockNotification->update([
             'status' => 'notified',
             'notified_at' => now(),
         ]);
 
-        return back()->with('success', 'Customer notified successfully.');
+        return back()->with('success', "{$product->name} is now active with stock available and the customer has been notified.");
     }
 
     public function profile(): View
@@ -378,6 +448,17 @@ class BackendController extends Controller
         return back()->with('success', Str::headline($setting) . ' updated successfully.');
     }
 
+    public function editOrder(Order $order): View
+    {
+        if (! $order->tracking_number) {
+            $order->forceFill(['tracking_number' => $this->royalMailTrackingNumber($order)])->save();
+        }
+
+        return view('backend.pages.order-edit', [
+            'order' => $order->load('items'),
+            'pageTitle' => 'Edit Order #' . $order->order_number,
+        ]);
+    }
     public function showOrder(Order $order): View
     {
         if (! $order->tracking_number) {
@@ -484,11 +565,10 @@ class BackendController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($admin->id)],
             'phone' => ['nullable', 'string', 'max:40'],
-            'current_password' => ['nullable', 'required_with:password', 'current_password'],
             'password' => ['nullable', 'string', 'min:6', 'confirmed'],
         ]);
 
-        unset($data['current_password'], $data['password_confirmation']);
+        unset($data['password_confirmation']);
 
         if (! empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
@@ -579,29 +659,46 @@ class BackendController extends Controller
         return back()->with('success', Str::headline(Str::singular($resource)) . ' deleted successfully.');
     }
 
-    public function toggleStatus(string $resource, int $id): RedirectResponse
+    public function toggleStatus(Request $request, string $resource, int $id): RedirectResponse|JsonResponse
     {
         $this->authorizeResource($resource);
         $record = $this->findRecord($resource, $id);
 
         abort_if($resource === 'users' && auth()->id() === $record->id, 403);
 
-        $record->update([
-            'status' => $record->status === 'active' ? 'inactive' : 'active',
-        ]);
+        $newStatus = $record->status === 'active' ? 'inactive' : 'active';
+        $record->update(['status' => $newStatus]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'active' => $newStatus === 'active',
+                'label' => Str::headline($newStatus),
+                'message' => 'Status updated successfully.',
+            ]);
+        }
 
         return back()->with('success', 'Status updated successfully.');
     }
 
-    public function toggleProductField(Product $product, string $field): RedirectResponse
+    public function toggleProductField(Request $request, Product $product, string $field): RedirectResponse|JsonResponse
     {
         abort_unless(in_array($field, ['stock', 'is_bestseller'], true), 404);
 
-        $product->update([
-            $field => $field === 'stock'
-                ? ($product->stock > 0 ? 0 : 1)
-                : ! $product->is_bestseller,
-        ]);
+        $newValue = $field === 'stock'
+            ? ($product->stock > 0 ? 0 : 1)
+            : ! $product->is_bestseller;
+
+        $product->update([$field => $newValue]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'active' => (bool) $newValue,
+                'label' => $newValue ? 'Active' : 'Inactive',
+                'message' => Str::headline($field) . ' updated successfully.',
+            ]);
+        }
 
         return back()->with('success', Str::headline($field) . ' updated successfully.');
     }

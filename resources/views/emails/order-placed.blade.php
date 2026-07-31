@@ -1,78 +1,13 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Order Confirmation</title>
-</head>
-<body style="margin:0;background:#f4f4f4;font-family:Arial,Helvetica,sans-serif;color:#161616;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f4f4;padding:28px 12px;">
-        <tr>
-            <td align="center">
-                <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="max-width:620px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e6e6e6;">
-                    <tr>
-                        <td style="background:#050505;padding:26px 30px;color:#ffffff;">
-                            <h1 style="margin:0;font-size:26px;line-height:1.15;text-transform:uppercase;">Arete Performance</h1>
-                            <p style="margin:8px 0 0;color:#f5a817;font-weight:700;">Order #{{ $order->order_number }}</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding:28px 30px;">
-                            @if ($adminNotification)
-                                <h2 style="margin:0 0 10px;font-size:22px;">New order from {{ $order->customer_name }}.</h2>
-                                <p style="margin:0 0 22px;color:#5f5f5f;line-height:1.6;">A new customer order has been received. Here are the order details.</p>
-                            @else
-                                <h2 style="margin:0 0 10px;font-size:22px;">Thanks, {{ $order->customer_name }}.</h2>
-                                <p style="margin:0 0 22px;color:#5f5f5f;line-height:1.6;">Your order has been received. Here are your order details.</p>
-                            @endif
-
-                            @if ($adminNotification)
-                                <div style="margin:0 0 22px;padding:16px;background:#fafafa;border:1px solid #eeeeee;border-radius:8px;">
-                                    <strong style="display:block;margin-bottom:8px;">Customer Contact</strong>
-                                    <p style="margin:0;color:#5f5f5f;line-height:1.55;">
-                                        Email: {{ $order->email }}<br>
-                                        Phone: {{ $order->phone ?: 'Not provided' }}<br>
-                                        Payment: {{ ucfirst($order->payment_method) }}
-                                    </p>
-                                </div>
-                            @endif
-
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
-                                @foreach ($order->items as $item)
-                                    <tr>
-                                        <td style="padding:14px 0;border-bottom:1px solid #ececec;">
-                                            <strong style="display:block;">{{ $item->product_name }}</strong>
-                                            <span style="color:#707070;font-size:13px;">Qty: {{ $item->quantity }} x £{{ number_format((float) $item->unit_price, 2) }}</span>
-                                        </td>
-                                        <td align="right" style="padding:14px 0;border-bottom:1px solid #ececec;font-weight:700;">£{{ number_format((float) $item->line_total, 2) }}</td>
-                                    </tr>
-                                @endforeach
-                            </table>
-
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:18px;">
-                                <tr><td style="padding:6px 0;color:#5f5f5f;">Subtotal</td><td align="right" style="padding:6px 0;">£{{ number_format((float) $order->subtotal, 2) }}</td></tr>
-                                <tr><td style="padding:6px 0;color:#5f5f5f;">Shipping</td><td align="right" style="padding:6px 0;">£{{ number_format((float) $order->shipping_total, 2) }}</td></tr>
-                                <tr><td style="padding:12px 0 0;font-size:18px;font-weight:800;">Total</td><td align="right" style="padding:12px 0 0;font-size:18px;font-weight:800;color:#f5a817;">£{{ number_format((float) $order->total, 2) }}</td></tr>
-                            </table>
-
-                            <div style="margin-top:24px;padding:18px;background:#fafafa;border:1px solid #eeeeee;border-radius:8px;">
-                                <strong style="display:block;margin-bottom:8px;">Shipping Address</strong>
-                                <p style="margin:0;color:#5f5f5f;line-height:1.55;">
-                                    @if ($order->company){{ $order->company }}<br>@endif
-                                    {{ $order->address }}<br>
-                                    @if ($order->address_2){{ $order->address_2 }}<br>@endif
-                                    {{ $order->city }}, {{ $order->state }} {{ $order->zip }}<br>{{ $order->country }}
-                                </p>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding:18px 30px;background:#050505;color:#bdbdbd;font-size:12px;">
-                            Premium performance solutions designed to help you reach your full potential.
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ $adminNotification ? 'New order received' : 'Order confirmation' }}</title><style>@media only screen and (max-width:620px){.email-shell{width:100%!important}.email-pad{padding:24px 18px!important}.email-title{font-size:25px!important}.summary-cell{display:block!important;width:100%!important;padding:7px 0!important}.product-image{width:48px!important}.product-name{font-size:12px!important}.cta{display:block!important;text-align:center!important}.footer-pad{padding:22px 18px!important}}</style></head>
+<body style="margin:0;padding:0;background:#f1f3f6;font-family:Arial,Helvetica,sans-serif;color:#171717;-webkit-text-size-adjust:100%"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f1f3f6"><tr><td align="center" style="padding:28px 12px"><table role="presentation" class="email-shell" width="640" cellspacing="0" cellpadding="0" style="width:640px;max-width:100%;background:#fff;border:1px solid #e3e6eb;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(18,25,38,.08)">
+<tr><td align="center" style="background:#080808;padding:25px 24px;border-bottom:3px solid #e9a611"><img src="{{ $logoUrl }}" width="190" alt="Arete Performance" style="display:block;width:190px;max-width:72%;height:auto;border:0"></td></tr>
+<tr><td class="email-pad" style="padding:38px 42px 30px"><div style="display:inline-block;padding:6px 10px;border-radius:20px;background:{{ $adminNotification ? '#e8f1ff' : '#e4f7ec' }};color:{{ $adminNotification ? '#2863ad' : '#177f48' }};font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em">{{ $adminNotification ? 'New website order' : 'Order confirmed' }}</div><h1 class="email-title" style="margin:16px 0 10px;font-size:30px;line-height:1.18">{{ $adminNotification ? 'A new order has arrived.' : 'Thank you, '.$order->customer_name.'.' }}</h1><p style="margin:0 0 23px;color:#656d79;font-size:15px;line-height:1.65">{{ $adminNotification ? 'Review the customer, payment and fulfilment information below.' : 'We have received your order and will keep you informed as it moves through fulfilment.' }}</p>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8f9fb;border:1px solid #e8ebef;border-radius:13px;padding:14px"><tr><td class="summary-cell" width="50%" style="padding:8px"><span style="display:block;color:#8a919d;font-size:10px;text-transform:uppercase;font-weight:800">Order number</span><strong style="display:block;margin-top:4px;font-size:14px">#{{ $order->order_number }}</strong></td><td class="summary-cell" width="50%" style="padding:8px"><span style="display:block;color:#8a919d;font-size:10px;text-transform:uppercase;font-weight:800">Placed</span><strong style="display:block;margin-top:4px;font-size:14px">{{ $order->created_at->format('d M Y, h:i A') }}</strong></td></tr><tr><td class="summary-cell" style="padding:8px"><span style="display:block;color:#8a919d;font-size:10px;text-transform:uppercase;font-weight:800">Payment</span><strong style="display:block;margin-top:4px;font-size:14px">{{ Str::headline($order->payment_status) }} · {{ Str::headline($order->payment_method) }}</strong></td><td class="summary-cell" style="padding:8px"><span style="display:block;color:#8a919d;font-size:10px;text-transform:uppercase;font-weight:800">Delivery</span><strong style="display:block;margin-top:4px;font-size:14px">{{ Str::headline($order->shipping_method) }}</strong></td></tr></table>
+@if($adminNotification)<div style="margin-top:18px;padding:15px;border-left:3px solid #e9a611;background:#fffbf2;border-radius:0 9px 9px 0"><strong style="display:block;color:#8c5e00;font-size:11px;text-transform:uppercase">Customer contact</strong><p style="margin:6px 0 0;color:#4f5661;font-size:13px;line-height:1.6">{{ $order->customer_name }}<br><a href="mailto:{{ $order->email }}" style="color:#9a6800">{{ $order->email }}</a><br>{{ $order->phone ?: 'Phone not provided' }}</p></div>@endif
+<h2 style="margin:27px 0 10px;font-size:16px">Order items</h2><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse">@foreach($order->items as $item)<tr><td width="58" style="padding:12px 8px 12px 0;border-bottom:1px solid #eceff2"><img class="product-image" src="{{ url($item->product_image ?: 'frontend/assets/images/product-bottle.png') }}" width="50" height="50" alt="" style="display:block;width:50px;height:50px;object-fit:contain;border-radius:8px;background:#f7f8fa"></td><td style="padding:12px 8px;border-bottom:1px solid #eceff2"><strong class="product-name" style="display:block;font-size:13px">{{ $item->product_name }}</strong><span style="display:block;margin-top:3px;color:#777f8b;font-size:11px">{{ $item->product_sku }} · Qty {{ $item->quantity }} × £{{ number_format($item->unit_price,2) }}</span></td><td align="right" style="padding:12px 0;border-bottom:1px solid #eceff2;font-size:13px;font-weight:800;white-space:nowrap">£{{ number_format($item->line_total,2) }}</td></tr>@endforeach</table>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:17px"><tr><td style="padding:5px 0;color:#69717d;font-size:13px">Subtotal</td><td align="right" style="padding:5px 0;font-size:13px">£{{ number_format($order->subtotal,2) }}</td></tr><tr><td style="padding:5px 0;color:#69717d;font-size:13px">Shipping</td><td align="right" style="padding:5px 0;font-size:13px">£{{ number_format($order->shipping_total,2) }}</td></tr><tr><td style="padding:13px 0 0;border-top:1px solid #e4e7eb;font-size:17px;font-weight:900">Total</td><td align="right" style="padding:13px 0 0;border-top:1px solid #e4e7eb;font-size:19px;font-weight:900;color:#b87900">£{{ number_format($order->total,2) }}</td></tr></table>
+<div style="margin-top:23px;padding:16px;background:#f8f9fb;border:1px solid #e8ebef;border-radius:11px"><strong style="display:block;margin-bottom:7px;font-size:12px">Shipping address</strong><p style="margin:0;color:#5f6773;font-size:12px;line-height:1.6">{{ $order->customer_name }}<br>@if($order->company){{ $order->company }}<br>@endif{{ $order->address }}<br>@if($order->address_2){{ $order->address_2 }}<br>@endif{{ $order->city }}, {{ $order->state }} {{ $order->zip }}<br>{{ $order->country }}</p></div>
+@php($emailActionUrl=$adminNotification?route('backend.orders.show',$order):route('frontend.track-order',['order_number'=>$order->order_number,'email'=>$order->email]))<p style="margin:25px 0 8px"><a class="cta" href="{{ $emailActionUrl }}" style="display:inline-block;background:#e9a611;color:#111;padding:14px 23px;border-radius:9px;text-decoration:none;font-size:14px;font-weight:900">{{ $adminNotification ? 'Open order in dashboard' : 'Track your order' }}&nbsp; →</a></p>@unless($adminNotification)<p style="margin:0;color:#747b86;font-size:12px;line-height:1.6">We will use this email address for important updates about your order.</p>@endunless</td></tr>
+<tr><td class="footer-pad" style="padding:24px 42px;background:#0b0b0b;color:#aeb2ba;font-size:12px;line-height:1.6"><strong style="display:block;color:#fff;font-size:14px;margin-bottom:4px">Arete Performance</strong>Premium performance solutions designed to help you reach your full potential.<div style="margin-top:12px"><a href="{{ route('frontend.shop') }}" style="color:#e9a611;text-decoration:none">Shop products</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="{{ url('/') }}" style="color:#e9a611;text-decoration:none">Visit website</a></div></td></tr>
+</table></td></tr></table></body></html>

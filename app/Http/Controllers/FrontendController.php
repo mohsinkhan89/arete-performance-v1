@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\SiteSetting;
+use App\Mail\StockRequestMail;
 use App\Models\StockNotification;
 use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
@@ -225,10 +226,18 @@ class FrontendController extends Controller
         $filters = $this->filters($request);
         $products = $this->filteredProducts($filters)->paginate(12)->withQueryString();
 
+        $priceBounds = Product::where('status', 'active')
+            ->selectRaw('FLOOR(MIN(COALESCE(sale_price, price))) as min_price, CEIL(MAX(COALESCE(sale_price, price))) as max_price')
+            ->first();
+
         return view('frontend.search', [
             'categories' => Category::withCount(['products' => fn ($query) => $query->where('status', 'active')])->where('status', 'active')->orderBy('sort_order')->get(),
             'products' => $products,
             'filters' => $filters,
+            'priceBounds' => [
+                'min' => (int) ($priceBounds->min_price ?? 0),
+                'max' => max(1, (int) ($priceBounds->max_price ?? 400)),
+            ],
         ]);
     }
 
@@ -323,16 +332,15 @@ class FrontendController extends Controller
             ]
         );
 
-        $adminEmail = config('mail.from.address');
-        if ($adminEmail) {
-            Mail::raw(
-                "Stock notification request\n\nProduct: {$product->name}\nSKU: {$product->sku}\nRequested quantity: {$stockNotification->quantity}\n\nCustomer: {$stockNotification->customer_name}\nEmail: {$stockNotification->email}\nPhone: " . ($stockNotification->phone ?? 'N/A') . "\n\nMessage:\n" . ($stockNotification->message ?? 'N/A'),
-                fn ($message) => $message
-                    ->to($adminEmail)
-                    ->replyTo($stockNotification->email, $stockNotification->customer_name)
-                    ->subject("Stock request: {$product->name}")
-            );
-        }
+        $adminEmails = collect(explode(',', SiteSetting::getValue('admin_order_emails', '') ?? ''))
+            ->map(fn (string $email) => strtolower(trim($email)))
+            ->filter(fn (string $email) => filter_var($email, FILTER_VALIDATE_EMAIL))
+            ->whenEmpty(fn ($emails) => $emails->push(config('mail.from.address')))
+            ->filter()
+            ->unique();
+
+        $stockNotification->load('product');
+        $adminEmails->each(fn (string $email) => Mail::to($email)->send(new StockRequestMail($stockNotification)));
 
         return response()->json([
             'message' => 'Thanks. You will be notified when this product is available.',

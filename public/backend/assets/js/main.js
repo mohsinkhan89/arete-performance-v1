@@ -277,65 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
     (label || textarea).after(editorShell);
   });
 
-  document.querySelectorAll('.product-form-layout').forEach((layout) => {
-    const panels = [...layout.querySelectorAll(':scope > .form-section')];
-    if (panels.length < 2) return;
-
-    const icons = ['fa-rectangle-list', 'fa-sliders', 'fa-image', 'fa-align-left', 'fa-shield-halved'];
-    const tabs = document.createElement('nav');
-    tabs.className = 'vx-form-tabs';
-    tabs.setAttribute('aria-label', 'Form sections');
-    tabs.innerHTML = panels.map((panel, index) => {
-      const title = panel.querySelector('.form-section-head h2')?.textContent.trim() || `Step ${index + 1}`;
-      return `<button type="button" data-vx-form-tab="${index}" aria-selected="${index === 0}">
-        <i class="fa-solid ${icons[index] || 'fa-circle'}"></i>
-        <span>${title}</span>
-      </button>`;
-    }).join('');
-
-    const pager = document.createElement('div');
-    pager.className = 'vx-form-pager';
-    pager.innerHTML = `
-      <button type="button" data-vx-form-prev><i class="fa-solid fa-arrow-left"></i> Previous</button>
-      <span data-vx-form-progress></span>
-      <button type="button" data-vx-form-next>Next <i class="fa-solid fa-arrow-right"></i></button>
-    `;
-
-    layout.before(tabs);
-    layout.after(pager);
-    layout.classList.add('vx-tabbed-form');
-    panels.forEach((panel, index) => {
-      panel.classList.add('vx-form-panel');
-      panel.setAttribute('role', 'tabpanel');
-      panel.hidden = index !== 0;
-    });
-
-    const tabButtons = [...tabs.querySelectorAll('[data-vx-form-tab]')];
-    const previous = pager.querySelector('[data-vx-form-prev]');
-    const next = pager.querySelector('[data-vx-form-next]');
-    const progress = pager.querySelector('[data-vx-form-progress]');
-    let activeIndex = 0;
-
-    const showPanel = (index) => {
-      activeIndex = Math.max(0, Math.min(panels.length - 1, index));
-      panels.forEach((panel, panelIndex) => { panel.hidden = panelIndex !== activeIndex; });
-      tabButtons.forEach((button, buttonIndex) => {
-        const isActive = buttonIndex === activeIndex;
-        button.classList.toggle('active', isActive);
-        button.setAttribute('aria-selected', String(isActive));
-      });
-      previous.disabled = activeIndex === 0;
-      next.disabled = activeIndex === panels.length - 1;
-      progress.textContent = `Step ${activeIndex + 1} of ${panels.length}`;
-      layout.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-
-    tabButtons.forEach((button, index) => button.addEventListener('click', () => showPanel(index)));
-    previous.addEventListener('click', () => showPanel(activeIndex - 1));
-    next.addEventListener('click', () => showPanel(activeIndex + 1));
-    showPanel(0);
-  });
-
   const themeToggle = document.querySelector('.theme-toggle');
   const themeIcon = themeToggle?.querySelector('i');
   const savedTheme = localStorage.getItem('adminTheme') || 'light';
@@ -480,8 +421,240 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   resourcePreviewModal?.querySelectorAll('[data-resource-preview-close]').forEach((button) => button.addEventListener('click', closeResourcePreview));
+
+  const userEditorModal = document.querySelector('[data-user-editor-modal]');
+  const userEditorForm = userEditorModal?.querySelector('[data-user-modal-form]');
+  const userEditorTitle = userEditorModal?.querySelector('#userModalTitle');
+  const userEditorMethod = userEditorModal?.querySelector('[data-user-modal-method]');
+  const userSubmitLabel = userEditorModal?.querySelector('[data-user-submit-label]');
+  const userPassword = userEditorModal?.querySelector('[data-user-field="password"]');
+  const userPasswordNote = userEditorModal?.querySelector('[data-user-password-note]');
+  const setUserField = (field, value) => {
+    const input = userEditorModal?.querySelector(`[data-user-field="${field}"]`);
+    if (input) input.value = value || '';
+  };
+  const closeUserEditor = () => {
+    userEditorModal?.classList.remove('is-open');
+    userEditorModal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  };
+
+  document.querySelectorAll('[data-user-modal-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!userEditorModal || !userEditorForm) return;
+
+      const isEdit = button.dataset.mode === 'edit';
+      userEditorForm.action = button.dataset.action || '';
+      if (userEditorTitle) userEditorTitle.textContent = isEdit ? 'Edit User' : 'Add User';
+      if (userSubmitLabel) userSubmitLabel.textContent = isEdit ? 'Update User' : 'Save User';
+
+      if (userEditorMethod) {
+        userEditorMethod.disabled = !isEdit;
+        userEditorMethod.value = isEdit ? 'PUT' : '';
+      }
+
+      setUserField('name', isEdit ? button.dataset.name : '');
+      setUserField('email', isEdit ? button.dataset.email : '');
+      setUserField('phone', isEdit ? button.dataset.phone : '');
+      setUserField('role', isEdit ? button.dataset.role : 'admin');
+      setUserField('status', isEdit ? button.dataset.status : 'active');
+      setUserField('password', '');
+
+      if (userPassword) {
+        userPassword.required = !isEdit;
+        userPassword.placeholder = isEdit ? 'Leave blank to keep current password' : 'Minimum 6 characters';
+      }
+
+      if (userPasswordNote) {
+        userPasswordNote.textContent = isEdit ? 'Leave blank to keep the current password.' : 'Required for new users.';
+      }
+
+      userEditorModal.classList.add('is-open');
+      userEditorModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      window.setTimeout(() => userEditorModal.querySelector('[data-user-field="name"]')?.focus(), 60);
+    });
+  });
+  userEditorModal?.querySelectorAll('[data-user-modal-close]').forEach((button) => button.addEventListener('click', closeUserEditor));
+
+  document.querySelectorAll('[data-user-view-toggle]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const target = document.getElementById(button.dataset.userViewToggle || '');
+      if (!target) return;
+
+      const isHidden = target.hasAttribute('hidden');
+      document.querySelectorAll('.vx-user-detail-row').forEach((row) => {
+        if (row !== target) row.setAttribute('hidden', '');
+      });
+      document.querySelectorAll('[data-user-view-toggle]').forEach((toggleButton) => {
+        if (toggleButton !== button) toggleButton.classList.remove('is-active');
+      });
+      target.toggleAttribute('hidden', !isHidden);
+      button.classList.toggle('is-active', isHidden);
+    });
+  });
+
+  const resourceEditorModal = document.querySelector('[data-resource-editor-modal]');
+  const resourceEditorForm = resourceEditorModal?.querySelector('[data-resource-modal-form]');
+  const resourceEditorTitle = resourceEditorModal?.querySelector('#resourceModalTitle');
+  const resourceEditorMethod = resourceEditorModal?.querySelector('[data-resource-modal-method]');
+  const resourceSubmitLabel = resourceEditorModal?.querySelector('[data-resource-submit-label]');
+  const setResourceField = (field, value) => {
+    const input = resourceEditorModal?.querySelector(`[data-resource-field="${field}"]`);
+    if (!input) return;
+
+    if (input.type === 'checkbox') {
+      input.checked = value === '1' || value === 'true' || value === true;
+      return;
+    }
+
+    input.value = value || '';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  };
+  const closeResourceEditor = () => {
+    resourceEditorModal?.classList.remove('is-open');
+    resourceEditorModal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  };
+
+  document.querySelectorAll('[data-resource-modal-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!resourceEditorModal || !resourceEditorForm) return;
+
+      const isEdit = button.dataset.mode === 'edit';
+      const resource = button.dataset.resource || 'resource';
+      const singular = resource.replace(/s$/, '').replace(/-/g, ' ');
+      resourceEditorForm.reset();
+      resourceEditorForm.action = button.dataset.action || '';
+      if (resourceEditorTitle) resourceEditorTitle.textContent = `${isEdit ? 'Edit' : 'Add'} ${singular.charAt(0).toUpperCase()}${singular.slice(1)}`;
+      if (resourceSubmitLabel) resourceSubmitLabel.textContent = `${isEdit ? 'Update' : 'Save'} ${singular.charAt(0).toUpperCase()}${singular.slice(1)}`;
+
+      if (resourceEditorMethod) {
+        resourceEditorMethod.disabled = !isEdit;
+        resourceEditorMethod.value = isEdit ? 'PUT' : '';
+      }
+
+      [
+        'name', 'sku', 'slug', 'categoryId', 'shortDescription', 'description', 'price', 'salePrice',
+        'stock', 'reviewsCount', 'status', 'isFeatured', 'isBestseller', 'sortOrder', 'image',
+        'customerName', 'customerTitle', 'productId', 'rating', 'avatar', 'comment',
+      ].forEach((field) => setResourceField(field, isEdit ? button.dataset[field] : ''));
+
+      if (!isEdit) {
+        setResourceField('stock', '1');
+        setResourceField('reviewsCount', '0');
+        setResourceField('sortOrder', '0');
+        setResourceField('rating', '5');
+        setResourceField('status', 'active');
+      }
+
+      resourceEditorModal.classList.add('is-open');
+      resourceEditorModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      window.setTimeout(() => resourceEditorModal.querySelector('input, select, textarea')?.focus(), 60);
+    });
+  });
+  resourceEditorModal?.querySelectorAll('[data-resource-modal-close]').forEach((button) => {
+    button.addEventListener('click', closeResourceEditor);
+  });
+
+  const orderEditorModal = document.querySelector('[data-order-editor-modal]');
+  const orderEditorForm = orderEditorModal?.querySelector('[data-order-modal-form]');
+  if (orderEditorModal && orderEditorModal.parentElement !== document.body) {
+    document.body.appendChild(orderEditorModal);
+  }
+  const setOrderField = (field, value) => {
+    const input = orderEditorModal?.querySelector(`[data-order-field="${field}"]`);
+    if (input) input.value = value || '';
+  };
+  const closeOrderEditor = () => {
+    orderEditorModal?.classList.remove('is-open');
+    orderEditorModal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  };
+
+  document.querySelectorAll('[data-order-modal-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!orderEditorModal || !orderEditorForm) return;
+
+      orderEditorForm.action = button.dataset.action || '';
+      [
+        'customerName', 'email', 'phone', 'zip', 'address', 'address2', 'city', 'state',
+        'status', 'paymentStatus', 'trackingStatus', 'trackingNumber', 'trackingNote', 'adminNote',
+      ].forEach((field) => setOrderField(field, button.dataset[field]));
+
+      orderEditorModal.classList.add('is-open');
+      orderEditorModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      window.setTimeout(() => orderEditorModal.querySelector('input, select, textarea')?.focus(), 60);
+    });
+  });
+  orderEditorModal?.querySelectorAll('[data-order-modal-close]').forEach((button) => {
+    button.addEventListener('click', closeOrderEditor);
+  });
+
+  const reportViewModal = document.querySelector('[data-report-view-modal]');
+  if (reportViewModal && reportViewModal.parentElement !== document.body) {
+    document.body.appendChild(reportViewModal);
+  }
+  const reportViewUrl = reportViewModal?.querySelector('[data-report-view-url]');
+  const setReportText = (field, value) => {
+    const element = reportViewModal?.querySelector(`[data-report-${field}]`);
+    if (element) element.textContent = value || '-';
+  };
+  const closeReportView = () => {
+    reportViewModal?.classList.remove('is-open');
+    reportViewModal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  };
+
+  document.querySelectorAll('[data-report-modal-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!reportViewModal) return;
+
+      setReportText('order', button.dataset.order ? `Order ${button.dataset.order}` : 'Order Report');
+      setReportText('customer', button.dataset.customer);
+      setReportText('email', button.dataset.email);
+      setReportText('total', button.dataset.total);
+      setReportText('payment', button.dataset.payment);
+      setReportText('tracking', button.dataset.tracking);
+      setReportText('created', button.dataset.created);
+      if (reportViewUrl) reportViewUrl.href = button.dataset.viewUrl || '#';
+
+      reportViewModal.classList.add('is-open');
+      reportViewModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+    });
+  });
+  reportViewModal?.querySelectorAll('[data-report-modal-close]').forEach((button) => {
+    button.addEventListener('click', closeReportView);
+  });
+
+  document.querySelectorAll('[data-resource-view-toggle]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const target = document.getElementById(button.dataset.resourceViewToggle || '');
+      if (!target) return;
+
+      const isHidden = target.hasAttribute('hidden');
+      document.querySelectorAll('.vx-user-detail-row').forEach((row) => {
+        if (row !== target) row.setAttribute('hidden', '');
+      });
+      document.querySelectorAll('[data-resource-view-toggle], [data-user-view-toggle]').forEach((toggleButton) => {
+        if (toggleButton !== button) toggleButton.classList.remove('is-active');
+      });
+      target.toggleAttribute('hidden', !isHidden);
+      button.classList.toggle('is-active', isHidden);
+    });
+  });
+
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeResourcePreview();
+    if (event.key === 'Escape') {
+      closeResourcePreview();
+      closeUserEditor();
+      closeResourceEditor();
+      closeOrderEditor();
+      closeReportView();
+    }
   });
   document.addEventListener('fullscreenchange', syncFullscreen);
 
@@ -536,8 +709,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (revenue.length) {
         const gradient = context.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
-        gradient.addColorStop(0, 'rgba(115, 103, 240, .28)');
-        gradient.addColorStop(1, 'rgba(115, 103, 240, 0)');
+        gradient.addColorStop(0, 'rgba(247, 174, 26, .28)');
+        gradient.addColorStop(1, 'rgba(247, 174, 26, 0)');
         context.beginPath();
         revenue.forEach((value, index) => {
           const x = xAt(index);
@@ -558,7 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (index === 0) context.moveTo(x, y);
           else context.lineTo(x, y);
         });
-        context.strokeStyle = '#7367f0';
+        context.strokeStyle = '#f7ae1a';
         context.lineWidth = 2.5;
         context.lineJoin = 'round';
         context.lineCap = 'round';
@@ -596,6 +769,91 @@ document.addEventListener('DOMContentLoaded', () => {
     drawDashboardChart();
   }
 
+  const analyticsTooltip = document.createElement('div');
+  analyticsTooltip.className = 'analytics-tooltip';
+  analyticsTooltip.setAttribute('role', 'tooltip');
+  document.body.appendChild(analyticsTooltip);
+
+  const positionAnalyticsTooltip = (clientX, clientY) => {
+    const gap = 14;
+    const width = analyticsTooltip.offsetWidth;
+    const height = analyticsTooltip.offsetHeight;
+    let left = clientX + gap;
+    let top = clientY + gap;
+    if (left + width > window.innerWidth - 10) left = clientX - width - gap;
+    if (top + height > window.innerHeight - 10) top = clientY - height - gap;
+    analyticsTooltip.style.left = `${Math.max(10, left)}px`;
+    analyticsTooltip.style.top = `${Math.max(10, top)}px`;
+  };
+  const escapeAnalyticsHtml = (value) => String(value).replace(/[&<>'"]/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;'
+  })[character]);
+  const showAnalyticsTooltip = (html, clientX, clientY) => {
+    analyticsTooltip.innerHTML = html;
+    analyticsTooltip.classList.add('show');
+    positionAnalyticsTooltip(clientX, clientY);
+  };
+  const hideAnalyticsTooltip = () => analyticsTooltip.classList.remove('show');
+
+  document.querySelectorAll('[data-analytics-title]').forEach((row) => {
+    const showCategoryDetail = (event) => {
+      showAnalyticsTooltip(
+        `<strong>${escapeAnalyticsHtml(row.dataset.analyticsTitle)}</strong>` +
+        `<span>Revenue <b>£${row.dataset.analyticsRevenue}</b></span>` +
+        `<span>Units sold <b>${row.dataset.analyticsUnits}</b></span>` +
+        `<span>Revenue share <b>${row.dataset.analyticsShare}%</b></span>` +
+        `<span>Action <b>Open products →</b></span>`,
+        event.clientX || row.getBoundingClientRect().left,
+        event.clientY || row.getBoundingClientRect().bottom
+      );
+    };
+    row.addEventListener('mouseenter', showCategoryDetail);
+    row.addEventListener('mousemove', (event) => positionAnalyticsTooltip(event.clientX, event.clientY));
+    row.addEventListener('mouseleave', hideAnalyticsTooltip);
+    row.addEventListener('focus', showCategoryDetail);
+    row.addEventListener('blur', hideAnalyticsTooltip);
+  });
+
+  if (dashboardCanvas && dashboardChartData) {
+    const hoverData = JSON.parse(dashboardChartData.textContent || '{}');
+    const chartWrap = dashboardCanvas.parentElement;
+    const crosshair = document.createElement('i');
+    crosshair.className = 'analytics-chart-crosshair';
+    chartWrap.appendChild(crosshair);
+    const showChartDetail = (event) => {
+      const rect = dashboardCanvas.getBoundingClientRect();
+      const labels = hoverData.labels || [];
+      if (!labels.length) return;
+      const padding = { left: 48, right: 18, top: 20, bottom: 34 };
+      const chartWidth = rect.width - padding.left - padding.right;
+      const localX = Math.min(rect.width - padding.right, Math.max(padding.left, event.clientX - rect.left));
+      const index = labels.length <= 1 ? 0 : Math.round(((localX - padding.left) / chartWidth) * (labels.length - 1));
+      const revenue = Number(hoverData.revenue?.[index] || 0);
+      const orders = Number(hoverData.orders?.[index] || 0);
+      const average = orders ? revenue / orders : 0;
+      const maxRevenue = Math.max(...(hoverData.revenue || []), 1);
+      const chartHeight = rect.height - padding.top - padding.bottom;
+      const pointY = padding.top + chartHeight - (revenue / maxRevenue) * chartHeight;
+      const pointX = padding.left + (labels.length <= 1 ? chartWidth / 2 : (index / (labels.length - 1)) * chartWidth);
+      crosshair.style.display = 'block';
+      crosshair.style.left = `${pointX}px`;
+      crosshair.style.setProperty('--point-y', `${pointY - padding.top}px`);
+      showAnalyticsTooltip(
+        `<strong>${escapeAnalyticsHtml(labels[index])}</strong>` +
+        `<span>Revenue <b>£${revenue.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</b></span>` +
+        `<span>Orders <b>${orders.toLocaleString()}</b></span>` +
+        `<span>Average order <b>£${average.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</b></span>`,
+        event.clientX,
+        event.clientY
+      );
+    };
+    dashboardCanvas.addEventListener('mousemove', showChartDetail);
+    dashboardCanvas.addEventListener('click', showChartDetail);
+    dashboardCanvas.addEventListener('mouseleave', () => {
+      crosshair.style.display = 'none';
+      hideAnalyticsTooltip();
+    });
+  }
   const commandPalette = document.querySelector('.command-palette');
   const commandToggle = document.querySelector('.command-toggle');
   const commandBackdrop = document.querySelector('.command-backdrop');
@@ -872,6 +1130,65 @@ document.addEventListener('DOMContentLoaded', () => {
     closeNotifications();
     closePaymentProofModal();
     closeSidebar();
+  });
+
+  const showToggleToast = (message, type = 'success') => {
+    let toast = document.querySelector('[data-toggle-toast]');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'inline-toggle-toast';
+      toast.dataset.toggleToast = '';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      document.body.appendChild(toast);
+    }
+
+    toast.classList.remove('success', 'error', 'is-visible');
+    toast.classList.add(type);
+    toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i><span>${escapeHtml(message)}</span>`;
+    requestAnimationFrame(() => toast.classList.add('is-visible'));
+    window.clearTimeout(toast._hideTimer);
+    toast._hideTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 2400);
+  };
+
+  document.querySelectorAll('.inline-toggle-form').forEach((form) => {
+    form.addEventListener('submit', async (event) => {
+      if (!window.fetch) return;
+      event.preventDefault();
+
+      const button = form.querySelector('.modern-switch');
+      if (!button || button.classList.contains('is-loading')) return;
+
+      button.classList.add('is-loading');
+      button.disabled = true;
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: {
+            Accept: 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.message || 'Unable to update this setting.');
+        }
+
+        button.classList.toggle('is-active', Boolean(payload.active));
+        button.classList.toggle('is-inactive', !payload.active);
+        button.setAttribute('aria-pressed', String(Boolean(payload.active)));
+        const label = button.querySelector('span');
+        if (label) label.textContent = payload.label || (payload.active ? 'Active' : 'Inactive');
+        showToggleToast(payload.message || 'Updated successfully.');
+      } catch (error) {
+        showToggleToast(error.message || 'Unable to update. Please try again.', 'error');
+      } finally {
+        button.classList.remove('is-loading');
+        button.disabled = false;
+      }
+    });
   });
 
   document.querySelectorAll('.admin-nav a').forEach((link) => {

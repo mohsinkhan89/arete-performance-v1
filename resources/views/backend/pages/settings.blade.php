@@ -12,17 +12,37 @@
         $jsVersion = old('js_version', $settings['js_version'] ?? '1.0.0');
     @endphp
 
-    <div class="page-heading">
-        <h1>Site Settings</h1>
-        <p>Manage frontend branding, customer contact details and order notifications.</p>
+    <div class="page-heading settings-page-heading">
+        <div>
+            <span class="settings-eyebrow"><i class="fa-solid fa-sliders"></i> Store configuration</span>
+            <h1>Site Settings</h1>
+            <p>Manage frontend branding, customer contact details and order notifications.</p>
+        </div>
+        <a href="{{ route('frontend.index') }}" target="_blank" rel="noopener">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Store
+        </a>
     </div>
 
     <article class="panel form-panel form-panel-full settings-admin-panel">
+        <header class="settings-overview">
+            <div class="settings-overview-copy">
+                <span><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                <div>
+                    <strong>Store configuration</strong>
+                    <p>Changes are applied individually, so you can safely update one setting at a time.</p>
+                </div>
+            </div>
+            <div class="settings-overview-status">
+                <span><i></i> Store online</span>
+                <span><b>5</b> Setting groups</span>
+            </div>
+        </header>
+
         <div class="settings-native-grid">
             <form class="admin-form form-section" action="{{ route('backend.settings.site.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="setting" value="header_logo">
-                <div class="form-section-head"><span>01</span><h2>Header Logo</h2></div>
+                <div class="form-section-head"><span><i class="fa-regular fa-image"></i></span><div><h2>Header Logo</h2><small>Primary website identity</small></div></div>
                 <div class="settings-logo-current"><img src="{{ url($headerLogo) }}" alt="Current header logo"></div>
                 <label>Choose Header Logo
                     <input type="file" name="header_logo_file" accept=".jpg,.jpeg,.png,.webp,.svg,image/*">
@@ -35,7 +55,7 @@
             <form class="admin-form form-section" action="{{ route('backend.settings.site.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="setting" value="footer_logo">
-                <div class="form-section-head"><span>02</span><h2>Footer Logo</h2></div>
+                <div class="form-section-head"><span><i class="fa-solid fa-signature"></i></span><div><h2>Footer Logo</h2><small>Footer brand identity</small></div></div>
                 <div class="settings-logo-current"><img src="{{ url($footerLogo) }}" alt="Current footer logo"></div>
                 <label>Choose Footer Logo
                     <input type="file" name="footer_logo_file" accept=".jpg,.jpeg,.png,.webp,.svg,image/*">
@@ -48,7 +68,7 @@
             <form class="admin-form form-section" action="{{ route('backend.settings.site.update') }}" method="POST">
                 @csrf
                 <input type="hidden" name="setting" value="company_whatsapp_number">
-                <div class="form-section-head"><span>03</span><h2>WhatsApp Number</h2></div>
+                <div class="form-section-head"><span><i class="fa-brands fa-whatsapp"></i></span><div><h2>WhatsApp Number</h2><small>Customer checkout contact</small></div></div>
                 <label>Company WhatsApp Number
                     <input type="text" name="company_whatsapp_number" value="{{ $whatsappNumber }}" placeholder="+44 7123 456789">
                     <small>Customers are redirected to this number after checkout.</small>
@@ -60,7 +80,7 @@
             <form class="admin-form form-section" action="{{ route('backend.settings.site.update') }}" method="POST">
                 @csrf
                 <input type="hidden" name="setting" value="admin_order_emails">
-                <div class="form-section-head"><span>04</span><h2>Admin Order Emails</h2></div>
+                <div class="form-section-head"><span><i class="fa-regular fa-envelope"></i></span><div><h2>Admin Order Emails</h2><small>Order notification recipients</small></div></div>
                 <label>Admin Email Addresses
                     <input type="text" name="admin_order_emails" value="{{ $adminOrderEmails }}" placeholder="admin@example.com, orders@example.com">
                     <small>Separate multiple email addresses with commas.</small>
@@ -72,7 +92,7 @@
             <form class="admin-form form-section" action="{{ route('backend.settings.site.update') }}" method="POST">
                 @csrf
                 <input type="hidden" name="setting" value="asset_versions">
-                <div class="form-section-head"><span>05</span><h2>CSS &amp; JS Versions</h2></div>
+                <div class="form-section-head"><span><i class="fa-solid fa-code-branch"></i></span><div><h2>CSS &amp; JS Versions</h2><small>Frontend cache management</small></div></div>
                 <div class="asset-version-fields">
                     <label>CSS Version
                         <input type="text" name="css_version" value="{{ $cssVersion }}" placeholder="1.0.0">

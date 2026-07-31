@@ -41,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
             ]);
         });
 
-        View::composer('backend.layouts.master', function ($view) {
+        View::composer(['backend.layouts.master', 'backend.auth.login'], function ($view) {
             $view->with([
                 'orderNotifications' => Order::latest()->take(50)->get(),
                 'orderNotificationCount' => Order::count(),

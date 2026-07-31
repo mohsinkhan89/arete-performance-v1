@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\SiteSetting;
 use App\Models\StockNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -29,6 +30,9 @@ class StockAvailableMail extends Mailable
     {
         return new Content(
             view: 'emails.stock-available',
+            with: [
+                'logoUrl' => url(SiteSetting::getValue('header_logo', 'frontend/assets/images/logo/logo-transperent.png')),
+            ],
         );
     }
 }
