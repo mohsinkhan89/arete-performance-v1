@@ -297,6 +297,15 @@ class BackendController extends Controller
             'proofs' => Order::whereNotNull('payment_proof')->where('payment_proof', '!=', '')->count(),
         ] : null;
 
+        if ($page === 'orders') {
+            return view('backend.pages.orders-index', [
+                'pageTitle' => 'Orders',
+                'records' => $records,
+                'search' => $search,
+                'status' => $status,
+                'orderStats' => $orderStats,
+            ]);
+        }
         if ($page === 'settings') {
             return view('backend.pages.settings', [
                 'page' => $page,
@@ -433,6 +442,17 @@ class BackendController extends Controller
         return back()->with('success', Str::headline($setting) . ' updated successfully.');
     }
 
+    public function editOrder(Order $order): View
+    {
+        if (! $order->tracking_number) {
+            $order->forceFill(['tracking_number' => $this->royalMailTrackingNumber($order)])->save();
+        }
+
+        return view('backend.pages.order-edit', [
+            'order' => $order->load('items'),
+            'pageTitle' => 'Edit Order #' . $order->order_number,
+        ]);
+    }
     public function showOrder(Order $order): View
     {
         if (! $order->tracking_number) {

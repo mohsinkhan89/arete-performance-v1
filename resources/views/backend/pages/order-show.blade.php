@@ -45,6 +45,7 @@
                 <a href="{{ route('backend.page', 'orders') }}" title="Back"><i class="fa-solid fa-arrow-left"></i></a>
                 <a href="{{ $trackUrl }}" target="_blank" rel="noopener" title="Customer tracking page"><i class="fa-solid fa-truck-fast"></i></a>
                 <a href="{{ $labelUrl }}" target="_blank" rel="noopener" title="Print Royal Mail label"><i class="fa-solid fa-tag"></i></a>
+<a href="{{ route('backend.orders.edit', $order) }}" title="Edit order"><i class="fa-solid fa-pen"></i></a>
             </div>
         </div>
     </div>
@@ -85,88 +86,6 @@
             </div>
         </article>
 
-        <article class="panel order-update-panel">
-            <div class="panel-head">
-                <h2>Update Tracking</h2>
-            </div>
-            <form class="admin-order-form compact-order-form" action="{{ route('backend.orders.update', $order) }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <div class="form-grid">
-                    <label>
-                        <span>Customer Name</span>
-                        <input type="text" name="customer_name" value="{{ old('customer_name', $order->customer_name) }}" placeholder="Customer name">
-                    </label>
-                    <label>
-                        <span>Email</span>
-                        <input type="email" name="email" value="{{ old('email', $order->email) }}" placeholder="Customer email">
-                    </label>
-                    <label>
-                        <span>Phone</span>
-                        <input type="text" name="phone" value="{{ old('phone', $order->phone) }}" placeholder="Phone">
-                    </label>
-                    <label>
-                        <span>Post Code</span>
-                        <input type="text" name="zip" value="{{ old('zip', $order->zip) }}" placeholder="Post code">
-                    </label>
-                    <label class="form-wide">
-                        <span>Address</span>
-                        <input type="text" name="address" value="{{ old('address', $order->address) }}" placeholder="Address line 1">
-                    </label>
-                    <label>
-                        <span>Address 2</span>
-                        <input type="text" name="address_2" value="{{ old('address_2', $order->address_2) }}" placeholder="Address line 2">
-                    </label>
-                    <label>
-                        <span>City</span>
-                        <input type="text" name="city" value="{{ old('city', $order->city) }}" placeholder="City">
-                    </label>
-                    <label>
-                        <span>County/State</span>
-                        <input type="text" name="state" value="{{ old('state', $order->state) }}" placeholder="County or state">
-                    </label>
-                    <label>
-                        <span>Order Status</span>
-                        <select name="status" required>
-                            @foreach ($statusLabels as $value => $label)
-                                <option value="{{ $value }}" @selected($order->status === $value)>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </label>
-                    <label>
-                        <span>Payment Status</span>
-                        <select name="payment_status" required>
-                            @foreach ($paymentLabels as $value => $label)
-                                <option value="{{ $value }}" @selected(($order->payment_status ?? 'unpaid') === $value)>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </label>
-                    <label>
-                        <span>Tracking Status</span>
-                        <select name="tracking_status" required>
-                            @foreach ($trackingLabels as $value => $label)
-                                <option value="{{ $value }}" @selected(($order->tracking_status ?? 'placed') === $value)>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </label>
-                    <label>
-                        <span>Royal Mail ID</span>
-                        <input type="text" name="tracking_number" value="{{ old('tracking_number', $order->tracking_number) }}" placeholder="Royal Mail tracking ID">
-                    </label>
-                    <label class="form-wide">
-                        <span>Customer Tracking Note</span>
-                        <textarea name="tracking_note" rows="3" placeholder="Visible on customer tracking page">{{ old('tracking_note', $order->tracking_note) }}</textarea>
-                    </label>
-                    <label class="form-wide">
-                        <span>Admin Note</span>
-                        <textarea name="admin_note" rows="3" placeholder="Internal note">{{ old('admin_note', $order->admin_note) }}</textarea>
-                    </label>
-                </div>
-                <div class="form-actions">
-                    <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Save update</button>
-                </div>
-            </form>
-        </article>
     </div>
 
     <article class="panel resource-panel order-items-panel">

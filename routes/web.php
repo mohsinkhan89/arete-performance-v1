@@ -44,6 +44,7 @@ Route::prefix('admin')->name('backend.')->middleware('auth')->group(function () 
     Route::put('profile', [BackendController::class, 'updateProfile'])->name('profile.update');
     Route::get('notifications/orders', [BackendController::class, 'orderNotifications'])->name('notifications.orders');
     Route::post('stock-notifications/{stockNotification}/notify', [BackendController::class, 'notifyStockCustomer'])->name('stock-notifications.notify');
+    Route::get('orders/{order}/edit', [BackendController::class, 'editOrder'])->name('orders.edit');
     Route::get('orders/{order}', [BackendController::class, 'showOrder'])->name('orders.show');
     Route::get('orders/{order}/royal-mail-label', [BackendController::class, 'royalMailLabel'])->name('orders.royal-mail-label');
     Route::patch('orders/{order}', [BackendController::class, 'updateOrder'])->name('orders.update');
