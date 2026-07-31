@@ -8614,9 +8614,12 @@ button.is-loading .fa-spinner {
 }
 
 @media (max-width: 575.98px) {
+  .footer-bottom span {
+    text-align: center;
+  }
   .brand {
-    width: auto;
-    height: 110px;
+    width: 210px;
+    height: 70px;
   }
 
   .navbar {
@@ -10814,5 +10817,67 @@ button {
     color: #a71919;
     background: #fff0f0;
     transform: translateY(-50%);
+  }
+}
+
+/* Header search overlay: contained product scrolling */
+.search-panel { overflow: hidden; }
+.search-panel .search-box {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 140px);
+  overflow: hidden;
+}
+.search-panel .search-box > .eyebrow,
+.search-panel .search-form { flex: 0 0 auto; }
+.search-panel .search-results {
+  min-height: 0;
+  max-height: none;
+  padding-right: 8px;
+  padding-bottom: 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #d5a028 #f0f1f3;
+}
+.search-panel .search-results::-webkit-scrollbar { width: 7px; }
+.search-panel .search-results::-webkit-scrollbar-track { background: #f0f1f3; border-radius: 20px; }
+.search-panel .search-results::-webkit-scrollbar-thumb { background: #d5a028; border-radius: 20px; }
+@media (max-width: 767.98px) {
+  .search-panel { overflow: hidden; }
+  .search-panel .search-box { max-height: calc(100dvh - 86px); }
+  .search-panel .search-results { max-height: none; }
+}
+/* Reliable sticky frontend header for mobile and tablet */
+@media (max-width: 991.98px) {
+  html,
+  body {
+    overflow-x: clip !important;
+    overflow-y: visible;
+  }
+
+  body .site-header,
+  body.home-page .site-header,
+  body:not(.home-page) .site-header {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0 !important;
+    right: auto !important;
+    left: auto !important;
+    z-index: 1090 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    background: #030303 !important;
+    border-bottom: 1px solid rgba(245, 168, 23, .3) !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .3) !important;
+  }
+
+  body .site-header .navbar-collapse {
+    max-height: calc(100dvh - 82px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 }

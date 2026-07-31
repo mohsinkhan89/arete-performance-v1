@@ -1536,6 +1536,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (normalized) url.searchParams.set("q", normalized);
 
     searchResults.innerHTML = '<p class="no-results">Loading products...</p>';
+    searchResults.scrollTop = 0;
 
     try {
       const response = await fetch(url, { headers: { Accept: "application/json" } });
