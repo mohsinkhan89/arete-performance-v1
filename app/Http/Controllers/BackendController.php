@@ -36,15 +36,21 @@ class BackendController extends Controller
         $categoryFilter = (int) $request->query('category', 0);
         $channelFilter = trim((string) $request->query('channel', ''));
         $rangeStart = now()->startOfDay()->subDays($range - 1);
-        $rangeOrders = Order::query()
+        $applyFilters = function ($query) use ($orderStatusFilter, $categoryFilter, $channelFilter) {
+            return $query
+                ->when($orderStatusFilter, fn ($query) => $query->where(fn ($query) => $query
+                    ->where('status', $orderStatusFilter)
+                    ->orWhere('payment_status', $orderStatusFilter)
+                    ->orWhere('tracking_status', $orderStatusFilter)))
+                ->when($categoryFilter, fn ($query) => $query->whereHas('items.product', fn ($query) => $query->where('category_id', $categoryFilter)))
+                ->when($channelFilter, fn ($query) => $query->where('payment_method', $channelFilter));
+        };
+        $rangeOrders = $applyFilters(Order::query())
             ->where('created_at', '>=', $rangeStart)
-            ->when($orderStatusFilter, fn ($query) => $query->where(fn ($query) => $query
-                ->where('status', $orderStatusFilter)
-                ->orWhere('payment_status', $orderStatusFilter)
-                ->orWhere('tracking_status', $orderStatusFilter)))
-            ->when($categoryFilter, fn ($query) => $query->whereHas('items.product', fn ($query) => $query->where('category_id', $categoryFilter)))
-            ->when($channelFilter, fn ($query) => $query->where('payment_method', $channelFilter))
             ->oldest()
+            ->get();
+        $previousOrders = $applyFilters(Order::query())
+            ->whereBetween('created_at', [$rangeStart->copy()->subDays($range), $rangeStart->copy()->subSecond()])
             ->get();
         $dailyOrders = $rangeOrders->groupBy(fn (Order $order) => $order->created_at->format('Y-m-d'));
         $chartDates = collect(range(0, $range - 1))->map(fn (int $offset) => $rangeStart->copy()->addDays($offset));
@@ -106,6 +112,17 @@ class BackendController extends Controller
             ->sortByDesc('revenue')
             ->values();
 
+        $rangeRevenue = (float) $rangeOrders->sum('total');
+        $previousRevenue = (float) $previousOrders->sum('total');
+        $percentageChange = static fn (float $current, float $previous): ?float => $previous > 0
+            ? round((($current - $previous) / $previous) * 100, 1)
+            : ($current > 0 ? 100.0 : null);
+        $currentItems = (int) OrderItem::whereIn('order_id', $rangeOrders->pluck('id'))->sum('quantity');
+        $previousItems = (int) OrderItem::whereIn('order_id', $previousOrders->pluck('id'))->sum('quantity');
+        $rangeCustomers = $rangeOrders->pluck('email')->map(fn ($email) => strtolower($email))->unique()->count();
+        $previousCustomers = $previousOrders->pluck('email')->map(fn ($email) => strtolower($email))->unique()->count();
+        $filteredPaidOrders = $rangeOrders->where('payment_status', 'paid');
+
         return view('backend.dashboard', [
             'totalProducts' => Product::count(),
             'totalCategories' => Category::count(),
@@ -136,7 +153,15 @@ class BackendController extends Controller
             'paymentBreakdown' => collect($paymentStatuses)->mapWithKeys(fn ($status) => [$status => Order::where('payment_status', $status)->count()]),
             'lowStockProducts' => Product::with('category')->where('stock', '<=', 5)->orderBy('stock')->take(5)->get(),
             'range' => $range,
-            'rangeRevenue' => (float) $rangeOrders->sum('total'),
+            'rangeRevenue' => $rangeRevenue,
+            'revenueChange' => $percentageChange($rangeRevenue, $previousRevenue),
+            'ordersChange' => $percentageChange((float) $rangeOrders->count(), (float) $previousOrders->count()),
+            'itemsChange' => $percentageChange((float) $currentItems, (float) $previousItems),
+            'customerChange' => $percentageChange((float) $rangeCustomers, (float) $previousCustomers),
+            'rangeCustomers' => $rangeCustomers,
+            'rangeAverageOrder' => $rangeOrders->count() ? $rangeRevenue / $rangeOrders->count() : 0,
+            'rangePaidRevenue' => (float) $filteredPaidOrders->sum('total'),
+            'rangePaidOrders' => $filteredPaidOrders->count(),
             'rangeOrders' => $rangeOrders->count(),
             'chartLabels' => $chartLabels,
             'revenueSeries' => $revenueSeries,
@@ -148,11 +173,13 @@ class BackendController extends Controller
             'channelFilter' => $channelFilter,
             'filterCategories' => Category::where('status', 'active')->orderBy('name')->get(['id', 'name']),
             'filterChannels' => Order::whereNotNull('payment_method')->distinct()->orderBy('payment_method')->pluck('payment_method'),
-            'itemsSold' => (int) OrderItem::whereIn('order_id', $rangeOrders->pluck('id'))->sum('quantity'),
+            'itemsSold' => $currentItems,
             'deliveredOrders' => $rangeOrders->where('tracking_status', 'delivered')->count(),
             'pendingOrders' => $rangeOrders->whereNotIn('tracking_status', ['delivered', 'cancelled'])->count(),
             'categoryPerformance' => $categoryPerformance,
             'channelPerformance' => $channelPerformance,
+            'filteredTrackingBreakdown' => collect($trackingStatuses)->mapWithKeys(fn ($status) => [$status => $rangeOrders->where('tracking_status', $status)->count()]),
+            'filteredPaymentBreakdown' => collect($paymentStatuses)->mapWithKeys(fn ($status) => [$status => $rangeOrders->where('payment_status', $status)->count()]),
         ]);
     }
 
