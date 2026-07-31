@@ -607,29 +607,46 @@ class BackendController extends Controller
         return back()->with('success', Str::headline(Str::singular($resource)) . ' deleted successfully.');
     }
 
-    public function toggleStatus(string $resource, int $id): RedirectResponse
+    public function toggleStatus(Request $request, string $resource, int $id): RedirectResponse|JsonResponse
     {
         $this->authorizeResource($resource);
         $record = $this->findRecord($resource, $id);
 
         abort_if($resource === 'users' && auth()->id() === $record->id, 403);
 
-        $record->update([
-            'status' => $record->status === 'active' ? 'inactive' : 'active',
-        ]);
+        $newStatus = $record->status === 'active' ? 'inactive' : 'active';
+        $record->update(['status' => $newStatus]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'active' => $newStatus === 'active',
+                'label' => Str::headline($newStatus),
+                'message' => 'Status updated successfully.',
+            ]);
+        }
 
         return back()->with('success', 'Status updated successfully.');
     }
 
-    public function toggleProductField(Product $product, string $field): RedirectResponse
+    public function toggleProductField(Request $request, Product $product, string $field): RedirectResponse|JsonResponse
     {
         abort_unless(in_array($field, ['stock', 'is_bestseller'], true), 404);
 
-        $product->update([
-            $field => $field === 'stock'
-                ? ($product->stock > 0 ? 0 : 1)
-                : ! $product->is_bestseller,
-        ]);
+        $newValue = $field === 'stock'
+            ? ($product->stock > 0 ? 0 : 1)
+            : ! $product->is_bestseller;
+
+        $product->update([$field => $newValue]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'active' => (bool) $newValue,
+                'label' => $newValue ? 'Active' : 'Inactive',
+                'message' => Str::headline($field) . ' updated successfully.',
+            ]);
+        }
 
         return back()->with('success', Str::headline($field) . ' updated successfully.');
     }

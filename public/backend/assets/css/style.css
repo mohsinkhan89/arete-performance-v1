@@ -5556,6 +5556,192 @@ body.sidebar-open {
   }
 }
 
+/* Direct active/inactive table switches */
+.inline-toggle-form {
+  display: inline-flex;
+  margin: 0;
+}
+
+.status-toggle.modern-switch,
+.crud-vx-list .status-toggle.modern-switch {
+  display: inline-flex;
+  min-width: 92px;
+  min-height: 30px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 3px 9px 3px 4px;
+  color: #8a8790;
+  background: #f1f2f4;
+  border: 1px solid #e0e2e5;
+  border-radius: 999px;
+  box-shadow: none;
+  cursor: pointer;
+  font-size: .68rem;
+  font-weight: 650;
+  line-height: 1;
+  transition: color .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.status-toggle.modern-switch > i,
+.crud-vx-list .status-toggle.modern-switch > i {
+  position: relative;
+  display: block;
+  width: 34px;
+  height: 20px;
+  flex: 0 0 34px;
+  background: #b9bdc3;
+  border-radius: 999px;
+  transition: background .22s ease;
+}
+
+.status-toggle.modern-switch > i::after,
+.crud-vx-list .status-toggle.modern-switch > i::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  content: "";
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(47, 43, 61, .28);
+  transition: transform .22s cubic-bezier(.4, 0, .2, 1);
+}
+
+.status-toggle.modern-switch.is-active,
+.crud-vx-list .status-toggle.modern-switch.is-active {
+  color: #168351;
+  background: #edf9f3;
+  border-color: #ccebdc;
+}
+
+.status-toggle.modern-switch.is-active > i,
+.crud-vx-list .status-toggle.modern-switch.is-active > i {
+  background: #28c76f;
+}
+
+.status-toggle.modern-switch.is-active > i::after,
+.crud-vx-list .status-toggle.modern-switch.is-active > i::after {
+  transform: translateX(14px);
+}
+
+.status-toggle.modern-switch:hover,
+.crud-vx-list .status-toggle.modern-switch:hover {
+  color: #5e5969;
+  background: #fff;
+  border-color: #c9c6cd;
+  box-shadow: 0 3px 9px rgba(47, 43, 61, .09);
+  transform: none;
+}
+
+.status-toggle.modern-switch.is-active:hover,
+.crud-vx-list .status-toggle.modern-switch.is-active:hover {
+  color: #117647;
+  background: #e7f8ef;
+  border-color: #afe0c8;
+}
+
+.status-toggle.modern-switch.is-loading {
+  cursor: wait;
+  opacity: .65;
+}
+
+.status-toggle.modern-switch.is-loading > i::before {
+  position: absolute;
+  inset: 3px;
+  z-index: 2;
+  content: "";
+  background: rgba(255, 255, 255, .82);
+  border: 2px solid rgba(93, 88, 104, .2);
+  border-top-color: #5d5868;
+  border-radius: 50%;
+  animation: inline-toggle-spin .65s linear infinite;
+}
+
+.status-toggle.modern-switch:focus-visible {
+  outline: 3px solid rgba(255, 193, 77, .28);
+  outline-offset: 2px;
+}
+
+.inline-toggle-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 7000;
+  display: flex;
+  min-width: 245px;
+  max-width: min(390px, calc(100vw - 32px));
+  min-height: 50px;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  color: #fff;
+  background: #2f2b3d;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 9px;
+  box-shadow: 0 16px 38px rgba(47, 43, 61, .25);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.inline-toggle-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.inline-toggle-toast.success i {
+  color: #54d990;
+}
+
+.inline-toggle-toast.error i {
+  color: #ff6b72;
+}
+
+.inline-toggle-toast span {
+  font-size: .76rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+body.dark-mode .status-toggle.modern-switch,
+body.dark-mode .crud-vx-list .status-toggle.modern-switch {
+  color: #aaa6b2;
+  background: #252230;
+  border-color: #4b465c;
+}
+
+body.dark-mode .status-toggle.modern-switch.is-active,
+body.dark-mode .crud-vx-list .status-toggle.modern-switch.is-active {
+  color: #67d99e;
+  background: rgba(40, 199, 111, .13);
+  border-color: rgba(40, 199, 111, .25);
+}
+
+@keyframes inline-toggle-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .inline-toggle-toast {
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-toggle.modern-switch,
+  .status-toggle.modern-switch > i,
+  .status-toggle.modern-switch > i::after,
+  .inline-toggle-toast {
+    transition: none;
+  }
+}
+
 /* Dense modern dashboard pass */
 .dashboard-v2 {
   gap: 12px;

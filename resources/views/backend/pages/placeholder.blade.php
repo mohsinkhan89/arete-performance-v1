@@ -225,32 +225,29 @@
                                     <td>£{{ number_format((float) $product->price, 2) }}</td>
                                     <td>{{ number_format($product->reviews_count) }}</td>
                                     <td>
-                                        <form action="{{ route('backend.resource.status', ['resource' => 'products', 'id' => $product->id]) }}" method="POST">
+                                        <form class="inline-toggle-form" action="{{ route('backend.resource.status', ['resource' => 'products', 'id' => $product->id]) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
-                                            <button class="status-toggle {{ $product->status === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status">
-                                                <i class="fa-solid {{ $product->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
-                                                {{ ucfirst($product->status) }}
+                                            <button class="status-toggle modern-switch {{ $product->status === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status" aria-pressed="{{ $product->status === 'active' ? 'true' : 'false' }}">
+                                                <i aria-hidden="true"></i><span>{{ ucfirst($product->status) }}</span>
                                             </button>
                                         </form>
                                     </td>
                                     <td>
-                                        <form action="{{ route('backend.products.toggle-field', ['product' => $product->id, 'field' => 'is_bestseller']) }}" method="POST">
+                                        <form class="inline-toggle-form" action="{{ route('backend.products.toggle-field', ['product' => $product->id, 'field' => 'is_bestseller']) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
-                                            <button class="status-toggle {{ $product->is_bestseller ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle bestseller">
-                                                <i class="fa-solid {{ $product->is_bestseller ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
-                                                {{ $product->is_bestseller ? 'Active' : 'Inactive' }}
+                                            <button class="status-toggle modern-switch {{ $product->is_bestseller ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle bestseller" aria-pressed="{{ $product->is_bestseller ? 'true' : 'false' }}">
+                                                <i aria-hidden="true"></i><span>{{ $product->is_bestseller ? 'Active' : 'Inactive' }}</span>
                                             </button>
                                         </form>
                                     </td>
                                     <td>
-                                        <form action="{{ route('backend.products.toggle-field', ['product' => $product->id, 'field' => 'stock']) }}" method="POST">
+                                        <form class="inline-toggle-form" action="{{ route('backend.products.toggle-field', ['product' => $product->id, 'field' => 'stock']) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
-                                            <button class="status-toggle {{ $product->stock > 0 ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle stock">
-                                                <i class="fa-solid {{ $product->stock > 0 ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
-                                                {{ $product->stock > 0 ? 'Active' : 'Inactive' }}
+                                            <button class="status-toggle modern-switch {{ $product->stock > 0 ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle stock" aria-pressed="{{ $product->stock > 0 ? 'true' : 'false' }}">
+                                                <i aria-hidden="true"></i><span>{{ $product->stock > 0 ? 'Active' : 'Inactive' }}</span>
                                             </button>
                                         </form>
                                     </td>
@@ -298,12 +295,11 @@
                                     <td>{{ $category->products_count }}</td>
                                     <td>{{ $category->sort_order }}</td>
                                     <td>
-                                        <form action="{{ route('backend.resource.status', ['resource' => 'categories', 'id' => $category->id]) }}" method="POST">
+                                        <form class="inline-toggle-form" action="{{ route('backend.resource.status', ['resource' => 'categories', 'id' => $category->id]) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
-                                            <button class="status-toggle {{ $category->status === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status">
-                                                <i class="fa-solid {{ $category->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
-                                                {{ ucfirst($category->status) }}
+                                            <button class="status-toggle modern-switch {{ $category->status === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status" aria-pressed="{{ $category->status === 'active' ? 'true' : 'false' }}">
+                                                <i aria-hidden="true"></i><span>{{ ucfirst($category->status) }}</span>
                                             </button>
                                         </form>
                                     </td>
@@ -411,7 +407,17 @@
                                                 <td>{{ $plan }}</td>
                                                 <td>{{ $billing }}</td>
                                                 <td>
-                                                    <span class="vx-status {{ $statusName === 'active' ? 'active' : ($statusName === 'inactive' ? 'inactive' : 'pending') }}">{{ Str::headline($statusName) }}</span>
+                                                    @if ($canManageUsers && auth()->id() !== $user->id)
+                                                        <form class="inline-toggle-form" action="{{ route('backend.resource.status', ['resource' => 'users', 'id' => $user->id]) }}" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button class="status-toggle modern-switch {{ $statusName === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle user status" aria-pressed="{{ $statusName === 'active' ? 'true' : 'false' }}">
+                                                                <i aria-hidden="true"></i><span>{{ Str::headline($statusName) }}</span>
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <span class="vx-status {{ $statusName === 'active' ? 'active' : ($statusName === 'inactive' ? 'inactive' : 'pending') }}">{{ Str::headline($statusName) }}</span>
+                                                    @endif
                                                 </td>
                                                 <td>
                                                     @if ($canManageUsers)
@@ -650,12 +656,11 @@
                                     <td><span class="rating-stars">{{ str_repeat('★', $review->rating) }}</span></td>
                                     <td>{{ \Illuminate\Support\Str::limit($review->comment, 70) }}</td>
                                     <td>
-                                        <form action="{{ route('backend.resource.status', ['resource' => 'reviews', 'id' => $review->id]) }}" method="POST">
+                                        <form class="inline-toggle-form" action="{{ route('backend.resource.status', ['resource' => 'reviews', 'id' => $review->id]) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
-                                            <button class="status-toggle {{ $review->status === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status">
-                                                <i class="fa-solid {{ $review->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
-                                                {{ ucfirst($review->status) }}
+                                            <button class="status-toggle modern-switch {{ $review->status === 'active' ? 'is-active' : 'is-inactive' }}" type="submit" title="Toggle status" aria-pressed="{{ $review->status === 'active' ? 'true' : 'false' }}">
+                                                <i aria-hidden="true"></i><span>{{ ucfirst($review->status) }}</span>
                                             </button>
                                         </form>
                                     </td>
@@ -942,4 +947,3 @@
         </article>
     @endif
 @endsection
-

@@ -1047,6 +1047,65 @@ document.addEventListener('DOMContentLoaded', () => {
     closeSidebar();
   });
 
+  const showToggleToast = (message, type = 'success') => {
+    let toast = document.querySelector('[data-toggle-toast]');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'inline-toggle-toast';
+      toast.dataset.toggleToast = '';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      document.body.appendChild(toast);
+    }
+
+    toast.classList.remove('success', 'error', 'is-visible');
+    toast.classList.add(type);
+    toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i><span>${escapeHtml(message)}</span>`;
+    requestAnimationFrame(() => toast.classList.add('is-visible'));
+    window.clearTimeout(toast._hideTimer);
+    toast._hideTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 2400);
+  };
+
+  document.querySelectorAll('.inline-toggle-form').forEach((form) => {
+    form.addEventListener('submit', async (event) => {
+      if (!window.fetch) return;
+      event.preventDefault();
+
+      const button = form.querySelector('.modern-switch');
+      if (!button || button.classList.contains('is-loading')) return;
+
+      button.classList.add('is-loading');
+      button.disabled = true;
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: {
+            Accept: 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.message || 'Unable to update this setting.');
+        }
+
+        button.classList.toggle('is-active', Boolean(payload.active));
+        button.classList.toggle('is-inactive', !payload.active);
+        button.setAttribute('aria-pressed', String(Boolean(payload.active)));
+        const label = button.querySelector('span');
+        if (label) label.textContent = payload.label || (payload.active ? 'Active' : 'Inactive');
+        showToggleToast(payload.message || 'Updated successfully.');
+      } catch (error) {
+        showToggleToast(error.message || 'Unable to update. Please try again.', 'error');
+      } finally {
+        button.classList.remove('is-loading');
+        button.disabled = false;
+      }
+    });
+  });
+
   document.querySelectorAll('.admin-nav a').forEach((link) => {
     link.addEventListener('click', closeSidebar);
   });
