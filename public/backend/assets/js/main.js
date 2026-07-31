@@ -769,6 +769,91 @@ document.addEventListener('DOMContentLoaded', () => {
     drawDashboardChart();
   }
 
+  const analyticsTooltip = document.createElement('div');
+  analyticsTooltip.className = 'analytics-tooltip';
+  analyticsTooltip.setAttribute('role', 'tooltip');
+  document.body.appendChild(analyticsTooltip);
+
+  const positionAnalyticsTooltip = (clientX, clientY) => {
+    const gap = 14;
+    const width = analyticsTooltip.offsetWidth;
+    const height = analyticsTooltip.offsetHeight;
+    let left = clientX + gap;
+    let top = clientY + gap;
+    if (left + width > window.innerWidth - 10) left = clientX - width - gap;
+    if (top + height > window.innerHeight - 10) top = clientY - height - gap;
+    analyticsTooltip.style.left = `${Math.max(10, left)}px`;
+    analyticsTooltip.style.top = `${Math.max(10, top)}px`;
+  };
+  const escapeAnalyticsHtml = (value) => String(value).replace(/[&<>'"]/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;'
+  })[character]);
+  const showAnalyticsTooltip = (html, clientX, clientY) => {
+    analyticsTooltip.innerHTML = html;
+    analyticsTooltip.classList.add('show');
+    positionAnalyticsTooltip(clientX, clientY);
+  };
+  const hideAnalyticsTooltip = () => analyticsTooltip.classList.remove('show');
+
+  document.querySelectorAll('[data-analytics-title]').forEach((row) => {
+    const showCategoryDetail = (event) => {
+      showAnalyticsTooltip(
+        `<strong>${escapeAnalyticsHtml(row.dataset.analyticsTitle)}</strong>` +
+        `<span>Revenue <b>£${row.dataset.analyticsRevenue}</b></span>` +
+        `<span>Units sold <b>${row.dataset.analyticsUnits}</b></span>` +
+        `<span>Revenue share <b>${row.dataset.analyticsShare}%</b></span>` +
+        `<span>Action <b>Open products →</b></span>`,
+        event.clientX || row.getBoundingClientRect().left,
+        event.clientY || row.getBoundingClientRect().bottom
+      );
+    };
+    row.addEventListener('mouseenter', showCategoryDetail);
+    row.addEventListener('mousemove', (event) => positionAnalyticsTooltip(event.clientX, event.clientY));
+    row.addEventListener('mouseleave', hideAnalyticsTooltip);
+    row.addEventListener('focus', showCategoryDetail);
+    row.addEventListener('blur', hideAnalyticsTooltip);
+  });
+
+  if (dashboardCanvas && dashboardChartData) {
+    const hoverData = JSON.parse(dashboardChartData.textContent || '{}');
+    const chartWrap = dashboardCanvas.parentElement;
+    const crosshair = document.createElement('i');
+    crosshair.className = 'analytics-chart-crosshair';
+    chartWrap.appendChild(crosshair);
+    const showChartDetail = (event) => {
+      const rect = dashboardCanvas.getBoundingClientRect();
+      const labels = hoverData.labels || [];
+      if (!labels.length) return;
+      const padding = { left: 48, right: 18, top: 20, bottom: 34 };
+      const chartWidth = rect.width - padding.left - padding.right;
+      const localX = Math.min(rect.width - padding.right, Math.max(padding.left, event.clientX - rect.left));
+      const index = labels.length <= 1 ? 0 : Math.round(((localX - padding.left) / chartWidth) * (labels.length - 1));
+      const revenue = Number(hoverData.revenue?.[index] || 0);
+      const orders = Number(hoverData.orders?.[index] || 0);
+      const average = orders ? revenue / orders : 0;
+      const maxRevenue = Math.max(...(hoverData.revenue || []), 1);
+      const chartHeight = rect.height - padding.top - padding.bottom;
+      const pointY = padding.top + chartHeight - (revenue / maxRevenue) * chartHeight;
+      const pointX = padding.left + (labels.length <= 1 ? chartWidth / 2 : (index / (labels.length - 1)) * chartWidth);
+      crosshair.style.display = 'block';
+      crosshair.style.left = `${pointX}px`;
+      crosshair.style.setProperty('--point-y', `${pointY - padding.top}px`);
+      showAnalyticsTooltip(
+        `<strong>${escapeAnalyticsHtml(labels[index])}</strong>` +
+        `<span>Revenue <b>£${revenue.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</b></span>` +
+        `<span>Orders <b>${orders.toLocaleString()}</b></span>` +
+        `<span>Average order <b>£${average.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</b></span>`,
+        event.clientX,
+        event.clientY
+      );
+    };
+    dashboardCanvas.addEventListener('mousemove', showChartDetail);
+    dashboardCanvas.addEventListener('click', showChartDetail);
+    dashboardCanvas.addEventListener('mouseleave', () => {
+      crosshair.style.display = 'none';
+      hideAnalyticsTooltip();
+    });
+  }
   const commandPalette = document.querySelector('.command-palette');
   const commandToggle = document.querySelector('.command-toggle');
   const commandBackdrop = document.querySelector('.command-backdrop');
