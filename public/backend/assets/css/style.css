@@ -1523,6 +1523,114 @@ tbody tr:last-child td {
   }
 }
 
+/* Compact login banner without athlete photo */
+.login-shell {
+  grid-template-columns: minmax(0, 1.55fr) minmax(460px, .78fr);
+}
+
+.login-visual {
+  background:
+    linear-gradient(135deg, rgba(247, 174, 26, .14), transparent 24%),
+    radial-gradient(circle at 70% 32%, rgba(247, 174, 26, .16), transparent 20%),
+    radial-gradient(circle at 20% 84%, rgba(255, 255, 255, .06), transparent 18%),
+    #050505;
+}
+
+.login-visual-bg {
+  inset: 19% 11% auto auto;
+  width: min(380px, 34vw);
+  height: min(380px, 54vh);
+  background:
+    radial-gradient(circle, rgba(247, 174, 26, .20), transparent 58%),
+    conic-gradient(from 140deg, rgba(247, 174, 26, .24), transparent 34%, rgba(255, 255, 255, .08), transparent 70%, rgba(247, 174, 26, .18));
+  border: 1px solid rgba(247, 174, 26, .18);
+  border-radius: 50%;
+  filter: blur(.2px);
+}
+
+.login-visual-bg::before,
+.login-visual-bg::after {
+  position: absolute;
+  content: "";
+  border-radius: 50%;
+}
+
+.login-visual-bg::before {
+  inset: 16%;
+  border: 1px solid rgba(247, 174, 26, .26);
+}
+
+.login-visual-bg::after {
+  inset: 36%;
+  background: #f7ae1a;
+  box-shadow: 0 0 60px rgba(247, 174, 26, .45);
+}
+
+.login-banner-orb-one {
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(247, 174, 26, .10), transparent 62%);
+}
+
+.login-banner-orb-two {
+  width: 230px;
+  height: 230px;
+  background: radial-gradient(circle, rgba(247, 174, 26, .08), transparent 65%);
+}
+
+.login-visual-logo img {
+  width: 176px;
+}
+
+.login-visual-copy {
+  max-width: 390px;
+}
+
+.login-visual-copy p {
+  font-size: clamp(2.15rem, 4vw, 3.9rem);
+  line-height: .98;
+}
+
+.login-banner-pills {
+  margin-top: 20px;
+}
+
+.login-card {
+  padding: 42px 54px;
+}
+
+.login-card-inner {
+  width: min(430px, 100%);
+  padding: 30px;
+}
+
+.login-card-head h1 {
+  font-size: 1.75rem;
+}
+
+@media (max-width: 991.98px) {
+  .login-visual-bg {
+    width: min(300px, 58vw);
+    height: min(300px, 44vh);
+  }
+}
+
+@media (max-width: 640px) {
+  .login-visual {
+    min-height: 320px;
+  }
+
+  .login-visual-bg {
+    inset: 26% 8% auto auto;
+    width: 180px;
+    height: 180px;
+  }
+
+  .login-visual-copy p {
+    font-size: 1.85rem;
+  }
+}
+
 .product-row em {
   color: #f1f3f8;
   font-style: normal;

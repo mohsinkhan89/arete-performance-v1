@@ -18,17 +18,16 @@
             <div class="login-banner-orb login-banner-orb-two"></div>
 
             <div class="login-visual-logo">
-                <img src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
+                <img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
             </div>
 
             <div class="login-visual-copy">
-                <small>Admin Control Center</small>
-                <p>Manage premium performance<br><strong>with confidence.</strong></p>
+                <small>Admin Console</small>
+                <p>Performance<br><strong>Dashboard</strong></p>
                 <span></span>
                 <div class="login-banner-pills" aria-label="Platform highlights">
-                    <b><i class="fa-solid fa-chart-line"></i> Live Analytics</b>
-                    <b><i class="fa-solid fa-boxes-stacked"></i> Product Control</b>
-                    <b><i class="fa-solid fa-shield-halved"></i> Secure Access</b>
+                    <b><i class="fa-solid fa-chart-line"></i> Analytics</b>
+                    <b><i class="fa-solid fa-shield-halved"></i> Secure</b>
                 </div>
             </div>
         </section>
