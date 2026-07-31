@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Order;
+use App\Models\SiteSetting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -31,6 +32,9 @@ class OrderPlacedMail extends Mailable
     {
         return new Content(
             view: 'emails.order-placed',
+            with: [
+                'logoUrl' => url(SiteSetting::getValue('header_logo', 'frontend/assets/images/logo/logo-transperent.png')),
+            ],
         );
     }
 }

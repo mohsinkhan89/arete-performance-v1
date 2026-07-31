@@ -12,12 +12,12 @@
             <p>Thank you for your order. Your purchase has been confirmed and saved.</p>
             <p class="success-order-id">Order <strong>#{{ $order->order_number }}</strong></p>
             @if ($customerWhatsappUrl)
-              <p class="success-whatsapp-redirect">WhatsApp will open in <strong data-whatsapp-countdown>10</strong> seconds so you can send this order to us.</p>
+              <p class="success-whatsapp-redirect" data-whatsapp-message>WhatsApp will open in <strong data-whatsapp-countdown>10</strong> seconds so you can send this order to us.</p>
             @endif
             <div class="success-actions">
               <a class="btn btn-gold" href="#orderDetails">View order details <i class="fa-solid fa-arrow-right"></i></a>
               @if ($customerWhatsappUrl)
-                <a class="btn btn-outline-light" href="{{ $customerWhatsappUrl }}" target="_blank" rel="noopener">Send on WhatsApp <i class="fa-brands fa-whatsapp"></i></a>
+                <a class="btn btn-outline-light" href="{{ $customerWhatsappUrl }}" target="_blank" rel="noopener" data-whatsapp-manual>Send on WhatsApp <i class="fa-brands fa-whatsapp"></i></a>
               @endif
               <a class="btn btn-outline-light" href="{{ route('frontend.track-order', ['order_number' => $order->order_number, 'email' => $order->email]) }}">Track order <i class="fa-solid fa-truck-fast"></i></a>
             </div>
@@ -92,17 +92,55 @@
       document.addEventListener('DOMContentLoaded', () => {
         const redirectTarget = document.querySelector('[data-whatsapp-redirect]');
         const countdown = document.querySelector('[data-whatsapp-countdown]');
+        const message = document.querySelector('[data-whatsapp-message]');
+        const manualLink = document.querySelector('[data-whatsapp-manual]');
         const whatsappUrl = redirectTarget?.dataset.whatsappRedirect;
+        const returnKey = 'arete-whatsapp-order-{{ $order->id }}';
+        const homeUrl = @json(route('frontend.index'));
+        let whatsappTimer;
+        let homeTimer;
 
         if (!whatsappUrl) return;
 
+        const markWhatsappOpened = () => sessionStorage.setItem(returnKey, String(Date.now()));
+        const startHomeRedirect = () => {
+          if (!sessionStorage.getItem(returnKey) || homeTimer) return;
+          window.clearInterval(whatsappTimer);
+          let seconds = 5;
+          if (message) message.innerHTML = 'WhatsApp se return ho gaye. Home page <strong data-whatsapp-countdown>5</strong> seconds mein open hoga.';
+          const homeCountdown = document.querySelector('[data-whatsapp-countdown]');
+          homeTimer = window.setInterval(() => {
+            seconds -= 1;
+            if (homeCountdown) homeCountdown.textContent = String(Math.max(seconds, 0));
+            if (seconds <= 0) {
+              window.clearInterval(homeTimer);
+              sessionStorage.removeItem(returnKey);
+              window.location.replace(homeUrl);
+            }
+          }, 1000);
+        };
+
+        manualLink?.addEventListener('click', markWhatsappOpened);
+        window.addEventListener('focus', startHomeRedirect);
+        window.addEventListener('pageshow', (event) => {
+          if (event.persisted || sessionStorage.getItem(returnKey)) startHomeRedirect();
+        });
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') startHomeRedirect();
+        });
+
+        if (sessionStorage.getItem(returnKey)) {
+          startHomeRedirect();
+          return;
+        }
+
         let seconds = 10;
-        const timer = window.setInterval(() => {
+        whatsappTimer = window.setInterval(() => {
           seconds -= 1;
           if (countdown) countdown.textContent = String(Math.max(seconds, 0));
-
           if (seconds <= 0) {
-            window.clearInterval(timer);
+            window.clearInterval(whatsappTimer);
+            markWhatsappOpened();
             window.location.href = whatsappUrl;
           }
         }, 1000);
