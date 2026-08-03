@@ -5,36 +5,29 @@
       <div class="container hero-content">
         <div class="home-hero-slider" data-home-hero-slider aria-label="Featured products">
           <div class="home-hero-track">
-            @forelse ($heroProducts as $product)
-              <article class="home-hero-slide {{ $loop->first ? 'is-active' : '' }}" data-home-hero-slide aria-hidden="{{ $loop->first ? 'false' : 'true' }}">
+            @forelse ($heroSlides as $slide)
+              <article class="home-hero-slide {{ $loop->first ? 'is-active' : '' }}" data-home-hero-slide aria-hidden="{{ $loop->first ? 'false' : 'true' }}" @if($slide->background_image) style="--hero-slide-bg: url('{{ url($slide->background_image) }}')" @endif>
+                @if($slide->background_image)<span class="home-hero-slide-bg" aria-hidden="true"></span>@endif
                 <div class="home-hero-copy">
-                  <p class="eyebrow">{{ $product->stock > 0 ? 'Featured performance product' : 'Back by popular demand soon' }}</p>
-                  <h1>{{ $product->name }}</h1>
-                  <p class="hero-copy">{{ $product->short_description ?: 'Premium quality, performance-focused support for your goals.' }}</p>
-                  <div class="home-hero-price"><strong>&pound;{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong><span>{{ $product->category?->name ?? 'Performance' }}</span></div>
-                  <div class="d-flex flex-wrap gap-3 mt-4">
-                    <a class="btn btn-gold" href="{{ route('frontend.product-details', $product->slug) }}">View product <i class="fa-solid fa-arrow-right"></i></a>
-                    @if ($product->stock <= 0)
-                      <button class="btn hero-notify-btn" type="button" data-stock-notify="{{ $product->id }}" data-product-name="{{ $product->name }}"><i class="fa-regular fa-bell"></i> Inform Me</button>
-                    @else
-                      <button class="btn btn-outline-light-custom" type="button" data-cart-add="{{ $product->id }}">Add to cart</button>
-                    @endif
-                  </div>
+                  @if($slide->subtitle)<p class="eyebrow">{{ $slide->subtitle }}</p>@endif
+                  <h1>{{ $slide->title }}</h1>
+                  @if($slide->paragraph)<p class="hero-copy">{{ $slide->paragraph }}</p>@endif
+                  @if($slide->button_label && $slide->button_url)
+                    <div class="d-flex flex-wrap gap-3 mt-4"><a class="btn btn-gold" href="{{ $slide->button_url }}">{{ $slide->button_label }} <i class="fa-solid fa-arrow-right"></i></a></div>
+                  @endif
                 </div>
-                <a class="home-hero-product" href="{{ route('frontend.product-details', $product->slug) }}" aria-label="View {{ $product->name }}">
-                  @if ($product->stock <= 0)<span class="home-hero-stock">Out of stock</span>@endif
-                  <span class="home-hero-glow" aria-hidden="true"></span>
-                  <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
-                </a>
+                @if($slide->product_image)
+                  <div class="home-hero-product"><span class="home-hero-glow" aria-hidden="true"></span><img src="{{ url($slide->product_image) }}" alt="{{ $slide->title }}"></div>
+                @endif
               </article>
             @empty
               <article class="home-hero-slide is-active" data-home-hero-slide aria-hidden="false"><div class="home-hero-copy"><p class="eyebrow">Premium performance solutions</p><h1>Reach your <span>potential</span></h1><p class="hero-copy">Science-backed products designed to help you perform, recover and grow.</p><div class="d-flex flex-wrap gap-3 mt-4"><a class="btn btn-gold" href="#products">Shop now <i class="fa-solid fa-arrow-right"></i></a><a class="btn btn-outline-light-custom" href="#about">Learn more</a></div></div></article>
             @endforelse
           </div>
-          @if ($heroProducts->count() > 1)
-            <button class="home-hero-arrow home-hero-prev" type="button" aria-label="Previous featured product"><i class="fa-solid fa-chevron-left"></i></button>
-            <button class="home-hero-arrow home-hero-next" type="button" aria-label="Next featured product"><i class="fa-solid fa-chevron-right"></i></button>
-            <div class="home-hero-pagination" aria-label="Featured product pagination"></div>
+          @if ($heroSlides->count() > 1)
+            <button class="home-hero-arrow home-hero-prev" type="button" aria-label="Previous hero slide"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="home-hero-arrow home-hero-next" type="button" aria-label="Next hero slide"><i class="fa-solid fa-chevron-right"></i></button>
+            <div class="home-hero-pagination" aria-label="Hero slide pagination"></div>
           @endif
         </div>
         <div class="hero-feature-slider reveal-up delay-4" data-hero-feature-slider>

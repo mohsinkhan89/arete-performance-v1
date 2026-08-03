@@ -46,6 +46,7 @@
             @php
                 $menuItems = [
                     ['group' => 'Dashboards', 'label' => 'Analytics', 'icon' => 'fa-chart-pie', 'url' => route('backend.dashboard'), 'active' => request()->routeIs('backend.dashboard')],
+                    ['group' => 'Store Management', 'label' => 'Hero Slides', 'icon' => 'fa-images', 'url' => route('backend.page', 'hero-slides'), 'active' => request()->is('admin/hero-slides*')],
                     ['group' => 'Store Management', 'label' => 'Products', 'icon' => 'fa-box', 'url' => route('backend.page', 'products')],
                     ['group' => 'Store Management', 'label' => 'Categories', 'icon' => 'fa-layer-group', 'url' => route('backend.page', 'categories')],
                     ['group' => 'Store Management', 'label' => 'Orders', 'icon' => 'fa-cart-shopping', 'url' => route('backend.page', 'orders')],
@@ -99,6 +100,7 @@
                 <div class="topbar-actions">
                     @php
                         $searchablePages = [
+                            'hero-slides' => 'Search hero slides...',
                             'products' => 'Search products...',
                             'categories' => 'Search categories...',
                             'orders' => 'Search orders...',

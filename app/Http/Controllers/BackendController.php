@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\StockAvailableMail;
 use App\Models\Category;
+use App\Models\HeroSlide;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -188,6 +189,7 @@ class BackendController extends Controller
         $allowedPages = [
             'products',
             'categories',
+            'hero-slides',
             'users',
             'orders',
             'reviews',
@@ -214,6 +216,7 @@ class BackendController extends Controller
                 ->latest()
                 ->paginate(10)
                 ->withQueryString(),
+            'hero-slides' => HeroSlide::orderBy('sort_order')->latest()->paginate(10)->withQueryString(),
             'categories' => Category::withCount('products')
                 ->when($search, fn ($query) => $query->where(fn ($query) => $query
                     ->where('name', 'like', "%{$search}%")
@@ -297,6 +300,9 @@ class BackendController extends Controller
             'proofs' => Order::whereNotNull('payment_proof')->where('payment_proof', '!=', '')->count(),
         ] : null;
 
+        if ($page === 'hero-slides') {
+            return view('backend.pages.hero-slides-index', compact('page', 'pageTitle', 'records', 'search', 'status'));
+        }
         if ($page === 'orders') {
             return view('backend.pages.orders-index', [
                 'pageTitle' => 'Orders',
@@ -585,7 +591,7 @@ class BackendController extends Controller
     {
         $this->authorizeResource($resource);
 
-        return view('backend.pages.form', [
+        return view($resource === 'hero-slides' ? 'backend.pages.hero-slide-form' : 'backend.pages.form', [
             'resource' => $resource,
             'record' => null,
             'categories' => Category::where('status', 'active')->orderBy('name')->get(),
@@ -599,6 +605,7 @@ class BackendController extends Controller
         $this->authorizeResource($resource);
 
         match ($resource) {
+            'hero-slides' => HeroSlide::create($this->heroSlideData($request)),
             'products' => Product::create($this->productData($request)),
             'categories' => Category::create($this->categoryData($request)),
             'users' => User::create($this->userData($request)),
@@ -613,7 +620,7 @@ class BackendController extends Controller
     {
         $this->authorizeResource($resource);
 
-        return view('backend.pages.form', [
+        return view($resource === 'hero-slides' ? 'backend.pages.hero-slide-form' : 'backend.pages.form', [
             'resource' => $resource,
             'record' => $this->findRecord($resource, $id),
             'categories' => Category::where('status', 'active')->orderBy('name')->get(),
@@ -629,6 +636,7 @@ class BackendController extends Controller
         $record = $this->findRecord($resource, $id);
 
         match ($resource) {
+            'hero-slides' => $record->update($this->heroSlideData($request, $record->product_image, $record->background_image)),
             'products' => $record->update($this->productData($request, $record->id, $record->image, $record->test_report_image)),
             'categories' => $record->update($this->categoryData($request, $record->id, $record->image)),
             'users' => $record->update($this->userData($request, $record->id)),
@@ -645,6 +653,11 @@ class BackendController extends Controller
         $record = $this->findRecord($resource, $id);
 
         abort_if($resource === 'users' && auth()->id() === $record->id, 403);
+
+        if ($resource === 'hero-slides') {
+            $this->deleteUploadedImage($record->product_image);
+            $this->deleteUploadedImage($record->background_image);
+        }
 
         if (in_array($resource, ['products', 'categories'], true)) {
             $this->deleteUploadedImage($record->image);
@@ -705,13 +718,14 @@ class BackendController extends Controller
 
     private function authorizeResource(string $resource): void
     {
-        abort_unless(in_array($resource, ['products', 'categories', 'users', 'reviews'], true), 404);
+        abort_unless(in_array($resource, ['products', 'categories', 'users', 'reviews', 'hero-slides'], true), 404);
         abort_if($resource === 'users' && ! $this->isSuperAdmin(), 403);
     }
 
-    private function findRecord(string $resource, int $id): Product|Category|User|Review
+    private function findRecord(string $resource, int $id): Product|Category|User|Review|HeroSlide
     {
         return match ($resource) {
+            'hero-slides' => HeroSlide::findOrFail($id),
             'products' => Product::findOrFail($id),
             'categories' => Category::findOrFail($id),
             'users' => User::findOrFail($id),
@@ -720,6 +734,26 @@ class BackendController extends Controller
         };
     }
 
+    private function heroSlideData(Request $request, ?string $currentProductImage = null, ?string $currentBackgroundImage = null): array
+    {
+        $data = $request->validate([
+            'subtitle' => ['nullable', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
+            'paragraph' => ['nullable', 'string', 'max:1000'],
+            'product_image_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'background_image_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144'],
+            'remove_product_image' => ['nullable', 'boolean'],
+            'remove_background_image' => ['nullable', 'boolean'],
+            'button_label' => ['nullable', 'string', 'max:80'],
+            'button_url' => ['nullable', 'string', 'max:500'],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+            'sort_order' => ['required', 'integer', 'min:0'],
+        ]);
+        $data['product_image'] = $this->imageValue($request, 'product_image_file', 'remove_product_image', $currentProductImage);
+        $data['background_image'] = $this->imageValue($request, 'background_image_file', 'remove_background_image', $currentBackgroundImage);
+        unset($data['product_image_file'], $data['background_image_file'], $data['remove_product_image'], $data['remove_background_image']);
+        return $data;
+    }
     private function productData(Request $request, ?int $ignoreId = null, ?string $currentImage = null, ?string $currentTestReportImage = null): array
     {
         $data = $request->validate([

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\OrderPlacedMail;
 use App\Models\Category;
+use App\Models\HeroSlide;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
@@ -24,11 +25,7 @@ class FrontendController extends Controller
 {
     public function index()
     {
-        $heroProducts = Product::with('category')
-            ->where('status', 'active')
-            ->where('is_featured', true)
-            ->latest()
-            ->get();
+        $heroSlides = HeroSlide::where('status', 'active')->orderBy('sort_order')->latest()->get();
 
         return view('frontend.index', [
             'categories' => Category::withCount('products')->where('status', 'active')->orderBy('sort_order')->take(8)->get(),
@@ -38,8 +35,7 @@ class FrontendController extends Controller
                 ->orderByRaw('stock > 0 desc')
                 ->latest()
                 ->get(),
-            // Out-of-stock featured products stay visible for restock requests.
-            'heroProducts' => $heroProducts,
+            'heroSlides' => $heroSlides,
             'reviews' => Review::where('status', 'active')->latest()->take(5)->get(),
         ]);
     }
