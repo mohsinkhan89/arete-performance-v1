@@ -17,7 +17,7 @@
                   @endif
                 </div>
                 @if($slide->product_image)
-                  <div class="home-hero-product"><span class="home-hero-glow" aria-hidden="true"></span><img src="{{ url($slide->product_image) }}" alt="{{ $slide->title }}"></div>
+                  <div class="home-hero-product"><img src="{{ url($slide->product_image) }}" alt="{{ $slide->title }}"></div>
                 @endif
               </article>
             @empty
