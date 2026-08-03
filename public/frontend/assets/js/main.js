@@ -2336,6 +2336,27 @@ document.addEventListener("DOMContentLoaded", () => {
     calculate();
   });
 
+
+  document.querySelectorAll("[data-home-hero-slider]").forEach((slider) => {
+    const slides = [...slider.querySelectorAll("[data-home-hero-slide]")];
+    const pagination = slider.querySelector(".home-hero-pagination");
+    const previous = slider.querySelector(".home-hero-prev");
+    const next = slider.querySelector(".home-hero-next");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let active = 0, timer = null, touchStart = 0;
+    if (slides.length < 2) return;
+    pagination.innerHTML = slides.map((_, index) => `<button type="button" aria-label="Show featured product ${index + 1}"></button>`).join("");
+    const dots = [...pagination.querySelectorAll("button")];
+    const show = (index) => { active = (index + slides.length) % slides.length; slides.forEach((slide, i) => { const selected = i === active; slide.classList.toggle("is-active", selected); slide.setAttribute("aria-hidden", selected ? "false" : "true"); }); dots.forEach((dot, i) => { dot.classList.toggle("is-active", i === active); dot.setAttribute("aria-current", i === active ? "true" : "false"); }); };
+    const stop = () => { if (timer) window.clearInterval(timer); timer = null; };
+    const start = () => { stop(); if (!reduceMotion) timer = window.setInterval(() => show(active + 1), 5200); };
+    previous?.addEventListener("click", () => { show(active - 1); start(); }); next?.addEventListener("click", () => { show(active + 1); start(); });
+    dots.forEach((dot, index) => dot.addEventListener("click", () => { show(index); start(); }));
+    slider.addEventListener("pointerenter", stop); slider.addEventListener("pointerleave", start); slider.addEventListener("focusin", stop); slider.addEventListener("focusout", start);
+    slider.addEventListener("touchstart", (event) => { touchStart = event.changedTouches[0].clientX; stop(); }, { passive: true });
+    slider.addEventListener("touchend", (event) => { const distance = event.changedTouches[0].clientX - touchStart; if (Math.abs(distance) > 45) show(active + (distance < 0 ? 1 : -1)); start(); }, { passive: true });
+    show(0); start();
+  });
   document.querySelectorAll("[data-hero-feature-slider]").forEach((slider) => {
     const track = slider.querySelector(".hero-features");
     const slides = [...slider.querySelectorAll(".hero-feature-slide")];

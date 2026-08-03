@@ -24,6 +24,12 @@ class FrontendController extends Controller
 {
     public function index()
     {
+        $heroProducts = Product::with('category')
+            ->where('status', 'active')
+            ->where('is_featured', true)
+            ->latest()
+            ->get();
+
         return view('frontend.index', [
             'categories' => Category::withCount('products')->where('status', 'active')->orderBy('sort_order')->take(8)->get(),
             'featuredProducts' => Product::with('category')
@@ -32,6 +38,8 @@ class FrontendController extends Controller
                 ->orderByRaw('stock > 0 desc')
                 ->latest()
                 ->get(),
+            // Out-of-stock featured products stay visible for restock requests.
+            'heroProducts' => $heroProducts,
             'reviews' => Review::where('status', 'active')->latest()->take(5)->get(),
         ]);
     }

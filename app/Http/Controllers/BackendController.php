@@ -683,11 +683,11 @@ class BackendController extends Controller
 
     public function toggleProductField(Request $request, Product $product, string $field): RedirectResponse|JsonResponse
     {
-        abort_unless(in_array($field, ['stock', 'is_bestseller'], true), 404);
+        abort_unless(in_array($field, ['stock', 'is_bestseller', 'is_featured'], true), 404);
 
         $newValue = $field === 'stock'
             ? ($product->stock > 0 ? 0 : 1)
-            : ! $product->is_bestseller;
+            : ! $product->{$field};
 
         $product->update([$field => $newValue]);
 
