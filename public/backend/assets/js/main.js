@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const autoDismissAlerts = (selector, delay = 4000) => {
+  const autoDismissAlerts = (selector, delay = 10000) => {
     document.querySelectorAll(selector).forEach((alert) => {
       window.setTimeout(() => {
         alert.classList.add('is-hiding');

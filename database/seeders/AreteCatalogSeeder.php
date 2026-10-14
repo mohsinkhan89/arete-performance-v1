@@ -101,7 +101,7 @@ class AreteCatalogSeeder extends Seeder
                         'name' => $name,
                         'sku' => 'ARTE-' . strtoupper(Str::slug($categoryName, '')) . '-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT),
                         'short_description' => 'Premium ' . strtolower($categoryName) . ' product.',
-                        'description' => 'Pharma grade, lab tested product from Arete Performance.',
+                        'description' => 'Pharma grade, lab tested product from Majix.',
                         'image' => 'backend/assets/imgs/product-bottle.png',
                         'price' => $price,
                         'sale_price' => null,

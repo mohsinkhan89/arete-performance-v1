@@ -6,7 +6,7 @@
     @if (! in_array($page, ['users', 'products', 'categories', 'reviews', 'reports'], true))
         <div class="page-heading">
             <h1>{{ $pageTitle }}</h1>
-            <p>Manage {{ strtolower($pageTitle) }} from your Arete Performance admin panel.</p>
+            <p>Manage {{ strtolower($pageTitle) }} from your Majix admin panel.</p>
         </div>
     @endif
 

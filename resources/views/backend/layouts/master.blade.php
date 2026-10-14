@@ -7,7 +7,7 @@
     <meta name="msapplication-TileColor" content="#000000">
     <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
     <meta name="theme-color" content="#000000">
-    <title>@yield('title', 'Admin Dashboard') - Arete Performance</title>
+    <title>@yield('title', 'Admin Dashboard') - Majix</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -34,11 +34,11 @@
     <div class="admin-shell">
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="sidebar-brand-row">
-                <a class="brand" href="{{ route('backend.dashboard') }}" aria-label="Arete Performance Admin">
+                <a class="brand" href="{{ route('backend.dashboard') }}" aria-label="Majix Admin">
                     <span class="vuexy-brand-mark arete-sidebar-logo" aria-hidden="true">
                         <img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="">
                     </span>
-                    <span class="arete-brand-copy"><strong>Arete</strong><small>Admin Console</small></span>
+                    <span class="arete-brand-copy"><strong>Majix</strong><small>Admin Console</small></span>
                 </a>
                 <button class="sidebar-close" type="button" aria-label="Collapse sidebar"><i class="fa-regular fa-circle-dot"></i></button>
             </div>
@@ -86,7 +86,7 @@
             </div> --}}
 
             <div class="sidebar-foot">
-                <span>Arete Admin</span>
+                <span>Majix Admin</span>
                 <small>Secure management panel</small>
             </div>
         </aside>
@@ -196,7 +196,7 @@
             </section>
 
             <footer class="admin-footer">
-                <span>&copy; {{ date('Y') }}, made with <i class="fa-solid fa-heart"></i> for Arete Performance</span>
+                <span>&copy; {{ date('Y') }}, made with <i class="fa-solid fa-heart"></i> for Majix</span>
                 <nav>
                     <a href="{{ route('backend.page', 'settings') }}">Settings</a>
                     <a href="{{ route('backend.page', 'reports') }}">Reports</a>

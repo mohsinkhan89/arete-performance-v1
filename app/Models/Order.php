@@ -103,7 +103,7 @@ class Order extends Model
 
         $companyLine = $companyWhatsapp ? "\nCompany WhatsApp: {$companyWhatsapp}" : '';
 
-        return trim("Hi {$this->customer_name},\n\nThis is your Arete Performance order confirmation. You placed order #{$this->order_number}.\n\nItems:\n{$itemLines}\n\nSubtotal: £" . number_format((float) $this->subtotal, 2) . "\nShipping: £" . number_format((float) $this->shipping_total, 2) . "\nTotal: £" . number_format((float) $this->total, 2) . "\n\nPayment: " . str_replace('_', ' ', ucfirst($this->payment_status ?? 'unpaid')) . "\nTracking: " . str_replace('_', ' ', ucfirst($this->tracking_status ?? 'placed')) . "\nRoyal Mail ID: " . ($this->tracking_number ?: 'Pending') . "\n\nDelivery address:\n{$address}\n\nTrack order:\n{$trackUrl}{$companyLine}\n\nThank you for ordering with Arete Performance.");
+        return trim("Hi {$this->customer_name},\n\nThis is your Majix order confirmation. You placed order #{$this->order_number}.\n\nItems:\n{$itemLines}\n\nSubtotal: £" . number_format((float) $this->subtotal, 2) . "\nShipping: £" . number_format((float) $this->shipping_total, 2) . "\nTotal: £" . number_format((float) $this->total, 2) . "\n\nPayment: " . str_replace('_', ' ', ucfirst($this->payment_status ?? 'unpaid')) . "\nTracking: " . str_replace('_', ' ', ucfirst($this->tracking_status ?? 'placed')) . "\nRoyal Mail ID: " . ($this->tracking_number ?: 'Pending') . "\n\nDelivery address:\n{$address}\n\nTrack order:\n{$trackUrl}{$companyLine}\n\nThank you for ordering with Majix.");
     }
 
     public function whatsappUrl(): string
@@ -126,7 +126,7 @@ class Order extends Model
                 . ' = GBP ' . number_format((float) $item->line_total, 2);
         })->implode("\n");
 
-        return trim("Hi Arete Performance,\n\nI have placed order #{$this->order_number}.\n\nName: {$this->customer_name}\nEmail: {$this->email}\nPhone: {$this->phone}\n\nItems:\n{$itemLines}\n\nTotal: GBP " . number_format((float) $this->total, 2) . "\nPayment: " . str_replace('_', ' ', ucfirst($this->payment_status ?? 'unpaid')) . "\nRoyal Mail ID: " . ($this->tracking_number ?: 'Pending') . "\n\nTrack order:\n{$trackUrl}\n\nPlease confirm my order.");
+        return trim("Hi Majix,\n\nI have placed order #{$this->order_number}.\n\nName: {$this->customer_name}\nEmail: {$this->email}\nPhone: {$this->phone}\n\nItems:\n{$itemLines}\n\nTotal: GBP " . number_format((float) $this->total, 2) . "\nPayment: " . str_replace('_', ' ', ucfirst($this->payment_status ?? 'unpaid')) . "\nRoyal Mail ID: " . ($this->tracking_number ?: 'Pending') . "\n\nTrack order:\n{$trackUrl}\n\nPlease confirm my order.");
     }
 
     public function customerWhatsappUrl(): ?string

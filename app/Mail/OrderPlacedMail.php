@@ -24,7 +24,7 @@ class OrderPlacedMail extends Mailable
         return new Envelope(
             subject: $this->adminNotification
                 ? 'New order received #' . $this->order->order_number
-                : 'Your Arete Performance order #' . $this->order->order_number,
+                : 'Your Majix order #' . $this->order->order_number,
         );
     }
 

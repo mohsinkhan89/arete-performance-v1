@@ -1292,7 +1292,7 @@ tbody tr:last-child td {
   font-size: .8125rem;
 }
 
-/* Modern Arete login banner */
+/* Modern Majix login banner */
 .login-body {
   background: #f8f7fa;
 }
@@ -10339,7 +10339,7 @@ body.admin-dark-page .snapshot-links a {
   }
 }
 
-/* Arete theme overrides: replace Vuexy purple accents with brand gold */
+/* Majix theme overrides: replace Vuexy purple accents with brand gold */
 body.admin-light-page {
   --vx-primary: #f7ae1a;
 }

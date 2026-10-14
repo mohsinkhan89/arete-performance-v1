@@ -64,7 +64,7 @@
       <div class="container">
         <div class="row align-items-center g-4 reveal-group">
           <div class="col-lg-3 why-intro">
-            <p class="eyebrow">Why choose Arete?</p>
+            <p class="eyebrow">Why choose Majix?</p>
             <h2>Your Goals.<br>Our Mission.</h2>
             <p>Premium quality products, backed by science and trusted by athletes worldwide.</p>
           </div>
@@ -115,7 +115,7 @@
         <div class="text-center section-heading testimonial-heading reveal-on-scroll">
           <p class="eyebrow">Trusted by athletes</p>
           <h2>Real Results. Real People.</h2>
-          <p>At Arete Performance, we don't just promise results - we deliver them.<br>Here's what athletes and professionals have to say about their journey with us.</p>
+          <p>At Majix, we don't just promise results - we deliver them.<br>Here's what athletes and professionals have to say about their journey with us.</p>
         </div>
         <div class="testimonial-carousel" data-testimonial-slider>
           <button class="testimonial-nav testimonial-prev" type="button" aria-label="Previous testimonial"><i class="fa-solid fa-chevron-left"></i></button>

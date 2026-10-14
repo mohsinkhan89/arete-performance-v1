@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>@yield('code') | Arete Performance</title>
+  <title>@yield('code') | Majix</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
@@ -13,8 +13,8 @@
 </head>
 <body class="error-page">
   <main class="error-screen">
-    <a class="error-brand" href="{{ route('frontend.index') }}" aria-label="Arete Performance home">
-      <img src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
+    <a class="error-brand" href="{{ route('frontend.index') }}" aria-label="Majix home">
+      <img src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="Majix">
     </a>
 
     <section class="error-card" aria-labelledby="error-title">

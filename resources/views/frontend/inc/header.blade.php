@@ -1,7 +1,7 @@
 <header class="site-header">
     <nav class="navbar navbar-expand-lg navbar-dark py-lg-0 py-md-1 py-3">
       <div class="container">
-        <a class="brand" href="{{ route('frontend.index') }}#home" aria-label="Arete Performance home"><img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance"></a>
+        <a class="brand" href="{{ route('frontend.index') }}#home" aria-label="Majix home"><img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="Majix"></a>
         <div class="header-mobile-actions d-flex d-lg-none align-items-center">
           <button class="icon-btn search-toggle" type="button" aria-label="Search products"><i class="fa-solid fa-magnifying-glass"></i></button>
           <button class="icon-btn cart-btn" type="button" aria-label="Cart"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">{{ $cartSummary['item_count'] ?? 0 }}</span></button>
