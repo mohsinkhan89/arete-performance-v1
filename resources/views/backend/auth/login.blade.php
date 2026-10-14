@@ -271,6 +271,12 @@
             box-shadow: 0 0 0 4px rgba(255, 182, 23, .16);
         }
 
+        .input-wrap input:disabled {
+            color: #5d6470;
+            background: #f1f3f6;
+            cursor: not-allowed;
+        }
+
         .password-toggle {
             position: absolute;
             top: 50%;
@@ -296,6 +302,18 @@
             background: #fff1f1;
             font-size: 13px;
             font-weight: 700;
+        }
+
+        .login-status {
+            margin: -8px 0 0;
+            padding: 12px 14px;
+            border: 1px solid rgba(34, 139, 78, .22);
+            border-radius: 9px;
+            color: #146c3a;
+            background: #edfff4;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.45;
         }
 
         .form-options {
@@ -552,44 +570,103 @@
         <section class="form-panel">
             <div class="login-card">
 
-                <h2 class="login-heading">Welcome Back</h2>
-                <p class="login-subtitle">Sign in to your account to continue</p>
+                @php($authMode = $authMode ?? 'login')
 
-                <form action="{{ route('login.store') }}" method="POST" class="login-form">
+                <h2 class="login-heading">
+                    @if($authMode === 'forgot')
+                        Forgot Password
+                    @elseif($authMode === 'reset')
+                        Reset Password
+                    @else
+                        Welcome Back
+                    @endif
+                </h2>
+                <p class="login-subtitle">
+                    @if($authMode === 'forgot')
+                        Enter your email address to receive a reset link
+                    @elseif($authMode === 'reset')
+                        Create a new password for your account
+                    @else
+                        Sign in to your account to continue
+                    @endif
+                </p>
+
+                @if (session('status'))
+                    <p class="login-status">{{ session('status') }}</p>
+                @endif
+
+                <form action="{{ $authMode === 'forgot' ? route('password.email') : ($authMode === 'reset' ? route('password.update') : route('login.store')) }}" method="POST" class="login-form">
                     @csrf
+
+                    @if($authMode === 'reset')
+                        <input type="hidden" name="token" value="{{ $resetToken }}">
+                    @endif
 
                     <label class="field">
                         <span>Email Address</span>
                         <div class="input-wrap">
                             <i class="fa-regular fa-envelope"></i>
-                            <input type="email" name="email" value="{{ old('email') }}" placeholder="Enter your email address" required autofocus>
+                            <input type="email" name="email" value="{{ old('email', $resetEmail ?? '') }}" placeholder="Enter your email address" required autofocus @disabled($authMode === 'reset')>
+                            @if($authMode === 'reset')
+                                <input type="hidden" name="email" value="{{ old('email', $resetEmail ?? '') }}">
+                            @endif
                         </div>
                     </label>
 
-                    <label class="field">
-                        <span>Password</span>
-                        <div class="input-wrap">
-                            <i class="fa-solid fa-lock"></i>
-                            <input id="adminPassword" type="password" name="password" placeholder="Enter your password" required>
-                            <button class="password-toggle" type="button" aria-label="Show password" aria-controls="adminPassword">
-                                <i class="fa-regular fa-eye-slash"></i>
-                            </button>
-                        </div>
-                    </label>
+                    @if($authMode !== 'forgot')
+                        <label class="field">
+                            <span>{{ $authMode === 'reset' ? 'New Password' : 'Password' }}</span>
+                            <div class="input-wrap">
+                                <i class="fa-solid fa-lock"></i>
+                                <input id="adminPassword" type="password" name="password" placeholder="{{ $authMode === 'reset' ? 'Enter new password' : 'Enter your password' }}" required>
+                                <button class="password-toggle" type="button" aria-label="Show password" aria-controls="adminPassword">
+                                    <i class="fa-regular fa-eye-slash"></i>
+                                </button>
+                            </div>
+                        </label>
+                    @endif
+
+                    @if($authMode === 'reset')
+                        <label class="field">
+                            <span>Confirm Password</span>
+                            <div class="input-wrap">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" name="password_confirmation" placeholder="Confirm new password" required>
+                            </div>
+                        </label>
+                    @endif
 
                     @error('email')
                         <p class="login-error">{{ $message }}</p>
                     @enderror
+                    @error('password')
+                        <p class="login-error">{{ $message }}</p>
+                    @enderror
 
-                    <div class="form-options">
-                        <label class="check-row">
-                            <input type="checkbox" name="remember" value="1" checked>
-                            <span>Remember me</span>
-                        </label>
-                        <a class="forgot-link" href="{{ route('frontend.index') }}">Forgot Password?</a>
-                    </div>
+                    @if($authMode === 'login')
+                        <div class="form-options">
+                            <label class="check-row">
+                                <input type="checkbox" name="remember" value="1" checked>
+                                <span>Remember me</span>
+                            </label>
+                            <a class="forgot-link" href="{{ route('password.request') }}">Forgot Password?</a>
+                        </div>
+                    @else
+                        <div class="form-options">
+                            <a class="forgot-link" href="{{ route('login') }}">Back to Sign In</a>
+                        </div>
+                    @endif
 
-                    <button class="submit-btn" type="submit">Sign In <i class="fa-solid fa-arrow-right"></i></button>
+                    <button class="submit-btn" type="submit">
+                        @if($authMode === 'forgot')
+                            Send Reset Link
+                        @elseif($authMode === 'reset')
+                            Update Password
+                        @else
+                            Sign In
+                        @endif
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
                 </form>
             </div>
         </section>
