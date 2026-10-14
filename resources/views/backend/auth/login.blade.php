@@ -330,26 +330,34 @@
 
         .submit-btn {
             display: inline-flex;
-            height: 60px;
+            min-height: 48px;
+            padding: 15px 31px;
             align-items: center;
             justify-content: center;
-            gap: 14px;
+            gap: 0;
             border: 0;
-            border-radius: 999px;
-            color: #070707;
-            background: linear-gradient(180deg, #ffc332, #ffb219);
-            box-shadow: 0 12px 24px rgba(255, 178, 25, .25);
-            font-size: 17px;
-            font-weight: 900;
-            letter-spacing: 2px;
+            border-radius: 5px;
+            color: var(--color-black);
+            background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
+            box-shadow: 0 10px 24px rgba(245, 168, 23, .18);
+            font-size: .78rem;
+            font-weight: 800;
+            letter-spacing: 0;
             text-transform: uppercase;
             cursor: pointer;
-            transition: transform .18s ease, box-shadow .18s ease;
+            transition: transform .25s, box-shadow .25s, filter .25s, background .25s;
+        }
+
+        .submit-btn i {
+            margin-left: 10px;
         }
 
         .submit-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 16px 30px rgba(255, 178, 25, .34);
+            color: var(--color-black);
+            background: var(--color-primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 16px 34px rgba(245, 168, 23, .28);
+            filter: saturate(1.08);
         }
 
         .divider {
