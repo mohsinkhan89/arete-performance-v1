@@ -10,7 +10,7 @@
 
     <div class="page-heading">
         <h1>{{ $pageTitle }}</h1>
-        <p>{{ $isEdit ? 'Update' : 'Create' }} {{ strtolower($singular) }} details for your Arete admin panel.</p>
+        <p>{{ $isEdit ? 'Update' : 'Create' }} {{ strtolower($singular) }} details for your Majix admin panel.</p>
     </div>
 
     <article class="panel form-panel vx-flat-form-panel {{ in_array($resource, ['products', 'categories'], true) ? 'form-panel-full' : '' }}">

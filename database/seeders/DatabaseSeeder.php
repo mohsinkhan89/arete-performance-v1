@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
         ])->map(fn ($category, $index) => Category::updateOrCreate(
             ['slug' => $category['slug']],
             $category + [
-                'description' => 'Arete Performance ' . strtolower($category['name']) . ' collection.',
+                'description' => 'Majix ' . strtolower($category['name']) . ' collection.',
                 'status' => 'active',
                 'sort_order' => $index + 1,
             ]
@@ -56,7 +56,7 @@ class DatabaseSeeder extends Seeder
                 'name' => $product[0],
                 'sku' => $product[2],
                 'short_description' => 'Premium performance supplement.',
-                'description' => 'Premium performance supplement from Arete Performance.',
+                'description' => 'Premium performance supplement from Majix.',
                 'image' => 'backend/assets/imgs/product-bottle.png',
                 'price' => $product[3],
                 'stock' => $product[4],

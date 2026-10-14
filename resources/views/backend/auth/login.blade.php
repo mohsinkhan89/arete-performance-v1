@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Login - Arete Performance</title>
+    <title>Admin Login - Majix</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -366,6 +366,24 @@
             transition: transform .25s, box-shadow .25s, filter .25s, background .25s;
         }
 
+        .submit-btn.is-loading {
+            pointer-events: none;
+            opacity: .86;
+        }
+
+        .submit-btn .submit-spinner {
+            display: none;
+            margin-left: 10px;
+        }
+
+        .submit-btn.is-loading .submit-spinner {
+            display: inline-block;
+        }
+
+        .submit-btn.is-loading .submit-icon {
+            display: none;
+        }
+
         .submit-btn i {
             margin-left: 10px;
         }
@@ -376,6 +394,22 @@
             transform: translateY(-2px);
             box-shadow: 0 16px 34px rgba(245, 168, 23, .28);
             filter: saturate(1.08);
+        }
+
+        .login-status {
+            max-height: 120px;
+            overflow: hidden;
+            transition: opacity .35s ease, transform .35s ease, max-height .35s ease, margin .35s ease, padding .35s ease;
+        }
+
+        .login-status.is-hiding {
+            max-height: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            opacity: 0;
+            transform: translateY(-14px);
         }
 
         .divider {
@@ -532,10 +566,10 @@
 </head>
 <body>
     <main class="login-page">
-        <section class="brand-panel" aria-label="Arete Performance">
+        <section class="brand-panel" aria-label="Majix">
             <div class="brand-content">
-                <a class="brand-logo" href="{{ route('frontend.index') }}" aria-label="Arete Performance home">
-                    <img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
+                <a class="brand-logo" href="{{ route('frontend.index') }}" aria-label="Majix home">
+                    <img src="{{ url($siteSettings['header_logo'] ?? 'frontend/assets/images/logo/logo-transperent.png') }}" alt="Majix">
                 </a>
 
                 <span class="brand-kicker">Welcome Back</span>
@@ -657,15 +691,18 @@
                         </div>
                     @endif
 
-                    <button class="submit-btn" type="submit">
-                        @if($authMode === 'forgot')
-                            Send Reset Link
-                        @elseif($authMode === 'reset')
-                            Update Password
-                        @else
-                            Sign In
-                        @endif
-                        <i class="fa-solid fa-arrow-right"></i>
+                    <button class="submit-btn" type="submit" data-loading-text="Please wait">
+                        <span class="submit-label">
+                            @if($authMode === 'forgot')
+                                Send Reset Link
+                            @elseif($authMode === 'reset')
+                                Update Password
+                            @else
+                                Sign In
+                            @endif
+                        </span>
+                        <i class="fa-solid fa-arrow-right submit-icon"></i>
+                        <i class="fa-solid fa-spinner fa-spin submit-spinner" aria-hidden="true"></i>
                     </button>
                 </form>
             </div>
@@ -673,6 +710,28 @@
     </main>
 
     <script>
+        document.querySelectorAll('.login-form').forEach((form) => {
+            form.addEventListener('submit', () => {
+                const button = form.querySelector('.submit-btn[type="submit"]');
+                const label = button?.querySelector('.submit-label');
+
+                if (!button || !label || button.classList.contains('is-loading')) {
+                    return;
+                }
+
+                button.dataset.originalText = label.textContent.trim();
+                label.textContent = button.dataset.loadingText || 'Please wait';
+                button.classList.add('is-loading');
+                button.setAttribute('aria-busy', 'true');
+            });
+        });
+
+        document.querySelectorAll('.login-status').forEach((message) => {
+            window.setTimeout(() => {
+                message.classList.add('is-hiding');
+            }, 10000);
+        });
+
         document.querySelector('.password-toggle')?.addEventListener('click', function () {
             const input = document.querySelector('#adminPassword');
             const icon = this.querySelector('i');

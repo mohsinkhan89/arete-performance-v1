@@ -110,7 +110,7 @@ class AuthController extends Controller
                 'logoUrl' => url('frontend/assets/images/logo/logo-transperent.png'),
             ], function ($message) use ($user): void {
                 $message->to($user->email, $user->name)
-                    ->subject('Reset your Arete Performance password');
+                    ->subject('Reset your Majix password');
             });
         }
 

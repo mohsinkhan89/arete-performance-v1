@@ -2,8 +2,8 @@
     <div class="container">
         <div class="footer-main">
             <div class="footer-brand-block">
-                <a class="brand footer-brand" href="{{ route('frontend.index') }}#home" aria-label="Arete Performance home">
-                    <img src="{{ url($siteSettings['footer_logo'] ?? 'frontend/assets/images/logo/logo.png') }}" alt="Arete Performance">
+                <a class="brand footer-brand" href="{{ route('frontend.index') }}#home" aria-label="Majix home">
+                    <img src="{{ url($siteSettings['footer_logo'] ?? 'frontend/assets/images/logo/logo.png') }}" alt="Majix">
                 </a>
                 <p class="footer-copy">Premium performance solutions designed to help you reach your full potential.</p>
             </div>

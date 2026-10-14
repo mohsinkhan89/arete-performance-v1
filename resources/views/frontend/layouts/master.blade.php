@@ -5,13 +5,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="Arete Performance premium sports nutrition and performance products.">
+    <meta name="description" content="Majix premium sports nutrition and performance products.">
 
     <meta name="msapplication-TileColor" content="#000000">
     <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
     <meta name="theme-color" content="#000000">
     @yield('metas')
-    <title>Arete Performance</title>
+    <title>Majix</title>
 
     @yield('css')
     <link rel="apple-touch-icon" sizes="57x57" href="{{ url('frontend/assets/favicons/apple-icon-57x57.png') }}">
@@ -45,7 +45,7 @@
     <link href="{{ url('frontend/assets/css/style.css') }}?v={{ urlencode($siteSettings['css_version'] ?? '1.0.0') }}" rel="stylesheet">
 </head>
 <body class="@yield('body_class', (Request::path() === '/' ? 'home-page' : str_replace('/', '-', Request::path()) . '-page'))">
-  <div class="site-loader" data-site-loader aria-live="polite" aria-label="Loading Arete Performance">
+  <div class="site-loader" data-site-loader aria-live="polite" aria-label="Loading Majix">
     <div class="loader-smoke loader-smoke-left" aria-hidden="true"></div>
     <div class="loader-smoke loader-smoke-right" aria-hidden="true"></div>
     <div class="site-loader-content">
@@ -53,7 +53,7 @@
         <span></span>
         <span></span>
       </div>
-      <img class="loader-logo" src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="Arete Performance">
+      <img class="loader-logo" src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="Majix">
       <p>Preparing your performance...</p>
       <div class="loader-progress">
         <div class="loader-progress-track"><span data-loader-progress></span></div>
