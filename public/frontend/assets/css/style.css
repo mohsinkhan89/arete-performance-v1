@@ -460,7 +460,24 @@ body {
   isolation: isolate;
   padding: 24px;
   background: #070707;
-  transition: opacity .6s cubic-bezier(.22, 1, .36, 1), visibility .6s ease;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-100%);
+  will-change: transform;
+  transition: transform .75s cubic-bezier(.76, 0, .24, 1), visibility 0s linear .75s;
+}
+
+.site-loader.is-ready {
+  transform: translateY(0);
+  transition: transform .72s cubic-bezier(.22, 1, .36, 1), visibility 0s;
+}
+
+.site-loader.is-ready.is-hidden {
+  opacity: 1;
+  visibility: hidden;
+  transform: translateY(-100%);
+  pointer-events: none;
+  transition: transform .75s cubic-bezier(.76, 0, .24, 1), visibility 0s linear .75s;
 }
 
 .site-loader::before {
@@ -481,11 +498,6 @@ body {
   animation: loaderAura 3s ease-in-out infinite;
 }
 
-.site-loader.is-hidden .site-loader-content {
-  opacity: 0;
-  transform: translateY(-12px) scale(.97);
-}
-
 .loader-ambient {
   position: absolute;
   z-index: -1;
@@ -498,12 +510,15 @@ body {
 }
 
 .site-loader-content {
+  position: absolute;
+  inset: 0;
   gap: 0;
-  width: min(420px, calc(100vw - 48px));
+  display: grid;
+  place-items: center;
+  width: 100%;
   max-height: none;
   transform: none;
-  transition: opacity .35s ease, transform .5s cubic-bezier(.22, 1, .36, 1);
-  animation: loaderContentIn .75s cubic-bezier(.22, 1, .36, 1) both;
+  animation: none;
 }
 
 .loader-mark {
@@ -561,6 +576,7 @@ body {
   filter: drop-shadow(0 0 28px rgba(245,168,23,.12));
   transition: --loader-fill .3s cubic-bezier(.22, 1, .36, 1);
   white-space: nowrap;
+  transform: translateX(-.03em);
 }
 
 @keyframes loaderContentIn {

@@ -3,25 +3,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const loaderProgress = document.querySelector("[data-loader-progress]");
   const loaderPercent = document.querySelector("[data-loader-percent]");
   const loaderBrand = document.querySelector("[data-loader-brand]");
-  const loaderStorageKey = "majix_loader_v2_seen";
   let loaderValue = 0;
-  let loaderTimer = null;
-
-  const hasSeenLoader = () => {
-    try {
-      return sessionStorage.getItem(loaderStorageKey) === "true";
-    } catch (error) {
-      return false;
-    }
-  };
-
-  const markLoaderSeen = () => {
-    try {
-      sessionStorage.setItem(loaderStorageKey, "true");
-    } catch (error) {
-      // Storage can be unavailable in private browsing; the loader still works normally.
-    }
-  };
+  let loaderFrame = null;
 
   const setLoaderProgress = (value) => {
     loaderValue = Math.max(loaderValue, Math.min(100, Math.round(value)));
@@ -32,37 +15,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const hideSiteLoader = () => {
     setLoaderProgress(100);
-    markLoaderSeen();
     window.setTimeout(() => {
       siteLoader?.classList.add("is-hidden");
-      document.documentElement.classList.add("loader-seen");
-    }, 220);
-    if (loaderTimer) window.clearInterval(loaderTimer);
+    }, 180);
+    if (loaderFrame) window.cancelAnimationFrame(loaderFrame);
   };
 
   const showSiteLoader = () => {
-    if (hasSeenLoader()) return;
     loaderValue = 0;
     siteLoader?.classList.remove("is-hidden");
-    setLoaderProgress(18);
+    setLoaderProgress(0);
   };
 
   if (siteLoader) {
-    if (hasSeenLoader()) {
-      siteLoader.classList.add("is-hidden");
-      document.documentElement.classList.add("loader-seen");
-    } else {
-      setLoaderProgress(12);
-      loaderTimer = window.setInterval(() => {
-        if (loaderValue < 68) setLoaderProgress(loaderValue + Math.random() * 9);
-      }, 170);
-      window.setTimeout(() => setLoaderProgress(72), 620);
-      window.setTimeout(hideSiteLoader, 1450);
-      window.addEventListener("load", () => window.setTimeout(hideSiteLoader, 1450));
-      window.addEventListener("pageshow", (event) => {
-        if (event.persisted) hideSiteLoader();
-      });
-    }
+    setLoaderProgress(0);
+    const loaderDuration = 1900;
+    let loaderStartedAt = 0;
+
+    const animateLoader = (now) => {
+      const progress = Math.min((now - loaderStartedAt) / loaderDuration, 1);
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      setLoaderProgress(easedProgress * 100);
+
+      if (progress < 1) {
+        loaderFrame = window.requestAnimationFrame(animateLoader);
+      } else {
+        hideSiteLoader();
+      }
+    };
+
+    window.requestAnimationFrame(() => {
+      siteLoader.classList.add("is-ready");
+      window.setTimeout(() => {
+        loaderStartedAt = performance.now();
+        loaderFrame = window.requestAnimationFrame(animateLoader);
+      }, 620);
+    });
+
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) siteLoader.classList.add("is-hidden");
+    });
   }
 
   document.addEventListener("click", (event) => {
