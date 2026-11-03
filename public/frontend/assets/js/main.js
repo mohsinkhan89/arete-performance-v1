@@ -2,13 +2,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const siteLoader = document.querySelector("[data-site-loader]");
   const loaderProgress = document.querySelector("[data-loader-progress]");
   const loaderPercent = document.querySelector("[data-loader-percent]");
-  const loaderStorageKey = "arete_loader_seen";
+  const loaderBrand = document.querySelector("[data-loader-brand]");
+  const loaderStorageKey = "majix_loader_v2_seen";
   let loaderValue = 0;
   let loaderTimer = null;
 
   const hasSeenLoader = () => {
     try {
-      return localStorage.getItem(loaderStorageKey) === "true";
+      return sessionStorage.getItem(loaderStorageKey) === "true";
     } catch (error) {
       return false;
     }
@@ -16,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const markLoaderSeen = () => {
     try {
-      localStorage.setItem(loaderStorageKey, "true");
+      sessionStorage.setItem(loaderStorageKey, "true");
     } catch (error) {
       // Storage can be unavailable in private browsing; the loader still works normally.
     }
@@ -26,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loaderValue = Math.max(loaderValue, Math.min(100, Math.round(value)));
     if (loaderProgress) loaderProgress.style.width = `${loaderValue}%`;
     if (loaderPercent) loaderPercent.textContent = `${loaderValue}%`;
+    if (loaderBrand) loaderBrand.style.setProperty("--loader-fill", `${loaderValue}%`);
   };
 
   const hideSiteLoader = () => {

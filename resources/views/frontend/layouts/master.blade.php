@@ -37,7 +37,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <script>
       try {
-        if (localStorage.getItem('arete_loader_seen') === 'true') {
+        if (sessionStorage.getItem('majix_loader_v2_seen') === 'true') {
           document.documentElement.classList.add('loader-seen');
         }
       } catch (error) {}
@@ -46,25 +46,9 @@
 </head>
 <body class="@yield('body_class', (Request::path() === '/' ? 'home-page' : str_replace('/', '-', Request::path()) . '-page'))">
   <div class="site-loader" data-site-loader aria-live="polite" aria-label="Loading Majix">
-    <div class="loader-smoke loader-smoke-left" aria-hidden="true"></div>
-    <div class="loader-smoke loader-smoke-right" aria-hidden="true"></div>
+    <div class="loader-ambient" aria-hidden="true"></div>
     <div class="site-loader-content">
-      <div class="loader-logo-ring" aria-hidden="true">
-        <span></span>
-        <span></span>
-      </div>
-      <img class="loader-logo" src="{{ url('frontend/assets/images/logo/logo-transperent.png') }}" alt="Majix">
-      <p>Preparing your performance...</p>
-      <div class="loader-progress">
-        <div class="loader-progress-track"><span data-loader-progress></span></div>
-        <b data-loader-percent>0%</b>
-      </div>
-      <div class="loader-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-      <div class="loader-features" aria-label="Store benefits">
-        <div><i class="fa-solid fa-truck-fast"></i><span>Fast &amp; Secure<br>Delivery</span></div>
-        <div><i class="fa-solid fa-globe"></i><span>Delivery All<br>Over UK</span></div>
-        <div><i class="fa-solid fa-sterling-sign"></i><span>Flat Delivery<br>&pound;4.99</span></div>
-      </div>
+      <div class="loader-brand" data-loader-brand data-text="MAJIX">MAJIX</div>
     </div>
   </div>
 
