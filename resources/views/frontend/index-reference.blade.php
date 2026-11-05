@@ -18,6 +18,26 @@
   @if($heroSlides->count() > 1)<div class="onyx-hero-controls"><button class="home-hero-arrow home-hero-prev" type="button" aria-label="Previous slide"><i class="fa-solid fa-arrow-left"></i></button><div class="home-hero-pagination"></div><button class="home-hero-arrow home-hero-next" type="button" aria-label="Next slide"><i class="fa-solid fa-arrow-right"></i></button></div>@endif
 </section>
 
+@if($categories->isNotEmpty())
+<section class="onyx-categories section-pad" aria-labelledby="categoryHeading">
+  <div class="container">
+    <header class="onyx-category-heading">
+      <div><p class="onyx-eyebrow">Browse by category</p><h2 id="categoryHeading">Find your research focus</h2><p>Explore the MAJIX collection by compound category.</p></div>
+      <a href="{{ route('frontend.shop') }}">View all categories <i class="fa-solid fa-arrow-right"></i></a>
+    </header>
+    <div class="onyx-category-grid">
+      @foreach($categories as $category)
+        <a class="onyx-category-card" href="{{ route('frontend.shop', ['category' => $category->slug]) }}">
+          <span class="onyx-category-image"><img src="{{ url($category->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $category->name }}"></span>
+          <span class="onyx-category-content"><small>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</small><strong>{{ $category->name }}</strong><em>{{ $category->products_count }} {{ \Illuminate\Support\Str::plural('product', $category->products_count) }}</em></span>
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
+      @endforeach
+    </div>
+  </div>
+</section>
+@endif
+
 <section class="onyx-collection section-pad" id="products">
   <div class="container">
     <header class="onyx-section-heading"><p class="onyx-eyebrow">Our research collection</p><h2>Explore the Majix collection</h2><p>A focused range of premium research products, supplied with quality and consistency.</p></header>
@@ -41,6 +61,46 @@
       @endforelse
     </div>
     <div class="onyx-center-action"><a class="onyx-dark-btn" href="{{ route('frontend.shop') }}">View full collection <i class="fa-solid fa-arrow-right"></i></a></div>
+  </div>
+</section>
+
+<section class="onyx-standard section-pad" id="about">
+  <div class="container onyx-standard-grid">
+    <div class="onyx-lab-visual">
+      <div class="onyx-lab-frame"><img src="{{ url('frontend/assets/images/banner/trusted-research-banner.png') }}" alt="Laboratory research vial with precision dropper"></div>
+      <div class="onyx-lab-seal"><i class="fa-solid fa-flask-vial"></i><span><strong>MAJIX Standard</strong><small>Precision in every detail</small></span></div>
+    </div>
+    <div class="onyx-standard-copy">
+      <p class="onyx-eyebrow"><span></span>The Majix standard</p>
+      <h2>Trusted Research.<br><em>Proven Quality.</em></h2>
+      <p>Formulated and supplied to meet exacting standards of purity, consistency and reliability for professional research applications.</p>
+      <div class="onyx-quality-row"><div><i class="fa-solid fa-microscope"></i><span><strong>Lab Verified</strong><small>Quality checks and documented standards.</small></span></div><div><i class="fa-solid fa-layer-group"></i><span><strong>High Purity</strong><small>Consistent compounds across every batch.</small></span></div><div><i class="fa-solid fa-shield-halved"></i><span><strong>Research Use Only</strong><small>Purpose-built for laboratory applications.</small></span></div></div>
+    </div>
+  </div>
+</section>
+
+@if($reviews->isNotEmpty())
+<section class="onyx-reviews section-pad" aria-labelledby="reviewHeading">
+  <div class="container">
+    <header class="onyx-review-heading"><p class="onyx-eyebrow">Trusted by our customers</p><h2 id="reviewHeading">Confidence, backed by experience.</h2><p>Real feedback from customers who choose MAJIX for quality and consistency.</p></header>
+    <div class="onyx-review-grid">
+      @foreach($reviews->take(3) as $review)
+        <article class="onyx-review-card {{ $review->is_featured ? 'is-featured' : '' }}">
+          <div class="onyx-review-top"><span aria-label="{{ $review->rating }} out of 5 stars">{!! str_repeat('&#9733;', max(1, min(5, (int) $review->rating))) !!}</span><i class="fa-solid fa-quote-right"></i></div>
+          <p>&ldquo;{{ $review->comment }}&rdquo;</p>
+          <footer><img src="{{ url($review->avatar ?: 'frontend/assets/images/testimonials/miker.png') }}" alt="{{ $review->customer_name }}"><span><strong>{{ $review->customer_name }}</strong><small>{{ $review->customer_title ?: 'Verified customer' }}</small></span><em><i class="fa-solid fa-circle-check"></i> Verified</em></footer>
+        </article>
+      @endforeach
+    </div>
+    <div class="onyx-review-metrics"><span><strong>4.9/5</strong><small>Average rating</small></span><span><strong>Quality</strong><small>Focused standards</small></span><span><strong>Secure</strong><small>Protected checkout</small></span></div>
+  </div>
+</section>
+@endif
+
+<section class="onyx-process">
+  <div class="container">
+    <div class="onyx-process-copy"><p class="onyx-eyebrow">How it works</p><h2>A Simple, Secure Process</h2><p>Browse, order and receive your research compounds with confidence.</p><div class="onyx-steps"><div><b>1</b><i class="fa-regular fa-calendar-check"></i><span><strong>Browse &amp; Select</strong><small>Explore our research compounds and choose what you need.</small></span></div><div><b>2</b><i class="fa-solid fa-lock"></i><span><strong>Secure Checkout</strong><small>A fast, encrypted and seamless process.</small></span></div><div><b>3</b><i class="fa-solid fa-truck-fast"></i><span><strong>Fast Delivery</strong><small>Discreet, reliable and tracked to your door.</small></span></div></div></div>
+    <div class="onyx-newsletter"><div class="onyx-newsletter-copy"><i class="fa-regular fa-envelope"></i><div><h2>Stay Updated with MAJIX</h2><p>Be the first to know about new research compounds, restocks and updates.</p></div></div><span class="onyx-newsletter-divider" aria-hidden="true"></span><form onsubmit="event.preventDefault()"><label><i class="fa-regular fa-envelope"></i><input type="email" placeholder="Enter your email address" aria-label="Email address" required></label><button type="submit">Subscribe <i class="fa-solid fa-arrow-right"></i></button></form></div>
   </div>
 </section>
 
