@@ -2567,7 +2567,6 @@
 .home-page .onyx-category-card {
     position: relative;
     min-width: 0;
-    min-height: clamp(320px, 23vw, 430px);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -3080,7 +3079,6 @@
 }
 
 .home-page .onyx-category-card {
-    min-height: 118px;
     display: grid;
     place-items: center;
     padding: 20px;
@@ -3185,10 +3183,9 @@
 }
 
 .home-page .onyx-category-card {
-    min-height: 82px;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-start;-
     padding: 18px 22px 18px 28px;
     border: 1px solid #17242d;
     border-radius: 13px;
