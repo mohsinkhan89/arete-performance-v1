@@ -32,8 +32,10 @@
       <div class="swiper-wrapper onyx-category-grid">
         @foreach($categories as $category)
           <div class="swiper-slide">
-            <a class="onyx-category-card" href="{{ route('frontend.shop', ['category' => $category->slug]) }}">
-              <strong>{{ $category->name }}</strong>
+            <a class="onyx-category-card" href="{{ route('frontend.shop', ['category' => $category->slug]) }}" data-category-index="{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}">
+              <span class="onyx-category-icon"><i class="fa-solid fa-layer-group"></i></span>
+              <span class="onyx-category-copy"><strong>{{ $category->name }}</strong><small>{{ $category->products_count }} {{ Str::plural('product', $category->products_count) }}</small></span>
+              <i class="fa-solid fa-arrow-right onyx-category-arrow" aria-hidden="true"></i>
             </a>
           </div>
         @endforeach
