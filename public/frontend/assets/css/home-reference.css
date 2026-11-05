@@ -2424,6 +2424,73 @@
     }
 }
 
+/* Homepage collection and category carousels. */
+.home-page .onyx-product-swiper,
+.home-page .onyx-category-swiper,
+.home-page .onyx-review-swiper {
+    position: relative;
+    z-index: 1;
+    padding: 8px 4px 46px;
+}
+
+.home-page .onyx-product-swiper .onyx-product-grid,
+.home-page .onyx-category-swiper .onyx-category-grid,
+.home-page .onyx-review-swiper .onyx-review-grid {
+    display: flex;
+    gap: 0;
+}
+
+.home-page .onyx-product-swiper .swiper-slide,
+.home-page .onyx-category-swiper .swiper-slide,
+.home-page .onyx-review-swiper .swiper-slide {
+    height: auto;
+}
+
+.home-page .onyx-product-swiper .onyx-product-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.home-page .onyx-product-swiper .onyx-product-content {
+    flex: 1;
+}
+
+.home-page .onyx-category-swiper .onyx-category-card {
+    width: 100%;
+    height: 100%;
+}
+
+.home-page .onyx-product-pagination,
+.home-page .onyx-category-pagination,
+.home-page .onyx-review-pagination {
+    bottom: 4px;
+}
+
+.home-page .swiper-pagination-bullet {
+    width: 8px;
+    height: 8px;
+    margin: 0 5px !important;
+    background: #aab1b5;
+    opacity: .55;
+    transition: width .25s ease, border-radius .25s ease, background .25s ease, opacity .25s ease;
+}
+
+.home-page .swiper-pagination-bullet-active {
+    width: 28px;
+    border-radius: 999px;
+    background: var(--gold-deep);
+    opacity: 1;
+}
+
+@media(max-width:575px) {
+    .home-page .onyx-product-swiper,
+    .home-page .onyx-category-swiper,
+    .home-page .onyx-review-swiper {
+        margin-right: -16px;
+        padding-right: 16px;
+    }
+}
+
 /* Category discovery — dark, image-led cards matching the hero/footer. */
 .home-page .onyx-categories {
     position: relative;
@@ -3185,4 +3252,41 @@
         min-height: 72px;
         padding: 15px 18px 15px 24px;
     }
+}
+
+/* Readable homepage copy and an automatically highlighted centre review. */
+.home-page .onyx-section-heading > p:last-child,
+.home-page .onyx-category-heading > div > p:last-child,
+.home-page .onyx-review-heading > p:last-child {
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.home-page .onyx-review-card > p {
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.home-page .onyx-review-swiper .onyx-review-card.swiper-slide-active {
+    border-color: rgba(198,136,23,.55);
+    background: linear-gradient(145deg, #101c25, #071016);
+    color: #fff;
+}
+
+.home-page .onyx-review-swiper .onyx-review-card.swiper-slide-active > p {
+    color: #d0d7db;
+}
+
+.home-page .footer-copy {
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.home-page .footer-links a,
+.home-page .footer-shop-link {
+    font-size: 12px;
+}
+
+.home-page .footer-bottom {
+    font-size: 11px;
 }
