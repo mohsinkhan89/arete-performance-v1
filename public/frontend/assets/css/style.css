@@ -9120,20 +9120,6 @@ button.is-loading .fa-spinner {
 .site-header {
   background: linear-gradient(180deg, rgba(5, 5, 5, .92), rgba(5, 5, 5, .78));
   border-bottom: 1px solid rgba(245, 168, 23, .18);
-  box-shadow: 0 12px 34px rgba(0, 0, 0, .24);
-  backdrop-filter: blur(14px);
-}
-
-.site-header::before {
-  content: "";
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(245, 168, 23, .78), transparent);
-  opacity: .78;
-  pointer-events: none;
 }
 
 .site-header.is-scrolled,
@@ -9220,9 +9206,6 @@ button.is-loading .fa-spinner {
 
 .site-header .nav-actions {
   padding: 5px;
-  background: rgba(255, 255, 255, .035);
-  border: 1px solid rgba(255, 255, 255, .08);
-  border-radius: 999px;
 }
 
 .site-header .icon-btn {
@@ -9233,7 +9216,6 @@ button.is-loading .fa-spinner {
   padding: 0;
   color: rgba(255, 255, 255, .9);
   font-size: 1rem;
-  background: rgba(255, 255, 255, .045);
   border: 1px solid rgba(255, 255, 255, .08);
   border-radius: 50%;
 }

@@ -41,14 +41,6 @@
     max-height: 62px
 }
 
-.home-page .site-header .navbar-collapse {
-    background: rgba(9, 16, 23, .58);
-    border: 1px solid rgba(255, 255, 255, .22);
-    border-radius: 999px;
-    padding: 3px 6px;
-    backdrop-filter: blur(18px)
-}
-
 .home-page .site-header .navbar-nav {
     gap: 0 !important
 }
@@ -276,9 +268,9 @@
     position: absolute;
     z-index: 1;
     right: 5%;
-    bottom: 20px;
-    width: 37%;
-    height: 83%;
+    bottom: 55px;
+    width: 30%;
+    height: 80%;
     display: flex;
     justify-content: center;
     align-items: flex-end
