@@ -18,25 +18,6 @@
   @if($heroSlides->count() > 1)<div class="onyx-hero-controls"><button class="home-hero-arrow home-hero-prev" type="button" aria-label="Previous slide"><i class="fa-solid fa-arrow-left"></i></button><div class="home-hero-pagination"></div><button class="home-hero-arrow home-hero-next" type="button" aria-label="Next slide"><i class="fa-solid fa-arrow-right"></i></button></div>@endif
 </section>
 
-<section class="onyx-standard section-pad" id="about">
-  <div class="container onyx-standard-grid">
-    <div class="onyx-lab-visual">
-      <div class="onyx-lab-frame"><img src="{{ url('frontend/assets/images/banner/trusted-research-banner.png') }}" alt="Laboratory research vial with precision dropper"></div>
-      <div class="onyx-lab-seal"><i class="fa-solid fa-flask-vial"></i><span><strong>MAJIX Standard</strong><small>Precision in every detail</small></span></div>
-    </div>
-    <div class="onyx-standard-copy">
-      <p class="onyx-eyebrow"><span></span>The Majix standard</p>
-      <h2>Trusted Research.<br><em>Proven Quality.</em></h2>
-      <p>Formulated and supplied to meet exacting standards of purity, consistency and reliability for professional research applications.</p>
-      <div class="onyx-quality-row">
-        <div><i class="fa-solid fa-microscope"></i><span><strong>Lab Verified</strong><small>Quality checks and documented standards.</small></span></div>
-        <div><i class="fa-solid fa-layer-group"></i><span><strong>High Purity</strong><small>Consistent compounds across every batch.</small></span></div>
-        <div><i class="fa-solid fa-shield-halved"></i><span><strong>Research Use Only</strong><small>Purpose-built for laboratory applications.</small></span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="onyx-collection section-pad" id="products">
   <div class="container">
     <header class="onyx-section-heading"><p class="onyx-eyebrow">Our research collection</p><h2>Explore the Majix collection</h2><p>A focused range of premium research products, supplied with quality and consistency.</p></header>
@@ -63,9 +44,4 @@
   </div>
 </section>
 
-<section class="onyx-science"><div class="container"><header><p class="onyx-eyebrow">Why choose Majix</p><h2>Built for research. Backed by quality.</h2></header><div class="onyx-science-grid"><div><i class="fa-solid fa-flask-vial"></i><span><strong>Research focused</strong><small>For laboratory and research applications.</small></span></div><div><i class="fa-solid fa-shield-halved"></i><span><strong>Verified purity</strong><small>Quality and batch validation.</small></span></div><div><i class="fa-solid fa-layer-group"></i><span><strong>Reliable supply</strong><small>Consistent quality and availability.</small></span></div><div><i class="fa-solid fa-award"></i><span><strong>Quality assured</strong><small>Rigorous standards and protocols.</small></span></div></div></div></section>
-
-<section class="onyx-process section-pad"><div class="container onyx-process-grid"><div class="onyx-process-copy"><p class="onyx-eyebrow">How it works</p><h2>A simple, secure process</h2><p>From browsing to delivery, Majix makes ordering easy, safe and efficient.</p><div class="onyx-steps"><div><b>1</b><i class="fa-solid fa-cart-shopping"></i><span><strong>Browse &amp; select</strong><small>Explore the range and choose what suits your goals.</small></span></div><div><b>2</b><i class="fa-solid fa-lock"></i><span><strong>Secure checkout</strong><small>A fast, protected and straightforward process.</small></span></div><div><b>3</b><i class="fa-solid fa-truck-fast"></i><span><strong>Fast delivery</strong><small>Discreet, reliable delivery to your door.</small></span></div></div></div><div class="onyx-process-visual"><img src="{{ url('frontend/assets/images/product-bottle.png') }}" alt="Majix performance bottle"><span></span></div></div></section>
-
-<section class="onyx-newsletter"><div class="container"><div><h2>Stay updated with Majix</h2><p>Be first to know about new products, restocks and performance insights.</p></div><form onsubmit="event.preventDefault()"><label><i class="fa-regular fa-envelope"></i><input type="email" placeholder="Enter your email address" aria-label="Email address" required></label><button type="submit">Subscribe <i class="fa-solid fa-arrow-right"></i></button></form></div></section>
 @endsection
