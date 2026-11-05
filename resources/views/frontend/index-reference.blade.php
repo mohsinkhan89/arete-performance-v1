@@ -23,7 +23,6 @@
   <div class="container">
     <header class="onyx-category-heading">
       <div><p class="onyx-eyebrow">Browse by category</p><h2 id="categoryHeading">Find your research focus</h2><p>Explore the MAJIX collection by compound category.</p></div>
-      <a href="{{ route('frontend.shop') }}">View all categories <i class="fa-solid fa-arrow-right"></i></a>
     </header>
     <div class="onyx-category-grid">
       @foreach($categories as $category)

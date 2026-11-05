@@ -2434,14 +2434,25 @@
     background: radial-gradient(circle at 90% 0, rgba(243,182,63,.12), transparent 24%), linear-gradient(145deg, #09151e, #050b10);
 }
 
+.home-page .onyx-categories > .container {
+    width: 100%;
+    max-width: none;
+    padding-right: clamp(22px, 3.2vw, 64px);
+    padding-left: clamp(22px, 3.2vw, 64px);
+}
+
 .home-page .onyx-category-heading {
     position: relative;
     z-index: 1;
     display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 30px;
-    margin-bottom: 34px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 48px;
+    text-align: center;
+}
+
+.home-page .onyx-category-heading > div {
+    width: min(100%, 920px);
 }
 
 .home-page .onyx-category-heading h2,
@@ -2483,31 +2494,33 @@
     z-index: 1;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
+    /* gap: clamp(14px, 1.25vw, 24px); */
+    /* gap: clamp(14px, 1.25vw, 24px); */
+    gap: 0px;
 }
 
 .home-page .onyx-category-card {
     position: relative;
     min-width: 0;
-    min-height: 230px;
+    min-height: clamp(320px, 23vw, 430px);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,.11);
-    border-radius: 18px;
-    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 0px;
+    background: #101920;
     color: #fff;
     text-decoration: none;
-    box-shadow: 0 15px 38px rgba(0,0,0,.18);
+    box-shadow: 0 20px 50px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.08);
     transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
 }
 
 .home-page .onyx-category-card:hover {
-    transform: translateY(-7px);
-    border-color: rgba(243,182,63,.55);
+    transform: translateY(-9px);
+    border-color: rgba(243,182,63,.75);
     color: #fff;
-    box-shadow: 0 25px 50px rgba(0,0,0,.3);
+    box-shadow: 0 32px 70px rgba(0,0,0,.42), 0 0 0 1px rgba(243,182,63,.12);
 }
 
 .home-page .onyx-category-image {
@@ -2519,18 +2532,22 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(0deg, rgba(5,11,16,.98), rgba(5,11,16,.42) 58%, rgba(5,11,16,.06));
+    background:
+        linear-gradient(0deg, rgba(5,11,16,.99) 0%, rgba(5,11,16,.82) 20%, rgba(5,11,16,.15) 56%, transparent 76%),
+        linear-gradient(135deg, rgba(243,182,63,.07), transparent 42%);
 }
 
 .home-page .onyx-category-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform .45s ease;
+    filter: saturate(.9) contrast(1.03);
+    transition: transform .55s cubic-bezier(.2,.8,.2,1), filter .4s ease;
 }
 
 .home-page .onyx-category-card:hover .onyx-category-image img {
-    transform: scale(1.07);
+    transform: scale(1.075);
+    filter: saturate(1.05) contrast(1.06);
 }
 
 .home-page .onyx-category-content {
@@ -2538,41 +2555,60 @@
     z-index: 1;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 30px;
+    background: linear-gradient(0deg, rgba(5,11,16,.76), transparent);
 }
 
 .home-page .onyx-category-content small {
-    margin-bottom: 6px;
+    width: 30px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 9px;
+    border: 1px solid rgba(243,182,63,.35);
+    border-radius: 999px;
+    background: rgba(243,182,63,.09);
     color: var(--gold);
-    font-size: 8px;
+    font-size: 9px;
     letter-spacing: .13em;
 }
 
 .home-page .onyx-category-content strong {
     max-width: calc(100% - 42px);
-    font-size: 17px;
+    font-size: clamp(19px, 1.45vw, 26px);
+    line-height: 1.05;
     text-transform: uppercase;
 }
 
 .home-page .onyx-category-content em {
-    margin-top: 4px;
+    margin-top: 7px;
     color: #aab3b8;
-    font-size: 8px;
+    font-size: 9px;
     font-style: normal;
 }
 
 .home-page .onyx-category-card > i {
     position: absolute;
     z-index: 2;
-    right: 17px;
-    bottom: 20px;
-    width: 34px;
-    height: 34px;
+    top: 22px;
+    right: 22px;
+    bottom: auto;
+    width: 46px;
+    height: 46px;
     display: grid;
     place-items: center;
     border: 1px solid rgba(243,182,63,.45);
     border-radius: 50%;
-    background: rgba(5,11,16,.72);
+    background: rgba(5,11,16,.78);
+    box-shadow: 0 10px 25px rgba(0,0,0,.22);
+    backdrop-filter: blur(10px);
+    transition: background .25s ease, color .25s ease, transform .25s ease;
+}
+
+.home-page .onyx-category-card:hover > i {
+    background: var(--gold);
+    color: #101820;
+    transform: rotate(5deg) scale(1.05);
 }
 
 /* Customer proof — editorial cards with one featured onyx review. */
@@ -2715,6 +2751,10 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .home-page .onyx-category-card {
+        min-height: 340px;
+    }
+
     .home-page .onyx-review-grid {
         grid-template-columns: 1fr;
     }
@@ -2735,7 +2775,11 @@
     }
 
     .home-page .onyx-category-card {
-        min-height: 210px;
+        min-height: 330px;
+    }
+
+    .home-page .onyx-category-content {
+        padding: 24px;
     }
 
     .home-page .onyx-review-card {
