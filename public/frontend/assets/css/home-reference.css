@@ -2206,7 +2206,7 @@
 }
 
 .home-page .footer-main {
-    grid-template-columns: minmax(320px, .8fr) minmax(0, 1.2fr);
+    grid-template-columns: minmax(320px, .8fr) minmax(0, 1.6fr);
     gap: clamp(70px, 9vw, 140px);
     align-items: end;
     padding: 0 22px 52px;
