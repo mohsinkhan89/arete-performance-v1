@@ -63,21 +63,6 @@
   </div>
 </section>
 
-<section class="onyx-standard section-pad" id="about">
-  <div class="container onyx-standard-grid">
-    <div class="onyx-lab-visual">
-      <div class="onyx-lab-frame"><img src="{{ url('frontend/assets/images/banner/trusted-research-banner.png') }}" alt="Laboratory research vial with precision dropper"></div>
-      <div class="onyx-lab-seal"><i class="fa-solid fa-flask-vial"></i><span><strong>MAJIX Standard</strong><small>Precision in every detail</small></span></div>
-    </div>
-    <div class="onyx-standard-copy">
-      <p class="onyx-eyebrow"><span></span>The Majix standard</p>
-      <h2>Trusted Research.<br><em>Proven Quality.</em></h2>
-      <p>Formulated and supplied to meet exacting standards of purity, consistency and reliability for professional research applications.</p>
-      <div class="onyx-quality-row"><div><i class="fa-solid fa-microscope"></i><span><strong>Lab Verified</strong><small>Quality checks and documented standards.</small></span></div><div><i class="fa-solid fa-layer-group"></i><span><strong>High Purity</strong><small>Consistent compounds across every batch.</small></span></div><div><i class="fa-solid fa-shield-halved"></i><span><strong>Research Use Only</strong><small>Purpose-built for laboratory applications.</small></span></div></div>
-    </div>
-  </div>
-</section>
-
 @if($reviews->isNotEmpty())
 <section class="onyx-reviews section-pad" aria-labelledby="reviewHeading">
   <div class="container">
@@ -95,12 +80,4 @@
   </div>
 </section>
 @endif
-
-<section class="onyx-process">
-  <div class="container">
-    <div class="onyx-process-copy"><p class="onyx-eyebrow">How it works</p><h2>A Simple, Secure Process</h2><p>Browse, order and receive your research compounds with confidence.</p><div class="onyx-steps"><div><b>1</b><i class="fa-regular fa-calendar-check"></i><span><strong>Browse &amp; Select</strong><small>Explore our research compounds and choose what you need.</small></span></div><div><b>2</b><i class="fa-solid fa-lock"></i><span><strong>Secure Checkout</strong><small>A fast, encrypted and seamless process.</small></span></div><div><b>3</b><i class="fa-solid fa-truck-fast"></i><span><strong>Fast Delivery</strong><small>Discreet, reliable and tracked to your door.</small></span></div></div></div>
-    <div class="onyx-newsletter"><div class="onyx-newsletter-copy"><i class="fa-regular fa-envelope"></i><div><h2>Stay Updated with MAJIX</h2><p>Be the first to know about new research compounds, restocks and updates.</p></div></div><span class="onyx-newsletter-divider" aria-hidden="true"></span><form onsubmit="event.preventDefault()"><label><i class="fa-regular fa-envelope"></i><input type="email" placeholder="Enter your email address" aria-label="Email address" required></label><button type="submit">Subscribe <i class="fa-solid fa-arrow-right"></i></button></form></div>
-  </div>
-</section>
-
 @endsection
