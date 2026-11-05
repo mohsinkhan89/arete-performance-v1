@@ -27,9 +27,7 @@
     <div class="onyx-category-grid">
       @foreach($categories as $category)
         <a class="onyx-category-card" href="{{ route('frontend.shop', ['category' => $category->slug]) }}">
-          <span class="onyx-category-image"><img src="{{ url($category->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $category->name }}"></span>
-          <span class="onyx-category-content"><small>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</small><strong>{{ $category->name }}</strong><em>{{ $category->products_count }} {{ \Illuminate\Support\Str::plural('product', $category->products_count) }}</em></span>
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <strong>{{ $category->name }}</strong>
         </a>
       @endforeach
     </div>
