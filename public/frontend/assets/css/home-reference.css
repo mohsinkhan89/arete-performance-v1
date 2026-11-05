@@ -1021,6 +1021,332 @@
     }
 }
 
+/* Premium collection cards with transparent product imagery on white. */
+.onyx-collection {
+    background: linear-gradient(145deg, #f7f8f9 0%, #fff 50%, #f1f3f4 100%);
+}
+
+.onyx-product-grid {
+    gap: 18px;
+}
+
+.home-page .onyx-product-card {
+    position: relative;
+    min-width: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #e0e4e6;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 12px 35px rgba(7, 16, 24, .075);
+    transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+
+.home-page .onyx-product-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(198, 136, 23, .55);
+    box-shadow: 0 24px 55px rgba(7, 16, 24, .14);
+}
+
+.onyx-product-badges {
+    position: absolute;
+    z-index: 3;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.onyx-product-status,
+.onyx-product-featured {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 25px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .055em;
+    text-transform: uppercase;
+}
+
+.onyx-product-status {
+    background: #e7f6ed;
+    color: #187844;
+}
+
+.onyx-product-status:before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #20a35c;
+}
+
+.onyx-product-status.is-empty {
+    background: #f2f2f2;
+    color: #6c7378;
+}
+
+.onyx-product-status.is-empty:before {
+    background: #858b8f;
+}
+
+.onyx-product-featured {
+    background: #101b23;
+    color: var(--gold);
+}
+
+.home-page .onyx-product-image {
+    height: 275px;
+    display: block;
+    padding: 32px 28px 18px;
+    border-bottom: 1px solid #edf0f1;
+    background: #fff !important;
+}
+
+.home-page .onyx-product-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: transparent;
+    filter: drop-shadow(0 18px 17px rgba(7, 16, 24, .18));
+    transition: transform .35s ease;
+}
+
+.home-page .onyx-product-card:hover .onyx-product-image img {
+    transform: scale(1.045) translateY(-3px);
+}
+
+.home-page .onyx-product-card > .onyx-product-content {
+    /* Isolate the homepage card from the shared `.product-card > div`
+       rules used by the shop and related-product cards. */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    min-width: 0;
+    margin-top: 0;
+    padding: 17px 17px 16px;
+}
+
+.onyx-product-category {
+    margin-bottom: 5px;
+    color: var(--gold-deep);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .095em;
+    text-transform: uppercase;
+}
+
+.onyx-product-title {
+    display: block;
+    min-height: 39px;
+    color: #0c151c;
+    font: 800 19px/1.05 "Barlow Condensed", Inter, sans-serif;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.onyx-product-title:hover {
+    color: var(--gold-deep);
+}
+
+.onyx-product-summary {
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid #edf0f1;
+}
+
+.onyx-product-rating {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 0;
+}
+
+.onyx-product-rating span {
+    display: flex;
+    gap: 2px;
+    color: var(--gold-deep);
+    font-size: 9px;
+}
+
+.onyx-product-rating small {
+    display: inline;
+    min-height: 0;
+    color: #778087;
+    font-size: 9px;
+    white-space: nowrap;
+}
+
+.onyx-product-details {
+    flex: 0 0 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.onyx-product-details>span {
+    display: flex;
+    align-items: baseline;
+    min-width: 0;
+    gap: 7px;
+}
+
+.onyx-product-details strong {
+    color: #0b141b;
+    font-size: 17px;
+}
+
+.onyx-product-details del {
+    color: #9ba2a7;
+    font-size: 10px;
+}
+
+.onyx-report-btn {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #dce1e3;
+    border-radius: 9px;
+    background: #f7f8f9;
+    color: #17232b;
+    font-size: 12px;
+}
+
+.onyx-report-btn:hover {
+    border-color: var(--gold);
+    background: #fff8e8;
+    color: var(--gold-deep);
+}
+
+.onyx-add-cart {
+    width: 100%;
+    min-height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    border: 0;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #101c25, #071016);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .055em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background .25s ease, color .25s ease, transform .25s ease;
+}
+
+/* The generic product-card component also styles every nested button as a
+   small circle. Keep those rules out of this full-width homepage action. */
+.home-page .onyx-product-card .onyx-add-cart {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    border-radius: 11px;
+    color: #fff;
+    background: linear-gradient(135deg, #101c25, #071016);
+    box-shadow: none;
+}
+
+.home-page .onyx-product-card .onyx-add-cart:hover {
+    color: #111820;
+    background: linear-gradient(135deg, #ffe39a, #dfa126);
+    box-shadow: none;
+    transform: translateY(-2px);
+}
+
+.home-page .onyx-product-card .onyx-report-btn {
+    flex: 0 0 32px;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #dce1e3;
+    border-radius: 9px;
+    color: #17232b;
+    background: #f7f8f9;
+    box-shadow: none;
+}
+
+.onyx-add-cart:hover {
+    background: linear-gradient(135deg, #ffe39a, #dfa126);
+    color: #111820;
+    transform: translateY(-2px);
+}
+
+@media(max-width:767px) {
+    .onyx-product-grid {
+        gap: 10px;
+    }
+
+    .home-page .onyx-product-image {
+        height: 205px;
+        padding: 30px 14px 14px;
+    }
+
+    .home-page .onyx-product-card > .onyx-product-content {
+        padding: 13px 12px 12px;
+    }
+
+    .onyx-product-title {
+        font-size: 16px;
+    }
+
+    .onyx-product-summary {
+        gap: 8px;
+    }
+
+    .onyx-product-rating {
+        gap: 5px;
+    }
+
+    .onyx-product-rating small {
+        font-size: 8px;
+    }
+}
+
+@media(max-width:430px) {
+    .onyx-product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-page .onyx-product-image {
+        height: 235px;
+    }
+
+    .onyx-product-featured {
+        display: none;
+    }
+
+    .onyx-product-details strong {
+        font-size: 15px;
+    }
+}
+
 /* Keep hero slider navigation together at the bottom-right edge of the content container. */
 .onyx-hero-controls {
     position: absolute;
@@ -1294,5 +1620,239 @@
 
     .onyx-process {
         background: linear-gradient(90deg, rgba(255, 255, 255, .97), rgba(255, 255, 255, .86)), url('../images/banner/sports-performance-banner.webp') center/cover
+    }
+}
+
+/* Premium Trusted Research section. */
+.onyx-standard {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: 82px 0;
+    background: linear-gradient(135deg, #f8fafb 0%, #fff 54%, #f1f4f5 100%);
+}
+
+.onyx-standard:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width: 520px;
+    height: 520px;
+    top: -330px;
+    right: -120px;
+    border: 1px solid rgba(198, 136, 23, .16);
+    border-radius: 50%;
+    box-shadow: 0 0 0 70px rgba(198, 136, 23, .025), 0 0 0 145px rgba(7, 16, 24, .018);
+}
+
+.onyx-standard-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+    gap: clamp(48px, 6vw, 92px);
+}
+
+.onyx-lab-visual {
+    position: relative;
+    height: auto;
+    min-width: 0;
+    padding: 0 22px 26px 0;
+}
+
+.onyx-lab-frame {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(243, 182, 63, .75);
+    border-radius: 28px 28px 78px 28px;
+    background: #0a141c;
+    box-shadow: 0 30px 70px rgba(7, 16, 24, .2);
+}
+
+.onyx-lab-frame:after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(125deg, rgba(255, 255, 255, .1), transparent 32%, transparent 72%, rgba(243, 182, 63, .1));
+}
+
+.onyx-lab-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 280px;
+    object-fit: cover;
+}
+
+.onyx-lab-seal {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    min-width: 235px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 14px 18px;
+    border: 1px solid rgba(255, 255, 255, .13);
+    border-radius: 16px;
+    background: linear-gradient(115deg, rgba(8, 18, 26, .97), rgba(28, 42, 51, .93));
+    color: #fff;
+    box-shadow: 0 18px 35px rgba(7, 16, 24, .25);
+    backdrop-filter: blur(15px);
+}
+
+.onyx-lab-seal i {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #ffe49d, #d99a20);
+    color: #111820;
+    font-size: 19px;
+}
+
+.onyx-lab-seal span,
+.onyx-quality-row span {
+    display: flex;
+    flex-direction: column;
+}
+
+.onyx-lab-seal strong {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.onyx-lab-seal small {
+    margin-top: 3px;
+    color: #aeb7bd;
+    font-size: 9px;
+}
+
+.onyx-standard-copy .onyx-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--gold-deep);
+}
+
+.onyx-standard-copy .onyx-eyebrow span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 6px rgba(243, 182, 63, .14);
+}
+
+.onyx-standard-copy h2 {
+    max-width: 600px;
+    margin: 0 0 18px;
+    color: #09131b;
+    font: 800 clamp(44px, 4.2vw, 64px)/.94 Inter, sans-serif;
+    letter-spacing: -.05em;
+}
+
+.onyx-standard-copy h2 em {
+    color: var(--gold-deep);
+    font-style: normal;
+}
+
+.onyx-standard-copy>p:not(.onyx-eyebrow) {
+    max-width: 610px;
+    margin: 0;
+    color: #4e5961;
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+.onyx-quality-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 9px;
+    margin-top: 28px;
+}
+
+.onyx-quality-row>div {
+    min-height: 66px;
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 15px;
+    border: 1px solid #e1e5e7;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .82);
+    text-align: left;
+    box-shadow: 0 8px 25px rgba(7, 16, 24, .045);
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+.onyx-quality-row>div:hover {
+    transform: translateX(6px);
+    border-color: rgba(198, 136, 23, .55);
+    box-shadow: 0 14px 32px rgba(7, 16, 24, .09);
+}
+
+.onyx-quality-row>div:last-child {
+    border: 1px solid #e1e5e7;
+}
+
+.onyx-quality-row i {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #0c1821;
+    color: var(--gold);
+    font-size: 19px;
+}
+
+.onyx-quality-row strong {
+    color: #101820;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .025em;
+}
+
+.onyx-quality-row small {
+    margin-top: 3px;
+    color: #68737a;
+    font-size: 9px;
+    line-height: 1.35;
+}
+
+@media(max-width:991px) {
+    .onyx-standard-grid {
+        grid-template-columns: 1fr;
+        gap: 48px;
+    }
+
+    .onyx-lab-frame img {
+        min-height: 0;
+    }
+}
+
+@media(max-width:767px) {
+    .onyx-standard {
+        padding: 60px 0;
+    }
+
+    .onyx-lab-visual {
+        height: auto;
+        padding: 0 10px 24px 0;
+    }
+
+    .onyx-lab-frame {
+        border-radius: 20px 20px 50px 20px;
+    }
+
+    .onyx-lab-seal {
+        min-width: 210px;
+        padding: 11px 13px;
+    }
+
+    .onyx-standard-copy h2 {
+        font-size: 43px;
     }
 }
