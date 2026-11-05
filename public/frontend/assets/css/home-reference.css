@@ -1,0 +1,910 @@
+:root {
+    --gold: #f3aa18;
+    --ink: #090909
+}
+
+.home-page {
+    background: #fff;
+    color: #111;
+    font-family: Inter, Arial, sans-serif
+}
+
+.home-page main {
+    overflow: hidden
+}
+
+.home-page .container {
+    max-width: 1280px
+}
+
+.home-page .global-announcement {
+    height: 38px;
+    background: #080808;
+    color: #fff
+}
+
+.home-page .global-announcement .container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600
+}
+
+.home-page .global-announcement i {
+    color: var(--gold);
+    margin-right: 8px
+}
+
+.home-page .site-header {
+    position: relative;
+    background: #fff;
+    border: 0;
+    box-shadow: 0 3px 14px #00000014
+}
+
+.home-page .site-header .navbar {
+    min-height: 78px
+}
+
+.home-page .site-header .brand img {
+    max-height: 54px
+}
+
+.home-page .brand-wordmark {
+    display: none
+}
+
+.home-page .site-header .navbar .nav-link {
+    color: #111;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 28px 17px
+}
+
+.home-page .site-header .navbar .nav-link i {
+    display: none
+}
+
+.home-page .site-header .icon-btn {
+    color: #111;
+    background: #fff;
+    border: 0;
+    font-size: 20px
+}
+
+.ref-hero {
+    height: 535px;
+    position: relative;
+    color: #fff;
+    background: #050505;
+    overflow: hidden
+}
+
+.ref-hero-track,
+.ref-hero-slide {
+    position: absolute;
+    inset: 0
+}
+
+.ref-hero-slide {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .6s ease
+}
+
+.ref-hero-slide.is-active {
+    opacity: 1;
+    visibility: visible
+}
+
+.ref-hero-bg {
+    position: absolute;
+    inset: 0;
+    background: url('../images/banner/hero-banner.png') center/cover no-repeat
+}
+
+.ref-hero-bg:after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #000b 0%, #0003 58%, transparent)
+}
+
+.ref-hero-inner {
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center
+}
+
+.ref-hero-copy {
+    width: 50%;
+    padding-left: 25px;
+    position: relative;
+    z-index: 2
+}
+
+.ref-hero-product {
+    position: absolute;
+    /* right: clamp(42px, 7vw, 105px);
+    bottom: 18px; */
+    right: -90px;
+    bottom: 55px;
+    width: clamp(220px, 19vw, 300px);
+    height: 78%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1;
+    pointer-events: none
+}
+
+.ref-hero-product img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: contain;
+    object-position: center bottom;
+    filter: drop-shadow(0 18px 20px #000a)
+}
+
+.ref-kicker {
+    color: var(--gold);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase
+}
+
+.ref-hero h1 {
+    font-size: clamp(48px, 5vw, 76px);
+    line-height: .98;
+    font-weight: 800;
+    letter-spacing: -.05em;
+    margin: 12px 0 18px
+}
+
+.ref-hero h1 span {
+    color: var(--gold)
+}
+
+.ref-hero-copy>p:not(.ref-kicker) {
+    font-size: 17px;
+    line-height: 1.55
+}
+
+.ref-actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 26px
+}
+
+.ref-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: linear-gradient(135deg, #ffd569, #efa008);
+    color: #111 !important;
+    text-decoration: none;
+    border: 0;
+    border-radius: 28px;
+    padding: 14px 28px;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 7px 20px #f3aa183d
+}
+
+.ref-btn-outline {
+    background: #0005;
+    color: #fff !important;
+    border: 1px solid #f3aa18a6;
+    box-shadow: none
+}
+
+.ref-hero-benefits {
+    display: flex;
+    gap: 36px;
+    margin-top: 42px
+}
+
+.ref-hero-benefits span {
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 700
+}
+
+.ref-hero-benefits i {
+    color: var(--gold);
+    font-size: 18px
+}
+
+.ref-hero .home-hero-arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 5;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid #ffffff66;
+    background: #0005;
+    color: #fff
+}
+
+.ref-hero .home-hero-prev {
+    left: 24px
+}
+
+.ref-hero .home-hero-next {
+    right: 24px
+}
+
+.ref-hero .home-hero-pagination {
+    position: absolute;
+    z-index: 5;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 9px
+}
+
+.ref-hero .home-hero-pagination button {
+    width: 9px;
+    height: 9px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #fff
+}
+
+.ref-hero .home-hero-pagination button.is-active {
+    background: var(--gold)
+}
+
+.ref-trust {
+    border-bottom: 1px solid #eee
+}
+
+.ref-trust-grid {
+    min-height: 112px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    align-items: center
+}
+
+.ref-trust-grid>div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border-right: 1px solid #ccc
+}
+
+.ref-trust-grid>div:last-child {
+    border: 0
+}
+
+.ref-trust-grid i {
+    font-size: 30px
+}
+
+.ref-trust-grid span,
+.ref-stats span,
+.ref-review-grid article>div span {
+    display: flex;
+    flex-direction: column
+}
+
+.ref-trust-grid strong {
+    font-size: 13px
+}
+
+.ref-trust-grid small {
+    font-size: 11px;
+    color: #555
+}
+
+.ref-section {
+    padding: 60px 0
+}
+
+.ref-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 42px
+}
+
+.ref-title span {
+    width: 60px;
+    height: 2px;
+    background: var(--gold)
+}
+
+.ref-title h2,
+.ref-products-head h2,
+.ref-review-title h2 {
+    font-size: 34px;
+    letter-spacing: -.04em;
+    font-weight: 800;
+    margin: 0
+}
+
+.ref-category-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px
+}
+
+.ref-category-card {
+    text-decoration: none;
+    color: #111;
+    text-align: center
+}
+
+.ref-category-card>div {
+    height: 230px;
+    background: #f5f5f5;
+    border-radius: 14px;
+    padding: 18px
+}
+
+.ref-category-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: .3s
+}
+
+.ref-category-card:hover img {
+    transform: scale(1.06)
+}
+
+.ref-category-card h3 {
+    font-size: 13px;
+    font-weight: 800;
+    margin: 15px 4px 0
+}
+
+.ref-promo-wrap {
+    padding-bottom: 55px
+}
+
+.ref-promo {
+    height: 410px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #050505 url('../images/banner/sports-performance-banner.webp') center/cover no-repeat;
+    color: #fff;
+    display: flex;
+    align-items: center
+}
+
+.ref-promo-copy {
+    width: 50%;
+    padding-left: 80px
+}
+
+.ref-promo-copy>p {
+    color: var(--gold);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase
+}
+
+.ref-promo-copy h2 {
+    font-size: 58px;
+    font-style: italic;
+    text-transform: uppercase;
+    font-weight: 900;
+    line-height: .88
+}
+
+.ref-promo-copy h2 span {
+    color: var(--gold)
+}
+
+.ref-promo-copy>div {
+    max-width: 350px;
+    line-height: 1.45;
+    margin: 20px 0
+}
+
+.ref-products {
+    padding-top: 0
+}
+
+.ref-products-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px
+}
+
+.ref-pills {
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    display: flex
+}
+
+.ref-pills span {
+    padding: 10px 25px;
+    font-size: 11px;
+    font-weight: 700
+}
+
+.ref-pills .active {
+    background: #111;
+    color: #fff;
+    border-radius: 22px
+}
+
+.ref-product-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px
+}
+
+.home-page .ref-product-card {
+    border: 1px solid #ddd;
+    border-radius: 13px;
+    overflow: hidden;
+    background: #fff;
+    padding: 0;
+    box-shadow: none;
+    min-width: 0
+}
+
+.ref-product-media {
+    height: 245px;
+    background: #f6f6f6;
+    position: relative;
+    padding: 22px
+}
+
+.ref-product-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain
+}
+
+.ref-stock {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #111;
+    color: #fff;
+    border-radius: 4px;
+    padding: 5px 7px;
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase
+}
+
+.ref-heart {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 19px
+}
+
+.ref-product-info {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    min-height: 210px
+}
+
+.ref-product-info h3 {
+    font-size: 13px;
+    line-height: 1.25;
+    font-weight: 800;
+    min-height: 34px;
+    margin: 0
+}
+
+.ref-product-info>small {
+    font-size: 10px;
+    color: #777
+}
+
+.ref-product-info>strong {
+    font-size: 17px;
+    margin-top: auto
+}
+
+.ref-rating span,
+.ref-product-info em {
+    color: var(--gold)
+}
+
+.ref-rating {
+    font-size: 11px;
+    margin: 5px 0 10px
+}
+
+.ref-product-info button {
+    height: 36px;
+    border: 1px solid #999;
+    background: #fff;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800
+}
+
+.ref-mission {
+    min-height: 410px;
+    display: grid;
+    grid-template-columns: 1.08fr .92fr;
+    background: #f5f5f5
+}
+
+.ref-mission-photo {
+    background: url('../images/banner/hero-performance.png') center right/cover no-repeat
+}
+
+.ref-mission-copy {
+    padding: 60px 8vw 55px 60px
+}
+
+.ref-mission-copy h2 {
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -.04em
+}
+
+.ref-mission-copy>p:not(.ref-kicker) {
+    font-size: 14px
+}
+
+.ref-mission-copy ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0
+}
+
+.ref-mission-copy li {
+    margin: 10px 0;
+    font-size: 13px
+}
+
+.ref-mission-copy li i {
+    background: var(--gold);
+    color: #fff;
+    border-radius: 50%;
+    padding: 4px;
+    margin-right: 8px
+}
+
+.ref-stats {
+    padding: 30px 0;
+    border-bottom: 1px solid #ddd
+}
+
+.ref-stats .container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr)
+}
+
+.ref-stats .container>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    border-right: 1px solid #ccc
+}
+
+.ref-stats i {
+    font-size: 35px;
+    color: var(--gold)
+}
+
+.ref-stats strong {
+    font-size: 18px
+}
+
+.ref-stats small {
+    font-size: 10px
+}
+
+.ref-review-title {
+    text-align: center;
+    margin-bottom: 30px
+}
+
+.ref-review-title p {
+    font-size: 13px
+}
+
+.ref-review-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px
+}
+
+.ref-review-grid article {
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 8px 22px #0000000d
+}
+
+.ref-review-grid article>i,
+.ref-review-grid em {
+    color: var(--gold)
+}
+
+.ref-review-grid article>p {
+    height: 58px;
+    overflow: hidden;
+    font-size: 12px
+}
+
+.ref-review-grid article>div {
+    display: flex;
+    align-items: center;
+    gap: 12px
+}
+
+.ref-review-grid img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover
+}
+
+.ref-review-grid strong {
+    font-size: 11px
+}
+
+.ref-review-grid small,
+.ref-review-grid em {
+    font-size: 9px;
+    font-style: normal
+}
+
+.ref-newsletter {
+    background: #101010 url('../images/hero-performance.png') center/cover no-repeat;
+    color: #fff;
+    padding: 32px 0
+}
+
+.ref-newsletter .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center
+}
+
+.ref-newsletter p {
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: 10px;
+    font-weight: 800;
+    margin: 0
+}
+
+.ref-newsletter h2 {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.05;
+    margin: 5px 0
+}
+
+.ref-newsletter small {
+    font-size: 10px
+}
+
+.ref-newsletter form {
+    display: flex;
+    gap: 12px;
+    width: 52%
+}
+
+.ref-newsletter label {
+    height: 46px;
+    background: #fff;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #666;
+    padding: 0 16px;
+    flex: 1
+}
+
+.ref-newsletter input {
+    border: 0;
+    outline: 0;
+    width: 100%;
+    font-size: 12px
+}
+
+.ref-newsletter .ref-btn {
+    border-radius: 6px;
+    padding: 0 38px
+}
+
+.home-page .site-footer {
+    background: #080808;
+    color: #fff
+}
+
+.home-page .footer-copy,
+.home-page .footer-links a {
+    color: #bbb
+}
+
+@media(max-width:991px) {
+    .ref-hero-bg {
+        background-position: 63%
+    }
+
+    .ref-hero-copy {
+        width: 62%
+    }
+
+    .ref-hero-product {
+        right: 2%;
+        bottom: 14px;
+        width: clamp(190px, 27vw, 250px);
+        height: 72%
+    }
+
+    .ref-category-grid {
+        grid-template-columns: repeat(3, 1fr)
+    }
+
+    .ref-product-grid {
+        grid-template-columns: repeat(3, 1fr)
+    }
+
+    .ref-product-card:nth-child(n+4) {
+        display: none
+    }
+
+    .ref-mission {
+        grid-template-columns: 1fr
+    }
+
+    .ref-mission-photo {
+        height: 360px
+    }
+
+    .home-page .site-header .navbar-toggler {
+        filter: invert(1)
+    }
+}
+
+@media(max-width:767px) {
+    .ref-hero {
+        height: 580px
+    }
+
+    .ref-hero-bg {
+        background-image: linear-gradient(90deg, #000c, #0002), url('../images/banner/mobile/hero-mobile.png')
+    }
+
+    .ref-hero-copy {
+        width: 100%;
+        padding: 0 8px 150px
+    }
+
+    .ref-hero-product {
+        right: 4%;
+        bottom: 8px;
+        width: clamp(115px, 31vw, 165px);
+        height: 42%;
+        opacity: .9
+    }
+
+    .ref-hero h1 {
+        font-size: 43px
+    }
+
+    .ref-hero-benefits {
+        gap: 14px;
+        flex-wrap: wrap
+    }
+
+    .ref-trust-grid {
+        grid-template-columns: 1fr 1fr
+    }
+
+    .ref-trust-grid>div {
+        min-height: 90px
+    }
+
+    .ref-category-grid,
+    .ref-product-grid {
+        grid-template-columns: 1fr 1fr
+    }
+
+    .ref-category-card>div {
+        height: 165px
+    }
+
+    .ref-title h2 {
+        font-size: 27px
+    }
+
+    .ref-title span {
+        width: 30px
+    }
+
+    .ref-promo {
+        height: 390px;
+        background-position: 38%;
+        position: relative
+    }
+
+    .ref-promo-copy {
+        width: 100%;
+        padding: 35px;
+        position: relative
+    }
+
+    .ref-promo-copy h2 {
+        font-size: 45px
+    }
+
+    .ref-pills span {
+        display: none
+    }
+
+    .ref-pills .active {
+        display: block
+    }
+
+    .ref-product-card:nth-child(3) {
+        display: none
+    }
+
+    .ref-product-media {
+        height: 190px
+    }
+
+    .ref-mission-photo {
+        height: 300px
+    }
+
+    .ref-mission-copy {
+        padding: 45px 25px
+    }
+
+    .ref-stats .container {
+        grid-template-columns: 1fr 1fr;
+        gap: 25px 0
+    }
+
+    .ref-review-grid {
+        grid-template-columns: 1fr
+    }
+
+    .ref-review-grid article:nth-child(n+2) {
+        display: none
+    }
+
+    .ref-newsletter .container {
+        display: block
+    }
+
+    .ref-newsletter form {
+        width: 100%;
+        margin-top: 20px
+    }
+
+    .ref-newsletter .ref-btn {
+        padding: 0 18px
+    }
+}

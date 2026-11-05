@@ -27,7 +27,7 @@ class FrontendController extends Controller
     {
         $heroSlides = HeroSlide::where('status', 'active')->orderBy('sort_order')->latest()->get();
 
-        return view('frontend.index', [
+        return view('frontend.index-reference', [
             'categories' => Category::withCount('products')->where('status', 'active')->orderBy('sort_order')->take(8)->get(),
             'featuredProducts' => Product::with('category')
                 ->where('status', 'active')
