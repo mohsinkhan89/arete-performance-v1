@@ -291,7 +291,6 @@
     height: 90%;
     object-fit: contain;
     filter: drop-shadow(0 35px 35px rgba(0, 0, 0, .65));
-    animation: onyxFloat 5s ease-in-out infinite
 }
 
 .onyx-hero-controls {
