@@ -389,7 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const parallaxItems = document.querySelectorAll(
-      ".home-page .home-hero-product img, .home-page .home-hero-slide-bg, .home-page .categories, .home-page .why-section, .home-page .testimonials, .home-page .ref-hero-product img, .home-page .ref-campaign-grid, .home-page .ref-mission-photo"
+      ".home-page .home-hero-product img, .home-page .home-hero-slide-bg, .home-page .categories, .home-page .why-section, .home-page .testimonials, .home-page .ref-hero-product img, .home-page .ref-campaign-grid, .home-page .ref-mission-photo, .home-page .ref-newsletter"
     );
     let parallaxFrame = null;
     const updateParallax = () => {
