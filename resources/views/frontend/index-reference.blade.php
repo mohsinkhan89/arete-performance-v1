@@ -1,6 +1,6 @@
 @extends('frontend.layouts.master')
 @section('body')
-<section class="ref-hero" id="home" data-home-hero-slider>
+<section class="ref-hero" id="home" data-home-hero-slider data-shopify-home>
   <div class="ref-hero-noise" aria-hidden="true"></div><div class="ref-hero-track">
   @forelse($heroSlides as $slide)
     <article class="ref-hero-slide {{ $loop->first ? 'is-active' : '' }}" data-home-hero-slide aria-hidden="{{ $loop->first ? 'false' : 'true' }}">

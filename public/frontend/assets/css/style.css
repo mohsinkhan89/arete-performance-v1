@@ -16,6 +16,138 @@
   --shadow: 0 12px 34px rgba(0, 0, 0, .1);
 }
 
+/* Homepage motion language inspired by the reference storefront: soft section
+   reveals, tactile cards, image lift and restrained pointer parallax. */
+.home-page main > section {
+  position: relative;
+  isolation: isolate;
+}
+
+.home-page .categories::after,
+.home-page .testimonials::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: min(42vw, 560px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 168, 23, .1), transparent 68%);
+  filter: blur(2px);
+  pointer-events: none;
+  transform: translate3d(0, var(--scroll-shift, 0), 0);
+  transition: transform .15s linear;
+}
+
+.home-page .categories::after { top: 6%; right: -17%; }
+.home-page .testimonials::after { bottom: -12%; left: -18%; }
+
+.home-page .pawzy-section-heading {
+  overflow: hidden;
+}
+
+.home-page .pawzy-section-heading .eyebrow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-page .pawzy-section-heading .eyebrow::before {
+  content: "";
+  width: 0;
+  height: 2px;
+  background: var(--color-primary);
+  transition: width .7s cubic-bezier(.2, .8, .2, 1) .18s;
+}
+
+.home-page .pawzy-section-heading.is-visible .eyebrow::before,
+.home-page .why-intro.is-visible .eyebrow::before {
+  width: 30px;
+}
+
+.home-page .pawzy-motion-card {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  transform-origin: center;
+  transform-style: preserve-3d;
+}
+
+.home-page .pawzy-motion-card.is-visible:hover,
+.home-page .reveal-group > .pawzy-motion-card.is-visible:hover {
+  transform: perspective(900px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(-9px);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, .14);
+}
+
+.home-page .category-card img,
+.home-page .product-card > img,
+.home-page .quote-card figcaption img,
+.home-page .benefit > i {
+  will-change: transform;
+  transition: transform .55s cubic-bezier(.2, .8, .2, 1), filter .4s ease;
+}
+
+.home-page .category-card:hover img,
+.home-page .product-card:hover > img {
+  transform: translate3d(0, -10px, 28px) scale(1.055);
+  filter: drop-shadow(0 20px 22px rgba(0, 0, 0, .2));
+}
+
+.home-page .benefit:hover > i {
+  transform: translateZ(24px) rotate(-7deg) scale(1.1);
+}
+
+.home-page .quote-card:hover figcaption img {
+  transform: translateZ(20px) scale(1.08);
+}
+
+.home-page .category-card div > i,
+.home-page .product-card > div:last-child button,
+.home-page .section-heading > a {
+  transition: transform .35s cubic-bezier(.2, .8, .2, 1), background-color .3s ease, color .3s ease, box-shadow .3s ease;
+}
+
+.home-page .category-card:hover div > i { transform: translateX(4px) rotate(-8deg); }
+.home-page .product-card > div:last-child button:hover { transform: rotate(-7deg) scale(1.08); }
+.home-page .section-heading > a:hover { transform: translateX(5px); }
+
+.home-page .home-hero-product img {
+  transform: translate3d(0, var(--scroll-shift, 0), 0);
+  transition: transform .18s linear, filter .45s ease;
+}
+
+.home-page .home-hero-slide.is-active .home-hero-copy > * {
+  animation: pawzyHeroReveal .8s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.home-page .home-hero-slide.is-active .home-hero-copy > *:nth-child(2) { animation-delay: .1s; }
+.home-page .home-hero-slide.is-active .home-hero-copy > *:nth-child(3) { animation-delay: .2s; }
+.home-page .home-hero-slide.is-active .home-hero-copy > *:nth-child(4) { animation-delay: .3s; }
+
+@keyframes pawzyHeroReveal {
+  from { opacity: 0; transform: translateY(28px); filter: blur(6px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-page .pawzy-motion-card,
+  .home-page .pawzy-motion-card:hover,
+  .home-page .home-hero-product img,
+  .home-page .home-hero-slide.is-active .home-hero-copy > * {
+    animation: none !important;
+    transform: none !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media (hover: none), (max-width: 767.98px) {
+  .home-page .pawzy-motion-card.is-visible:hover,
+  .home-page .reveal-group > .pawzy-motion-card.is-visible:hover {
+    transform: translateY(-3px);
+  }
+}
+
 * {
   box-sizing: border-box;
 }

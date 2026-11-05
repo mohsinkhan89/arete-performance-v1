@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function prepareAnimatedHeadings() {
-    document.querySelectorAll(".section-heading h2, .why-intro h2").forEach((heading) => {
+    document.querySelectorAll(".section-heading h2, .why-intro h2, .ref-section-head h2, .ref-review-title h2, .ref-mission-copy h2, .ref-newsletter h2").forEach((heading) => {
       if (heading.dataset.animatedHeading === "true") return;
       const text = heading.textContent.trim();
       if (!text) return;
@@ -306,7 +306,17 @@ document.addEventListener("DOMContentLoaded", () => {
       ".tab-content-card",
       ".related-card",
       ".reviews-panel",
-      ".usage-panel"
+      ".usage-panel",
+      ".ref-trust-grid > div",
+      ".ref-section-head > *",
+      ".ref-category-card",
+      ".ref-campaign-copy > *",
+      ".ref-product-card",
+      ".ref-mission-photo",
+      ".ref-mission-copy > *",
+      ".ref-mission-list > div",
+      ".ref-review-grid > article",
+      ".ref-newsletter .container > *"
     ];
 
     const cards = document.querySelectorAll([
@@ -319,7 +329,11 @@ document.addEventListener("DOMContentLoaded", () => {
       ".order-summary",
       ".checkout-summary",
       ".product-info-card",
-      ".related-card"
+      ".related-card",
+      ".ref-category-card",
+      ".ref-product-card",
+      ".ref-review-grid > article",
+      ".ref-trust-grid > div"
     ].join(","));
 
     document.querySelectorAll(revealSelectors.join(",")).forEach((item, index) => {
@@ -341,6 +355,58 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".btn-gold, .success-check, .product-category-pill").forEach((item) => {
       item.classList.add("pulse-glow");
     });
+  }
+
+  function prepareHomeInteractions() {
+    if (!document.body.classList.contains("home-page")) return;
+
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const motionReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const interactiveCards = document.querySelectorAll(
+      ".home-page .category-card, .home-page .benefit, .home-page .product-card, .home-page .quote-card, .home-page .testimonial-stats > div, .home-page .ref-category-card, .home-page .ref-product-card, .home-page .ref-review-grid > article, .home-page .ref-trust-grid > div"
+    );
+
+    interactiveCards.forEach((card) => {
+      card.classList.add("pawzy-motion-card");
+      card.addEventListener("pointermove", (event) => {
+        if (!finePointer.matches || motionReduced.matches) return;
+        const bounds = card.getBoundingClientRect();
+        const x = (event.clientX - bounds.left) / bounds.width;
+        const y = (event.clientY - bounds.top) / bounds.height;
+        card.style.setProperty("--pointer-x", `${x * 100}%`);
+        card.style.setProperty("--pointer-y", `${y * 100}%`);
+        card.style.setProperty("--tilt-x", `${(0.5 - y) * 4}deg`);
+        card.style.setProperty("--tilt-y", `${(x - 0.5) * 5}deg`);
+      });
+      card.addEventListener("pointerleave", () => {
+        card.style.removeProperty("--tilt-x");
+        card.style.removeProperty("--tilt-y");
+      });
+    });
+
+    document.querySelectorAll(".home-page .section-heading, .home-page .why-intro, .home-page .testimonial-heading, .home-page .ref-section-head, .home-page .ref-review-title").forEach((heading) => {
+      heading.classList.add("pawzy-section-heading");
+    });
+
+    const parallaxItems = document.querySelectorAll(
+      ".home-page .home-hero-product img, .home-page .home-hero-slide-bg, .home-page .categories, .home-page .why-section, .home-page .testimonials, .home-page .ref-hero-product img, .home-page .ref-campaign-grid, .home-page .ref-mission-photo"
+    );
+    let parallaxFrame = null;
+    const updateParallax = () => {
+      parallaxFrame = null;
+      if (motionReduced.matches) return;
+      parallaxItems.forEach((item) => {
+        const bounds = item.getBoundingClientRect();
+        if (bounds.bottom < 0 || bounds.top > window.innerHeight) return;
+        const progress = (window.innerHeight * 0.5 - (bounds.top + bounds.height * 0.5)) / window.innerHeight;
+        item.style.setProperty("--scroll-shift", `${Math.max(-18, Math.min(18, progress * 24))}px`);
+      });
+    };
+    window.addEventListener("scroll", () => {
+      if (parallaxFrame) return;
+      parallaxFrame = window.requestAnimationFrame(updateParallax);
+    }, { passive: true });
+    updateParallax();
   }
 
   function updateHeaderState() {
@@ -2430,6 +2496,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   prepareAnimatedHeadings();
   preparePageAnimations();
+  prepareHomeInteractions();
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
