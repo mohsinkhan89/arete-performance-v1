@@ -41,12 +41,12 @@
     @endif
 </head>
 <body class="@yield('body_class', (Request::path() === '/' ? 'home-page' : str_replace('/', '-', Request::path()) . '-page'))">
-  <div class="site-loader" data-site-loader aria-live="polite" aria-label="Loading Majix">
+  <!-- <div class="site-loader" data-site-loader aria-live="polite" aria-label="Loading Majix">
     <div class="loader-ambient" aria-hidden="true"></div>
     <div class="site-loader-content">
       <div class="loader-brand" data-loader-brand data-text="MAJIX">MAJIX</div>
     </div>
-  </div>
+  </div> -->
 
   <div class="global-announcement"><div class="container"><span><i class="fa-solid fa-truck-fast"></i> Free UK Shipping on Orders Over &pound;99</span></div></div>
   @include('frontend.inc.header')

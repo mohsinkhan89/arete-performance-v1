@@ -11229,7 +11229,7 @@ button {
 /* Featured product hero slider */
 .home-page .hero {
   background-color: var(--color-black);
-  background-image: url("../images/banner/hero-banner.png");
+  background-image: url("../images/banner/hero-banner.webp");
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat
