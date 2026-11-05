@@ -2427,6 +2427,146 @@
     }
 }
 
+/* Premium refinement for the homepage assurance and process sections. */
+.home-page .onyx-science {
+    position: relative;
+    overflow: hidden;
+    padding: 76px 0 80px;
+}
+
+.home-page .onyx-science:before {
+    content: "";
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    width: 520px;
+    height: 220px;
+    border: 1px solid rgba(243,182,63,.16);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.home-page .onyx-science > .container {
+    position: relative;
+    z-index: 1;
+}
+
+.home-page .onyx-science header {
+    max-width: 850px;
+    margin-right: auto;
+    margin-bottom: 42px;
+    margin-left: auto;
+}
+
+.home-page .onyx-science-grid {
+    counter-reset: assurance-card;
+    gap: 14px;
+}
+
+.home-page .onyx-science-grid > div,
+.home-page .onyx-science-grid > div:last-child {
+    position: relative;
+    min-height: 176px;
+    grid-template-columns: 52px 1fr;
+    align-items: start;
+    gap: 16px;
+    padding: 28px 22px;
+    overflow: hidden;
+    border: 1px solid #26343d;
+    border-radius: 16px;
+    background: #0d1922;
+    box-shadow: 0 18px 38px rgba(0,0,0,.18);
+    counter-increment: assurance-card;
+    transition: transform .25s ease, border-color .25s ease, background .25s ease, box-shadow .25s ease;
+}
+
+.home-page .onyx-science-grid > div:after {
+    content: "0" counter(assurance-card);
+    position: absolute;
+    right: 14px;
+    bottom: -10px;
+    color: rgba(255,255,255,.035);
+    font: 800 64px/1 Inter, sans-serif;
+}
+
+.home-page .onyx-science-grid > div:hover {
+    border-color: rgba(243,182,63,.58);
+    background: #111f29;
+    box-shadow: 0 24px 48px rgba(0,0,0,.28);
+    transform: translateY(-6px);
+}
+
+.home-page .onyx-science-grid i {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(243,182,63,.46);
+    border-radius: 13px;
+    background: rgba(243,182,63,.08);
+    font-size: 23px;
+}
+
+.home-page .onyx-science-grid span {
+    position: relative;
+    z-index: 1;
+    padding-top: 3px;
+}
+
+.home-page .onyx-science-grid strong {
+    font-size: 15px;
+    letter-spacing: -.01em;
+}
+
+.home-page .onyx-science-grid small {
+    margin-top: 9px;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.home-page .onyx-process-copy {
+    max-width: 760px;
+}
+
+.home-page .onyx-steps > div:hover {
+    border-color: rgba(243,182,63,.55);
+    background: rgba(17,31,41,.96);
+}
+
+@media(max-width:991px) {
+    .home-page .onyx-science-grid > div,
+    .home-page .onyx-science-grid > div:last-child,
+    .home-page .onyx-science-grid > div:nth-child(-n+2) {
+        border: 1px solid #26343d;
+    }
+}
+
+@media(max-width:575px) {
+    .home-page .onyx-science {
+        padding: 54px 0 58px;
+    }
+
+    .home-page .onyx-science header {
+        margin-bottom: 30px;
+    }
+
+    .home-page .onyx-science-grid > div,
+    .home-page .onyx-science-grid > div:last-child,
+    .home-page .onyx-science-grid > div:nth-child(2) {
+        min-height: 0;
+        grid-template-columns: 46px 1fr;
+        padding: 22px 18px;
+        border: 1px solid #26343d;
+    }
+
+    .home-page .onyx-science-grid i {
+        width: 46px;
+        height: 46px;
+        font-size: 20px;
+    }
+}
+
 /* Homepage collection and category carousels. */
 .home-page .onyx-product-swiper,
 .home-page .onyx-category-swiper,
@@ -3290,4 +3430,186 @@
 
 .home-page .footer-bottom {
     font-size: 11px;
+}
+
+/* Complete the homepage journey with assurance and ordering guidance. */
+.home-page .onyx-category-swiper .swiper-slide,
+.home-page .onyx-category-swiper .onyx-category-card {
+    height: 82px;
+    min-height: 82px;
+}
+
+.home-page .onyx-science {
+    padding: 62px 0 66px;
+    background: #071018;
+}
+
+.home-page .onyx-science header {
+    margin-bottom: 36px;
+}
+
+.home-page .onyx-science h2 {
+    color: #fff;
+}
+
+.home-page .onyx-science-grid {
+    gap: 0;
+}
+
+.home-page .onyx-science-grid > div {
+    min-height: 104px;
+    padding: 10px 28px;
+}
+
+.home-page .onyx-science-grid i {
+    color: var(--gold);
+}
+
+.home-page .onyx-science-grid strong {
+    color: #fff;
+    font-size: 14px;
+}
+
+.home-page .onyx-science-grid small {
+    color: #aeb8be;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.home-page .onyx-process {
+    margin-bottom: 0;
+    padding-top: 82px;
+    padding-bottom: 82px;
+}
+
+.home-page .onyx-process-copy > p:not(.onyx-eyebrow) {
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.home-page .onyx-steps strong {
+    font-size: 14px;
+}
+
+.home-page .onyx-steps small {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+@media(max-width:991px) {
+    .home-page .onyx-science-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .home-page .onyx-science-grid > div:nth-child(2) {
+        border-right: 0;
+    }
+
+    .home-page .onyx-science-grid > div:nth-child(-n+2) {
+        border-bottom: 1px solid rgba(255,255,255,.2);
+    }
+}
+
+@media(max-width:575px) {
+    .home-page .onyx-category-swiper .swiper-slide,
+    .home-page .onyx-category-swiper .onyx-category-card {
+        height: 72px;
+        min-height: 72px;
+    }
+
+    .home-page .onyx-science {
+        padding: 48px 0;
+    }
+
+    .home-page .onyx-science-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-page .onyx-science-grid > div,
+    .home-page .onyx-science-grid > div:nth-child(2) {
+        min-height: 92px;
+        padding: 18px 4px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255,255,255,.2);
+    }
+
+    .home-page .onyx-science-grid > div:last-child {
+        border-bottom: 0;
+    }
+
+    .home-page .onyx-process {
+        padding-top: 58px;
+        padding-bottom: 58px;
+    }
+}
+
+/* Final assurance-card overrides must follow the legacy homepage rules. */
+.home-page .onyx-science {
+    padding: 76px 0 80px;
+}
+
+.home-page .onyx-science header {
+    margin-bottom: 42px;
+}
+
+.home-page .onyx-science-grid {
+    gap: 14px;
+}
+
+.home-page .onyx-science-grid > div,
+.home-page .onyx-science-grid > div:last-child {
+    min-height: 176px;
+    grid-template-columns: 52px 1fr;
+    align-items: start;
+    gap: 16px;
+    padding: 28px 22px;
+    border: 1px solid #26343d;
+    border-radius: 16px;
+    background: #0d1922;
+}
+
+.home-page .onyx-science-grid i {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(243,182,63,.46);
+    border-radius: 13px;
+    background: rgba(243,182,63,.08);
+    font-size: 23px;
+}
+
+.home-page .onyx-science-grid strong {
+    font-size: 15px;
+}
+
+.home-page .onyx-science-grid small {
+    margin-top: 9px;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+@media(max-width:575px) {
+    .home-page .onyx-science {
+        padding: 54px 0 58px;
+    }
+
+    .home-page .onyx-science header {
+        margin-bottom: 30px;
+    }
+
+    .home-page .onyx-science-grid > div,
+    .home-page .onyx-science-grid > div:last-child,
+    .home-page .onyx-science-grid > div:nth-child(2) {
+        min-height: 0;
+        grid-template-columns: 46px 1fr;
+        padding: 22px 18px;
+        border: 1px solid #26343d;
+    }
+
+    .home-page .onyx-science-grid i {
+        width: 46px;
+        height: 46px;
+        font-size: 20px;
+    }
 }

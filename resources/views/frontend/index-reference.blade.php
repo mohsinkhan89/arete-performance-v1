@@ -72,6 +72,33 @@
   </div>
 </section>
 
+<section class="onyx-science" aria-labelledby="assuranceHeading">
+  <div class="container">
+    <header><p class="onyx-eyebrow">Why choose Majix</p><h2 id="assuranceHeading">Confidence built into every order.</h2></header>
+    <div class="onyx-science-grid">
+      <div><i class="fa-solid fa-flask-vial"></i><span><strong>Research focused</strong><small>A clearly organised catalogue for laboratory and research requirements.</small></span></div>
+      <div><i class="fa-solid fa-file-shield"></i><span><strong>Quality documented</strong><small>Available product information and test reports are easy to access.</small></span></div>
+      <div><i class="fa-solid fa-box"></i><span><strong>Discreet dispatch</strong><small>Carefully prepared packaging with dependable UK fulfilment.</small></span></div>
+      <div><i class="fa-solid fa-headset"></i><span><strong>Responsive support</strong><small>Clear assistance before and after you place an order.</small></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="onyx-process" aria-labelledby="processHeading">
+  <div class="container">
+    <div class="onyx-process-copy">
+      <p class="onyx-eyebrow">A straightforward process</p>
+      <h2 id="processHeading">From research need to secure delivery.</h2>
+      <p>Find the right category, review the available product information and complete your order through our secure checkout.</p>
+      <div class="onyx-steps">
+        <div><b>01</b><span><strong>Explore the catalogue</strong><small>Browse focused categories and compare the available research products.</small></span><i class="fa-solid fa-magnifying-glass"></i></div>
+        <div><b>02</b><span><strong>Review the details</strong><small>Check specifications, availability and supporting product documentation.</small></span><i class="fa-solid fa-file-circle-check"></i></div>
+        <div><b>03</b><span><strong>Order with confidence</strong><small>Use the secure checkout and follow your order through delivery.</small></span><i class="fa-solid fa-box-open"></i></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 @if($reviews->isNotEmpty())
 <section class="onyx-reviews section-pad" aria-labelledby="reviewHeading">
   <div class="container">
