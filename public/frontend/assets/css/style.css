@@ -1027,7 +1027,7 @@ img {
   /* min-height: 704px; */
   height: 800px;
   color: var(--color-white);
-  background: var(--color-black) url("../images/hero-performance.png") center bottom/cover no-repeat;
+  background: var(--color-black) url("../images/hero-performance.webp") center bottom/cover no-repeat;
   animation: heroBackdropDrift 18s ease-in-out infinite alternate;
   overflow: hidden;
 }
@@ -3108,8 +3108,8 @@ button.is-loading .fa-spinner {
 
 .shop-hero {
   color: var(--color-white);
-  background: var(--color-black) url("../images/hero-performance.png") right 35% bottom/auto 120% no-repeat;
-  /* background: var(--color-black) url("../images/hero-performance.png") center bottom/auto 118% no-repeat; */
+  background: var(--color-black) url("../images/hero-performance.webp") right 35% bottom/auto 120% no-repeat;
+  /* background: var(--color-black) url("../images/hero-performance.webp") center bottom/auto 118% no-repeat; */
   border-bottom: 1px solid rgba(255, 255, 255, .1);
   overflow: hidden;
 }
@@ -3726,8 +3726,8 @@ button.is-loading .fa-spinner {
   min-height: 310px;
   padding: 74px 0 58px;
   color: var(--color-white);
-  background: var(--color-black) url("../images/hero-performance.png") right 35% bottom/auto 120% no-repeat;
-  /* background: var(--color-black) url("../images/hero-performance.png") right 14% bottom/auto 126% no-repeat; */
+  background: var(--color-black) url("../images/hero-performance.webp") right 35% bottom/auto 120% no-repeat;
+  /* background: var(--color-black) url("../images/hero-performance.webp") right 14% bottom/auto 126% no-repeat; */
   border-bottom: 1px solid rgba(255, 255, 255, .1);
   overflow: hidden;
 }
@@ -4043,8 +4043,8 @@ button.is-loading .fa-spinner {
   min-height: 315px;
   padding: 72px 0 54px;
   color: var(--color-white);
-  background: var(--color-black) url("../images/hero-performance.png") right 35% bottom/auto 120% no-repeat;
-  /* background: var(--color-black) url("../images/hero-performance.png") right 11% bottom/auto 134% no-repeat; */
+  background: var(--color-black) url("../images/hero-performance.webp") right 35% bottom/auto 120% no-repeat;
+  /* background: var(--color-black) url("../images/hero-performance.webp") right 11% bottom/auto 134% no-repeat; */
   border-bottom: 1px solid rgba(255, 255, 255, .1);
   overflow: hidden;
 }
@@ -4611,8 +4611,8 @@ button.is-loading .fa-spinner {
   min-height: 330px;
   padding: 62px 0 48px;
   color: var(--color-white);
-  background: var(--color-black) url("../images/hero-performance.png") right 35% bottom/auto 120% no-repeat;
-  /* background: var(--color-black) url("../images/hero-performance.png") right 12% bottom/auto 124% no-repeat; */
+  background: var(--color-black) url("../images/hero-performance.webp") right 35% bottom/auto 120% no-repeat;
+  /* background: var(--color-black) url("../images/hero-performance.webp") right 12% bottom/auto 124% no-repeat; */
   border-bottom: 1px solid rgba(255, 255, 255, .1);
   overflow: hidden;
 }
@@ -9859,7 +9859,7 @@ button:not(.navbar-toggler):not(.panel-close):not(.slider-arrow):not(.testimonia
 .cart-hero,
 .search-hero {
   color: var(--color-white) !important;
-  background: var(--color-black) url("../images/hero-performance.png") right 35% bottom/auto 120% no-repeat !important;
+  background: var(--color-black) url("../images/hero-performance.webp") right 35% bottom/auto 120% no-repeat !important;
   border-bottom: 1px solid rgba(255, 255, 255, .1) !important;
   overflow: hidden !important;
   position: relative !important;
@@ -9935,7 +9935,7 @@ button:not(.navbar-toggler):not(.panel-close):not(.slider-arrow):not(.testimonia
 
 .success-hero {
   position: relative !important;
-  /* background: var(--color-black) url("../images/hero-performance.png") right 35% bottom/auto 120% no-repeat !important; */
+  /* background: var(--color-black) url("../images/hero-performance.webp") right 35% bottom/auto 120% no-repeat !important; */
   animation: successHeroBackdropDrift 18s ease-in-out infinite alternate !important;
 }
 
