@@ -1023,7 +1023,7 @@
 }
 
 /* Reference-led How It Works banner, adapted to the MAJIX black/gold theme. */
-.home-page .onyx-process {
+.home-page main .onyx-process {
     position: relative;
     isolation: isolate;
     margin-bottom: 54px;
@@ -2564,6 +2564,111 @@
         width: 46px;
         height: 46px;
         font-size: 20px;
+    }
+}
+
+/* Light editorial treatment for the research-to-delivery process. */
+.home-page main .onyx-process {
+    position: relative;
+    isolation: isolate;
+    margin: 0;
+    padding: 86px 0;
+    color: #101a22;
+    background-color: #fff;
+    background-image: linear-gradient(90deg, #fff 0%, #fff 48%, rgba(255,255,255,.94) 60%, rgba(255,255,255,.42) 78%, rgba(255,255,255,.12) 100%), url('../images/banner/how-works-banner.webp');
+    background-position: right center;
+    background-size: 100% 100%, auto 100%;
+    background-repeat: no-repeat;
+}
+
+.home-page main .onyx-process:before {
+    display: none;
+}
+
+.home-page main .onyx-process:after {
+    z-index: -1;
+    background-image: radial-gradient(rgba(198,136,23,.18) 1px, transparent 1px);
+    opacity: .22;
+}
+
+.home-page main .onyx-process-copy {
+    width: min(760px, 62%);
+    max-width: 760px;
+}
+
+.home-page main .onyx-process-copy .onyx-eyebrow {
+    color: var(--gold-deep);
+}
+
+.home-page main .onyx-process-copy h2 {
+    max-width: 720px;
+    color: #0b151d;
+}
+
+.home-page main .onyx-process-copy > p:not(.onyx-eyebrow) {
+    color: #53616a;
+}
+
+.home-page main .onyx-steps {
+    gap: 12px;
+}
+
+.home-page main .onyx-steps > div {
+    min-height: 86px;
+    padding: 16px 62px 16px 16px;
+    border: 1px solid #dfe5e8;
+    background: rgba(255,255,255,.94);
+    box-shadow: 0 14px 34px rgba(7,16,24,.08);
+    backdrop-filter: blur(8px);
+}
+
+.home-page main .onyx-steps > div:hover {
+    border-color: rgba(198,136,23,.58);
+    background: #fff;
+    box-shadow: 0 20px 42px rgba(7,16,24,.13);
+}
+
+.home-page main .onyx-steps b {
+    border-color: rgba(198,136,23,.38);
+    background: #fff8e8;
+    color: var(--gold-deep);
+}
+
+.home-page main .onyx-steps i {
+    color: var(--gold-deep);
+}
+
+.home-page main .onyx-steps strong {
+    color: #101a22;
+}
+
+.home-page main .onyx-steps small {
+    color: #65717a;
+}
+
+@media(max-width:991px) {
+    .home-page main .onyx-process {
+        background-position: 72% center;
+    }
+
+    .home-page main .onyx-process:before {
+        background: rgba(255,255,255,.92);
+    }
+
+    .home-page main .onyx-process-copy {
+        width: 100%;
+    }
+}
+
+@media(max-width:575px) {
+    .home-page main .onyx-process {
+        padding: 58px 0;
+        background-position: 66% center;
+    }
+
+    .home-page main .onyx-steps > div {
+        min-height: 82px;
+        padding: 13px 50px 13px 13px;
     }
 }
 
