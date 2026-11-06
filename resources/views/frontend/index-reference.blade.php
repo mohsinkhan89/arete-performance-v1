@@ -425,6 +425,59 @@
    </div>
 </section>
 
+<section class="majix-journal section-pad" aria-labelledby="journalHeading">
+   <div class="container">
+      <header class="majix-journal-head">
+         <div>
+            <p class="onyx-eyebrow">The Majix journal</p>
+            <h2 id="journalHeading">Research, quality and smarter ordering.</h2>
+         </div>
+         <p>Clear, useful reads created to help you understand our standards, product information and fulfilment journey.</p>
+      </header>
+
+      <div class="majix-journal-grid">
+         <article class="majix-journal-card majix-journal-featured">
+            <a class="majix-journal-media" href="{{ route('frontend.shop') }}" aria-label="Read: A clearer way to review research products">
+               <img src="{{ asset('frontend/assets/images/banner/blog-lab-research.jpg') }}" alt="Researcher working with laboratory equipment" loading="lazy">
+               <span>Featured insight</span>
+            </a>
+            <div class="majix-journal-copy">
+               <div class="majix-journal-meta"><span>Research guide</span><time datetime="2026-11-06">6 Nov 2026</time></div>
+               <h3>A clearer way to review research products.</h3>
+               <p>Start with the details that matter: product information, available documentation and clear research-use guidance.</p>
+               <a href="{{ route('frontend.shop') }}">Explore the collection <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+         </article>
+
+         <div class="majix-journal-stack">
+            <article class="majix-journal-card majix-journal-compact">
+               <a class="majix-journal-media" href="{{ route('frontend.shop') }}" aria-label="Read: Quality starts with careful inspection">
+                  <img src="{{ asset('frontend/assets/images/banner/blog-lab-quality.jpg') }}" alt="Laboratory quality control inspection" loading="lazy">
+                  <span>Quality focus</span>
+               </a>
+               <div class="majix-journal-copy">
+                  <div class="majix-journal-meta"><span>Inside Majix</span><time datetime="2026-11-06">4 min read</time></div>
+                  <h3>Quality starts with careful inspection.</h3>
+                  <a href="{{ route('frontend.shop') }}" aria-label="Explore quality information">Discover more <i class="fa-solid fa-arrow-right"></i></a>
+               </div>
+            </article>
+
+            <article class="majix-journal-card majix-journal-compact">
+               <a class="majix-journal-media" href="{{ route('frontend.track-order') }}" aria-label="Read: From confirmation to discreet dispatch">
+                  <img src="{{ asset('frontend/assets/images/banner/blog-dispatch.jpg') }}" alt="Clean order packaging and dispatch environment" loading="lazy">
+                  <span>Order journey</span>
+               </a>
+               <div class="majix-journal-copy">
+                  <div class="majix-journal-meta"><span>Fulfilment</span><time datetime="2026-11-06">3 min read</time></div>
+                  <h3>From confirmation to discreet dispatch.</h3>
+                  <a href="{{ route('frontend.track-order') }}">Track an order <i class="fa-solid fa-arrow-right"></i></a>
+               </div>
+            </article>
+         </div>
+      </div>
+   </div>
+</section>
+
 @if($reviews->isNotEmpty())
 <section class="onyx-reviews section-pad" aria-labelledby="reviewHeading">
    <div class="container">
@@ -587,7 +640,7 @@
      ].join(',')));
      const cardElements = Array.from(document.querySelectorAll([
        '.onyx-category-card', '.onyx-product-card', '.onyx-science-grid > div',
-       '.onyx-steps > div', '.onyx-steps > article', '.onyx-review-card', '.onyx-faq-item', '.onyx-faq-note'
+       '.onyx-steps > div', '.onyx-steps > article', '.majix-journal-card', '.onyx-review-card', '.onyx-faq-item', '.onyx-faq-note'
      ].join(',')));
      const visualElements = Array.from(document.querySelectorAll([
        '.onyx-hero-product', '.onyx-most-ordered-visual', '.onyx-most-ordered-proof',
