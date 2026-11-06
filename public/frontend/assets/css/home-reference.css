@@ -63,12 +63,6 @@
     margin-left: 18px
 }
 
-.home-page .site-header .icon-btn {
-    color: #fff;
-    border-color: transparent;
-    font-size: 19px
-}
-
 .home-page .site-header.is-scrolled {
     position: fixed;
     background: rgba(6, 13, 19, .94);
@@ -173,6 +167,7 @@
     justify-content: space-between;
     gap: 35px;
     /* min-width: 270px; */
+    border: 1px solid var(--gold);
     background: var(--gold);
     color: #0a1015;
     text-decoration: none;
@@ -183,12 +178,52 @@
     letter-spacing: .04em;
     text-transform: uppercase;
     box-shadow: 0 12px 35px rgba(0, 0, 0, .2);
-    transition: .25s
+    transition: color .25s ease, background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease
 }
 
 .onyx-primary-btn:hover {
-    color: #fff;
-    background: #101c25;
+    color: var(--gold);
+    border-color: var(--gold);
+    background: transparent;
+    box-shadow: 0 12px 28px rgba(243,182,63,.12);
+    transform: translateY(-2px);
+}
+
+.onyx-primary-btn i,
+.onyx-secondary-btn i {
+    color: currentColor;
+    transition: transform .25s ease;
+}
+
+.onyx-primary-btn:hover i,
+.onyx-secondary-btn:hover i {
+    transform: translateX(4px);
+}
+
+.onyx-secondary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-width: 190px;
+    padding: 14px 22px;
+    border: 1px solid var(--gold);
+    border-radius: 11px;
+    background: transparent;
+    color: var(--gold);
+    box-shadow: inset 0 0 0 0 var(--gold);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color .25s ease, background .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+
+.onyx-secondary-btn:hover {
+    color: #0a1015;
+    background: var(--gold);
+    box-shadow: 0 12px 28px rgba(243,182,63,.24);
     transform: translateY(-2px);
 }
 
@@ -3165,9 +3200,16 @@
 .home-page .onyx-help-topics i { color: var(--gold); }
 .home-page .onyx-help-actions { position: relative; z-index: 1; display: flex; align-items: center; gap: 22px; }
 .home-page .onyx-help-actions .onyx-primary-btn { min-width: 220px; padding: 15px 22px; }
-.home-page .onyx-help-link { color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .05em; text-decoration: none; text-transform: uppercase; white-space: nowrap; }
-.home-page .onyx-help-link i { margin-left: 8px; color: var(--gold); }
-.home-page .onyx-help-link:hover { color: var(--gold); }
+.home-page .onyx-help-actions .onyx-secondary-btn { min-width: 190px; padding: 15px 22px; white-space: nowrap; }
+
+/* Final homepage button states stay consistent across hero, product and CTA sections. */
+.home-page .onyx-primary-btn:hover,
+.home-page .onyx-most-ordered-actions .onyx-primary-btn:hover,
+.home-page .onyx-help-actions .onyx-primary-btn:hover {
+    border-color: var(--gold);
+    background: transparent;
+    color: var(--gold);
+}
 
 @media(max-width:991px) {
     .home-page .onyx-faq-layout { grid-template-columns: 1fr; gap: 34px; }
@@ -3192,6 +3234,7 @@
     .home-page .onyx-help-topics { gap: 10px 14px; }
     .home-page .onyx-help-actions { grid-column: auto; align-items: stretch; flex-direction: column; gap: 15px; }
     .home-page .onyx-help-actions .onyx-primary-btn { width: 100%; min-width: 0; }
+    .home-page .onyx-help-actions .onyx-secondary-btn { width: 100%; min-width: 0; }
 }
 
 /* Light editorial treatment for the research-to-delivery process. */
