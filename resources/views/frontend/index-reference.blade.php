@@ -322,29 +322,31 @@
 
 @if($topOrderedProduct)
 <section class="onyx-most-ordered section-pad" aria-labelledby="mostOrderedHeading">
-   <div class="container">
+   <div class="container-fluid px-0">
       <div class="onyx-most-ordered-card">
+         <div class="onyx-most-ordered-copy">
+            <span class="onyx-most-ordered-kicker"><i class="fa-solid fa-vial"></i> The {{ $topOrderedProduct->category?->name ?: 'research' }} standard</span>
+            <span class="onyx-most-ordered-category">{{ $topOrderedProduct->category?->name ?: 'Research compound' }}</span>
+            <h2 id="mostOrderedHeading">{{ $topOrderedProduct->name }}</h2>
+            <p>{{ $topOrderedProduct->short_description ?: 'A leading choice from the Majix research collection, selected for its consistent quality and clearly documented product information.' }}</p>
+            <div class="onyx-most-ordered-actions">
+               <a class="onyx-primary-btn" href="{{ route('frontend.product-details', $topOrderedProduct->slug) }}">Explore product <i class="fa-solid fa-arrow-right"></i></a>
+               <span class="onyx-most-ordered-price"><strong>&pound;{{ number_format((float)($topOrderedProduct->sale_price ?: $topOrderedProduct->price), 2) }}</strong><small>{{ (int) $topOrderedProduct->total_ordered > 0 ? number_format((int) $topOrderedProduct->total_ordered) . ' units ordered' : 'Customer favourite' }}</small></span>
+            </div>
+         </div>
          <div class="onyx-most-ordered-visual">
-            <span class="onyx-most-ordered-rank"><small>Customer choice</small><strong>#1</strong></span>
+            <span class="onyx-most-ordered-rank"><small>Most ordered</small><strong>#1</strong></span>
             <span class="onyx-most-ordered-orbit" aria-hidden="true"></span>
+            <span class="onyx-most-ordered-glow" aria-hidden="true"></span>
             <img src="{{ url($topOrderedProduct->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $topOrderedProduct->name }}" />
          </div>
-         <div class="onyx-most-ordered-copy">
-            <p class="onyx-eyebrow">Most ordered product</p>
-            <h2 id="mostOrderedHeading">The product customers choose most.</h2>
-            <span class="onyx-most-ordered-category">{{ $topOrderedProduct->category?->name ?: 'Research compound' }}</span>
-            <h3>{{ $topOrderedProduct->name }}</h3>
-            <p>{{ $topOrderedProduct->short_description ?: 'A leading choice from the Majix research collection, selected for its consistent quality and clearly documented product information.' }}</p>
-            <div class="onyx-most-ordered-facts">
-               <span><i class="fa-solid fa-arrow-trend-up"></i><strong>{{ (int) $topOrderedProduct->total_ordered > 0 ? number_format((int) $topOrderedProduct->total_ordered) : 'Top' }}</strong><small>{{ (int) $topOrderedProduct->total_ordered > 0 ? 'Units ordered' : 'Customer choice' }}</small></span>
-               <span><i class="fa-solid fa-star"></i><strong>{{ $topOrderedProduct->reviews_count ?: 'New' }}</strong><small>{{ $topOrderedProduct->reviews_count ? 'Product reviews' : 'Collection favourite' }}</small></span>
-               <span><i class="fa-solid fa-box-open"></i><strong>{{ $topOrderedProduct->stock > 0 ? 'Ready' : 'Notify' }}</strong><small>{{ $topOrderedProduct->stock > 0 ? 'Available now' : 'When available' }}</small></span>
-            </div>
-            <div class="onyx-most-ordered-actions">
-               <a class="onyx-primary-btn" href="{{ route('frontend.product-details', $topOrderedProduct->slug) }}">View product <i class="fa-solid fa-arrow-right"></i></a>
-               <strong>&pound;{{ number_format((float)($topOrderedProduct->sale_price ?: $topOrderedProduct->price), 2) }}</strong>
-            </div>
-         </div>
+         <aside class="onyx-most-ordered-proof" aria-label="Product highlights">
+            <div class="onyx-proof-heading"><small>Why it leads</small><strong>The preferred choice for focused research.</strong></div>
+            <div class="onyx-proof-item"><span>01</span><i class="fa-solid fa-file-shield"></i><div><strong>Quality documented</strong><small>Product information and reports are easy to review.</small></div></div>
+            <div class="onyx-proof-item"><span>02</span><i class="fa-solid fa-flask-vial"></i><div><strong>Research focused</strong><small>Clearly presented for laboratory requirements.</small></div></div>
+            <div class="onyx-proof-item"><span>03</span><i class="fa-solid fa-box"></i><div><strong>Secure fulfilment</strong><small>Careful preparation and dependable UK delivery.</small></div></div>
+            <a href="{{ route('frontend.product-details', $topOrderedProduct->slug) }}">View full details <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+         </aside>
       </div>
    </div>
 </section>
