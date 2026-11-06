@@ -417,7 +417,7 @@
          </div>
       </div>
       <div class="onyx-steps">
-         <article><b>01</b><i class="fa-solid fa-cart-plus"></i><span><strong>Build your cart</strong><small>Explore the collection, review product information and add your selected items.</small></span><em>Select</em></article>
+         <article class="is-active"><b>01</b><i class="fa-solid fa-cart-plus"></i><span><strong>Build your cart</strong><small>Explore the collection, review product information and add your selected items.</small></span><em>Select</em></article>
          <article><b>02</b><i class="fa-solid fa-clipboard-check"></i><span><strong>Complete checkout</strong><small>Enter your contact and delivery details through the secure checkout experience.</small></span><em>Checkout</em></article>
          <article><b>03</b><i class="fa-solid fa-comments"></i><span><strong>Confirm your order</strong><small>Continue with the prepared WhatsApp confirmation and follow the payment instructions.</small></span><em>Confirm</em></article>
          <article><b>04</b><i class="fa-solid fa-truck-fast"></i><span><strong>Track the delivery</strong><small>Use your order number and email to follow fulfilment through to delivery.</small></span><em>Receive</em></article>
