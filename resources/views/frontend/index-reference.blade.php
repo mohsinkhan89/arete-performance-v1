@@ -573,6 +573,11 @@
                Our support team can help with products, availability and
                existing orders.
             </p>
+            <div class="onyx-help-topics" aria-label="Support topics">
+               <span><i class="fa-solid fa-flask"></i> Product guidance</span>
+               <span><i class="fa-solid fa-box"></i> Order support</span>
+               <span><i class="fa-regular fa-bell"></i> Stock updates</span>
+            </div>
          </div>
          <div class="onyx-help-actions">
             <a class="onyx-primary-btn" href="{{ route('frontend.shop') }}"

@@ -3100,42 +3100,71 @@
 }
 
 .home-page .onyx-help {
-    padding: 0 0 70px;
+    padding: 12px 0 76px;
     background: linear-gradient(145deg, #f8fafb, #eef2f4);
 }
 
 .home-page .onyx-help-card {
     position: relative;
     display: grid;
-    grid-template-columns: 74px 1fr auto;
+    grid-template-columns: 88px minmax(0, 1fr) auto;
     align-items: center;
-    gap: 24px;
-    padding: 34px 38px;
+    gap: 30px;
+    padding: 42px 46px;
     overflow: hidden;
     border: 1px solid #26343d;
-    border-radius: 22px;
+    border-radius: 20px;
     background:
-        radial-gradient(circle at 78% 0, rgba(243,182,63,.13), transparent 30%),
-        linear-gradient(135deg, #101d26, #071018);
-    box-shadow: 0 26px 60px rgba(7,16,24,.2);
+        radial-gradient(circle at 88% -20%, rgba(243,182,63,.18), transparent 34%),
+        linear-gradient(135deg, #101e27, #071018 68%);
+    box-shadow: 0 28px 65px rgba(7,16,24,.18);
+}
+
+.home-page .onyx-help-card:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 46px;
+    width: 120px;
+    height: 3px;
+    border-radius: 0 0 999px 999px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-deep));
+}
+
+.home-page .onyx-help-card:after {
+    content: "?";
+    position: absolute;
+    right: 29%;
+    bottom: -74px;
+    color: rgba(255,255,255,.025);
+    font: 800 230px/1 "Barlow Condensed", sans-serif;
+    pointer-events: none;
 }
 
 .home-page .onyx-help-icon {
-    width: 74px;
-    height: 74px;
+    position: relative;
+    z-index: 1;
+    width: 88px;
+    height: 88px;
     display: grid;
     place-items: center;
     border: 1px solid rgba(243,182,63,.45);
-    border-radius: 20px;
-    background: rgba(243,182,63,.08);
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(243,182,63,.16), rgba(243,182,63,.04));
     color: var(--gold);
-    font-size: 28px;
+    font-size: 30px;
+    box-shadow: inset 0 1px rgba(255,255,255,.08), 0 14px 28px rgba(0,0,0,.18);
 }
 
-.home-page .onyx-help-copy h2 { margin-bottom: 5px; color: #fff; font-size: 40px; }
-.home-page .onyx-help-copy > p:last-child { margin: 0; color: #aeb8be; font-size: 13px; }
-.home-page .onyx-help-actions { display: flex; align-items: center; gap: 22px; }
-.home-page .onyx-help-actions .onyx-primary-btn { min-width: 220px; padding: 14px 20px; }
+.home-page .onyx-help-copy { position: relative; z-index: 1; }
+.home-page .onyx-help-copy .onyx-eyebrow { color: var(--gold); }
+.home-page .onyx-help-copy h2 { margin: 0 0 9px; color: #fff; font: 800 clamp(38px, 3.6vw, 52px)/.96 "Barlow Condensed", sans-serif; letter-spacing: -.025em; }
+.home-page .onyx-help-copy > p { max-width: 620px; margin: 0; color: #aeb8be; font-family: var(--font-body); font-size: 14px; line-height: 1.65; }
+.home-page .onyx-help-topics { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 18px; }
+.home-page .onyx-help-topics span { display: inline-flex; align-items: center; gap: 7px; color: #8f9ba2; font-size: 10px; font-weight: 700; }
+.home-page .onyx-help-topics i { color: var(--gold); }
+.home-page .onyx-help-actions { position: relative; z-index: 1; display: flex; align-items: center; gap: 22px; }
+.home-page .onyx-help-actions .onyx-primary-btn { min-width: 220px; padding: 15px 22px; }
 .home-page .onyx-help-link { color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .05em; text-decoration: none; text-transform: uppercase; white-space: nowrap; }
 .home-page .onyx-help-link i { margin-left: 8px; color: var(--gold); }
 .home-page .onyx-help-link:hover { color: var(--gold); }
@@ -3144,8 +3173,8 @@
     .home-page .onyx-faq-layout { grid-template-columns: 1fr; gap: 34px; }
     .home-page .onyx-faq-intro { position: static; }
     .home-page .onyx-faq-note { max-width: 600px; }
-    .home-page .onyx-help-card { grid-template-columns: 64px 1fr; }
-    .home-page .onyx-help-icon { width: 64px; height: 64px; }
+    .home-page .onyx-help-card { grid-template-columns: 68px 1fr; padding: 36px; }
+    .home-page .onyx-help-icon { width: 68px; height: 68px; }
     .home-page .onyx-help-actions { grid-column: 1 / -1; }
 }
 
@@ -3156,9 +3185,11 @@
     .home-page .onyx-faq-trigger span { gap: 10px; }
     .home-page .onyx-faq-answer p { margin: 0 50px 18px 39px; font-size: 12px; }
     .home-page .onyx-help { padding-bottom: 48px; }
-    .home-page .onyx-help-card { grid-template-columns: 1fr; gap: 16px; padding: 26px 22px; }
+    .home-page .onyx-help-card { grid-template-columns: 1fr; gap: 18px; padding: 32px 22px 26px; }
     .home-page .onyx-help-icon { width: 54px; height: 54px; border-radius: 15px; font-size: 22px; }
-    .home-page .onyx-help-copy h2 { font-size: 36px; }
+    .home-page .onyx-help-copy h2 { font-size: 38px; }
+    .home-page .onyx-help-copy > p { font-size: 14px; }
+    .home-page .onyx-help-topics { gap: 10px 14px; }
     .home-page .onyx-help-actions { grid-column: auto; align-items: stretch; flex-direction: column; gap: 15px; }
     .home-page .onyx-help-actions .onyx-primary-btn { width: 100%; min-width: 0; }
 }
