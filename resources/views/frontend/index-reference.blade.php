@@ -594,6 +594,68 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
    document.addEventListener('DOMContentLoaded', function () {
+     const page = document.body;
+     const sections = Array.from(document.querySelectorAll('.home-page main > section'));
+     const textElements = Array.from(document.querySelectorAll([
+       '.onyx-hero-copy > *',
+       '.onyx-category-heading h2', '.onyx-category-heading p',
+       '.onyx-section-heading > *',
+       '.onyx-most-ordered-copy > *', '.onyx-proof-heading > *',
+       '.onyx-science header > *',
+       '.onyx-process-copy > .onyx-eyebrow', '.onyx-process-copy > h2', '.onyx-process-copy > p',
+       '.onyx-review-heading > *',
+       '.onyx-faq-intro > .onyx-eyebrow', '.onyx-faq-intro > h2', '.onyx-faq-intro > p',
+       '.onyx-help-copy > .onyx-eyebrow', '.onyx-help-copy > h2', '.onyx-help-copy > p'
+     ].join(',')));
+     const cardElements = Array.from(document.querySelectorAll([
+       '.onyx-category-card', '.onyx-product-card', '.onyx-science-grid > div',
+       '.onyx-steps > div', '.onyx-review-card', '.onyx-faq-item', '.onyx-faq-note'
+     ].join(',')));
+     const visualElements = Array.from(document.querySelectorAll([
+       '.onyx-hero-product', '.onyx-most-ordered-visual', '.onyx-most-ordered-proof',
+       '.onyx-help-icon', '.onyx-help-actions'
+     ].join(',')));
+
+     page.classList.add('majix-motion-ready');
+     sections.forEach(function (section) { section.classList.add('majix-section-reveal'); });
+     textElements.forEach(function (element, index) {
+       element.classList.add('majix-text-reveal');
+       element.style.setProperty('--majix-delay', `${(index % 5) * 85}ms`);
+     });
+     cardElements.forEach(function (element, index) {
+       element.classList.add('majix-card-reveal');
+       element.style.setProperty('--majix-delay', `${(index % 4) * 90}ms`);
+     });
+     visualElements.forEach(function (element, index) {
+       element.classList.add('majix-visual-reveal');
+       element.style.setProperty('--majix-delay', `${120 + (index % 3) * 100}ms`);
+     });
+
+     const motionElements = sections.concat(cardElements, visualElements);
+     if ('IntersectionObserver' in window) {
+       const motionObserver = new IntersectionObserver(function (entries, observer) {
+         entries.forEach(function (entry) {
+           if (!entry.isIntersecting) return;
+           entry.target.classList.add('is-in-view');
+           observer.unobserve(entry.target);
+         });
+       }, { threshold: 0.1, rootMargin: '0px 0px -7% 0px' });
+       motionElements.forEach(function (element) { motionObserver.observe(element); });
+     } else {
+       motionElements.forEach(function (element) { element.classList.add('is-in-view'); });
+     }
+
+     let heroMotionFrame = null;
+     const updateHeroParallax = function () {
+       const offset = Math.min(window.scrollY * .075, 38);
+       document.documentElement.style.setProperty('--majix-hero-shift', `${offset}px`);
+       heroMotionFrame = null;
+     };
+     window.addEventListener('scroll', function () {
+       if (heroMotionFrame) return;
+       heroMotionFrame = window.requestAnimationFrame(updateHeroParallax);
+     }, { passive: true });
+
      const faqItems = Array.from(document.querySelectorAll('.onyx-faq-item'));
 
      faqItems.forEach(function (item) {
