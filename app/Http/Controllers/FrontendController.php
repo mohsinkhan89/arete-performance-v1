@@ -26,6 +26,20 @@ class FrontendController extends Controller
     public function index()
     {
         $heroSlides = HeroSlide::where('status', 'active')->orderBy('sort_order')->latest()->get();
+        $orderTotals = DB::table('order_items')
+            ->select('product_id', DB::raw('SUM(quantity) as total_ordered'))
+            ->whereNotNull('product_id')
+            ->groupBy('product_id');
+
+        $topOrderedProduct = Product::with('category')
+            ->leftJoinSub($orderTotals, 'order_totals', fn ($join) => $join->on('products.id', '=', 'order_totals.product_id'))
+            ->select('products.*')
+            ->selectRaw('COALESCE(order_totals.total_ordered, 0) as total_ordered')
+            ->where('products.status', 'active')
+            ->orderByDesc('total_ordered')
+            ->orderByDesc('products.is_bestseller')
+            ->orderByDesc('products.created_at')
+            ->first();
 
         return view('frontend.index-reference', [
             'categories' => Category::withCount('products')->where('status', 'active')->orderBy('sort_order')->take(8)->get(),
@@ -37,6 +51,7 @@ class FrontendController extends Controller
                 ->get(),
             'heroSlides' => $heroSlides,
             'reviews' => Review::where('status', 'active')->latest()->take(5)->get(),
+            'topOrderedProduct' => $topOrderedProduct,
         ]);
     }
 

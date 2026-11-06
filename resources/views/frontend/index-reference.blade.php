@@ -320,6 +320,36 @@
    </div>
 </section>
 
+@if($topOrderedProduct)
+<section class="onyx-most-ordered section-pad" aria-labelledby="mostOrderedHeading">
+   <div class="container">
+      <div class="onyx-most-ordered-card">
+         <div class="onyx-most-ordered-visual">
+            <span class="onyx-most-ordered-rank"><small>Customer choice</small><strong>#1</strong></span>
+            <span class="onyx-most-ordered-orbit" aria-hidden="true"></span>
+            <img src="{{ url($topOrderedProduct->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $topOrderedProduct->name }}" />
+         </div>
+         <div class="onyx-most-ordered-copy">
+            <p class="onyx-eyebrow">Most ordered product</p>
+            <h2 id="mostOrderedHeading">The product customers choose most.</h2>
+            <span class="onyx-most-ordered-category">{{ $topOrderedProduct->category?->name ?: 'Research compound' }}</span>
+            <h3>{{ $topOrderedProduct->name }}</h3>
+            <p>{{ $topOrderedProduct->short_description ?: 'A leading choice from the Majix research collection, selected for its consistent quality and clearly documented product information.' }}</p>
+            <div class="onyx-most-ordered-facts">
+               <span><i class="fa-solid fa-arrow-trend-up"></i><strong>{{ (int) $topOrderedProduct->total_ordered > 0 ? number_format((int) $topOrderedProduct->total_ordered) : 'Top' }}</strong><small>{{ (int) $topOrderedProduct->total_ordered > 0 ? 'Units ordered' : 'Customer choice' }}</small></span>
+               <span><i class="fa-solid fa-star"></i><strong>{{ $topOrderedProduct->reviews_count ?: 'New' }}</strong><small>{{ $topOrderedProduct->reviews_count ? 'Product reviews' : 'Collection favourite' }}</small></span>
+               <span><i class="fa-solid fa-box-open"></i><strong>{{ $topOrderedProduct->stock > 0 ? 'Ready' : 'Notify' }}</strong><small>{{ $topOrderedProduct->stock > 0 ? 'Available now' : 'When available' }}</small></span>
+            </div>
+            <div class="onyx-most-ordered-actions">
+               <a class="onyx-primary-btn" href="{{ route('frontend.product-details', $topOrderedProduct->slug) }}">View product <i class="fa-solid fa-arrow-right"></i></a>
+               <strong>&pound;{{ number_format((float)($topOrderedProduct->sale_price ?: $topOrderedProduct->price), 2) }}</strong>
+            </div>
+         </div>
+      </div>
+   </div>
+</section>
+@endif
+
 <section class="onyx-science" aria-labelledby="assuranceHeading">
    <div class="container">
       <header>
@@ -489,74 +519,42 @@
          </header>
 
          <div class="onyx-faq-list">
-            <details open>
-               <summary>
-                  <span><b>01</b> What are Majix products intended for?</span
-                  ><i class="fa-solid fa-plus" aria-hidden="true"></i>
-               </summary>
-               <p>
-                  Majix products are supplied strictly for laboratory and
-                  research use. They are not medicines, supplements or products
-                  intended for human consumption.
-               </p>
-            </details>
-            <details>
-               <summary>
-                  <span><b>02</b> Are test reports available?</span
-                  ><i class="fa-solid fa-plus" aria-hidden="true"></i>
-               </summary>
-               <p>
-                  Where a test report is available, you can open it directly
-                  from the product card or product detail page using the report
-                  icon.
-               </p>
-            </details>
-            <details>
-               <summary>
-                  <span><b>03</b> How quickly are UK orders dispatched?</span
-                  ><i class="fa-solid fa-plus" aria-hidden="true"></i>
-               </summary>
-               <p>
-                  Orders are prepared as quickly as possible after payment
-                  confirmation. Delivery timing can vary by service and
-                  destination, and tracking is shared once available.
-               </p>
-            </details>
-            <details>
-               <summary>
-                  <span><b>04</b> How can I track my order?</span
-                  ><i class="fa-solid fa-plus" aria-hidden="true"></i>
-               </summary>
-               <p>
-                  Use the Track Order page with your order number and checkout
-                  email. Your latest fulfilment status and courier details will
-                  appear there.
-               </p>
-            </details>
-            <details>
-               <summary>
-                  <span
-                     ><b>05</b> What should I do if a product is out of
-                     stock?</span
-                  ><i class="fa-solid fa-plus" aria-hidden="true"></i>
-               </summary>
-               <p>
-                  Select “Notify me” on the product card and submit your email
-                  address. We will let you know when that product becomes
-                  available again.
-               </p>
-            </details>
-            <details>
-               <summary>
-                  <span><b>06</b> How should research products be stored?</span
-                  ><i class="fa-solid fa-plus" aria-hidden="true"></i>
-               </summary>
-               <p>
-                  Always follow the storage guidance shown on the individual
-                  product page or packaging. Requirements may differ between
-                  products.
-               </p>
-            </details>
+            <article class="onyx-faq-item is-active">
+               <button class="onyx-faq-trigger" type="button" aria-expanded="true" aria-controls="faq-answer-1">
+                  <span><b>01</b> What are Majix products intended for?</span><i class="fa-solid fa-plus" aria-hidden="true"></i>
+               </button>
+               <div class="onyx-faq-answer" id="faq-answer-1"><div><p>Majix products are supplied strictly for laboratory and research use. They are not medicines, supplements or products intended for human consumption.</p></div></div>
+            </article>
+            <article class="onyx-faq-item">
+               <button class="onyx-faq-trigger" type="button" aria-expanded="false" aria-controls="faq-answer-2">
+                  <span><b>02</b> Are test reports available?</span><i class="fa-solid fa-plus" aria-hidden="true"></i>
+               </button>
+               <div class="onyx-faq-answer" id="faq-answer-2"><div><p>Where a test report is available, you can open it directly from the product card or product detail page using the report icon.</p></div></div>
+            </article>
+            <article class="onyx-faq-item">
+               <button class="onyx-faq-trigger" type="button" aria-expanded="false" aria-controls="faq-answer-3">
+                  <span><b>03</b> How quickly are UK orders dispatched?</span><i class="fa-solid fa-plus" aria-hidden="true"></i>
+               </button>
+               <div class="onyx-faq-answer" id="faq-answer-3"><div><p>Orders are prepared as quickly as possible after payment confirmation. Delivery timing can vary by service and destination, and tracking is shared once available.</p></div></div>
+            </article>
+            <article class="onyx-faq-item">
+               <button class="onyx-faq-trigger" type="button" aria-expanded="false" aria-controls="faq-answer-4">
+                  <span><b>04</b> How can I track my order?</span><i class="fa-solid fa-plus" aria-hidden="true"></i>
+               </button>
+               <div class="onyx-faq-answer" id="faq-answer-4"><div><p>Use the Track Order page with your order number and checkout email. Your latest fulfilment status and courier details will appear there.</p></div></div>
+            </article>
+            <article class="onyx-faq-item">
+               <button class="onyx-faq-trigger" type="button" aria-expanded="false" aria-controls="faq-answer-5">
+                  <span><b>05</b> What should I do if a product is out of stock?</span><i class="fa-solid fa-plus" aria-hidden="true"></i>
+               </button>
+               <div class="onyx-faq-answer" id="faq-answer-5"><div><p>Select “Notify me” on the product card and submit your email address. We will let you know when that product becomes available again.</p></div></div>
+            </article>
+            <article class="onyx-faq-item">
+               <button class="onyx-faq-trigger" type="button" aria-expanded="false" aria-controls="faq-answer-6">
+                  <span><b>06</b> How should research products be stored?</span><i class="fa-solid fa-plus" aria-hidden="true"></i>
+               </button>
+               <div class="onyx-faq-answer" id="faq-answer-6"><div><p>Always follow the storage guidance shown on the individual product page or packaging. Requirements may differ between products.</p></div></div>
+            </article>
          </div>
       </div>
    </div>
@@ -589,11 +587,20 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
    document.addEventListener('DOMContentLoaded', function () {
-     document.querySelectorAll('.onyx-faq-list details').forEach(function (item) {
-       item.addEventListener('toggle', function () {
-         if (!item.open) return;
-         document.querySelectorAll('.onyx-faq-list details[open]').forEach(function (openItem) {
-           if (openItem !== item) openItem.open = false;
+     const faqItems = Array.from(document.querySelectorAll('.onyx-faq-item'));
+
+     faqItems.forEach(function (item) {
+       const trigger = item.querySelector('.onyx-faq-trigger');
+       if (!trigger) return;
+
+       trigger.addEventListener('click', function () {
+         if (item.classList.contains('is-active')) return;
+
+         faqItems.forEach(function (faqItem) {
+           const faqTrigger = faqItem.querySelector('.onyx-faq-trigger');
+           const isSelected = faqItem === item;
+           faqItem.classList.toggle('is-active', isSelected);
+           if (faqTrigger) faqTrigger.setAttribute('aria-expanded', String(isSelected));
          });
        });
      });
