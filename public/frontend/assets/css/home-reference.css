@@ -1251,6 +1251,26 @@
 }
 
 /* Final homepage readability scale */
+.home-page main .onyx-hero-benefits {
+    gap: 0;
+}
+
+.home-page main .onyx-hero-benefits > div {
+    gap: 13px;
+    padding: 0 22px;
+}
+
+.home-page main .onyx-hero-benefits strong {
+    font-size: 14px;
+    line-height: 1.25;
+}
+
+.home-page main .onyx-hero-benefits small {
+    margin-top: 3px;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
 .home-page main .onyx-eyebrow {
     font-size: 11px;
 }
@@ -1351,6 +1371,19 @@
 }
 
 @media(max-width:575px) {
+    .home-page main .onyx-hero-benefits > div {
+        gap: 8px;
+        padding: 0 8px;
+    }
+
+    .home-page main .onyx-hero-benefits strong {
+        font-size: 11px;
+    }
+
+    .home-page main .onyx-hero-benefits small {
+        font-size: 9px;
+    }
+
     .home-page main .onyx-eyebrow {
         font-size: 10px;
     }
