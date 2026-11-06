@@ -45,19 +45,13 @@
     gap: 0 !important
 }
 
-.home-page .site-header .navbar .nav-link {
-    color: #fff !important;
-    border-radius: 999px;
-    padding: 10px 18px;
-    font-size: 12px
-}
-
 .home-page .site-header .navbar .nav-link i {
     display: none
 }
 
 .home-page .site-header .navbar .nav-link.active {
-    background: linear-gradient(#ffe29b, #dfa029);
+    /* background: linear-gradient(#ffe29b, #dfa029); */
+    background: var(--gold);
     color: #080e13 !important
 }
 
@@ -178,7 +172,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 35px;
-    min-width: 270px;
+    /* min-width: 270px; */
     background: var(--gold);
     color: #0a1015;
     text-decoration: none;
