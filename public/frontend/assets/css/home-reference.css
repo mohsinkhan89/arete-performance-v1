@@ -1250,6 +1250,48 @@
     }
 }
 
+/* Unified animated section eyebrow */
+.home-page main .onyx-eyebrow {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: max-content;
+    margin-bottom: 13px;
+    color: var(--gold-deep);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+}
+
+.home-page main .onyx-eyebrow:before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: 0 0 0 0 rgba(190,133,25,.32);
+    animation: majixEyebrowPulse 2.4s ease-out infinite;
+}
+
+@keyframes majixEyebrowPulse {
+    0%, 38% { box-shadow: 0 0 0 0 rgba(190,133,25,.34); transform: scale(1); }
+    68% { box-shadow: 0 0 0 7px rgba(190,133,25,0); transform: scale(1.08); }
+    100% { box-shadow: 0 0 0 0 rgba(190,133,25,0); transform: scale(1); }
+}
+
+@media(max-width:575px) {
+    .home-page main .onyx-eyebrow { gap: 8px; font-size: 9px; letter-spacing: .17em; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    .home-page main .onyx-eyebrow:before { animation: none; }
+}
+
 @media(max-width:991px) {
     .home-page .site-header .navbar-collapse {
         margin-top: 12px;
