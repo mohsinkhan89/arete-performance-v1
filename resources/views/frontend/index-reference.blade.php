@@ -402,47 +402,25 @@
    </div>
 </section>
 
-<section class="onyx-process" aria-labelledby="processHeading">
+<section class="onyx-process majix-order-route" aria-labelledby="processHeading">
    <div class="container">
-      <div class="onyx-process-copy">
-         <p class="onyx-eyebrow">A straightforward process</p>
-         <h2 id="processHeading">From research need to secure delivery.</h2>
-         <p>
-            Find the right category, review the available product information
-            and complete your order through our secure checkout.
-         </p>
-         <div class="onyx-steps">
-            <div>
-               <b>01</b
-               ><span
-                  ><strong>Explore the catalogue</strong
-                  ><small
-                     >Browse focused categories and compare the available
-                     research products.</small
-                  ></span
-               ><i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-            <div>
-               <b>02</b
-               ><span
-                  ><strong>Review the details</strong
-                  ><small
-                     >Check specifications, availability and supporting product
-                     documentation.</small
-                  ></span
-               ><i class="fa-solid fa-file-circle-check"></i>
-            </div>
-            <div>
-               <b>03</b
-               ><span
-                  ><strong>Order with confidence</strong
-                  ><small
-                     >Use the secure checkout and follow your order through
-                     delivery.</small
-                  ></span
-               ><i class="fa-solid fa-box-open"></i>
-            </div>
+      <div class="majix-route-intro">
+         <header class="onyx-process-copy">
+            <p class="onyx-eyebrow">A straightforward process</p>
+            <h2 id="processHeading">Four clear moves. One seamless order.</h2>
+            <p>Move from product discovery to tracked UK delivery through a clear, guided ordering journey.</p>
+            <span class="majix-route-badge"><i class="fa-solid fa-route"></i> Cart to delivery, clearly connected</span>
+         </header>
+         <div class="majix-route-banner" role="img" aria-label="Carefully prepared order packaging in a clean laboratory">
+            <span><i class="fa-solid fa-shield-halved"></i> Prepared with care</span>
+            <strong>Clear at every stage.</strong>
          </div>
+      </div>
+      <div class="onyx-steps">
+         <article><b>01</b><i class="fa-solid fa-cart-plus"></i><span><strong>Build your cart</strong><small>Explore the collection, review product information and add your selected items.</small></span><em>Select</em></article>
+         <article><b>02</b><i class="fa-solid fa-clipboard-check"></i><span><strong>Complete checkout</strong><small>Enter your contact and delivery details through the secure checkout experience.</small></span><em>Checkout</em></article>
+         <article><b>03</b><i class="fa-solid fa-comments"></i><span><strong>Confirm your order</strong><small>Continue with the prepared WhatsApp confirmation and follow the payment instructions.</small></span><em>Confirm</em></article>
+         <article><b>04</b><i class="fa-solid fa-truck-fast"></i><span><strong>Track the delivery</strong><small>Use your order number and email to follow fulfilment through to delivery.</small></span><em>Receive</em></article>
       </div>
    </div>
 </section>
@@ -609,7 +587,7 @@
      ].join(',')));
      const cardElements = Array.from(document.querySelectorAll([
        '.onyx-category-card', '.onyx-product-card', '.onyx-science-grid > div',
-       '.onyx-steps > div', '.onyx-review-card', '.onyx-faq-item', '.onyx-faq-note'
+       '.onyx-steps > div', '.onyx-steps > article', '.onyx-review-card', '.onyx-faq-item', '.onyx-faq-note'
      ].join(',')));
      const visualElements = Array.from(document.querySelectorAll([
        '.onyx-hero-product', '.onyx-most-ordered-visual', '.onyx-most-ordered-proof',
