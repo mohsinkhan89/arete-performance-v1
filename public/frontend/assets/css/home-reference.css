@@ -3174,6 +3174,45 @@
     }
 }
 
+/* Keep category action clear of long titles. */
+.home-page main .onyx-category-swiper a.onyx-category-card {
+    grid-template-columns: 46px minmax(0, 1fr);
+    padding-right: 64px;
+}
+
+.home-page main .onyx-category-swiper a.onyx-category-card .onyx-category-copy {
+    padding-right: 6px;
+}
+
+.home-page main .onyx-category-swiper a.onyx-category-card > .onyx-category-arrow {
+    position: absolute;
+    z-index: 3;
+    top: 12px;
+    right: 14px;
+    width: 34px;
+    height: 34px;
+    transform: rotate(-45deg);
+    transform-origin: center;
+}
+
+.home-page main .onyx-category-swiper a.onyx-category-card:hover > .onyx-category-arrow {
+    transform: translate(2px, -2px) rotate(-45deg);
+}
+
+@media(max-width:575px) {
+    .home-page main .onyx-category-swiper a.onyx-category-card {
+        grid-template-columns: 42px minmax(0, 1fr);
+        padding-right: 56px;
+    }
+
+    .home-page main .onyx-category-swiper a.onyx-category-card > .onyx-category-arrow {
+        top: 10px;
+        right: 11px;
+        width: 30px;
+        height: 30px;
+    }
+}
+
 /* Most-ordered spotlight uses live sales totals with a bestseller fallback. */
 .home-page .onyx-most-ordered {
     position: relative;
