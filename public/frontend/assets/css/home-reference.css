@@ -3030,6 +3030,12 @@
 }
 
 @media(max-width:575px) {
+    .onyx-hero-inner {
+        align-items: start;
+    }
+    .home-page .onyx-hero-bg {
+        background: black;
+    }
     .home-page .site-footer {
         padding-top: 52px;
     }
