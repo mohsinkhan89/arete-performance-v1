@@ -11809,6 +11809,29 @@ button {
 .shop-page .onyx-product-details{display:flex;flex:0 0 auto;align-items:center;gap:7px}.shop-page .onyx-product-details>span{display:flex;align-items:baseline;gap:5px}.shop-page .onyx-product-details strong{color:#0b141b;font-size:15px}.shop-page .onyx-product-details del{color:#9ba2a7;font-size:9px}
 .shop-page .shop-product-card .onyx-report-btn{display:grid;width:30px;height:30px;place-items:center;padding:0;color:#17232b;background:#f7f8f9;border:1px solid #dce1e3;border-radius:9px;box-shadow:none}.shop-page .shop-product-card .onyx-report-btn:hover{color:var(--gold-deep);background:#fff8e8;border-color:var(--gold)}
 .shop-page .shop-product-card .onyx-add-cart{display:flex;width:100%;min-width:0;height:43px;min-height:43px;align-items:center;justify-content:center;gap:10px;margin-top:12px;padding:0 15px;color:#fff;font-size:10px;font-weight:800;letter-spacing:.055em;text-transform:uppercase;background:linear-gradient(135deg,#101c25,#071016);border:0;border-radius:11px;box-shadow:none}.shop-page .shop-product-card .onyx-add-cart:hover{color:#111820;background:var(--gold);box-shadow:none;transform:translateY(-2px)}
+.shop-page article.shop-product-card.product-card button.onyx-add-cart{
+  display:flex!important;
+  width:100%!important;
+  min-width:100%!important;
+  max-width:none!important;
+  height:43px!important;
+  min-height:43px!important;
+  flex:0 0 43px;
+  align-self:stretch;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:0 15px!important;
+  white-space:nowrap;
+  border:0!important;
+  border-radius:11px!important;
+}
+.shop-page article.shop-product-card.product-card button.onyx-add-cart span,
+.shop-page article.shop-product-card.product-card button.onyx-add-cart i{
+  display:inline-block;
+  flex:0 0 auto;
+  line-height:1;
+}
 .shop-page .shop-hero-benefits>div{grid-template-columns:38px 1fr;column-gap:13px}.shop-page .shop-hero-benefits i{display:grid;width:38px;height:38px;place-items:center;color:var(--gold);font-size:23px}.shop-page .shop-hero-benefits strong{font-size:11px}.shop-page .shop-hero-benefits small{color:#fff;font-size:9px;font-weight:700}
 @media(max-width:1199.98px){.shop-page .shop-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:991.98px){.shop-page .shop-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.shop-page .shop-product-card .onyx-product-image{height:250px}}
