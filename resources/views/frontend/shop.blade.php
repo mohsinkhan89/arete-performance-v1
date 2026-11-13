@@ -10,9 +10,9 @@
           <p>Premium research compounds, clearly organised in one collection.</p>
         </div>
         <div class="shop-hero-benefits">
-          <div><i class="fa-solid fa-shield-halved"></i><span><strong>Verified quality</strong><small>Carefully presented products</small></span></div>
-          <div><i class="fa-solid fa-truck-fast"></i><span><strong>Secure delivery</strong><small>Reliable UK-wide service</small></span></div>
-          <div><i class="fa-solid fa-file-shield"></i><span><strong>Clear information</strong><small>Reports where available</small></span></div>
+          <div><i class="fa-solid fa-flask-vial"></i><span><strong>Research grade</strong><small>Compounds</small></span></div>
+          <div><i class="fa-solid fa-shield-halved"></i><span><strong>Verified purity</strong><small>Quality assured</small></span></div>
+          <div><i class="fa-solid fa-layer-group"></i><span><strong>Consistent</strong><small>Quality</small></span></div>
         </div>
       </div>
     </section>
@@ -88,21 +88,21 @@
 
             <div class="shop-grid reveal-group">
               @forelse ($products as $product)
-                <article class="shop-product-card product-card {{ $product->stock <= 0 ? 'is-out-of-stock' : '' }}" id="{{ $product->category?->slug }}" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-url="{{ route('frontend.product-details', $product->slug) }}">
-                  @if ($product->stock <= 0)<span class="tag stock-tag">Out of Stock</span>@elseif ($product->is_featured)<span class="tag">Popular</span>@endif
-                  <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
-                  <small>{{ $product->category?->name }}</small>
-                  <h3>{{ $product->name }}</h3>
-                  <div class="rating">★★★★★ <span>({{ number_format($product->reviews_count) }} reviews)</span></div>
-                  <div class="product-card-tools">
-                    @if ($product->stock > 0)
-                      <div class="product-card-qty" aria-label="{{ $product->name }} quantity"><button type="button" data-card-qty-dec>-</button><span data-card-qty>1</span><button type="button" data-card-qty-inc>+</button></div>
-                    @endif
-                    @if ($product->test_report_image)
-                      <button class="test-report-icon" type="button" data-test-report="{{ url($product->test_report_image) }}" data-test-report-title="{{ $product->name }} test report" aria-label="View {{ $product->name }} test report"><i class="fa-solid fa-flask-vial"></i></button>
-                    @endif
+                <article class="shop-product-card onyx-product-card product-card {{ $product->stock <= 0 ? 'is-out-of-stock' : '' }}" id="{{ $product->category?->slug }}" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-url="{{ route('frontend.product-details', $product->slug) }}">
+                  <div class="onyx-product-badges">
+                    <span class="onyx-product-status {{ $product->stock <= 0 ? 'is-empty' : '' }}">{{ $product->stock <= 0 ? 'Out of stock' : 'In stock' }}</span>
+                    @if($product->is_bestseller || $product->is_featured)<span class="onyx-product-featured"><i class="fa-solid fa-bolt"></i> {{ $product->is_bestseller ? 'Bestseller' : 'Popular' }}</span>@endif
                   </div>
-                  <div><strong>&pound;{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong>@if ($product->stock > 0)<button type="button" data-cart-add="{{ $product->id }}" aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button>@else<button class="notify-stock-btn" type="button" data-stock-notify="{{ $product->id }}" data-product-name="{{ $product->name }}">Inform Me</button>@endif</div>
+                  <a class="onyx-product-image" href="{{ route('frontend.product-details', $product->slug) }}"><img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}"></a>
+                  <div class="onyx-product-content">
+                    <div class="onyx-product-category">{{ $product->category?->name ?: 'Research compound' }}</div>
+                    <a class="onyx-product-title" href="{{ route('frontend.product-details', $product->slug) }}">{{ $product->name }}</a>
+                    <div class="onyx-product-summary">
+                      <div class="onyx-product-rating"><span aria-label="Customer reviews"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span><small>{{ $product->reviews_count > 0 ? $product->reviews_count.' reviews' : 'New arrival' }}</small></div>
+                      <div class="onyx-product-details"><span><strong>&pound;{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong>@if($product->sale_price)<del>&pound;{{ number_format((float) $product->price, 2) }}</del>@endif</span>@if($product->test_report_image)<button class="onyx-report-btn test-report-icon" type="button" data-test-report="{{ url($product->test_report_image) }}" data-test-report-title="{{ $product->name }} test report" aria-label="View {{ $product->name }} test report"><i class="fa-solid fa-file-shield"></i></button>@endif</div>
+                    </div>
+                    @if($product->stock > 0)<button class="onyx-add-cart" type="button" data-cart-add="{{ $product->id }}"><span>Add to cart</span><i class="fa-solid fa-cart-shopping"></i></button>@else<button class="onyx-add-cart notify-stock-btn" type="button" data-stock-notify="{{ $product->id }}" data-product-name="{{ $product->name }}"><span>Notify me</span><i class="fa-regular fa-bell"></i></button>@endif
+                  </div>
                 </article>
               @empty
                 <p>No products found.</p>
