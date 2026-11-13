@@ -3,6 +3,8 @@
 @section('metas')
 @endsection
 
+@section('body_class', 'shop-page search-page')
+
 @section('css')
 <style>
 .search-hero h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(42px,6vw,68px);font-weight:800;line-height:.95}.search-hero h1 span{display:block}.search-hero-form{display:flex!important;align-items:center;padding:0 10px 0 6px}.search-icon-button{display:grid!important;place-items:center!important;flex:0 0 42px;width:42px!important;height:42px!important;padding:0!important;border:0!important;background:transparent!important;color:#171717!important;font-size:16px;cursor:pointer}.search-icon-button:hover{color:#b87900!important}.search-hero-form input{flex:1;padding:0 8px}.search-empty-state{grid-column:1/-1;display:grid;place-items:center;text-align:center;min-height:350px;padding:45px 25px;background:#fff;border:1px solid #e5e8ec;border-radius:14px;box-shadow:0 8px 25px rgba(18,25,38,.05)}.search-empty-icon{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:#fff1cf;color:#9b6700;font-size:25px;margin:0 auto 16px}.search-empty-state h2{font-size:25px;margin:0 0 8px}.search-empty-state p{max-width:460px;margin:0 auto;color:#737b87;font-size:12px;line-height:1.6}.search-empty-actions{display:flex;justify-content:center;gap:9px;margin-top:18px;flex-wrap:wrap}.search-empty-actions a{padding:10px 15px;border-radius:9px;text-decoration:none;font-size:11px;font-weight:900}.search-empty-actions .primary{background:#e9a611;color:#111}.search-empty-actions .secondary{border:1px solid #dfe4e9;color:#333}.category-empty{padding:10px 0;color:#8a919c;font-size:11px;line-height:1.5}.search-sidebar .price-range-control input[type=range]{padding:0;border:0}.search-sidebar .filter-fields input{margin:0;width:100%;height:42px}.price-input-wrap{position:relative;display:block!important;margin:0!important;padding:0!important}.price-input-wrap span{position:absolute;left:10px;top:12px;color:#8b929d;font-size:12px;font-weight:800}.price-input-wrap input{padding-left:25px!important}@media(max-width:560px){.search-empty-state{min-height:290px}.search-empty-state h2{font-size:21px}}
@@ -14,32 +16,47 @@
       $query = $filters['q'] ?: 'all products';
     @endphp
 
-    <section class="search-hero">
-      <div class="container">
-        <div class="search-hero-copy reveal-up">
-          <p class="eyebrow">Search results</p>
-          <h1>Results for <span>"{{ $query }}"</span></h1>
-          <p>Showing {{ $products->firstItem() ?? 0 }}-{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p>
-          <form class="search-hero-form" method="GET" action="{{ route('frontend.search') }}">
-            <label class="visually-hidden" for="searchQuery">Search query</label>
-            <button class="search-icon-button" type="submit" aria-label="Search products"><i class="fa-solid fa-magnifying-glass"></i></button>
-            <input id="searchQuery" name="q" type="search" value="{{ $filters['q'] }}" aria-label="Search query" placeholder="Search products or categories">
-
-          </form>
+    <section class="shop-hero" aria-labelledby="searchHeroTitle">
+      <div class="shop-hero-grid" aria-hidden="true"></div>
+      <div class="shop-hero-backdrop-text" aria-hidden="true"><span>SEARCH</span></div>
+      <div class="container shop-hero-inner">
+        <div class="shop-hero-copy reveal-up">
+          <p class="shop-hero-eyebrow"><span></span> The complete Majix collection</p>
+          <h1 id="searchHeroTitle" class="shop-title-word" aria-label="Search"><span>S</span><span>E</span><span>A</span><span>R</span><span>C</span><span>H</span></h1>
+          <p>Search premium research compounds, clearly organised in one collection.</p>
+        </div>
+        <div class="shop-hero-benefits" aria-label="Majix quality standards">
+          <div><i class="fa-solid fa-flask-vial"></i><span><strong>Research grade</strong><small>Compounds</small></span></div>
+          <div><i class="fa-solid fa-shield-halved"></i><span><strong>Verified purity</strong><small>Quality assured</small></span></div>
+          <div><i class="fa-solid fa-layer-group"></i><span><strong>Consistent</strong><small>Quality</small></span></div>
         </div>
       </div>
     </section>
 
     <section class="search-results-page section-space">
       <div class="container">
-        <nav class="search-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('frontend.index') }}">Home</a><i class="fa-solid fa-chevron-right"></i><span>Search</span></nav>
+        <header class="search-catalog-intro reveal-on-scroll">
+          <div><p><span></span> Search catalogue</p><h2>Results for <em>"{{ $query }}"</em></h2><small>Use the filters to quickly narrow down the Majix collection.</small></div>
+          <div class="search-result-count"><strong>{{ $products->total() }}</strong><span>Products found</span></div>
+        </header>
+        <form class="search-catalog-form reveal-on-scroll" method="GET" action="{{ route('frontend.search') }}">
+          <label class="visually-hidden" for="searchQuery">Search products</label>
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="searchQuery" name="q" type="search" value="{{ $filters['q'] }}" placeholder="Search products or categories">
+          <button type="submit">Search <i class="fa-solid fa-arrow-right"></i></button>
+        </form>
         <div class="shop-layout search-layout">
           <aside class="shop-sidebar search-sidebar reveal-on-scroll" aria-label="Search filters">
             <form method="GET" action="{{ route('frontend.search') }}">
               <input type="hidden" name="q" value="{{ $filters['q'] }}">
 
+              <div class="filter-rail-head">
+                <span><i class="fa-solid fa-sliders"></i></span>
+                <div><small>Refine results</small><strong>Search filters</strong></div>
+              </div>
+
               <div class="filter-block collapsible-filter">
-                <h2>Categories <i class="fa-solid fa-minus"></i></h2>
+                <h2>Categories</h2>
                 <a class="{{ empty($filters['category']) ? 'active' : '' }}" href="{{ route('frontend.search', array_filter(['q' => $filters['q'] ?? null])) }}"><span>All Products</span><strong>({{ $products->total() }})</strong></a>
                 @forelse ($categories as $category)
                   <a class="{{ ($filters['category'] ?? '') === $category->slug ? 'active' : '' }}" href="{{ route('frontend.search', array_filter(['q' => $filters['q'] ?? null, 'category' => $category->slug])) }}"><span>{{ $category->name }}</span><strong>({{ $category->products_count }})</strong></a>
@@ -49,7 +66,7 @@
               </div>
 
               <div class="filter-block collapsible-filter">
-                <h2>Price Range <i class="fa-solid fa-minus"></i></h2>
+                <h2>Price Range</h2>
                 @php
                   $minBound = $priceBounds['min'] ?? 0;
                   $maxBound = $priceBounds['max'] ?? 400;
@@ -68,14 +85,14 @@
                 </div>
               </div>
 
-              <button class="clear-filters light-clear" type="submit">Apply filters <i class="fa-solid fa-filter"></i></button>
+              <button class="clear-filters" type="submit">Apply filters <i class="fa-solid fa-filter"></i></button>
               <a class="clear-filters filter-reset" href="{{ route('frontend.search') }}">Clear filters <i class="fa-solid fa-rotate-right"></i></a>
             </form>
           </aside>
 
           <div class="shop-products">
             <div class="shop-toolbar reveal-on-scroll">
-              <p>Showing {{ $products->firstItem() ?? 0 }}-{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p>
+              <div class="shop-toolbar-main"><span>Search results</span><p>Showing {{ $products->firstItem() ?? 0 }}-{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p></div>
               <form method="GET" action="{{ route('frontend.search') }}" class="sort-form">
                 @foreach (['q', 'category', 'min_price', 'max_price'] as $filterKey)
                   @if (! empty($filters[$filterKey]))
@@ -94,7 +111,15 @@
 
             <div class="shop-grid reveal-group">
               @forelse ($products as $product)
-                <article class="shop-product-card product-card {{ $product->stock <= 0 ? 'is-out-of-stock' : '' }}" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-url="{{ route('frontend.product-details', $product->slug) }}">
+                <article class="shop-product-card onyx-product-card product-card {{ $product->stock <= 0 ? 'is-out-of-stock' : '' }}" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-url="{{ route('frontend.product-details', $product->slug) }}">
+                  <div class="onyx-product-badges"><span class="onyx-product-status {{ $product->stock <= 0 ? 'is-empty' : '' }}">{{ $product->stock <= 0 ? 'Out of stock' : 'In stock' }}</span>@if($product->is_bestseller || $product->is_featured)<span class="onyx-product-featured"><i class="fa-solid fa-bolt"></i> {{ $product->is_bestseller ? 'Bestseller' : 'Popular' }}</span>@endif</div>
+                  <a class="onyx-product-image" href="{{ route('frontend.product-details', $product->slug) }}"><img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}"></a>
+                  <div class="onyx-product-content">
+                    <div class="onyx-product-category">{{ $product->category?->name ?: 'Research compound' }}</div>
+                    <a class="onyx-product-title" href="{{ route('frontend.product-details', $product->slug) }}">{{ $product->name }}</a>
+                    <div class="onyx-product-summary"><div class="onyx-product-rating"><span><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span><small>{{ $product->reviews_count > 0 ? $product->reviews_count.' reviews' : 'New arrival' }}</small></div><div class="onyx-product-details"><span><strong>&pound;{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong>@if($product->sale_price)<del>&pound;{{ number_format((float) $product->price, 2) }}</del>@endif</span>@if($product->test_report_image)<button class="onyx-report-btn test-report-icon" type="button" data-test-report="{{ url($product->test_report_image) }}" data-test-report-title="{{ $product->name }} test report"><i class="fa-solid fa-file-shield"></i></button>@endif</div></div>
+                    @if($product->stock > 0)<button class="onyx-add-cart" type="button" data-cart-add="{{ $product->id }}"><span>Add to cart</span><i class="fa-solid fa-cart-shopping"></i></button>@else<button class="onyx-add-cart notify-stock-btn" type="button" data-stock-notify="{{ $product->id }}" data-product-name="{{ $product->name }}"><span>Notify me</span><i class="fa-regular fa-bell"></i></button>@endif
+                  </div>
                   @if ($product->stock <= 0)<span class="tag stock-tag">Out of Stock</span>@elseif ($product->is_featured)<span class="tag">Popular</span>@endif
                   <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
                   <small>{{ $product->category?->name }}</small>
