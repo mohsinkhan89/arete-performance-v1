@@ -3955,6 +3955,94 @@
     }
 }
 
+/* Tablet refinement: remove the oversized top gap and keep slider navigation
+   below the copy instead of floating above the product. */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .home-page .onyx-hero-inner {
+        padding-top: 58px;
+    }
+
+    .home-page .onyx-hero-copy {
+        width: 58%;
+    }
+
+    .home-page .onyx-hero-copy h1 {
+        margin-bottom: 16px;
+    }
+
+    .home-page .onyx-hero-copy > a + p {
+        max-width: 440px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .home-page .onyx-hero-controls {
+        top: auto;
+        right: auto;
+        bottom: 118px;
+        left: 18px;
+        gap: 8px;
+        padding: 5px 7px;
+    }
+
+    .home-page .onyx-hero-controls .home-hero-arrow {
+        width: 36px;
+        height: 36px;
+    }
+
+    .home-page .onyx-hero-controls .home-hero-pagination {
+        min-width: 48px;
+    }
+}
+
+/* Final tablet stage: copy and product share one row, navigation belongs to
+   the product column, and assurances form a full-width footer rail. */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .home-page .onyx-hero-copy {
+        width: 58%;
+    }
+
+    .home-page .onyx-hero-product {
+        /* top: 54px; */
+        top: 0px;
+        right: 2%;
+        bottom: auto;
+        left: auto;
+        width: 34%;
+        height: 430px;
+        margin: 0;
+    }
+
+    .home-page .onyx-hero-controls {
+        top: auto;
+        right: 19%;
+        bottom: 88px;
+        left: auto;
+        transform: translateX(50%);
+    }
+
+    .home-page .onyx-hero-benefit-slider {
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 72px;
+        border-top: 1px solid rgba(243, 182, 63, .25);
+        background: rgba(8, 16, 22, .94);
+    }
+
+    .home-page main .onyx-hero-benefit-slider .onyx-hero-benefits {
+        height: 100%;
+    }
+
+    .home-page main .onyx-hero-benefit-slider .hero-feature-slide {
+        height: 72px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 22px;
+    }
+}
+
 /* Keep category action clear of long titles. */
 .home-page main .onyx-category-swiper a.onyx-category-card {
     grid-template-columns: 46px minmax(0, 1fr);
