@@ -3,6 +3,9 @@
 @section('body')
     <section class="shop-hero" aria-labelledby="shopHeroTitle">
       <div class="shop-hero-grid" aria-hidden="true"></div>
+      <div class="shop-hero-backdrop-text" aria-hidden="true">
+        <span>SHOP</span>
+      </div>
       <div class="container shop-hero-inner">
         <div class="shop-hero-copy reveal-up">
           <p class="shop-hero-eyebrow"><span></span> The complete Majix collection</p>

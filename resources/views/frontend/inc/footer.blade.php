@@ -1,3 +1,4 @@
+<div class="home-page shared-footer-shell">
 <footer class="site-footer" id="contact">
     <div class="container">
         <!-- <div class="footer-feature-strip">
@@ -42,3 +43,4 @@
         </div>
     </div>
 </footer>
+</div>
