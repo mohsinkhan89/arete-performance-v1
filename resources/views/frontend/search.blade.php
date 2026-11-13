@@ -24,6 +24,14 @@
           <p class="shop-hero-eyebrow"><span></span> The complete Majix collection</p>
           <h1 id="searchHeroTitle" class="shop-title-word" aria-label="Search"><span>S</span><span>E</span><span>A</span><span>R</span><span>C</span><span>H</span></h1>
           <p>Search premium research compounds, clearly organised in one collection.</p>
+          @if($products->total() > 0)
+            <form class="search-hero-product-form" method="GET" action="{{ route('frontend.search') }}">
+              <label class="visually-hidden" for="heroSearchQuery">Search products</label>
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input id="heroSearchQuery" name="q" type="search" value="{{ $filters['q'] }}" placeholder="Search products or categories">
+              <button type="submit">Search <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+          @endif
         </div>
         <div class="shop-hero-benefits" aria-label="Majix quality standards">
           <div><i class="fa-solid fa-flask-vial"></i><span><strong>Research grade</strong><small>Compounds</small></span></div>
@@ -39,12 +47,6 @@
           <div><p><span></span> Search catalogue</p><h2>Results for <em>"{{ $query }}"</em></h2><small>Use the filters to quickly narrow down the Majix collection.</small></div>
           <div class="search-result-count"><strong>{{ $products->total() }}</strong><span>Products found</span></div>
         </header>
-        <form class="search-catalog-form reveal-on-scroll" method="GET" action="{{ route('frontend.search') }}">
-          <label class="visually-hidden" for="searchQuery">Search products</label>
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input id="searchQuery" name="q" type="search" value="{{ $filters['q'] }}" placeholder="Search products or categories">
-          <button type="submit">Search <i class="fa-solid fa-arrow-right"></i></button>
-        </form>
         <div class="shop-layout search-layout">
           <aside class="shop-sidebar search-sidebar reveal-on-scroll" aria-label="Search filters">
             <form method="GET" action="{{ route('frontend.search') }}">
@@ -91,23 +93,12 @@
           </aside>
 
           <div class="shop-products">
-            <div class="shop-toolbar reveal-on-scroll">
-              <div class="shop-toolbar-main"><span>Search results</span><p>Showing {{ $products->firstItem() ?? 0 }}-{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p></div>
-              <form method="GET" action="{{ route('frontend.search') }}" class="sort-form">
-                @foreach (['q', 'category', 'min_price', 'max_price'] as $filterKey)
-                  @if (! empty($filters[$filterKey]))
-                    <input type="hidden" name="{{ $filterKey }}" value="{{ $filters[$filterKey] }}">
-                  @endif
-                @endforeach
-                <label class="visually-hidden" for="searchSort">Sort products</label>
-                <select id="searchSort" name="sort" onchange="this.form.submit()">
-                  <option value="latest" @selected(($filters['sort'] ?? 'latest') === 'latest')>Sort by: Latest</option>
-                  <option value="name" @selected(($filters['sort'] ?? '') === 'name')>Sort by: Name</option>
-                  <option value="price_asc" @selected(($filters['sort'] ?? '') === 'price_asc')>Price: Low to high</option>
-                  <option value="price_desc" @selected(($filters['sort'] ?? '') === 'price_desc')>Price: High to low</option>
-                </select>
-              </form>
+            @if($products->total() > 0)
+            <div class="shop-toolbar search-results-toolbar reveal-on-scroll">
+              <div class="search-results-summary"><i class="fa-solid fa-magnifying-glass"></i><div class="shop-toolbar-main"><span>{{ $products->total() }} products found</span><p>@if($filters['q'])Matching “{{ $filters['q'] }}”@else Explore the complete Majix collection @endif</p></div></div>
+              <div class="search-results-mark"><span></span> Majix verified collection</div>
             </div>
+            @endif
 
             <div class="shop-grid reveal-group">
               @forelse ($products as $product)
@@ -136,7 +127,19 @@
                   <div><strong>&pound;{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong>@if ($product->stock > 0)<button type="button" data-cart-add="{{ $product->id }}" aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button>@else<button class="notify-stock-btn" type="button" data-stock-notify="{{ $product->id }}" data-product-name="{{ $product->name }}">Inform Me</button>@endif</div>
                 </article>
               @empty
-                <section class="search-empty-state"><div><span class="search-empty-icon"><i class="fa-solid fa-magnifying-glass"></i></span><h2>No products found</h2><p>We could not find products matching your search or selected filters. Try a different keyword, category, or wider price range.</p><div class="search-empty-actions"><a class="primary" href="{{ route('frontend.shop') }}">Browse all products</a><a class="secondary" href="{{ route('frontend.search') }}">Clear search filters</a></div></div></section>
+                <section class="search-empty-state">
+                  <div>
+                    <span class="search-empty-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <p class="search-empty-eyebrow">No exact match</p>
+                    <h2>Let’s find the right compound.</h2>
+                    <p>We could not find a product matching “{{ $query }}”. Try another keyword or explore a research category below.</p>
+                    <form class="search-empty-form" method="GET" action="{{ route('frontend.search') }}"><input name="q" type="search" placeholder="Try another product name"><button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search again</button></form>
+                    <div class="search-category-links">
+                      @foreach($categories as $category)<a href="{{ route('frontend.search', ['category' => $category->slug]) }}">{{ $category->name }} <i class="fa-solid fa-arrow-right"></i></a>@endforeach
+                    </div>
+                    <div class="search-empty-actions"><a class="primary" href="{{ route('frontend.shop') }}">Browse full collection</a><a class="secondary" href="{{ route('frontend.search') }}">Reset search</a></div>
+                  </div>
+                </section>
               @endforelse
             </div>
 
