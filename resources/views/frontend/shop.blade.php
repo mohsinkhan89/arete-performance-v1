@@ -1,27 +1,23 @@
 @extends('frontend.layouts.master')
 
 @section('body')
-    <section class="shop-hero">
-      <div class="container">
-        <div class="shop-hero-inner">
-          <div class="shop-hero-copy reveal-up">
-            <p class="eyebrow">Premium performance products</p>
-            <h1>Shop</h1>
-            <p>Explore premium, science-backed supplements designed to help you perform, recover and grow.</p>
-          </div>
-          <div class="hero-feature-slider reveal-up delay-2" data-hero-feature-slider>
-            <div class="hero-features">
-              <div class="hero-feature-slide"><div class="hero-feature"><i class="fa-solid fa-truck-fast"></i><span>Fast &amp; Secure Delivery</span></div></div>
-              <div class="hero-feature-slide"><div class="hero-feature"><i class="fa-solid fa-globe"></i><span>Delivery All Over UK</span></div></div>
-              <div class="hero-feature-slide"><div class="hero-feature border-0"><i class="fa-solid fa-sterling-sign"></i><span>Flat Delivery &pound;4.99</span></div></div>
-            </div>
-            <div class="hero-feature-pagination" aria-label="Delivery benefits pagination"></div>
-          </div>
+    <section class="shop-hero" aria-labelledby="shopHeroTitle">
+      <div class="shop-hero-grid" aria-hidden="true"></div>
+      <div class="container shop-hero-inner">
+        <div class="shop-hero-copy reveal-up">
+          <p class="shop-hero-eyebrow"><span></span> The complete Majix collection</p>
+          <h1 id="shopHeroTitle" class="shop-title-word" aria-label="Shop"><span>S</span><span>H</span><span>O</span><span>P</span></h1>
+          <p>Premium research compounds, clearly organised in one collection.</p>
+        </div>
+        <div class="shop-hero-benefits">
+          <div><i class="fa-solid fa-shield-halved"></i><span><strong>Verified quality</strong><small>Carefully presented products</small></span></div>
+          <div><i class="fa-solid fa-truck-fast"></i><span><strong>Secure delivery</strong><small>Reliable UK-wide service</small></span></div>
+          <div><i class="fa-solid fa-file-shield"></i><span><strong>Clear information</strong><small>Reports where available</small></span></div>
         </div>
       </div>
     </section>
 
-    <section class="shop-catalog section-space">
+    <section class="shop-catalog section-space" id="shopCollection">
       <div class="container">
         <div class="shop-layout">
           <aside class="shop-sidebar reveal-on-scroll" aria-label="Shop filters">
