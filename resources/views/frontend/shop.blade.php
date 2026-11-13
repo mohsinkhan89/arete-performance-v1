@@ -1,31 +1,46 @@
 @extends('frontend.layouts.master')
 
 @section('body')
-    <section class="shop-hero">
-      <div class="container">
-        <div class="shop-hero-inner">
-          <div class="shop-hero-copy reveal-up">
-            <p class="eyebrow">Premium performance products</p>
-            <h1>Shop</h1>
-            <p>Explore premium, science-backed supplements designed to help you perform, recover and grow.</p>
-          </div>
-          <div class="hero-feature-slider reveal-up delay-2" data-hero-feature-slider>
-            <div class="hero-features">
-              <div class="hero-feature-slide"><div class="hero-feature"><i class="fa-solid fa-truck-fast"></i><span>Fast &amp; Secure Delivery</span></div></div>
-              <div class="hero-feature-slide"><div class="hero-feature"><i class="fa-solid fa-globe"></i><span>Delivery All Over UK</span></div></div>
-              <div class="hero-feature-slide"><div class="hero-feature border-0"><i class="fa-solid fa-sterling-sign"></i><span>Flat Delivery &pound;4.99</span></div></div>
-            </div>
-            <div class="hero-feature-pagination" aria-label="Delivery benefits pagination"></div>
-          </div>
+    <section class="shop-hero" aria-labelledby="shopHeroTitle">
+      <div class="shop-hero-grid" aria-hidden="true"></div>
+      <div class="shop-hero-backdrop-text" aria-hidden="true">
+        <span>SHOP</span>
+      </div>
+      <div class="container shop-hero-inner">
+        <div class="shop-hero-copy reveal-up">
+          <p class="shop-hero-eyebrow"><span></span> The complete Majix collection</p>
+          <h1 id="shopHeroTitle" class="shop-title-word" aria-label="Shop"><span>S</span><span>H</span><span>O</span><span>P</span></h1>
+          <p>Premium research compounds, clearly organised in one collection.</p>
+        </div>
+        <div class="shop-hero-benefits">
+          <div><i class="fa-solid fa-flask-vial"></i><span><strong>Research grade</strong><small>Compounds</small></span></div>
+          <div><i class="fa-solid fa-shield-halved"></i><span><strong>Verified purity</strong><small>Quality assured</small></span></div>
+          <div><i class="fa-solid fa-layer-group"></i><span><strong>Consistent</strong><small>Quality</small></span></div>
         </div>
       </div>
     </section>
 
-    <section class="shop-catalog section-space">
+    <section class="shop-catalog section-space" id="shopCollection">
       <div class="container">
+        <header class="majix-catalog-intro reveal-on-scroll">
+          <div>
+            <p><span></span> Research catalogue</p>
+            <h2>Find the right <em>compound.</em></h2>
+            <small>Filter the complete Majix collection and compare products with confidence.</small>
+          </div>
+          <div class="majix-catalog-stats" aria-label="Collection summary">
+            <span><strong>{{ $totalProducts }}</strong><small>Products</small></span>
+            <span><strong>{{ $categories->count() }}</strong><small>Categories</small></span>
+            <span><i class="fa-solid fa-flask-vial"></i><small>Research grade</small></span>
+          </div>
+        </header>
         <div class="shop-layout">
           <aside class="shop-sidebar reveal-on-scroll" aria-label="Shop filters">
             <form method="GET" action="{{ route('frontend.shop') }}">
+              <div class="filter-rail-head">
+                <span><i class="fa-solid fa-sliders"></i></span>
+                <div><small>Refine collection</small><strong>Shop filters</strong></div>
+              </div>
               @if (! empty($filters['q']))
                 <input type="hidden" name="q" value="{{ $filters['q'] }}">
               @endif
@@ -61,11 +76,6 @@
                 </div>
               </div>
 
-              <div class="filter-block">
-                <h2>Lab Tested</h2>
-                <label><input type="checkbox" checked> Yes <strong>({{ $totalProducts }})</strong></label>
-              </div>
-
               <button class="clear-filters" type="submit">Apply filters <i class="fa-solid fa-filter"></i></button>
               <a class="clear-filters filter-reset" href="{{ route('frontend.shop') }}">Clear filters <i class="fa-solid fa-rotate-right"></i></a>
             </form>
@@ -73,7 +83,7 @@
 
           <div class="shop-products">
             <div class="shop-toolbar reveal-on-scroll">
-              <p>Showing {{ $products->firstItem() ?? 0 }}-{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p>
+              <div class="shop-toolbar-main"><span>Majix collection</span><p>Showing {{ $products->firstItem() ?? 0 }}-{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p></div>
               <form method="GET" action="{{ route('frontend.shop') }}" class="sort-form">
                 @foreach (['q', 'category', 'min_price', 'max_price'] as $filterKey)
                   @if (! empty($filters[$filterKey]))
@@ -92,21 +102,21 @@
 
             <div class="shop-grid reveal-group">
               @forelse ($products as $product)
-                <article class="shop-product-card product-card {{ $product->stock <= 0 ? 'is-out-of-stock' : '' }}" id="{{ $product->category?->slug }}" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-url="{{ route('frontend.product-details', $product->slug) }}">
-                  @if ($product->stock <= 0)<span class="tag stock-tag">Out of Stock</span>@elseif ($product->is_featured)<span class="tag">Popular</span>@endif
-                  <img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}">
-                  <small>{{ $product->category?->name }}</small>
-                  <h3>{{ $product->name }}</h3>
-                  <div class="rating">★★★★★ <span>({{ number_format($product->reviews_count) }} reviews)</span></div>
-                  <div class="product-card-tools">
-                    @if ($product->stock > 0)
-                      <div class="product-card-qty" aria-label="{{ $product->name }} quantity"><button type="button" data-card-qty-dec>-</button><span data-card-qty>1</span><button type="button" data-card-qty-inc>+</button></div>
-                    @endif
-                    @if ($product->test_report_image)
-                      <button class="test-report-icon" type="button" data-test-report="{{ url($product->test_report_image) }}" data-test-report-title="{{ $product->name }} test report" aria-label="View {{ $product->name }} test report"><i class="fa-solid fa-flask-vial"></i></button>
-                    @endif
+                <article class="shop-product-card onyx-product-card product-card {{ $product->stock <= 0 ? 'is-out-of-stock' : '' }}" id="{{ $product->category?->slug }}" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-url="{{ route('frontend.product-details', $product->slug) }}">
+                  <div class="onyx-product-badges">
+                    <span class="onyx-product-status {{ $product->stock <= 0 ? 'is-empty' : '' }}">{{ $product->stock <= 0 ? 'Out of stock' : 'In stock' }}</span>
+                    @if($product->is_bestseller || $product->is_featured)<span class="onyx-product-featured"><i class="fa-solid fa-bolt"></i> {{ $product->is_bestseller ? 'Bestseller' : 'Popular' }}</span>@endif
                   </div>
-                  <div><strong>&pound;{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong>@if ($product->stock > 0)<button type="button" data-cart-add="{{ $product->id }}" aria-label="Add {{ $product->name }} to cart"><i class="fa-solid fa-cart-plus"></i></button>@else<button class="notify-stock-btn" type="button" data-stock-notify="{{ $product->id }}" data-product-name="{{ $product->name }}">Inform Me</button>@endif</div>
+                  <a class="onyx-product-image" href="{{ route('frontend.product-details', $product->slug) }}"><img src="{{ url($product->image ?: 'frontend/assets/images/product-bottle.png') }}" alt="{{ $product->name }}"></a>
+                  <div class="onyx-product-content">
+                    <div class="onyx-product-category">{{ $product->category?->name ?: 'Research compound' }}</div>
+                    <a class="onyx-product-title" href="{{ route('frontend.product-details', $product->slug) }}">{{ $product->name }}</a>
+                    <div class="onyx-product-summary">
+                      <div class="onyx-product-rating"><span aria-label="Customer reviews"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span><small>{{ $product->reviews_count > 0 ? $product->reviews_count.' reviews' : 'New arrival' }}</small></div>
+                      <div class="onyx-product-details"><span><strong>&pound;{{ number_format((float) ($product->sale_price ?: $product->price), 2) }}</strong>@if($product->sale_price)<del>&pound;{{ number_format((float) $product->price, 2) }}</del>@endif</span>@if($product->test_report_image)<button class="onyx-report-btn test-report-icon" type="button" data-test-report="{{ url($product->test_report_image) }}" data-test-report-title="{{ $product->name }} test report" aria-label="View {{ $product->name }} test report"><i class="fa-solid fa-file-shield"></i></button>@endif</div>
+                    </div>
+                    @if($product->stock > 0)<button class="onyx-add-cart" type="button" data-cart-add="{{ $product->id }}"><span>Add to cart</span><i class="fa-solid fa-cart-shopping"></i></button>@else<button class="onyx-add-cart notify-stock-btn" type="button" data-stock-notify="{{ $product->id }}" data-product-name="{{ $product->name }}"><span>Notify me</span><i class="fa-regular fa-bell"></i></button>@endif
+                  </div>
                 </article>
               @empty
                 <p>No products found.</p>

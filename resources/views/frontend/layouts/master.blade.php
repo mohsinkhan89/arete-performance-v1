@@ -35,16 +35,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
-    <link href="{{ url('frontend/assets/css/style.css') }}?v={{ urlencode($siteSettings['css_version'] ?? '1.0.0') }}" rel="stylesheet">
+    <link href="{{ url('frontend/assets/css/style.css') }}?v={{ urlencode($siteSettings['css_version'] ?? '1.0.0') }}&build={{ filemtime(public_path('frontend/assets/css/style.css')) }}" rel="stylesheet">
+    @if (Request::path() === '/' || Request::path() === 'shop' || Request::path() === 'search')
+      <link href="{{ url('frontend/assets/css/home-reference.css') }}?v={{ urlencode($siteSettings['css_version'] ?? '1.0.0') }}" rel="stylesheet">
+    @endif
 </head>
 <body class="@yield('body_class', (Request::path() === '/' ? 'home-page' : str_replace('/', '-', Request::path()) . '-page'))">
-  <div class="site-loader" data-site-loader aria-live="polite" aria-label="Loading Majix">
+  <!-- <div class="site-loader" data-site-loader aria-live="polite" aria-label="Loading Majix">
     <div class="loader-ambient" aria-hidden="true"></div>
     <div class="site-loader-content">
       <div class="loader-brand" data-loader-brand data-text="MAJIX">MAJIX</div>
     </div>
-  </div>
+  </div> -->
 
+  <div class="global-announcement"><div class="container"><span><i class="fa-solid fa-truck-fast"></i> Free UK Shipping on Orders Over &pound;99</span></div></div>
   @include('frontend.inc.header')
   <main>
     @yield('body')
