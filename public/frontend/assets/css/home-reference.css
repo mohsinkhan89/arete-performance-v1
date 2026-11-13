@@ -3995,9 +3995,14 @@
     }
 }
 
-/* Final tablet stage: copy and product share one row, navigation belongs to
-   the product column, and assurances form a full-width footer rail. */
+/* Final tablet stage: copy and product share one row, navigation is centred,
+   and assurances form a full-width footer rail. */
 @media (min-width: 768px) and (max-width: 991.98px) {
+    .home-page .onyx-hero {
+        height: 560px;
+        min-height: 560px;
+    }
+
     .home-page .onyx-hero-copy {
         width: 58%;
     }
@@ -4015,10 +4020,10 @@
 
     .home-page .onyx-hero-controls {
         top: auto;
-        right: 19%;
-        bottom: 88px;
-        left: auto;
-        transform: translateX(50%);
+        right: auto;
+        bottom: 79px;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     .home-page .onyx-hero-benefit-slider {
