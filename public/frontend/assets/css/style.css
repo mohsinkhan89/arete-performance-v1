@@ -11921,4 +11921,26 @@ button {
 .shop-page .payment-badges{gap:9px}.shop-page .payment-badges .payment-image{padding:6px 10px;background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.1);border-radius:8px}
 @media(max-width:991.98px){.shop-page .shop-trust-grid{grid-template-columns:repeat(2,1fr)}.shop-page .shop-trust-grid>div{padding:18px 22px}.shop-page .shop-trust-grid>div:nth-child(2){border-right:0}.shop-page .shop-trust-grid>div:nth-child(-n+2){border-bottom:1px solid rgba(255,255,255,.18)}.shop-page .footer-main{grid-template-columns:1fr;gap:42px}}
 @media(max-width:575.98px){.shop-page .shop-trust-grid{grid-template-columns:1fr;padding:18px 0}.shop-page .shop-trust-grid>div,.shop-page .shop-trust-grid>div:first-child{padding:16px 4px;border-right:0;border-bottom:1px solid rgba(255,255,255,.15)}.shop-page .shop-trust-grid>div:last-child{border-bottom:0}.shop-page .site-footer{padding-top:52px}.shop-page .footer-main{padding:0 4px 38px}.shop-page .footer-category-block{padding:22px 18px 12px}.shop-page .footer-category-links{grid-template-columns:1fr}.shop-page .footer-bottom{align-items:flex-start;padding-right:4px;padding-left:4px}}
+
+/* White delivery assurance strip above the shared dark footer. */
+.shop-page .shop-trust{
+  background:#fff;
+  border-top:1px solid #e8ebed;
+  border-bottom:1px solid #e1e5e7;
+}
+.shop-page .shop-trust-grid>div{border-right-color:#d9dee1}
+.shop-page .shop-trust-grid i{
+  color:var(--gold-deep);
+  background:#fffaf0;
+  border-color:var(--gold);
+}
+.shop-page .shop-trust-grid strong{color:#101820}
+.shop-page .shop-trust-grid span{color:#737e85}
+@media(max-width:991.98px){
+  .shop-page .shop-trust-grid>div:nth-child(-n+2){border-bottom-color:#e1e5e7}
+}
+@media(max-width:575.98px){
+  .shop-page .shop-trust-grid>div,
+  .shop-page .shop-trust-grid>div:first-child{border-bottom-color:#e1e5e7}
+}
 .shop-page .shop-hero-benefits{align-self:center}
