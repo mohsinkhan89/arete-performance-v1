@@ -38,27 +38,30 @@
                   supplied for laboratory and research use only.' }}
                </p>
               </div>
-              <div class="onyx-hero-benefits">
-                 <div>
+              <div class="onyx-hero-benefit-slider" data-hero-feature-slider>
+                <div class="onyx-hero-benefits hero-features">
+                 <div class="hero-feature-slide">
                     <i class="fa-solid fa-flask-vial"></i
                     ><span
                        ><strong>Research grade</strong
                        ><small>Compounds</small></span
                     >
                  </div>
-                 <div>
+                 <div class="hero-feature-slide">
                     <i class="fa-solid fa-shield-halved"></i
                     ><span
                        ><strong>Verified purity</strong
                        ><small>Quality assured</small></span
                     >
                  </div>
-                 <div>
+                 <div class="hero-feature-slide">
                     <i class="fa-solid fa-layer-group"></i
                     ><span
                        ><strong>Consistent</strong><small>Quality</small></span
                     >
                  </div>
+                </div>
+                <div class="hero-feature-pagination" aria-label="Product benefits pagination"></div>
               </div>
             <div class="onyx-hero-product">
                <span></span
@@ -88,27 +91,30 @@
                   research use only.
                </p>
               </div>
-              <div class="onyx-hero-benefits">
-                 <div>
+              <div class="onyx-hero-benefit-slider" data-hero-feature-slider>
+                <div class="onyx-hero-benefits hero-features">
+                 <div class="hero-feature-slide">
                     <i class="fa-solid fa-flask-vial"></i
                     ><span
                        ><strong>Research grade</strong
                        ><small>Compounds</small></span
                     >
                  </div>
-                 <div>
+                 <div class="hero-feature-slide">
                     <i class="fa-solid fa-shield-halved"></i
                     ><span
                        ><strong>Verified purity</strong
                        ><small>Quality assured</small></span
                     >
                  </div>
-                 <div>
+                 <div class="hero-feature-slide">
                     <i class="fa-solid fa-layer-group"></i
                     ><span
                        ><strong>Consistent</strong><small>Quality</small></span
                     >
                  </div>
+                </div>
+                <div class="hero-feature-pagination" aria-label="Product benefits pagination"></div>
               </div>
             <div class="onyx-hero-product">
                <span></span

@@ -3216,6 +3216,618 @@
     }
 }
 
+/* Hero benefits carousel and final product/navigation placement. */
+.home-page .onyx-hero-benefit-slider {
+    position: absolute;
+    z-index: 5;
+    bottom: 20px;
+    left: 0;
+    width: 58%;
+}
+
+.home-page main .onyx-hero-benefit-slider .onyx-hero-benefits {
+    position: static;
+    width: 100%;
+    display: flex;
+    margin: 0;
+    overflow: hidden;
+}
+
+.home-page main .onyx-hero-benefit-slider .hero-feature-slide {
+    min-width: 0;
+    flex: 0 0 33.3333%;
+}
+
+.home-page .onyx-hero-benefit-slider .hero-feature-pagination {
+    display: none;
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .home-page .onyx-hero-benefit-slider {
+        right: auto;
+        bottom: 24px;
+        left: 18px;
+        width: 57%;
+    }
+
+    .home-page main .onyx-hero-benefit-slider .hero-feature-slide {
+        flex-basis: 33.3333%;
+    }
+
+    .home-page .onyx-hero-product {
+        right: 2%;
+        left: auto;
+        bottom: 62px;
+        width: 34%;
+        height: 430px;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .home-page .onyx-hero-product {
+        right: -5px;
+        left: auto;
+        bottom: 87px;
+        width: 165px;
+        height: 250px;
+        margin-left: 0;
+    }
+
+    .home-page .onyx-hero-product img {
+        object-position: right bottom;
+    }
+
+    .home-page .onyx-hero-benefit-slider {
+        right: 18px;
+        bottom: 12px;
+        left: 18px;
+        width: auto;
+    }
+
+    .home-page main .onyx-hero-benefit-slider .onyx-hero-benefits {
+        padding-bottom: 13px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+    }
+
+    .home-page main .onyx-hero-benefit-slider .onyx-hero-benefits::-webkit-scrollbar {
+        display: none;
+    }
+
+    .home-page main .onyx-hero-benefit-slider .hero-feature-slide,
+    .home-page main .onyx-hero-benefit-slider .hero-feature-slide:last-child {
+        min-width: 0;
+        flex: 0 0 50%;
+        grid-column: auto;
+        justify-content: flex-start;
+        padding: 0 10px;
+        border-top: 0;
+        border-right: 1px solid rgba(255, 255, 255, .35);
+        scroll-snap-align: start;
+    }
+
+    .home-page main .onyx-hero-benefit-slider .hero-feature-slide:first-child {
+        padding-left: 0;
+    }
+
+    .home-page .onyx-hero-benefit-slider .hero-feature-pagination {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .home-page .onyx-hero-benefit-slider .hero-feature-pagination:empty {
+        display: none;
+    }
+
+    .home-page .onyx-hero-benefit-slider .hero-feature-pagination button {
+        width: 6px;
+        height: 6px;
+        padding: 0;
+        border: 0;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, .35);
+    }
+
+    .home-page .onyx-hero-benefit-slider .hero-feature-pagination button.is-active {
+        width: 18px;
+        background: var(--gold);
+    }
+
+    /* On phones the product slider uses clean arrows only: no dot rail or pill. */
+    .home-page .onyx-hero-controls {
+        right: auto;
+        bottom: 270px;
+        left: 18px;
+        gap: 8px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        backdrop-filter: none;
+    }
+
+    .home-page .onyx-hero-controls .home-hero-pagination {
+        display: none;
+    }
+
+    .home-page .onyx-hero-controls .home-hero-arrow {
+        width: 34px;
+        height: 34px;
+        background: rgba(7, 16, 24, .78);
+        backdrop-filter: blur(8px);
+    }
+}
+
+@media (max-width: 389.98px) {
+    .home-page .onyx-hero-product {
+        right: -10px;
+        width: 150px;
+        height: 232px;
+    }
+
+    .home-page .onyx-hero-benefit-slider {
+        right: 14px;
+        left: 14px;
+    }
+
+    .home-page .onyx-hero-controls {
+        left: 14px;
+    }
+}
+
+/* Final responsive homepage hero
+   These rules stay last so the older homepage breakpoints cannot move the
+   slider controls back over the product image. */
+@media (max-width: 991.98px) {
+    .home-page .site-header {
+        border-bottom: 1px solid rgba(243, 182, 63, .28);
+        background: rgba(3, 8, 12, .97);
+    }
+
+    .home-page .site-header .navbar-toggler {
+        filter: none;
+    }
+
+    .home-page .site-header .navbar-toggler-icon {
+        position: relative;
+        width: 20px;
+        height: 14px;
+        display: inline-block;
+        border-top: 2px solid #fff;
+        border-bottom: 2px solid #fff;
+        background-image: none;
+    }
+
+    .home-page .site-header .navbar-toggler-icon::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 0;
+        left: 0;
+        height: 2px;
+        background: #fff;
+        transform: translateY(-50%);
+    }
+
+    .home-page .site-header .navbar-collapse {
+        top: 100%;
+        margin-top: 0;
+        border-radius: 0 0 14px 14px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .home-page .site-header .navbar {
+        min-height: 84px;
+    }
+
+    .home-page .site-header .brand {
+        width: 150px;
+        height: 66px;
+    }
+
+    .home-page .site-header .brand img {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        object-fit: contain;
+    }
+
+    .home-page .onyx-hero {
+        height: 650px;
+        min-height: 650px;
+    }
+
+    .home-page .onyx-hero-inner {
+        align-items: flex-start;
+        padding-top: 145px;
+    }
+
+    .home-page .onyx-hero-copy {
+        width: 60%;
+        padding: 0;
+    }
+
+    .home-page .onyx-hero-copy h1 {
+        max-width: 500px;
+        font-size: clamp(46px, 6.4vw, 58px) !important;
+    }
+
+    .home-page .onyx-hero-copy > a + p {
+        max-width: 475px;
+        font-size: 14px;
+    }
+
+    .home-page .onyx-hero-product {
+        right: 2%;
+        bottom: 62px;
+        width: 34%;
+        height: 430px;
+        opacity: 1;
+    }
+
+    .home-page main .onyx-hero-benefits {
+        right: auto;
+        bottom: 24px;
+        left: 18px;
+        width: 57%;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .home-page main .onyx-hero-benefits > div {
+        min-width: 0;
+        padding: 0 12px;
+    }
+
+    .home-page .onyx-hero-controls {
+        top: 103px;
+        right: 24px;
+        bottom: auto;
+        left: auto;
+        display: flex;
+        padding: 6px;
+        border: 1px solid rgba(255, 255, 255, .16);
+        border-radius: 999px;
+        background: rgba(7, 16, 24, .74);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, .22);
+        backdrop-filter: blur(10px);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .home-page {
+        --home-hero-heading-size: clamp(38px, 11.6vw, 48px);
+    }
+
+    .home-page .site-header .navbar {
+        min-height: 86px;
+        padding-top: 7px !important;
+        padding-bottom: 7px !important;
+    }
+
+    .home-page .site-header .brand {
+        width: 132px;
+        height: 62px;
+        padding: 0;
+    }
+
+    .home-page .site-header .brand img {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        object-fit: contain;
+    }
+
+    .home-page .site-header .header-mobile-actions {
+        gap: 6px;
+        margin-right: 7px;
+    }
+
+    .home-page .site-header .header-mobile-actions .icon-btn,
+    .home-page .site-header .navbar-toggler {
+        width: 41px;
+        height: 41px;
+    }
+
+    .home-page .onyx-hero {
+        height: 720px;
+        min-height: 720px;
+    }
+
+    .home-page .onyx-hero-bg {
+        background-position: 59% center;
+    }
+
+    .home-page .onyx-hero-bg::after {
+        background:
+            linear-gradient(180deg, rgba(3, 8, 12, .08), rgba(3, 8, 12, .12) 48%, rgba(3, 8, 12, .86) 100%),
+            radial-gradient(circle at 50% 67%, rgba(243, 182, 63, .18), transparent 32%);
+    }
+
+    .home-page .onyx-hero-inner {
+        align-items: flex-start;
+        padding-top: 116px;
+    }
+
+    .home-page .onyx-hero-copy {
+        width: 100%;
+        padding: 0;
+    }
+
+    .home-page .onyx-hero-copy h1 {
+        max-width: none;
+        margin-bottom: 18px;
+        font-size: var(--home-hero-heading-size) !important;
+        line-height: .98;
+        letter-spacing: -.05em;
+    }
+
+    .home-page .onyx-hero-copy > a + p {
+        width: 100%;
+        max-width: 365px;
+        margin-top: 0;
+        color: rgba(255, 255, 255, .91);
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .home-page .onyx-hero-copy > a {
+        margin-top: 9px;
+    }
+
+    .home-page .onyx-primary-btn {
+        min-height: 45px;
+        padding: 12px 18px;
+        gap: 30px;
+        font-size: 10px;
+    }
+
+    .home-page .onyx-hero-product {
+        right: auto;
+        left: 50%;
+        bottom: 92px;
+        width: 145px;
+        height: 198px;
+        margin-left: -72.5px;
+        opacity: 1;
+        pointer-events: none;
+    }
+
+    .home-page .onyx-hero-product span {
+        width: 205px;
+    }
+
+    .home-page .onyx-hero-product img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center bottom;
+    }
+
+    .home-page main .onyx-hero-benefits {
+        right: 18px;
+        bottom: 13px;
+        left: 18px;
+        width: auto;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        row-gap: 7px;
+        margin: 0;
+    }
+
+    .home-page main .onyx-hero-benefits > div {
+        min-width: 0;
+        gap: 8px;
+        padding: 0 10px;
+    }
+
+    .home-page main .onyx-hero-benefits > div:first-child {
+        padding-left: 0;
+    }
+
+    .home-page main .onyx-hero-benefits > div:last-child {
+        grid-column: 1 / -1;
+        justify-content: center;
+        padding: 7px 0 0;
+        border-top: 1px solid rgba(255, 255, 255, .22);
+        border-right: 0;
+    }
+
+    .home-page main .onyx-hero-benefits i {
+        flex: 0 0 auto;
+        font-size: 21px;
+    }
+
+    .home-page main .onyx-hero-benefits span {
+        min-width: 0;
+    }
+
+    .home-page .onyx-hero-controls {
+        z-index: 10;
+        top: auto;
+        right: auto;
+        bottom: 285px;
+        left: 18px;
+        display: flex;
+        gap: 5px;
+        padding: 5px 7px;
+        border: 1px solid rgba(255, 255, 255, .18);
+        border-radius: 999px;
+        background: rgba(7, 16, 24, .76);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, .25);
+        backdrop-filter: blur(10px);
+    }
+
+    .home-page .onyx-hero-controls .home-hero-arrow {
+        width: 30px;
+        height: 30px;
+        font-size: 11px;
+    }
+
+    .home-page .onyx-hero-controls .home-hero-pagination {
+        min-width: 38px;
+        gap: 5px;
+    }
+
+    .home-page .onyx-hero-controls .home-hero-pagination button {
+        width: 6px;
+        height: 6px;
+    }
+
+    .home-page .onyx-hero-controls .home-hero-pagination button.is-active {
+        width: 18px;
+    }
+}
+
+@media (max-width: 389.98px) {
+    .home-page .site-header .brand {
+        width: 115px;
+    }
+
+    .home-page .site-header .header-mobile-actions .icon-btn,
+    .home-page .site-header .navbar-toggler {
+        width: 38px;
+        height: 38px;
+    }
+
+    .home-page .onyx-hero-copy > a + p {
+        max-width: 340px;
+        font-size: 12px;
+    }
+
+    .home-page .onyx-hero-product {
+        width: 136px;
+        height: 187px;
+        margin-left: -68px;
+    }
+
+    .home-page .onyx-hero-controls {
+        left: 14px;
+    }
+
+    .home-page main .onyx-hero-benefits {
+        right: 14px;
+        left: 14px;
+    }
+
+    .home-page main .onyx-hero-benefits > div {
+        padding-right: 7px;
+        padding-left: 7px;
+    }
+}
+
+/* Slider placement must follow the general responsive hero overrides above. */
+@media (max-width: 767.98px) {
+    .home-page .onyx-hero-product {
+        right: -5px;
+        left: auto;
+        bottom: 87px;
+        width: 165px;
+        height: 250px;
+        margin-left: 0;
+    }
+
+    .home-page .onyx-hero-controls {
+        right: auto;
+        bottom: 270px;
+        left: 18px;
+        gap: 8px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        backdrop-filter: none;
+    }
+
+    .home-page .onyx-hero-controls .home-hero-pagination {
+        display: none;
+    }
+
+    .home-page .onyx-hero-controls .home-hero-arrow {
+        width: 34px;
+        height: 34px;
+        background: rgba(7, 16, 24, .78);
+        backdrop-filter: blur(8px);
+    }
+}
+
+@media (max-width: 389.98px) {
+    .home-page .onyx-hero-product {
+        right: -10px;
+        width: 150px;
+        height: 232px;
+        margin-left: 0;
+    }
+
+    .home-page .onyx-hero-controls {
+        left: 14px;
+    }
+}
+
+/* Mobile hero cleanup: solid backdrop and navigation in its own safe zone. */
+@media (max-width: 767.98px) {
+    .home-page .onyx-hero,
+    .home-page .onyx-hero-bg {
+        background: #030608 !important;
+        background-image: none !important;
+    }
+
+    .home-page .onyx-hero-bg {
+        transform: none !important;
+    }
+
+    .home-page .onyx-hero-bg::after {
+        display: none;
+    }
+
+    .home-page .onyx-hero-controls {
+        top: auto !important;
+        right: auto !important;
+        bottom: 185px !important;
+        left: 24px !important;
+        width: auto;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .home-page .onyx-hero-controls .home-hero-arrow {
+        width: 36px;
+        height: 36px;
+        border-color: rgba(255, 255, 255, .36);
+        background: #10191f;
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .3);
+    }
+
+    .home-page .onyx-hero-controls .home-hero-pagination,
+    .home-page .onyx-hero-benefit-slider .hero-feature-pagination {
+        display: none !important;
+    }
+
+    .home-page main .onyx-hero-benefit-slider .onyx-hero-benefits {
+        padding-bottom: 0;
+    }
+}
+
+@media (max-width: 389.98px) {
+    .home-page .onyx-hero-controls {
+        left: 18px !important;
+    }
+}
+
 /* Keep category action clear of long titles. */
 .home-page main .onyx-category-swiper a.onyx-category-card {
     grid-template-columns: 46px minmax(0, 1fr);

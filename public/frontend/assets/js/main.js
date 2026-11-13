@@ -2427,7 +2427,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let autoSlide = null;
     let scrollFrame = null;
 
-    const visibleSlides = () => 2;
+    const visibleSlides = () => mobileQuery.matches ? 2 : 3;
     const pageCount = () => Math.ceil(slides.length / visibleSlides());
     const pageWidth = () => track.clientWidth;
 
@@ -2461,7 +2461,7 @@ document.addEventListener("DOMContentLoaded", () => {
       activePage = 0;
       track.scrollTo({ left: 0, behavior: "auto" });
       if (!pagination) return;
-      pagination.innerHTML = responsiveQuery.matches
+      pagination.innerHTML = responsiveQuery.matches && pageCount() > 1
         ? Array.from({ length: pageCount() }, (_, index) =>
           `<button type="button" aria-label="Show delivery benefits ${index + 1}"></button>`
         ).join("")
