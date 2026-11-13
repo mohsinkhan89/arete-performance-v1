@@ -3998,6 +3998,9 @@
 /* Final tablet stage: copy and product share one row, navigation is centred,
    and assurances form a full-width footer rail. */
 @media (min-width: 768px) and (max-width: 991.98px) {
+    .home-page .onyx-most-ordered-visual img {
+        width: 70%!important;
+    }
     .home-page .onyx-hero {
         height: 560px;
         min-height: 560px;
