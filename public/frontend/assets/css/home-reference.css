@@ -3447,6 +3447,15 @@
         min-height: 650px;
     }
 
+    .home-page .onyx-most-ordered-actions {
+        align-items: start!important;
+        flex-direction: column;
+    }
+    .home-page .onyx-most-ordered-card,
+    .home-page .onyx-most-ordered-card {
+        background: black!important;
+    }
+
     .home-page .onyx-hero-inner {
         align-items: flex-start;
         padding-top: 145px;
@@ -3609,7 +3618,8 @@
     .home-page .onyx-hero-product img {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        /* object-fit: contain; */
+        object-fit: cover;
         object-position: center bottom;
     }
 
@@ -3825,6 +3835,123 @@
 @media (max-width: 389.98px) {
     .home-page .onyx-hero-controls {
         left: 18px !important;
+    }
+}
+
+/* Compact phone composition inspired by a product spotlight card. */
+@media (max-width: 767.98px) {
+    .home-page .onyx-hero {
+        height: 690px;
+        min-height: 690px;
+    }
+
+    .home-page .onyx-hero-inner {
+        padding-top: 25px;
+    }
+
+    .home-page .onyx-hero-copy h1 {
+        margin-bottom: 14px;
+    }
+
+    .home-page .onyx-hero-copy > a + p {
+        max-width: 355px;
+        font-size: 13px;
+        line-height: 1.46;
+    }
+
+    .home-page .onyx-hero-copy > a {
+        margin-top: 8px;
+    }
+
+    .home-page .onyx-hero-product {
+        right: 24px;
+        bottom: 68px;
+        width: 160px;
+        /* height: 245px; */
+        height: 300px;
+    }
+
+    .home-page .onyx-hero-controls {
+        top: auto !important;
+        right: auto !important;
+        bottom: 172px !important;
+        left: 34px !important;
+        gap: 10px;
+    }
+
+    .home-page .onyx-hero-controls .home-hero-arrow {
+        width: 48px;
+        height: 48px;
+        border: 1px solid rgba(243, 182, 63, .58);
+        background: #111c23;
+        color: var(--gold);
+        font-size: 15px;
+    }
+
+    .home-page .onyx-hero-benefit-slider {
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 68px;
+        border-top: 1px solid rgba(243, 182, 63, .28);
+        background: #101b22;
+    }
+
+    .home-page main .onyx-hero-benefit-slider .onyx-hero-benefits {
+        height: 100%;
+        padding: 0;
+    }
+
+    .home-page main .onyx-hero-benefit-slider .hero-feature-slide,
+    .home-page main .onyx-hero-benefit-slider .hero-feature-slide:last-child {
+        height: 68px;
+        flex: 0 0 100%;
+        justify-content: center;
+        gap: 13px;
+        padding: 0 20px;
+        border: 0;
+        text-align: left;
+    }
+
+    .home-page main .onyx-hero-benefit-slider .hero-feature-slide i {
+        font-size: 27px;
+    }
+
+    .home-page main .onyx-hero-benefit-slider .hero-feature-slide strong {
+        font-size: 13px;
+    }
+
+    .home-page main .onyx-hero-benefit-slider .hero-feature-slide small {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 389.98px) {
+    .home-page .onyx-hero {
+        height: 675px;
+        min-height: 675px;
+    }
+
+    .home-page .onyx-hero-inner {
+        padding-top: 21px;
+    }
+
+    .home-page .onyx-hero-product {
+        right: 15px;
+        bottom: 68px;
+        width: 150px;
+        height: 228px;
+    }
+
+    .home-page .onyx-hero-controls {
+        bottom: 164px !important;
+        left: 24px !important;
+    }
+
+    .home-page .onyx-hero-controls .home-hero-arrow {
+        width: 44px;
+        height: 44px;
     }
 }
 
@@ -4491,6 +4618,10 @@
 }
 
 @media(max-width:575px) {
+    .home-page .onyx-most-ordered-card,
+    .home-page .onyx-most-ordered-card {
+        background: black;
+    }
     .home-page .onyx-faq { padding: 54px 0; }
     .home-page .onyx-faq-item.is-active { transform: none; }
     .home-page .onyx-faq-trigger { min-height: 68px; padding: 15px; font-size: 13px; }

@@ -2427,7 +2427,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let autoSlide = null;
     let scrollFrame = null;
 
-    const visibleSlides = () => mobileQuery.matches ? 2 : 3;
+    const visibleSlides = () => mobileQuery.matches ? 1 : 3;
     const pageCount = () => Math.ceil(slides.length / visibleSlides());
     const pageWidth = () => track.clientWidth;
 
