@@ -22,9 +22,25 @@
 
     <section class="shop-catalog section-space" id="shopCollection">
       <div class="container">
+        <header class="majix-catalog-intro reveal-on-scroll">
+          <div>
+            <p><span></span> Research catalogue</p>
+            <h2>Find the right <em>compound.</em></h2>
+            <small>Filter the complete Majix collection and compare products with confidence.</small>
+          </div>
+          <div class="majix-catalog-stats" aria-label="Collection summary">
+            <span><strong>{{ $totalProducts }}</strong><small>Products</small></span>
+            <span><strong>{{ $categories->count() }}</strong><small>Categories</small></span>
+            <span><i class="fa-solid fa-flask-vial"></i><small>Research grade</small></span>
+          </div>
+        </header>
         <div class="shop-layout">
           <aside class="shop-sidebar reveal-on-scroll" aria-label="Shop filters">
             <form method="GET" action="{{ route('frontend.shop') }}">
+              <div class="filter-rail-head">
+                <span><i class="fa-solid fa-sliders"></i></span>
+                <div><small>Refine collection</small><strong>Shop filters</strong></div>
+              </div>
               @if (! empty($filters['q']))
                 <input type="hidden" name="q" value="{{ $filters['q'] }}">
               @endif
@@ -72,7 +88,7 @@
 
           <div class="shop-products">
             <div class="shop-toolbar reveal-on-scroll">
-              <p>Showing {{ $products->firstItem() ?? 0 }}-{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p>
+              <div class="shop-toolbar-main"><span>Majix collection</span><p>Showing {{ $products->firstItem() ?? 0 }}-{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p></div>
               <form method="GET" action="{{ route('frontend.shop') }}" class="sort-form">
                 @foreach (['q', 'category', 'min_price', 'max_price'] as $filterKey)
                   @if (! empty($filters[$filterKey]))
