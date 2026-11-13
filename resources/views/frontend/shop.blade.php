@@ -76,11 +76,6 @@
                 </div>
               </div>
 
-              <div class="filter-block">
-                <h2>Lab Tested</h2>
-                <label><input type="checkbox" checked> Yes <strong>({{ $totalProducts }})</strong></label>
-              </div>
-
               <button class="clear-filters" type="submit">Apply filters <i class="fa-solid fa-filter"></i></button>
               <a class="clear-filters filter-reset" href="{{ route('frontend.shop') }}">Clear filters <i class="fa-solid fa-rotate-right"></i></a>
             </form>
